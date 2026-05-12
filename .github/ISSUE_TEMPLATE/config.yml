@@ -1,6 +1,1 @@
 blank_issues_enabled: false
-
-contact_links:
-  - name: Project Documentation
-    url: https://github.com/krishnabackup/Pragati/docs
-    about: Read project documentation before creating issues.
