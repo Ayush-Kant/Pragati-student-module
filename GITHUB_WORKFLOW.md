@@ -17,7 +17,7 @@ The goal is to:
 
 ```txt
 main
-dev
+develop
 feature/*
 ```
 
