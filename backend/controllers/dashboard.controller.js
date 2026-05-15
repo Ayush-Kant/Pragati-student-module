@@ -10,11 +10,12 @@ import { pool } from "../config/db.js";
 export const getDashboard = async (req, res) => {
   try {
     // req.user comes from JWT payload
-    const userId = req.user.id; // integer user ID from token
-
-    // Find mentor record for this user
+    const userId = req.user.uid; 
+    
     const mentorResult = await pool.query(
-      `SELECT id FROM mentors WHERE user_id = $1`,
+      `SELECT mentors.id FROM mentors 
+       JOIN users ON mentors.user_id = users.id
+       WHERE users.auth_user_id = $1`,
       [userId]
     );
 
