@@ -1,5 +1,5 @@
 -- TABLE 1: auth_users (login credentials)
-CREATE TABLE auth_users (
+CREATE TABLE IF NOT EXISTS auth_users (
   id                  SERIAL PRIMARY KEY,
   email               VARCHAR(255) UNIQUE NOT NULL,
   password_hash       VARCHAR(255) NOT NULL,
@@ -9,9 +9,9 @@ CREATE TABLE auth_users (
 );
 
 -- TABLE 2: users
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id            SERIAL PRIMARY KEY,
-  full_name      VARCHAR(50),
+  full_name     VARCHAR(50) NOT NULL,
   auth_user_id  BIGINT UNIQUE NOT NULL
                 REFERENCES auth_users(id)
                 ON DELETE CASCADE,
@@ -22,7 +22,7 @@ CREATE TABLE users (
 );
 
 -- TABLE 3: mentors
-CREATE TABLE mentors (
+CREATE TABLE IF NOT EXISTS mentors (
   id                SERIAL PRIMARY KEY,
   user_id           INTEGER NOT NULL REFERENCES users(id),
   bio               TEXT,
@@ -33,13 +33,13 @@ CREATE TABLE mentors (
   status            VARCHAR(50) NOT NULL DEFAULT 'pending'
 );
 
--- TABLE 4: drivers
-CREATE TABLE drives (
+-- TABLE 4: drives
+CREATE TABLE IF NOT EXISTS drives (
   id                SERIAL PRIMARY KEY,
   mentor_id         INTEGER NOT NULL REFERENCES mentors(id),
-  title             VARCHAR(500)
+  title             VARCHAR(500) NOT NULL
 );
 
 -- INDEX: fast tag search
-CREATE INDEX idx_mentors_expertise
+CREATE INDEX IF NOT EXISTS idx_mentors_expertise
 ON mentors USING GIN(expertise_tags);
