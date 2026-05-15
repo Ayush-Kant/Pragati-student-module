@@ -52,7 +52,7 @@ async function seedData() {
       INSERT INTO submissions (assessment_id, student_id, status) VALUES 
       ($1, $2, 'submitted'),
       ($1, $3, 'pending')
-    `, [assessmentId, students[0].id, assessmentId, students[1].id]);
+    `, [assessmentId, students[0].id, students[1].id]);
 
     console.log('Inserting recruitment drives...');
     const driveResult = await client.query(`

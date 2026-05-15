@@ -1,9 +1,10 @@
-import express from 'express';
-import authMiddleware from '../middleware/authMiddleware.js';
-import { getDashboard } from '../controllers/dashboard.controller.js';
+import express from "express";
+import { getDashboard } from "../controllers/dashboard.controller.js";
+import authMiddleware from "../middleware/authMiddleware.js"; // ✅ correct path - no 's', correct filename
 
 const router = express.Router();
 
-router.get('/dashboard', authMiddleware, getDashboard);
+// GET /api/mentor/dashboard
+router.get("/dashboard", authMiddleware, getDashboard);
 
 export default router;

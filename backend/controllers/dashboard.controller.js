@@ -3,37 +3,52 @@ import {
   getPendingReviews,
   getUpcomingSessions,
   getTopStudents,
-  getRecentNotifications
-} from '../services/dashboard.service.js';
+  getRecentNotifications,
+} from "../services/dashboard.service.js";
+import { pool } from "../config/db.js";
 
 export const getDashboard = async (req, res) => {
   try {
-    const mentorId = req.user.uid;
+    // req.user comes from JWT payload
+    const userId = req.user.id; // integer user ID from token
 
+    // Find mentor record for this user
+    const mentorResult = await pool.query(
+      `SELECT id FROM mentors WHERE user_id = $1`,
+      [userId]
+    );
+
+    if (!mentorResult.rows.length) {
+      return res.status(403).json({ error: "User is not a mentor" });
+    }
+
+    const mentorId = mentorResult.rows[0].id;
+
+    // Run all 5 queries in parallel
     const [
       activeDrives,
       pendingReviews,
       upcomingSessions,
       topStudents,
-      recentNotifications
+      recentNotifications,
     ] = await Promise.all([
       getActiveDrives(mentorId),
       getPendingReviews(mentorId),
       getUpcomingSessions(mentorId),
       getTopStudents(mentorId),
-      getRecentNotifications(mentorId)
+      getRecentNotifications(mentorId),
     ]);
 
-    res.status(200).json({
+    return res.status(200).json({
       activeDrives,
       pendingReviews,
       upcomingSessions,
       topStudents,
-      recentNotifications
+      recentNotifications,
     });
 
   } catch (error) {
     console.error("Dashboard fetch error:", error);
-    res.status(500).json({ error: 'Dashboard fetch failed' });
+    return res.status(500).json({ error: "Dashboard fetch failed" });
   }
 };
