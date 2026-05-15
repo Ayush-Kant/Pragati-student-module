@@ -5,7 +5,7 @@ export const getActiveDrives = async (mentorId) => {
     const query = `
       SELECT COUNT(*) as count 
       FROM recruitment_drives 
-      WHERE mentor_id = $1
+      WHERE mentor_id = $1 AND status = 'active'
     `;
     const result = await pool.query(query, [mentorId]);
     return parseInt(result.rows[0]?.count || 0, 10);
@@ -19,8 +19,10 @@ export const getPendingReviews = async (mentorId) => {
   try {
     const query = `
       SELECT COUNT(*) as count 
-      FROM submissions 
-      WHERE mentor_id = $1 AND status = 'pending'
+      FROM submissions s
+      JOIN assessments a ON s.assessment_id = a.id
+      JOIN courses c ON a.course_id = c.id
+      WHERE c.mentor_id = $1 AND s.status = 'submitted'
     `;
     const result = await pool.query(query, [mentorId]);
     return parseInt(result.rows[0]?.count || 0, 10);
@@ -33,11 +35,11 @@ export const getPendingReviews = async (mentorId) => {
 export const getUpcomingSessions = async (mentorId) => {
   try {
     const query = `
-      SELECT session_id as "sessionId", title, scheduled_at as "scheduledAt"
+      SELECT id as "sessionId", title, session_type as "sessionType", scheduled_at as "scheduledAt"
       FROM live_sessions 
       WHERE mentor_id = $1 AND scheduled_at > NOW() 
       ORDER BY scheduled_at ASC 
-      LIMIT 5
+      LIMIT 3
     `;
     const result = await pool.query(query, [mentorId]);
     return result.rows.length ? result.rows : [];
@@ -50,10 +52,18 @@ export const getUpcomingSessions = async (mentorId) => {
 export const getTopStudents = async (mentorId) => {
   try {
     const query = `
-      SELECT student_id as "studentId", name, readiness_score as "readinessScore"
-      FROM student_progress 
-      WHERE mentor_id = $1 
-      ORDER BY readiness_score DESC 
+      SELECT 
+        sp.student_id as "studentId", 
+        u.full_name as "name", 
+        sp.readiness_score as "readinessScore"
+      FROM student_progress sp
+      JOIN users u ON sp.student_id = u.id
+      WHERE sp.drive_id IN (
+        SELECT id
+        FROM recruitment_drives
+        WHERE mentor_id = $1
+      )
+      ORDER BY sp.readiness_score DESC 
       LIMIT 5
     `;
     const result = await pool.query(query, [mentorId]);
