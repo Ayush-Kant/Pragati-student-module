@@ -17,9 +17,7 @@ The goal is to:
 
 ```txt
 main
-frontend-dev
-backend-dev
-ai-dev
+develop
 feature/*
 ```
 
@@ -28,9 +26,7 @@ feature/*
 | Branch | Purpose |
 |---|---|
 | `main` | Stable production-ready code |
-| `frontend-dev` | Frontend team integration branch |
-| `backend-dev` | Backend team integration branch |
-| `ai-dev` | AI/ML team integration branch |
+| `develop` | Integration Branch | 
 | `feature/*` | Individual intern work branches |
 
 ---
@@ -63,14 +59,12 @@ git push origin main
 
 ```txt
 main
-frontend-dev
-backend-dev
-ai-dev
+dev
 ```
 
 ### Never
 
-- Force push
+- Force push git push --force 
 - Delete shared branches
 - Push incomplete/broken code
 - Rename shared branches
@@ -87,15 +81,14 @@ ai-dev
 Format:
 
 ```txt
-feature/<name>-<task>
+feature/featurename 
 ```
 
 Examples:
 
 ```txt
-feature/krishna-login-ui
-feature/arjun-auth-api
-feature/rahul-dashboard
+feature/admin-dashboard-be
+feature/admin-dashboard-fe
 ```
 
 ---
@@ -124,32 +117,18 @@ bugfix/login-error
 Move into the project folder:
 
 ```bash
-cd project-name
+cd Pragati
 ```
 
 ---
 
 # Step 2 — Pull Latest Changes
 
-Frontend interns:
+Interns:
 
 ```bash
-git checkout frontend-dev
-git pull origin frontend-dev
-```
-
-Backend interns:
-
-```bash
-git checkout backend-dev
-git pull origin backend-dev
-```
-
-AI interns:
-
-```bash
-git checkout ai-dev
-git pull origin ai-dev
+git checkout develop
+git pull origin develop
 ```
 
 ---
@@ -159,7 +138,7 @@ git pull origin ai-dev
 Example:
 
 ```bash
-git checkout -b feature/krishna-login-ui
+git checkout -b feature/admin-dashboard-fe
 ```
 
 This creates your personal working branch.
@@ -208,7 +187,8 @@ refactor: cleaned auth middleware
 # Step 6 — Push Your Branch
 
 ```bash
-git push origin feature/krishna-login-ui
+git push origin feature/admin-dashboard-fe
+if rebase -> git push --force origin feature/admin-dashboard-fe
 ```
 
 ---
@@ -218,13 +198,7 @@ git push origin feature/krishna-login-ui
 Create PR:
 
 ```txt
-feature/krishna-login-ui → frontend-dev
-```
-
-OR
-
-```txt
-feature/krishna-auth-api → backend-dev
+feature/admin-dashboard-fe → frontend-dev
 ```
 
 ---
@@ -266,21 +240,41 @@ Do NOT merge PR yourself unless instructed.
 
 # Updating Your Branch
 
-Before continuing work:
+Before starting your work everyday:
+
+Note : Should be in your feature branch , check the current branch in IDE then procced to do the below command
 
 ```bash
-git checkout frontend-dev
-git pull origin frontend-dev
-```
+git fetch origin
+git rebase origin/develop
 
-Then:
+if any conflict , resolve using IDE , don't remove others code , include your code and other person's code , If you have doubt contact your captain through slack
+once resolved
+
+git add .
+git rebase --continue
+
+once rebase completed :
+
+git push --force origin feature/admin-dashboard-fe
+
+```
+#if you don't commit any changes and need to sync use below commands:
 
 ```bash
-git checkout feature/your-branch
-git merge frontend-dev
-```
+git stash
 
-Use corresponding dev branch for your team.
+git checkout develop
+
+git pull origin develop
+
+git checkout feature/admin-dashboard-fe
+
+git merge develop
+
+git stash pop
+
+```
 
 ---
 
@@ -324,6 +318,7 @@ build/
 ✅ PR title is correct  
 ✅ Screenshots added if needed  
 
+
 ---
 
 # Good Practices
@@ -357,9 +352,9 @@ build/
 # Example Full Workflow
 
 ```txt
-backend-dev
+develop
     ↓
-feature/krishna-auth-api
+feature/admin-dashboard-be
     ↓
 Work Completed
     ↓
