@@ -129,6 +129,8 @@
 // }
 
 // export default Navbar;
+
+import { useNavigate } from "react-router-dom";
 import {
   FaBell,
   FaSearch,
@@ -137,13 +139,21 @@ import {
   FaSun,
 } from "react-icons/fa";
 
+
 function AdminNavbar({
   openSidebar,
   setOpenSidebar,
   darkMode,
   setDarkMode,
+  profile
 }) {
-
+  const navigate = useNavigate();
+  const initials =
+    profile?.fullName
+      ?.split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase() || "AD";
   return (
     <header
       className={`
@@ -250,9 +260,12 @@ function AdminNavbar({
         </button>
 
         {/* Profile */}
-        <div className="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold">
-          AD
-        </div>
+         <div
+  onClick={() => navigate("/admin/profile")}
+  className="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold cursor-pointer"
+>
+  {initials}
+</div>
 
       </div>
     </header>
