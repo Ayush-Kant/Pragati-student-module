@@ -1,16 +1,13 @@
-import { Toaster } from "react-hot-toast";
-import { Routes, Route } from 'react-router-dom';
-import Dashboard from './features/mentor/pages/Dashboard';
+
+import './App.css'
 
 function App() {
+
   return (
-    <>
-      <Toaster />
-      <Routes>
-        <Route path='/mentor/dashboard' element={<Dashboard/>}/>
-      </Routes>
+    <> 
+    <h1 className='text-amber-200 text-9xl'>Hello World</h1>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
