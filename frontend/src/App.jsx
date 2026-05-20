@@ -1,9 +1,10 @@
 
 // import './App.css'
 import { Toaster } from "react-hot-toast";
+import {Routes,Route} from 'react-router-dom'
+import Dashboard from './features/mentor/pages/Dashboard';
 
 import AdminProfile from './features/admin/pages/AdminProfile'
-import {Routes,Route} from 'react-router-dom'
 import AdminLayout from './features/admin/adminLayout'
 import AdminDashboard from './features/admin/adminDashboard/AdminDashboard'
 // import AdminProfile from './features/admin/adminProfile/AdminProfile'
@@ -22,6 +23,9 @@ function App() {
     <>
       <Toaster />
       <Routes>
+
+        <Route path='/mentor/dashboard' element={<Dashboard/>}/>
+
         {/* ================= ADMIN ROUTES ================= */}
         <Route path='/admin' element={<AdminLayout/>}>
           <Route path='profile' element={<AdminProfile/>}/>
