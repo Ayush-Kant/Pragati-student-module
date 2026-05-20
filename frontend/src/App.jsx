@@ -1,13 +1,23 @@
-
 import './App.css'
+import { useState } from "react";
+
+import LoginPage from "./features/student/pages/auth/LoginPage";
+import RegisterPage from "./features/student/pages/auth/RegisterPage";
 
 function App() {
 
+  // page switch state
+  const [showLogin, setShowLogin] = useState(true);
+
   return (
-    <> 
-    <h1 className='text-amber-200 text-9xl'>Hello World</h1>
+    <>
+      {showLogin ? (
+        <LoginPage onNavigate={() => setShowLogin(false)} />
+      ) : (
+        <RegisterPage onNavigate={() => setShowLogin(true)} />
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
