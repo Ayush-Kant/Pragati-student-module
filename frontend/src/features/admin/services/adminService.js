@@ -4,6 +4,28 @@ const API = axios.create({
   baseURL: "http://localhost:5000",
 });
 
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const getAdminProfile = async () => {
   const response = await API.get("/profile");
   return response.data;
@@ -90,4 +112,28 @@ export const suspendCollege = async (
   catch (error) {
     throw error;
   }
+};
+export const fetchDashboardStats = async () => {
+  const response = await API.get("/api/admin/dashboard/stats");
+  return response.data;
+};
+
+export const fetchDashboardFunnel = async () => {
+  const response = await API.get("/api/admin/dashboard/funnel");
+  return response.data;
+};
+
+export const fetchCompanyStats = async () => {
+  const response = await API.get("/api/admin/dashboard/company-stats");
+  return response.data;
+};
+
+export const fetchCollegePerformance = async () => {
+  const response = await API.get("/api/admin/dashboard/college-performance");
+  return response.data;
+};
+
+export const fetchActivityFeed = async () => {
+  const response = await API.get("/api/admin/dashboard/activity-feed");
+  return response.data;
 };
