@@ -4,8 +4,16 @@ import { Outlet } from "react-router-dom";
 import AdminNavbar from "./adminNavbar/AdminNavbar";
 import AdminSidebar from "./adminSidebar/AdminSidebar";
 import AdminFooter from "./adminFooter/AdminFooter";
+import { useAdminProfile } from "./hooks/useAdminProfile";
 
 const AdminLayout = () => {
+
+  const {
+    profile,
+    loading,
+    error,
+    saveProfile
+  } = useAdminProfile();
 
   // Sidebar Toggle
   const [openSidebar, setOpenSidebar] = useState(false);
@@ -32,6 +40,7 @@ const AdminLayout = () => {
         setOpenSidebar={setOpenSidebar}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        profile={profile}
       />
 
       <div className="flex">
@@ -49,7 +58,14 @@ const AdminLayout = () => {
           {/* Page Content */}
           <main className="flex-1 pt-20 p-6">
 
-            <Outlet />
+            <Outlet
+              context={{
+              profile,
+              loading,
+              error,
+              saveProfile
+            }}
+          />
 
           </main>
 
