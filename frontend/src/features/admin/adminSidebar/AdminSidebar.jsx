@@ -784,10 +784,51 @@ function AdminSidebar({
                 `}
               >
 
+                
                 {/* Icon */}
-                <div className="text-lg">
-                  {item.icon}
-                </div>
+               <div
+                  className={`
+                    flex items-center justify-center
+                    w-10 h-10 rounded-xl
+                    text-lg
+
+                ${
+                  
+                    item.title === "Dashboard"
+                    ? "bg-green-500 text-white"
+
+                    : item.title === "Companies"
+                    ? "bg-orange-500 text-white"
+
+                    : item.title === "Colleges"
+                    ? "bg-yellow-500 text-white"
+
+                    : item.title === "Students"
+                    ? "bg-violet-500 text-white"
+
+                    : item.title === "Mentors"
+                    ? "bg-sky-600 text-white"
+
+                    : item.title === "Assessments"
+                    ? "bg-slate-900 text-white"
+
+                    : item.title === "Training LMS"
+                    ? "bg-cyan-500 text-white"
+
+                     : item.title === "Drives"
+                     ? "bg-red-500 text-white"
+
+                     : item.title === "Notifications"
+                     ? "bg-pink-500 text-white"
+
+                     : "bg-indigo-500 text-white"
+                    }
+                     
+  `                }
+              >
+                {item.icon}
+              </div>
+            {/* Icon */}
 
                 {/* Title */}
                 <span className="font-medium text-sm">
