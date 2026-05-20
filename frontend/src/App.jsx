@@ -6,7 +6,6 @@ import RegisterPage from "./features/student/pages/auth/RegisterPage";
 
 function App() {
 
-  // page switch state
   const [showLogin, setShowLogin] = useState(true);
 
   return (
