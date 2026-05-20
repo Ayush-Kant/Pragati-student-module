@@ -3,14 +3,15 @@ import toast from "react-hot-toast";
 import { useAdminProfile } from "../hooks/useAdminProfile";
 import AdminProfileCard from "../components/AdminProfileCard";
 import AdminEditForm from "../components/AdminEditForm";
+import { useOutletContext } from "react-router-dom";
 
 const AdminProfile = () => {
   const {
-    profile,
-    loading,
-    error,
-    saveProfile,
-  } = useAdminProfile();
+  profile,
+  loading,
+  error,
+  saveProfile,
+} = useOutletContext();
 
   const [isEditing, setIsEditing] = useState(false);
 
