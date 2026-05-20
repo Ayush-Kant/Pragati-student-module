@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // React Router Navigation hook
 
-const LoginPage = ({ onNavigate }) => {
+const LoginPage = () => {
+  const navigate = useNavigate(); // Hook initialization
+
   // State for form fields
   const [formData, setFormData] = useState({
     email: '',
@@ -52,8 +55,7 @@ const LoginPage = ({ onNavigate }) => {
       setErrors(newErrors);
     } else {
       console.log('Login form submitted successfully:', formData);
-
-      // Backend integration logic goes here
+      // Backend api call hooks ikkada pettukochu (ex: login successful ayyaka navigate('/student') cheyochu)
     }
   };
 
@@ -68,29 +70,20 @@ const LoginPage = ({ onNavigate }) => {
           <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
             Welcome back
           </h2>
-
           <p className="mt-2 text-sm text-gray-600">
             Please enter your details to sign in
           </p>
         </div>
 
         {/* Form Section */}
-        <form
-          className="mt-8 space-y-6"
-          onSubmit={handleSubmit}
-          noValidate
-        >
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
           <div className="space-y-5">
 
             {/* Email Input Field */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email Address
               </label>
-
               <input
                 id="email"
                 name="email"
@@ -100,17 +93,11 @@ const LoginPage = ({ onNavigate }) => {
                 onChange={handleChange}
                 placeholder="you@example.com"
                 className={`block w-full px-4 py-2.5 bg-gray-50 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition duration-200 sm:text-sm ${
-                  errors.email
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300'
+                  errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                 }`}
               />
-
               {errors.email && (
-                <p
-                  className="mt-1.5 text-xs text-red-600 font-medium"
-                  id="email-error"
-                >
+                <p className="mt-1.5 text-xs text-red-600 font-medium" id="email-error">
                   {errors.email}
                 </p>
               )}
@@ -118,13 +105,9 @@ const LoginPage = ({ onNavigate }) => {
 
             {/* Password Input Field */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-
               <div className="relative">
                 <input
                   id="password"
@@ -135,12 +118,9 @@ const LoginPage = ({ onNavigate }) => {
                   onChange={handleChange}
                   placeholder="••••••••"
                   className={`block w-full px-4 py-2.5 bg-gray-50 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition duration-200 sm:text-sm pr-12 ${
-                    errors.password
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-300'
+                    errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                   }`}
                 />
-
                 {/* Show/Hide Password Toggle Button */}
                 <button
                   type="button"
@@ -150,12 +130,8 @@ const LoginPage = ({ onNavigate }) => {
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
-
               {errors.password && (
-                <p
-                  className="mt-1.5 text-xs text-red-600 font-medium"
-                  id="password-error"
-                >
+                <p className="mt-1.5 text-xs text-red-600 font-medium" id="password-error">
                   {errors.password}
                 </p>
               )}
@@ -177,10 +153,9 @@ const LoginPage = ({ onNavigate }) => {
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
-
             <button
               type="button"
-              onClick={onNavigate}
+              onClick={() => navigate('/register')} // Hooks direct route changing
               className="font-semibold text-blue-600 hover:text-blue-500 focus:outline-none underline-offset-4 hover:underline transition-all"
             >
               Sign up for free

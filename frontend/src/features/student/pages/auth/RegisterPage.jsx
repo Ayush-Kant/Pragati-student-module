@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // React Router Navigation hook
 
-const RegisterPage = ({ onNavigate }) => {
+const RegisterPage = () => {
+  const navigate = useNavigate(); // Hook initialization
+
   // State management for form data
   const [formData, setFormData] = useState({
     email: '',
@@ -101,8 +104,7 @@ const RegisterPage = ({ onNavigate }) => {
       setErrors(newErrors);
     } else {
       console.log('Registration data structurally ready:', formData);
-
-      // Outbound dispatch logic safely hooks here
+      // Backend api success ayyaka login screen ki toseyyochu: navigate('/login')
     }
   };
 
@@ -117,29 +119,20 @@ const RegisterPage = ({ onNavigate }) => {
           <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
             Create an account
           </h2>
-
           <p className="mt-2 text-sm text-gray-600">
             Start managing your onboarding module
           </p>
         </div>
 
         {/* Interactive Registration Document Tree */}
-        <form
-          className="mt-8 space-y-5"
-          onSubmit={handleSubmit}
-          noValidate
-        >
+        <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
           <div className="space-y-4">
 
             {/* Target Email Vector */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email Address
               </label>
-
               <input
                 id="email"
                 name="email"
@@ -148,12 +141,9 @@ const RegisterPage = ({ onNavigate }) => {
                 onChange={handleChange}
                 placeholder="you@example.com"
                 className={`block w-full px-4 py-2.5 bg-gray-50 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition duration-200 sm:text-sm ${
-                  errors.email
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300'
+                  errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                 }`}
               />
-
               {errors.email && (
                 <p className="mt-1.5 text-xs text-red-600 font-medium">
                   {errors.email}
@@ -163,13 +153,9 @@ const RegisterPage = ({ onNavigate }) => {
 
             {/* Primary Secure Credential Parameter */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-
               <div className="relative">
                 <input
                   id="password"
@@ -179,12 +165,9 @@ const RegisterPage = ({ onNavigate }) => {
                   onChange={handleChange}
                   placeholder="••••••••"
                   className={`block w-full px-4 py-2.5 bg-gray-50 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition duration-200 sm:text-sm pr-12 ${
-                    errors.password
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-300'
+                    errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                   }`}
                 />
-
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -197,27 +180,14 @@ const RegisterPage = ({ onNavigate }) => {
               {/* Dynamic Structural Strength Evaluator Bar */}
               {formData.password && (
                 <div className="mt-2 space-y-1.5">
-
                   <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${strength.color} ${strength.width} transition-all duration-300 ease-out`}
-                    />
+                    <div className={`h-full ${strength.color} ${strength.width} transition-all duration-300 ease-out`} />
                   </div>
-
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500">
-                      Password strength:
-                    </span>
-
-                    <span
-                      className={`font-semibold ${
-                        strength.label === 'Weak'
-                          ? 'text-red-500'
-                          : strength.label === 'Medium'
-                          ? 'text-yellow-600'
-                          : 'text-green-600'
-                      }`}
-                    >
+                    <span className="text-gray-500">Password strength:</span>
+                    <span className={`font-semibold ${
+                      strength.label === 'Weak' ? 'text-red-500' : strength.label === 'Medium' ? 'text-yellow-600' : 'text-green-600'
+                    }`}>
                       {strength.label}
                     </span>
                   </div>
@@ -233,13 +203,9 @@ const RegisterPage = ({ onNavigate }) => {
 
             {/* Verification Credential Shadow Sync Parameter */}
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
                 Confirm Password
               </label>
-
               <div className="relative">
                 <input
                   id="confirmPassword"
@@ -249,23 +215,17 @@ const RegisterPage = ({ onNavigate }) => {
                   onChange={handleChange}
                   placeholder="••••••••"
                   className={`block w-full px-4 py-2.5 bg-gray-50 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition duration-200 sm:text-sm pr-12 ${
-                    errors.confirmPassword
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-300'
+                    errors.confirmPassword ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                   }`}
                 />
-
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors focus:outline-none"
                 >
                   {showConfirmPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
-
               {errors.confirmPassword && (
                 <p className="mt-1.5 text-xs text-red-600 font-medium">
                   {errors.confirmPassword}
@@ -289,10 +249,9 @@ const RegisterPage = ({ onNavigate }) => {
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
             Already have an account?{' '}
-
             <button
               type="button"
-              onClick={onNavigate}
+              onClick={() => navigate('/login')}
               className="font-semibold text-blue-600 hover:text-blue-500 focus:outline-none underline-offset-4 hover:underline transition-all"
             >
               Sign in
