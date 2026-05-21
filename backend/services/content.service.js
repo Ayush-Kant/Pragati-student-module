@@ -1,4 +1,10 @@
+// services/course.service.js
+
 import { pool } from "../config/db.js";
+
+// =========================
+// CREATE COURSE
+// =========================
 
 export const createCourseService = async ({
   mentorId,
@@ -8,7 +14,7 @@ export const createCourseService = async ({
   driveId,
 }) => {
   try {
-    // ownership + active drive check
+    // verify drive ownership
     const driveCheckQuery = `
       SELECT id
       FROM drives
@@ -17,7 +23,7 @@ export const createCourseService = async ({
         AND is_active = true
     `;
 
-    const driveCheck = await client.query(driveCheckQuery, [driveId, mentorId]);
+    const driveCheck = await pool.query(driveCheckQuery, [driveId, mentorId]);
 
     if (driveCheck.rows.length === 0) {
       return {
@@ -39,7 +45,7 @@ export const createCourseService = async ({
       RETURNING id, status
     `;
 
-    const courseResult = await client.query(createCourseQuery, [
+    const courseResult = await pool.query(createCourseQuery, [
       title.trim(),
       description?.trim() || "",
       skillTags,
@@ -61,204 +67,155 @@ export const createCourseService = async ({
       RETURNING id
     `;
 
-    const moduleResult = await client.query(createModuleQuery, [
+    const moduleResult = await pool.query(createModuleQuery, [
       createdCourse.id,
       "Module 1",
       0,
     ]);
 
-    const createdModule = moduleResult.rows[0];
-
     return {
       courseId: createdCourse.id,
-      firstModuleId: createdModule.id,
+      firstModuleId: moduleResult.rows[0].id,
       status: createdCourse.status,
     };
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 
+// =========================
+// GET ALL COURSES
+// =========================
+
 export const getCoursesService = async ({ mentorId, status, driveId }) => {
   try {
-    const getCoursesQuery = `SELECT id, mentor_id, drive_id, title, skill_tags, status, created_at FROM courses WHERE mentor_id = $1`;
+    let query = `
+      SELECT
+        courses.id AS "courseId",
+        courses.title,
+        courses.skill_tags AS "skillTags",
+        courses.status,
+        courses.drive_id AS "driveId",
+        COUNT(modules.id)::int AS "moduleCount",
+        courses.created_at AS "createdAt"
 
-    // optional status filter
+      FROM courses
+
+      LEFT JOIN modules
+        ON modules.course_id = courses.id
+
+      WHERE courses.mentor_id = $1
+    `;
+
+    const values = [mentorId];
+
     if (status) {
       values.push(status);
 
       query += `
-      AND status = $${values.length}
-    `;
+        AND courses.status = $${values.length}
+      `;
     }
 
-    // optional drive filter
     if (driveId) {
       values.push(driveId);
 
       query += `
-      AND drive_id = $${values.length}
-    `;
+        AND courses.drive_id = $${values.length}
+      `;
     }
 
     query += `
-    ORDER BY created_at DESC
-  `;
+      GROUP BY courses.id
+      ORDER BY courses.created_at DESC
+    `;
 
     const result = await pool.query(query, values);
 
     return result.rows;
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    throw error;
   }
 };
+
+// =========================
+// GET COURSE BY ID
+// =========================
 
 export const getCourseByIdService = async ({ mentorId, courseId }) => {
-  const getCourseByIdQuery = `
-    SELECT
-      courses.id AS course_id,
-      courses.title,
-      courses.status,
-      courses.skill_tags,
-
-      modules.id AS module_id,
-      modules.title AS module_title,
-      modules.order_index
-
-    FROM courses
-    LEFT JOIN modules
-      ON modules.course_id = courses.id
-
-    WHERE courses.id = $1
-      AND courses.mentor_id = $2
-
-    ORDER BY modules.order_index ASC
-  `;
-
-  const result = await pool.query(getCourseByIdQuery, [courseId, mentorId]);
-
-  // course not found or not owned
-  if (result.rows.length === 0) {
-    return null;
-  }
-
-  const firstRow = result.rows[0];
-
-  const formattedCourse = {
-    courseId: firstRow.course_id,
-    title: firstRow.title,
-    status: firstRow.status,
-    skillTags: firstRow.skill_tags || [],
-    modules: [],
-  };
-
-  for (const row of result.rows) {
-    if (row.module_id) {
-      formattedCourse.modules.push({
-        moduleId: row.module_id,
-        title: row.module_title,
-        orderIndex: row.order_index,
-        lessons: [],
-      });
-    }
-  }
-
-  return formattedCourse;
-};
-
-// services/course.service.js
-
-import { pool } from "../config/db.js";
-
-export const updateCourseService = async ({
-  courseId,
-  mentorId,
-  title,
-  description,
-  skillTags,
-  status,
-}) => {
   try {
-    // check ownership
-    const checkCourseQuery = `
-      SELECT id
+    // check existence
+    const courseCheckQuery = `
+      SELECT id, mentor_id
       FROM courses
       WHERE id = $1
-        AND mentor_id = $2
     `;
 
-    const checkCourseResult = await pool.query(
-      checkCourseQuery,
-      [courseId, mentorId]
-    );
+    const courseCheck = await pool.query(courseCheckQuery, [courseId]);
 
-    if (checkCourseResult.rows.length === 0) {
+    if (courseCheck.rows.length === 0) {
       return {
         statusCode: 404,
-        success: false,
         message: "Course not found",
       };
     }
 
-    const updates = [];
-    const values = [];
-    let index = 1;
-
-    if (title !== undefined) {
-      updates.push(`title = $${index++}`);
-      values.push(title.trim());
-    }
-
-    if (description !== undefined) {
-      updates.push(`description = $${index++}`);
-      values.push(description.trim());
-    }
-
-    if (skillTags !== undefined) {
-      updates.push(`skill_tags = $${index++}`);
-      values.push(skillTags);
-    }
-
-    if (status !== undefined) {
-      updates.push(`status = $${index++}`);
-      values.push(status);
-    }
-
-    // no fields provided
-    if (updates.length === 0) {
+    if (courseCheck.rows[0].mentor_id !== mentorId) {
       return {
-        statusCode: 400,
-        success: false,
-        message: "No fields provided for update",
+        statusCode: 403,
+        message: "Forbidden",
       };
     }
 
-    values.push(courseId);
+    const getCourseQuery = `
+      SELECT
+        courses.id AS course_id,
+        courses.title,
+        courses.status,
+        courses.skill_tags,
 
-    const updateCourseQuery = `
-      UPDATE courses
-      SET ${updates.join(", ")}
-      WHERE id = $${index}
-      RETURNING id, status
+        modules.id AS module_id,
+        modules.title AS module_title,
+        modules.order_index
+
+      FROM courses
+
+      LEFT JOIN modules
+        ON modules.course_id = courses.id
+
+      WHERE courses.id = $1
+
+      ORDER BY modules.order_index ASC
     `;
 
-    const updateResult = await pool.query(
-      updateCourseQuery,
-      values
-    );
+    const result = await pool.query(getCourseQuery, [courseId]);
+
+    const firstRow = result.rows[0];
+
+    const formattedCourse = {
+      courseId: firstRow.course_id,
+      title: firstRow.title,
+      status: firstRow.status,
+      skillTags: firstRow.skill_tags || [],
+      modules: [],
+    };
+
+    for (const row of result.rows) {
+      if (row.module_id) {
+        formattedCourse.modules.push({
+          moduleId: row.module_id,
+          title: row.module_title,
+          orderIndex: row.order_index,
+          lessons: [],
+        });
+      }
+    }
 
     return {
       statusCode: 200,
-      success: true,
-      courseId: updateResult.rows[0].id,
-      status: updateResult.rows[0].status,
+      data: formattedCourse,
     };
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    throw error;
   }
 };
-
-export const archiveCourseService = async({})
-
-// addModuleService
-// deleteModuleService

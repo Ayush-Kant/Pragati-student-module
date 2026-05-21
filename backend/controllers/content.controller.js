@@ -3,6 +3,9 @@ import {
   getCoursesService,
   getCourseByIdService,
   updateCourseService,
+  deleteCourseService,
+  createModuleService,
+  deleteModuleService,
 } from "../services/course.service.js";
 
 export const createCourse = async (req, res) => {
@@ -112,7 +115,95 @@ export const updateCourse = async (req, res) => {
     });
   }
 };
-// deleteCourse
 
-// addModule
-// deleteModule
+export const deleteCourse = async (req, res) => {
+  try {
+    const mentorId = req.user.id;
+    const { courseId } = req.params;
+
+    const result = await deleteCourseService({
+      courseId,
+      mentorId,
+    });
+
+    return res.status(result.statusCode).json({
+      success: result.success,
+      message: result.message,
+    });
+  } catch (error) {
+    console.error("Delete Course Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const addModule = async (req, res) => {
+  try {
+    const mentorId = req.user.id;
+    const { courseId } = req.params;
+
+    const { title, orderIndex } = req.body;
+
+    if (!title || title.trim().length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: "Title must be at least 3 characters",
+      });
+    }
+
+    if (orderIndex === undefined || Number(orderIndex) < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid orderIndex is required",
+      });
+    }
+
+    const result = await createModuleService({
+      courseId,
+      mentorId,
+      title,
+      orderIndex,
+    });
+
+    return res.status(result.statusCode).json({
+      success: result.success,
+      moduleId: result.moduleId,
+      orderIndex: result.orderIndex,
+      message: result.message,
+    });
+  } catch (error) {
+    console.error("Add Module Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const deleteModule = async (req, res) => {
+  try {
+    const mentorId = req.user.id;
+    const { moduleId } = req.params;
+
+    const result = await deleteModuleService({
+      moduleId,
+      mentorId,
+    });
+
+    return res.status(result.statusCode).json({
+      success: result.success,
+      message: result.message,
+    });
+  } catch (error) {
+    console.error("Delete Module Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
