@@ -13,3 +13,15 @@ export const updateAdminProfile = async (profileData) => {
   const response = await API.put("/profile", profileData);
   return response.data;
 };
+
+
+// getColleges()
+// getCollegeById()
+// getCollegeStats()
+
+// approveCollege()
+// rejectCollege()
+// suspendCollege()
+
+// getCollegeRankings()
+// getNeedsRecruitment()
