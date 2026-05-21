@@ -7,21 +7,32 @@ import { pool } from "../config/db.js";
 // =========================
 
 export const createCourseService = async ({
-  mentorId,
+  userId,
   title,
   description,
   skillTags,
   driveId,
 }) => {
   try {
+    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+
     // verify drive ownership
     const driveCheckQuery = `
       SELECT id
       FROM drives
       WHERE id = $1
         AND mentor_id = $2
-        AND is_active = true
     `;
+
+    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
+
+    const mentorId = mentorResult.rows[0]?.id;
+
+    if (!mentorId) {
+      return {
+        status: "FORBIDDEN",
+      };
+    }
 
     const driveCheck = await pool.query(driveCheckQuery, [driveId, mentorId]);
 
@@ -79,7 +90,7 @@ export const createCourseService = async ({
       status: createdCourse.status,
     };
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 };
 
@@ -87,7 +98,7 @@ export const createCourseService = async ({
 // GET ALL COURSES
 // =========================
 
-export const getCoursesService = async ({ mentorId, status, driveId }) => {
+export const getCoursesService = async ({ userId, status, driveId }) => {
   try {
     let query = `
       SELECT
@@ -106,7 +117,17 @@ export const getCoursesService = async ({ mentorId, status, driveId }) => {
 
       WHERE courses.mentor_id = $1
     `;
+    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
 
+    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
+
+    const mentorId = mentorResult.rows[0]?.id;
+
+    if (!mentorId) {
+      return {
+        status: "FORBIDDEN",
+      };
+    }
     const values = [mentorId];
 
     if (status) {
@@ -142,7 +163,7 @@ export const getCoursesService = async ({ mentorId, status, driveId }) => {
 // GET COURSE BY ID
 // =========================
 
-export const getCourseByIdService = async ({ mentorId, courseId }) => {
+export const getCourseByIdService = async ({ userId, courseId }) => {
   try {
     // check existence
     const courseCheckQuery = `
@@ -150,6 +171,18 @@ export const getCourseByIdService = async ({ mentorId, courseId }) => {
       FROM courses
       WHERE id = $1
     `;
+
+    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+
+    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
+
+    const mentorId = mentorResult.rows[0]?.id;
+
+    if (!mentorId) {
+      return {
+        status: "FORBIDDEN",
+      };
+    }
 
     const courseCheck = await pool.query(courseCheckQuery, [courseId]);
 
@@ -217,5 +250,288 @@ export const getCourseByIdService = async ({ mentorId, courseId }) => {
     };
   } catch (error) {
     throw error;
+  }
+};
+
+// =========================
+// UPDATE COURSE
+// =========================
+
+export const updateCourseService = async ({
+  courseId,
+  userId,
+  title,
+  description,
+  skillTags,
+  status,
+}) => {
+  try {
+    // check ownership
+    const checkCourseQuery = `
+      SELECT id
+      FROM courses
+      WHERE id = $1
+        AND mentor_id = $2
+    `;
+
+    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+
+    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
+
+    const mentorId = mentorResult.rows[0]?.id;
+
+    if (!mentorId) {
+      return {
+        status: "FORBIDDEN",
+      };
+    }
+
+    const checkCourseResult = await pool.query(checkCourseQuery, [
+      courseId,
+      mentorId,
+    ]);
+
+    if (checkCourseResult.rows.length === 0) {
+      return {
+        statusCode: 404,
+        success: false,
+        message: "Course not found",
+      };
+    }
+
+    const updates = [];
+    const values = [];
+    let index = 1;
+
+    if (title !== undefined) {
+      updates.push(`title = $${index++}`);
+      values.push(title.trim());
+    }
+
+    if (description !== undefined) {
+      updates.push(`description = $${index++}`);
+      values.push(description.trim());
+    }
+
+    if (skillTags !== undefined) {
+      updates.push(`skill_tags = $${index++}`);
+      values.push(skillTags);
+    }
+
+    if (status !== undefined) {
+      updates.push(`status = $${index++}`);
+      values.push(status);
+    }
+
+    // no fields provided
+    if (updates.length === 0) {
+      return {
+        statusCode: 400,
+        success: false,
+        message: "No fields provided for update",
+      };
+    }
+
+    values.push(courseId);
+
+    const updateCourseQuery = `
+      UPDATE courses
+      SET ${updates.join(", ")}
+      WHERE id = $${index}
+      RETURNING id, status
+    `;
+
+    const updateResult = await pool.query(updateCourseQuery, values);
+
+    return {
+      statusCode: 200,
+      success: true,
+      courseId: updateResult.rows[0].id,
+      status: updateResult.rows[0].status,
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
+// =========================
+// ARCHIVE COURSE
+// =========================
+
+export const deleteCourseService = async ({ courseId, userId }) => {
+  try {
+    const checkQuery = `
+      SELECT id
+      FROM courses
+      WHERE id = $1
+        AND mentor_id = $2
+    `;
+
+    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+
+    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
+
+    const mentorId = mentorResult.rows[0]?.id;
+
+    if (!mentorId) {
+      return {
+        status: "FORBIDDEN",
+      };
+    }
+
+    const checkResult = await pool.query(checkQuery, [courseId, mentorId]);
+
+    if (checkResult.rows.length === 0) {
+      return {
+        statusCode: 404,
+        success: false,
+        message: "Course not found",
+      };
+    }
+
+    const archiveQuery = `
+      UPDATE courses
+      SET status = 'archived'
+      WHERE id = $1
+    `;
+
+    await pool.query(archiveQuery, [courseId]);
+
+    return {
+      statusCode: 200,
+      success: true,
+      message: "Course archived successfully",
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
+// =========================
+// CREATE MODULE
+// =========================
+
+export const createModuleService = async ({
+  courseId,
+  userId,
+  title,
+  orderIndex,
+}) => {
+  try {
+    // check course ownership
+    const checkCourseQuery = `
+      SELECT id
+      FROM courses
+      WHERE id = $1
+        AND mentor_id = $2
+    `;
+
+    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+
+    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
+
+    const mentorId = mentorResult.rows[0]?.id;
+
+    if (!mentorId) {
+      return {
+        status: "FORBIDDEN",
+      };
+    }
+
+    const checkCourseResult = await pool.query(checkCourseQuery, [
+      courseId,
+      mentorId,
+    ]);
+
+    if (checkCourseResult.rows.length === 0) {
+      return {
+        statusCode: 404,
+        success: false,
+        message: "Course not found",
+      };
+    }
+
+    const createModuleQuery = `
+      INSERT INTO modules (
+        course_id,
+        title,
+        order_index
+      )
+      VALUES ($1, $2, $3)
+      RETURNING id, order_index
+    `;
+
+    const result = await pool.query(createModuleQuery, [
+      courseId,
+      title.trim(),
+      orderIndex,
+    ]);
+
+    return {
+      statusCode: 201,
+      success: true,
+      moduleId: result.rows[0].id,
+      orderIndex: result.rows[0].order_index,
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
+// =========================
+// DELETE MODULE
+// =========================
+
+export const deleteModuleService = async ({ moduleId, userId }) => {
+  try {
+    // verify ownership through course
+    const checkModuleQuery = `
+      SELECT modules.id
+      FROM modules
+      INNER JOIN courses
+        ON courses.id = modules.course_id
+      WHERE modules.id = $1
+        AND courses.mentor_id = $2
+    `;
+
+    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+
+    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
+
+    const mentorId = mentorResult.rows[0]?.id;
+
+    if (!mentorId) {
+      return {
+        status: "FORBIDDEN",
+      };
+    }
+
+    const checkModuleResult = await pool.query(checkModuleQuery, [
+      moduleId,
+      mentorId,
+    ]);
+
+    if (checkModuleResult.rows.length === 0) {
+      return {
+        statusCode: 404,
+        success: false,
+        message: "Module not found",
+      };
+    }
+
+    const deleteQuery = `
+      DELETE FROM modules
+      WHERE id = $1
+    `;
+
+    await pool.query(deleteQuery, [moduleId]);
+
+    return {
+      statusCode: 200,
+      success: true,
+      message: "Module deleted",
+    };
+  } catch (err) {
+    throw err;
   }
 };

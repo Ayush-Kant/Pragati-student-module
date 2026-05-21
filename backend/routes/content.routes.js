@@ -14,7 +14,7 @@ import {
   validateCreateCourse,
   validateUpdateCourse,
   validateAddModule,
-} from "../validators/course.validation.js";
+} from "../validators/content.validator.js";
 
 const router = express.Router();
 

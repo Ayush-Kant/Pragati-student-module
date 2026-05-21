@@ -6,16 +6,16 @@ import {
   deleteCourseService,
   createModuleService,
   deleteModuleService,
-} from "../services/course.service.js";
+} from "../services/content.service.js";
 
 export const createCourse = async (req, res) => {
   try {
-    const mentorId = req.user.id;
+    const userId = req.user.uid;
 
     const { title, description, skillTags, driveId } = req.body;
 
     const result = await createCourseService({
-      mentorId,
+      userId,
       title,
       description,
       skillTags,
@@ -47,11 +47,11 @@ export const createCourse = async (req, res) => {
 
 export const getCourses = async (req, res) => {
   try {
-    const mentorId = req.user.id;
+    const userId = req.user.uid;
 
     const { status, driveId } = req.query;
 
-    const courses = await getCoursesService({ mentorId, status, driveId });
+    const courses = await getCoursesService({ userId, status, driveId });
 
     return res.status(200).json(courses);
   } catch (err) {
@@ -66,10 +66,11 @@ export const getCourses = async (req, res) => {
 
 export const getCourseById = async (req, res) => {
   try {
-    const mentorId = req.user.id;
+    const userId = req.user.uid;
+
     const { courseId } = req.params;
 
-    const course = await getCourseByIdService({ mentorId, courseId });
+    const course = await getCourseByIdService({ userId, courseId });
 
     if (!course) {
       return res.status(404).json({
@@ -91,12 +92,13 @@ export const getCourseById = async (req, res) => {
 
 export const updateCourse = async (req, res) => {
   try {
-    const mentorId = req.user.id;
+    const userId = req.user.uid;
+
     const { courseId } = req.params;
 
     const result = await updateCourseService({
       courseId,
-      mentorId,
+      userId,
       ...req.body,
     });
 
@@ -118,12 +120,12 @@ export const updateCourse = async (req, res) => {
 
 export const deleteCourse = async (req, res) => {
   try {
-    const mentorId = req.user.id;
+    const userId = req.user.uid;
     const { courseId } = req.params;
 
     const result = await deleteCourseService({
       courseId,
-      mentorId,
+      userId,
     });
 
     return res.status(result.statusCode).json({
@@ -142,7 +144,8 @@ export const deleteCourse = async (req, res) => {
 
 export const addModule = async (req, res) => {
   try {
-    const mentorId = req.user.id;
+    const userId = req.user.uid;
+
     const { courseId } = req.params;
 
     const { title, orderIndex } = req.body;
@@ -163,7 +166,7 @@ export const addModule = async (req, res) => {
 
     const result = await createModuleService({
       courseId,
-      mentorId,
+      userId,
       title,
       orderIndex,
     });
@@ -186,12 +189,13 @@ export const addModule = async (req, res) => {
 
 export const deleteModule = async (req, res) => {
   try {
-    const mentorId = req.user.id;
+    const userId = req.user.uid;
+
     const { moduleId } = req.params;
 
     const result = await deleteModuleService({
       moduleId,
-      mentorId,
+      userId,
     });
 
     return res.status(result.statusCode).json({
