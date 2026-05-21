@@ -2,10 +2,9 @@
 
 import { pool } from "../config/db.js";
 
-// =========================
-// CREATE COURSE
-// =========================
-
+// ==========================================
+// 1. CREATE COURSE
+// ==========================================
 export const createCourseService = async ({
   userId,
   title,
@@ -14,19 +13,28 @@ export const createCourseService = async ({
   driveId,
 }) => {
   try {
-    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
-
-    // verify drive ownership
-    const driveCheckQuery = `
-      SELECT id
-      FROM drives
-      WHERE id = $1
-        AND mentor_id = $2
+    // 1. Fetch mentor id and check drive ownership in parallel to avoid sequential awaits
+    const mentorQuery = `
+      SELECT mentors.id
+      FROM mentors
+      INNER JOIN users ON users.id = mentors.user_id
+      WHERE users.auth_user_id = $1
     `;
 
-    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
+    const driveQuery = `
+      SELECT recruitment_drives.id
+      FROM recruitment_drives
+      INNER JOIN users ON users.id = recruitment_drives.mentor_id
+      WHERE recruitment_drives.id = $1
+        AND users.auth_user_id = $2
+    `;
 
-    const mentorId = mentorResult.rows[0]?.id;
+    const [mentorRes, driveRes] = await Promise.all([
+      pool.query(mentorQuery, [userId]),
+      pool.query(driveQuery, [driveId, userId]),
+    ]);
+
+    const mentorId = mentorRes.rows[0]?.id;
 
     if (!mentorId) {
       return {
@@ -34,15 +42,13 @@ export const createCourseService = async ({
       };
     }
 
-    const driveCheck = await pool.query(driveCheckQuery, [driveId, mentorId]);
-
-    if (driveCheck.rows.length === 0) {
+    if (driveRes.rows.length === 0) {
       return {
         status: "FORBIDDEN",
       };
     }
 
-    // create course
+    // 2. Insert new course
     const createCourseQuery = `
       INSERT INTO courses (
         title,
@@ -67,7 +73,7 @@ export const createCourseService = async ({
 
     const createdCourse = courseResult.rows[0];
 
-    // auto create first module
+    // 3. Auto create first module (Module 1)
     const createModuleQuery = `
       INSERT INTO modules (
         course_id,
@@ -90,16 +96,33 @@ export const createCourseService = async ({
       status: createdCourse.status,
     };
   } catch (error) {
-    console.log(error);
+    console.error("createCourseService Error:", error);
+    throw error;
   }
 };
 
-// =========================
-// GET ALL COURSES
-// =========================
-
+// ==========================================
+// 2. GET ALL COURSES FOR MENTOR
+// ==========================================
 export const getCoursesService = async ({ userId, status, driveId }) => {
   try {
+    // 1. Resolve mentor existence
+    const mentorQuery = `
+      SELECT mentors.id
+      FROM mentors
+      INNER JOIN users ON users.id = mentors.user_id
+      WHERE users.auth_user_id = $1
+    `;
+    const mentorRes = await pool.query(mentorQuery, [userId]);
+    const mentorId = mentorRes.rows[0]?.id;
+
+    if (!mentorId) {
+      return {
+        status: "FORBIDDEN",
+      };
+    }
+
+    // 2. Build dynamic filter query
     let query = `
       SELECT
         courses.id AS "courseId",
@@ -109,41 +132,21 @@ export const getCoursesService = async ({ userId, status, driveId }) => {
         courses.drive_id AS "driveId",
         COUNT(modules.id)::int AS "moduleCount",
         courses.created_at AS "createdAt"
-
       FROM courses
-
-      LEFT JOIN modules
-        ON modules.course_id = courses.id
-
+      LEFT JOIN modules ON modules.course_id = courses.id
       WHERE courses.mentor_id = $1
     `;
-    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
 
-    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
-
-    const mentorId = mentorResult.rows[0]?.id;
-
-    if (!mentorId) {
-      return {
-        status: "FORBIDDEN",
-      };
-    }
     const values = [mentorId];
 
     if (status) {
       values.push(status);
-
-      query += `
-        AND courses.status = $${values.length}
-      `;
+      query += ` AND courses.status = $${values.length}`;
     }
 
     if (driveId) {
       values.push(driveId);
-
-      query += `
-        AND courses.drive_id = $${values.length}
-      `;
+      query += ` AND courses.drive_id = $${values.length}`;
     }
 
     query += `
@@ -152,78 +155,55 @@ export const getCoursesService = async ({ userId, status, driveId }) => {
     `;
 
     const result = await pool.query(query, values);
-
     return result.rows;
   } catch (error) {
+    console.error("getCoursesService Error:", error);
     throw error;
   }
 };
 
-// =========================
-// GET COURSE BY ID
-// =========================
-
+// ==========================================
+// 3. GET COURSE BY ID (WITH NESTED MODULES)
+// ==========================================
 export const getCourseByIdService = async ({ userId, courseId }) => {
   try {
-    // check existence
-    const courseCheckQuery = `
-      SELECT id, mentor_id
-      FROM courses
-      WHERE id = $1
-    `;
-
-    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
-
-    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
-
-    const mentorId = mentorResult.rows[0]?.id;
-
-    if (!mentorId) {
-      return {
-        status: "FORBIDDEN",
-      };
-    }
-
-    const courseCheck = await pool.query(courseCheckQuery, [courseId]);
-
-    if (courseCheck.rows.length === 0) {
-      return {
-        statusCode: 404,
-        message: "Course not found",
-      };
-    }
-
-    if (courseCheck.rows[0].mentor_id !== mentorId) {
-      return {
-        statusCode: 403,
-        message: "Forbidden",
-      };
-    }
-
+    // Combined Query: resolves existence, ownership, and details in one single roundtrip!
     const getCourseQuery = `
       SELECT
         courses.id AS course_id,
         courses.title,
         courses.status,
         courses.skill_tags,
-
+        users.auth_user_id AS mentor_auth_uid,
         modules.id AS module_id,
         modules.title AS module_title,
         modules.order_index
-
       FROM courses
-
-      LEFT JOIN modules
-        ON modules.course_id = courses.id
-
+      INNER JOIN mentors ON mentors.id = courses.mentor_id
+      INNER JOIN users ON users.id = mentors.user_id
+      LEFT JOIN modules ON modules.course_id = courses.id
       WHERE courses.id = $1
-
       ORDER BY modules.order_index ASC
     `;
 
     const result = await pool.query(getCourseQuery, [courseId]);
 
+    if (result.rows.length === 0) {
+      return {
+        statusCode: 404,
+        message: "Course not found",
+      };
+    }
+
     const firstRow = result.rows[0];
+
+    // Check ownership
+    if (String(firstRow.mentor_auth_uid) !== String(userId)) {
+      return {
+        statusCode: 403,
+        message: "Forbidden",
+      };
+    }
 
     const formattedCourse = {
       courseId: firstRow.course_id,
@@ -249,14 +229,14 @@ export const getCourseByIdService = async ({ userId, courseId }) => {
       data: formattedCourse,
     };
   } catch (error) {
+    console.error("getCourseByIdService Error:", error);
     throw error;
   }
 };
 
-// =========================
-// UPDATE COURSE
-// =========================
-
+// ==========================================
+// 4. UPDATE COURSE
+// ==========================================
 export const updateCourseService = async ({
   courseId,
   userId,
@@ -266,32 +246,21 @@ export const updateCourseService = async ({
   status,
 }) => {
   try {
-    // check ownership
-    const checkCourseQuery = `
-      SELECT id
+    // 1. Single roundtrip to fetch existence, ownership and current status
+    const checkQuery = `
+      SELECT 
+        courses.id,
+        courses.status,
+        users.auth_user_id AS mentor_auth_uid
       FROM courses
-      WHERE id = $1
-        AND mentor_id = $2
+      INNER JOIN mentors ON mentors.id = courses.mentor_id
+      INNER JOIN users ON users.id = mentors.user_id
+      WHERE courses.id = $1
     `;
 
-    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+    const checkRes = await pool.query(checkQuery, [courseId]);
 
-    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
-
-    const mentorId = mentorResult.rows[0]?.id;
-
-    if (!mentorId) {
-      return {
-        status: "FORBIDDEN",
-      };
-    }
-
-    const checkCourseResult = await pool.query(checkCourseQuery, [
-      courseId,
-      mentorId,
-    ]);
-
-    if (checkCourseResult.rows.length === 0) {
+    if (checkRes.rows.length === 0) {
       return {
         statusCode: 404,
         success: false,
@@ -299,6 +268,37 @@ export const updateCourseService = async ({
       };
     }
 
+    const courseData = checkRes.rows[0];
+
+    if (String(courseData.mentor_auth_uid) !== String(userId)) {
+      return {
+        statusCode: 403,
+        success: false,
+        message: "Forbidden",
+      };
+    }
+
+    // 2. Enforce status transition validation rules
+    const currentStatus = courseData.status;
+
+    if (status !== undefined && status !== currentStatus) {
+      if (currentStatus === "archived") {
+        return {
+          statusCode: 400,
+          success: false,
+          message: "Cannot update status of an archived course",
+        };
+      }
+      if (currentStatus === "published" && status === "draft") {
+        return {
+          statusCode: 400,
+          success: false,
+          message: "Cannot transition status back to draft from published",
+        };
+      }
+    }
+
+    // 3. Build dynamic update query
     const updates = [];
     const values = [];
     let index = 1;
@@ -323,7 +323,7 @@ export const updateCourseService = async ({
       values.push(status);
     }
 
-    // no fields provided
+    // No fields to update
     if (updates.length === 0) {
       return {
         statusCode: 400,
@@ -336,7 +336,7 @@ export const updateCourseService = async ({
 
     const updateCourseQuery = `
       UPDATE courses
-      SET ${updates.join(", ")}
+      SET ${updates.join(", ")}, updated_at = NOW()
       WHERE id = $${index}
       RETURNING id, status
     `;
@@ -349,39 +349,31 @@ export const updateCourseService = async ({
       courseId: updateResult.rows[0].id,
       status: updateResult.rows[0].status,
     };
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    console.error("updateCourseService Error:", error);
+    throw error;
   }
 };
 
-// =========================
-// ARCHIVE COURSE
-// =========================
-
+// ==========================================
+// 5. ARCHIVE COURSE (SOFT DELETE)
+// ==========================================
 export const deleteCourseService = async ({ courseId, userId }) => {
   try {
+    // 1. Single roundtrip to fetch existence, ownership and current status
     const checkQuery = `
-      SELECT id
+      SELECT 
+        courses.id,
+        users.auth_user_id AS mentor_auth_uid
       FROM courses
-      WHERE id = $1
-        AND mentor_id = $2
+      INNER JOIN mentors ON mentors.id = courses.mentor_id
+      INNER JOIN users ON users.id = mentors.user_id
+      WHERE courses.id = $1
     `;
 
-    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+    const checkRes = await pool.query(checkQuery, [courseId]);
 
-    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
-
-    const mentorId = mentorResult.rows[0]?.id;
-
-    if (!mentorId) {
-      return {
-        status: "FORBIDDEN",
-      };
-    }
-
-    const checkResult = await pool.query(checkQuery, [courseId, mentorId]);
-
-    if (checkResult.rows.length === 0) {
+    if (checkRes.rows.length === 0) {
       return {
         statusCode: 404,
         success: false,
@@ -389,9 +381,20 @@ export const deleteCourseService = async ({ courseId, userId }) => {
       };
     }
 
+    const courseData = checkRes.rows[0];
+
+    if (String(courseData.mentor_auth_uid) !== String(userId)) {
+      return {
+        statusCode: 403,
+        success: false,
+        message: "Forbidden",
+      };
+    }
+
+    // 2. Perform soft delete
     const archiveQuery = `
       UPDATE courses
-      SET status = 'archived'
+      SET status = 'archived', updated_at = NOW()
       WHERE id = $1
     `;
 
@@ -402,15 +405,15 @@ export const deleteCourseService = async ({ courseId, userId }) => {
       success: true,
       message: "Course archived successfully",
     };
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    console.error("deleteCourseService Error:", error);
+    throw error;
   }
 };
 
-// =========================
-// CREATE MODULE
-// =========================
-
+// ==========================================
+// 6. ADD MODULE TO COURSE
+// ==========================================
 export const createModuleService = async ({
   courseId,
   userId,
@@ -418,32 +421,20 @@ export const createModuleService = async ({
   orderIndex,
 }) => {
   try {
-    // check course ownership
-    const checkCourseQuery = `
-      SELECT id
+    // 1. Single roundtrip to fetch existence and ownership of course
+    const checkQuery = `
+      SELECT 
+        courses.id,
+        users.auth_user_id AS mentor_auth_uid
       FROM courses
-      WHERE id = $1
-        AND mentor_id = $2
+      INNER JOIN mentors ON mentors.id = courses.mentor_id
+      INNER JOIN users ON users.id = mentors.user_id
+      WHERE courses.id = $1
     `;
 
-    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+    const checkRes = await pool.query(checkQuery, [courseId]);
 
-    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
-
-    const mentorId = mentorResult.rows[0]?.id;
-
-    if (!mentorId) {
-      return {
-        status: "FORBIDDEN",
-      };
-    }
-
-    const checkCourseResult = await pool.query(checkCourseQuery, [
-      courseId,
-      mentorId,
-    ]);
-
-    if (checkCourseResult.rows.length === 0) {
+    if (checkRes.rows.length === 0) {
       return {
         statusCode: 404,
         success: false,
@@ -451,6 +442,17 @@ export const createModuleService = async ({
       };
     }
 
+    const courseData = checkRes.rows[0];
+
+    if (String(courseData.mentor_auth_uid) !== String(userId)) {
+      return {
+        statusCode: 403,
+        success: false,
+        message: "Forbidden",
+      };
+    }
+
+    // 2. Insert new module
     const createModuleQuery = `
       INSERT INTO modules (
         course_id,
@@ -473,45 +475,32 @@ export const createModuleService = async ({
       moduleId: result.rows[0].id,
       orderIndex: result.rows[0].order_index,
     };
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    console.error("createModuleService Error:", error);
+    throw error;
   }
 };
 
-// =========================
-// DELETE MODULE
-// =========================
-
+// ==========================================
+// 7. HARD DELETE MODULE
+// ==========================================
 export const deleteModuleService = async ({ moduleId, userId }) => {
   try {
-    // verify ownership through course
-    const checkModuleQuery = `
-      SELECT modules.id
+    // 1. Single roundtrip to fetch existence and ownership through module & parent course join
+    const checkQuery = `
+      SELECT 
+        modules.id,
+        users.auth_user_id AS mentor_auth_uid
       FROM modules
-      INNER JOIN courses
-        ON courses.id = modules.course_id
+      INNER JOIN courses ON courses.id = modules.course_id
+      INNER JOIN mentors ON mentors.id = courses.mentor_id
+      INNER JOIN users ON users.id = mentors.user_id
       WHERE modules.id = $1
-        AND courses.mentor_id = $2
     `;
 
-    const mentorCheckQuery = `SELECT id from mentors WHERE user_id = $1`;
+    const checkRes = await pool.query(checkQuery, [moduleId]);
 
-    const mentorResult = await pool.query(mentorCheckQuery, [userId]);
-
-    const mentorId = mentorResult.rows[0]?.id;
-
-    if (!mentorId) {
-      return {
-        status: "FORBIDDEN",
-      };
-    }
-
-    const checkModuleResult = await pool.query(checkModuleQuery, [
-      moduleId,
-      mentorId,
-    ]);
-
-    if (checkModuleResult.rows.length === 0) {
+    if (checkRes.rows.length === 0) {
       return {
         statusCode: 404,
         success: false,
@@ -519,6 +508,17 @@ export const deleteModuleService = async ({ moduleId, userId }) => {
       };
     }
 
+    const moduleData = checkRes.rows[0];
+
+    if (String(moduleData.mentor_auth_uid) !== String(userId)) {
+      return {
+        statusCode: 403,
+        success: false,
+        message: "Forbidden",
+      };
+    }
+
+    // 2. Perform hard delete
     const deleteQuery = `
       DELETE FROM modules
       WHERE id = $1
@@ -531,7 +531,8 @@ export const deleteModuleService = async ({ moduleId, userId }) => {
       success: true,
       message: "Module deleted",
     };
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    console.error("deleteModuleService Error:", error);
+    throw error;
   }
 };

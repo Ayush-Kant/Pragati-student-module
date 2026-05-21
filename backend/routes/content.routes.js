@@ -30,7 +30,7 @@ router.patch("/courses/:courseId", validateUpdateCourse, updateCourse);
 router.delete("/courses/:courseId", deleteCourse);
 
 // Modules
-router.post("/courses/:courseId/modules", addModule);
-router.delete("/modules/:moduleId", validateAddModule, deleteModule);
+router.post("/courses/:courseId/modules", validateAddModule, addModule);
+router.delete("/modules/:moduleId", deleteModule);
 
 export default router;
