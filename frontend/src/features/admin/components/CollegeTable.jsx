@@ -16,7 +16,7 @@ export default function CollegeTable({ colleges }) {
           </tr>
         </thead>
         <tbody>
-          {colleges.map((college)=>(
+          {colleges?.map((college)=>(
             <tr
             key={college.collegeId}
             className="border-b"

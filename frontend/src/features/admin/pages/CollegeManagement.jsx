@@ -1,34 +1,35 @@
-import { useState } from "react";
 import { mockColleges } from "../mockCollegeData";
 import CollegeTable from "../components/CollegeTable";
+import useCollegeManagement from "../hooks/useCollegeManagement";
+import CollegeRankingTable from "../components/CollegeRankingsTable";
+import { mockRankings } from "../mockCollegeData";
+import NeedsRecruitmentList from "../components/NeedsRecruitmentList";
+import { mockNeedsRecruitment } from "../mockCollegeData";
+
+
 
 export default function CollegeManagement() {
-    const [search, setSearch] = useState("");
-    const [status, setStatus] = useState("all");
-    const [department, setDepartment] = useState("");
+    const {
+        currentColleges,
+        currentPage,
+        setCurrentPage,
+        totalPages,
+        search,
+        setSearch,
+        status,
+        setStatus,
+        department,
+        setDepartment,
+        filteredColleges,
+        needsRecruitment,
+        rankings
+    } = useCollegeManagement();
 
-    const filteredColleges = mockColleges.filter((college) => {
-        return (
-            (college.name.toLowerCase().includes(search.toLowerCase()) ||
-                college.email.toLowerCase().includes(search.toLowerCase()) ||
-                college.location.toLowerCase().includes(search.toLowerCase()))
-            &&
-            (status === "all" || college.status === status)
-            &&
-            (department === "" ||
-                college.departments.some((dept) =>
-                    dept.toLowerCase()
-                        .includes(department.toLowerCase())
-                )
-            )
-        )
-    });
+
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-2">
-                College Management
-            </h1>
+            <h1 className="text-2xl font-bold mb-2">College Management</h1>
             <p className="text-gray-500 mb-6">
                 Approve institutions, monitor placement performance
             </p>
@@ -67,9 +68,44 @@ export default function CollegeManagement() {
                 <p className="font-semibold mb-3">
                     Showing {filteredColleges.length} colleges
                 </p>
-                <CollegeTable
-                    colleges={filteredColleges}
+                <CollegeTable colleges={currentColleges} />
+                <div className="flex justify-center gap-4 mt-6">
+                    <button
+                        onClick={() => setCurrentPage(
+                            prev => prev - 1
+                        )}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 border rounded"
+                    >
+                        Prev
+                    </button>
+                    <span>{currentPage} / {totalPages}</span>
+                    <button
+                        onClick={() => setCurrentPage(
+                            prev => prev + 1
+                        )}
+                        disabled={
+                            currentPage === totalPages
+                        }
+                        className="px-4 py-2 border rounded"
+                    >
+                        Next
+                    </button>
+                </div>
+                <NeedsRecruitmentList
+                    colleges={mockNeedsRecruitment}
                 />
+                {/* Use this when backend is prepared
+                <NeedsRecruitmentList
+                    colleges={needsRecruitment}
+                /> */}
+                <CollegeRankingTable
+                    rankings={mockRankings}
+                />
+                {/* Use when backend is ready
+                <CollegeRankingTable
+                    rankings={rankings}
+                /> */}
             </div>
         </div>
     );
