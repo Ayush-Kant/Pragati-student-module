@@ -1,58 +1,60 @@
 // StudentRoutes.jsx
-// Purpose: Defines all student-facing routes; imported into App.jsx to mount the student module
+// Purpose: Student module route tree — mounted under /student/* in App.jsx using relative paths
 
 import { Routes, Route } from 'react-router-dom';
 import PrivateRoute from '../components/routing/PrivateRoute';
 
-import LoginPage from '../pages/auth/LoginPage';
-import RegisterPage from '../pages/auth/RegisterPage';
-import OnboardingWizard from '../pages/onboarding/OnboardingWizard';
-import DashboardPage from '../pages/dashboard/DashboardPage';
-import ProfilePage from '../pages/profile/ProfilePage';
-import CoursesPage from '../pages/training/CoursesPage';
-import CourseDetailPage from '../pages/training/CourseDetailPage';
-import SessionsPage from '../pages/sessions/SessionsPage';
-import AssignmentsPage from '../pages/assignments/AssignmentsPage';
-import AssignmentDetail from '../pages/assignments/AssignmentDetail';
-import QuizzesPage from '../pages/quizzes/QuizzesPage';
-import CodingChallengePage from '../pages/coding/CodingChallengePage';
-import ProjectsPage from '../pages/projects/ProjectsPage';
-import ProjectDetailPage from '../pages/projects/ProjectDetailPage';
-import PerformancePage from '../pages/performance/PerformancePage';
-import InterviewsPage from '../pages/interviews/InterviewsPage';
-import NotificationsPage from '../pages/notifications/NotificationsPage';
+import LoginPage            from '../pages/auth/LoginPage';
+import RegisterPage         from '../pages/auth/RegisterPage';
+import OnboardingWizard     from '../pages/onboarding/OnboardingWizard';
+import DashboardPage        from '../pages/dashboard/DashboardPage';
+import ProfilePage          from '../pages/profile/ProfilePage';
+import CoursesPage          from '../pages/training/CoursesPage';
+import CourseDetailPage     from '../pages/training/CourseDetailPage';
+import SessionsPage         from '../pages/sessions/SessionsPage';
+import AssignmentsPage      from '../pages/assignments/AssignmentsPage';
+import AssignmentDetail     from '../pages/assignments/AssignmentDetail';
+import QuizzesPage          from '../pages/quizzes/QuizzesPage';
+import CodingChallengePage  from '../pages/coding/CodingChallengePage';
+import ProjectsPage         from '../pages/projects/ProjectsPage';
+import ProjectDetailPage    from '../pages/projects/ProjectDetailPage';
+import PerformancePage      from '../pages/performance/PerformancePage';
+import InterviewsPage       from '../pages/interviews/InterviewsPage';
+import NotificationsPage    from '../pages/notifications/NotificationsPage';
 import NotificationPreferences from '../pages/settings/NotificationPreferences';
-import CertificatesPage from '../pages/public/CertificatesPage';
-import VerificationPage from '../pages/public/VerificationPage';
+import CertificatesPage     from '../pages/public/CertificatesPage';
 
+// Paths here are RELATIVE — parent <Route path="/student/*"> in App.jsx
+// strips "/student/" before these routes are matched.
 const StudentRoutes = () => {
   return (
     <Routes>
-      {/* Public routes */}
-      <Route path="/student/login" element={<LoginPage />} />
-      <Route path="/student/register" element={<RegisterPage />} />
-      <Route path="/verify/:code" element={<VerificationPage />} />
 
-      {/* Private routes */}
+      {/* ── Public routes ─────────────────────────────── */}
+      <Route path="login"    element={<LoginPage />} />
+      <Route path="register" element={<RegisterPage />} />
+
+      {/* ── Private routes (guarded by PrivateRoute) ──── */}
       <Route element={<PrivateRoute />}>
-        <Route path="/student/onboarding" element={<OnboardingWizard />} />
-        <Route path="/student/dashboard" element={<DashboardPage />} />
-        <Route path="/student/profile" element={<ProfilePage />} />
-        <Route path="/student/courses" element={<CoursesPage />} />
-        <Route path="/student/courses/:courseId" element={<CourseDetailPage />} />
-        <Route path="/student/sessions" element={<SessionsPage />} />
-        <Route path="/student/assignments" element={<AssignmentsPage />} />
-        <Route path="/student/assignments/:id" element={<AssignmentDetail />} />
-        <Route path="/student/quizzes" element={<QuizzesPage />} />
-        <Route path="/student/coding/:challengeId" element={<CodingChallengePage />} />
-        <Route path="/student/projects" element={<ProjectsPage />} />
-        <Route path="/student/projects/:projectId" element={<ProjectDetailPage />} />
-        <Route path="/student/performance" element={<PerformancePage />} />
-        <Route path="/student/interviews" element={<InterviewsPage />} />
-        <Route path="/student/notifications" element={<NotificationsPage />} />
-        <Route path="/student/settings/notifications" element={<NotificationPreferences />} />
-        <Route path="/student/certificates" element={<CertificatesPage />} />
+        <Route path="onboarding"              element={<OnboardingWizard />} />
+        <Route path="dashboard"               element={<DashboardPage />} />
+        <Route path="profile"                 element={<ProfilePage />} />
+        <Route path="courses"                 element={<CoursesPage />} />
+        <Route path="courses/:courseId"       element={<CourseDetailPage />} />
+        <Route path="sessions"                element={<SessionsPage />} />
+        <Route path="assignments"             element={<AssignmentsPage />} />
+        <Route path="assignments/:id"         element={<AssignmentDetail />} />
+        <Route path="quizzes"                 element={<QuizzesPage />} />
+        <Route path="coding/:challengeId"     element={<CodingChallengePage />} />
+        <Route path="projects"                element={<ProjectsPage />} />
+        <Route path="projects/:projectId"     element={<ProjectDetailPage />} />
+        <Route path="performance"             element={<PerformancePage />} />
+        <Route path="interviews"              element={<InterviewsPage />} />
+        <Route path="notifications"           element={<NotificationsPage />} />
+        <Route path="settings/notifications"  element={<NotificationPreferences />} />
+        <Route path="certificates"            element={<CertificatesPage />} />
       </Route>
+
     </Routes>
   );
 };
