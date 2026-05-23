@@ -2,6 +2,7 @@ import express from "express";
 import connectDB from "./config/db.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import adminDashboardRoutes from './routes/admin.dashboard.routes.js';
+import adminCollegeRoutes from './routes/admin.college.routes.js'
 
 const PORT = process.env.PORT || 5001;
 
@@ -14,6 +15,8 @@ app.use(express.json());
 app.use("/api/mentor", mentorRoutes);
 
 app.use('/api/v1/admin/dashboard',adminDashboardRoutes);
+
+app.use('/api/v1/admin/colleges', adminCollegeRoutes);
 
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
