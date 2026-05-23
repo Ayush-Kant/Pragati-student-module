@@ -178,9 +178,9 @@ function CollegeDetail() {
                 <div className={`mt-6 p-4 rounded-lg border-l-4
                                     ${college.status === "rejected"
                         ?
-                        "bg-red-100 border-red-500 text-red-700"
+                        "bg-red-300 border-red-500 text-red-700"
                         :
-                        "bg-gray-100 border-gray-500 text-gray-700"
+                        "bg-gray-400 border-gray-500 text-gray-700"
                     }
                                 `} >
                     <h3 className="font-bold mb-2">
