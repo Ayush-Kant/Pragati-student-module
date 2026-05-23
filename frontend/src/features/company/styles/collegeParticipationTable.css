@@ -1,0 +1,65 @@
+.college-table-card {
+  background: white;
+
+  border-radius: 18px;
+
+  padding: 20px;
+
+  border: 1px solid #edf2f7;
+
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.02),
+    0 6px 14px rgba(15, 23, 42, 0.03);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.college-table-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 20px rgba(15, 23, 42, 0.06);
+}
+
+.college-table-wrapper {
+  margin-top: 18px;
+}
+
+.college-table-wrapper table {
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+.college-table-wrapper th {
+  text-align: left;
+
+  padding: 12px 0;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #6b7280;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.college-table-wrapper td {
+  padding: 15px 0;
+
+  font-size: 14px;
+
+  color: #111827;
+
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.college-table-wrapper tbody tr:hover {
+  background: #f9fafb;
+}
+
+.college-table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}

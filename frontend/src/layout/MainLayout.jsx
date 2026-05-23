@@ -15,16 +15,18 @@ const MainLayout = () => {
       >
         <Sidebar />
 
-        <main
-          style={{
-            marginLeft: "280px",
-            marginTop: "80px",
-            padding: "24px",
-            width: "100%",
-            minHeight: "100vh",
-            background: "#F8FAFC",
-          }}
-        >
+       <main
+  style={{
+    marginLeft: "280px",
+    marginTop: "80px",
+    padding: "24px",
+    flex: 1,
+    minHeight: "100vh",
+    background: "#F8FAFC",
+    boxSizing: "border-box",
+    overflowX: "hidden",
+  }}
+>
           <Outlet />
         </main>
       </div>
