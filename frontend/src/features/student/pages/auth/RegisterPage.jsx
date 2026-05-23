@@ -1,85 +1,96 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import studentImage from "./images/student.png";
+import manager from "./images/managers.png";
+import mentor from "./images/mentor.png";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
 
-  // State management for form data
+  // Track the currently selected role ('student', 'faculty', 'corporate')
+  const [selectedRole, setSelectedRole] = useState('student');
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
   });
 
-  // State management for individual errors
   const [errors, setErrors] = useState({});
-
-  // Visibility toggle flags
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Multi-tier structural evaluation for dynamic password strength
+  const rolesInfo = {
+    student: {
+      title: 'Candidate / Student',
+      description: 'Explore leagues, apply for jobs, and competitions for your future.',
+      image: studentImage,
+      bgColor: 'bg-[#2563EB]',
+      textColor: 'text-[#2563EB]',
+      borderColor: 'border-[#2563EB]',
+      focusRing: 'focus:ring-[#2563EB]/20',
+      focusBorder: 'focus:border-[#2563EB]',
+      lightBg: 'bg-[#2563EB]/10',
+      footerText: "Why Choose Uptoskills? • Build Skills, Compete, Get Hired and Earn Rewards."
+    },
+    faculty: {
+      title: 'Campus / Faculty',
+      description: 'Organise Competitions, Manage Placements, and structure academic benchmarks.',
+      image: manager,
+      bgColor: 'bg-[#00a896]', 
+      textColor: 'text-[#00a896]',
+      borderColor: 'border-[#00a896]',
+      focusRing: 'focus:ring-[#00a896]/20',
+      focusBorder: 'focus:border-[#00a896]',
+      lightBg: 'bg-[#00a896]/10',
+      footerText: "Why Campus Partner with Uptoskills? • HR Connect, Branding, AI Candidates Tracking."
+    },
+    corporate: {
+      title: 'Mentor / Corporate',
+      description: 'Speed up your hiring with AI Tools, interactive ATS, and global tracking.',
+      image: mentor,
+      bgColor: 'bg-[#EA580C]',
+      textColor: 'text-[#EA580C]',
+      borderColor: 'border-[#EA580C]',
+      focusRing: 'focus:ring-[#EA580C]/20',
+      focusBorder: 'focus:border-[#EA580C]',
+      lightBg: 'bg-[#EA580C]/10',
+      footerText: "Collaborate with Uptoskills • Easy Talent Access & AI Tools."
+    }
+  };
+
+  const currentTheme = rolesInfo[selectedRole];
+
+  // Password Strength logic
   const getPasswordStrength = (password) => {
-    if (!password)
-      return {
-        label: '',
-        color: 'bg-gray-200',
-        width: 'w-0',
-      };
-
+    if (!password) return { label: '', color: 'bg-slate-200', width: 'w-0' };
     let points = 0;
-
     if (password.length >= 6) points++;
     if (password.length >= 10) points++;
     if (/[A-Z]/.test(password) && /[0-9]/.test(password)) points++;
     if (/[^A-Za-z0-9]/.test(password)) points++;
 
-    if (points <= 1) {
-      return {
-        label: 'Weak',
-        color: 'bg-red-500',
-        width: 'w-1/3',
-      };
-    }
-
-    if (points === 2 || points === 3) {
-      return {
-        label: 'Medium',
-        color: 'bg-yellow-500',
-        width: 'w-2/3',
-      };
-    }
-
-    return {
-      label: 'Strong',
-      color: 'bg-green-500',
-      width: 'w-full',
-    };
+    if (points <= 1) return { label: 'Weak', color: 'bg-red-400', width: 'w-1/3' };
+    if (points === 2 || points === 3) return { label: 'Medium', color: 'bg-amber-400', width: 'w-2/3' };
+    return { label: 'Strong', color: currentTheme.bgColor, width: 'w-full' };
   };
 
   const strength = getPasswordStrength(formData.password);
 
-  // Unified input field sync wrapper
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: '',
-      }));
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
-  // Submission interceptor and local integrity validator
+  const handleRoleChange = (role) => {
+    setSelectedRole(role);
+    setFormData({ email: '', password: '', confirmPassword: '' });
+    setErrors({});
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const newErrors = {};
 
     if (!formData.email.trim()) {
@@ -103,202 +114,115 @@ const RegisterPage = () => {
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
     } else {
-      console.log('Registration data structurally ready:', formData);
+      console.log(`Registration submitted for ${selectedRole}:`, formData);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-orange-50 px-4 py-12 sm:px-6 lg:px-8">
-
-      {/* Centered Auth Card wrapper container */}
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-orange-100">
-
-        {/* Core Title Block Component */}
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-orange-600 tracking-tight">
-            Create an account
-          </h2>
-
-          <p className="mt-2 text-sm text-gray-500">
-            Start managing your onboarding module
-          </p>
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#FFFBF7] p-4 md:p-8 font-sans antialiased">
+      <div className="max-w-4xl w-full bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col md:flex-row relative p-4 gap-4 border border-gray-100">
+        
+        {/* LEFT HAND SIDE */}
+        <div className={`w-full md:w-[48%] ${currentTheme.bgColor} rounded-[24px] p-6 md:p-8 flex flex-col justify-between text-white transition-all duration-700 ease-in-out relative min-h-[490px] md:min-h-[540px]`}>
+          <div className="text-2xl font-black tracking-tight bg-white/15 inline-block px-4 py-1.5 rounded-xl backdrop-blur-md border border-white/10 self-start shadow-sm">
+            Uptoskills
+          </div>
+          <div className="bg-white rounded-[24px] p-4 my-auto shadow-[0_15px_35px_rgba(0,0,0,0.08)] border border-white/40 flex flex-col items-center text-center transform scale-100 hover:scale-[1.01] transition-transform duration-300">
+            <div className="w-full h-48 rounded-[16px] overflow-hidden mb-4 border border-gray-100 shadow-inner relative group">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent z-10" />
+              <img src={currentTheme.image} alt={currentTheme.title} className="w-full h-full object-cover object-center transition-all duration-1000 ease-out transform scale-105 group-hover:scale-100" />
+            </div>
+            <h3 className={`text-xl font-extrabold ${currentTheme.textColor} tracking-tight mb-1`}>{currentTheme.title}</h3>
+            <p className="text-xs text-gray-500 font-medium px-2 leading-relaxed max-w-[280px]">{currentTheme.description}</p>
+          </div>
+          <div className="space-y-4">
+            <div className="text-[11px] font-medium bg-black/15 p-3 rounded-xl backdrop-blur-md border border-white/5 leading-relaxed tracking-wide shadow-inner">
+              {currentTheme.footerText}
+            </div>
+            <div className="flex gap-2 items-center pl-1">
+              {Object.keys(rolesInfo).map((role) => (
+                <span key={role} className={`h-1.5 rounded-full transition-all duration-500 ${selectedRole === role ? 'w-7 bg-white shadow-sm' : 'w-1.5 bg-white/35'}`} />
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Interactive Registration Document Tree */}
-        <form
-          className="mt-8 space-y-5"
-          onSubmit={handleSubmit}
-          noValidate
-        >
-          <div className="space-y-4">
-
-            {/* Target Email Vector */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email Address
-              </label>
-
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="you@example.com"
-                className={`block w-full px-4 py-2.5 bg-orange-50/30 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition duration-200 sm:text-sm ${
-                  errors.email
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-orange-200'
-                }`}
-              />
-
-              {errors.email && (
-                <p className="mt-1.5 text-xs text-red-600 font-medium">
-                  {errors.email}
-                </p>
-              )}
+        {/* RIGHT HAND SIDE */}
+        <div className={`w-full md:w-[52%] p-3 md:p-6 flex flex-col justify-center border-2 ${currentTheme.borderColor} rounded-[24px] transition-all duration-700 ease-in-out`}>
+          <div className="w-full max-w-sm mx-auto space-y-5 my-auto">
+            <div className="text-center space-y-1">
+              <h2 className={`text-[38px] font-black ${currentTheme.textColor} tracking-tight leading-none drop-shadow-sm transition-colors duration-500`}>Register</h2>
+              <p className="text-sm text-gray-400 font-medium">Please enter your details to sign up</p>
             </div>
 
-            {/* Primary Secure Credential Parameter */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Password
-              </label>
-
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  className={`block w-full px-4 py-2.5 bg-orange-50/30 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition duration-200 sm:text-sm pr-12 ${
-                    errors.password
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-orange-200'
-                  }`}
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-sm font-medium text-gray-400 hover:text-orange-600 transition-colors focus:outline-none"
-                >
-                  {showPassword ? 'Hide' : 'Show'}
+            {/* Role Tabs */}
+            <div className={`grid grid-cols-3 gap-1 p-1 rounded-xl border transition-colors duration-500 ${currentTheme.lightBg} border-gray-100`}>
+              {Object.keys(rolesInfo).map((role) => (
+                <button key={role} type="button" onClick={() => handleRoleChange(role)} className={`py-2 text-xs font-bold rounded-lg transition-all capitalize ${selectedRole === role ? `bg-white shadow-sm ${rolesInfo[role].textColor}` : 'text-gray-500 hover:text-gray-800'}`}>
+                  {role}
                 </button>
+              ))}
+            </div>
+
+            <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+              {/* Email */}
+              <div className="space-y-1">
+                <label htmlFor="email" className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">Email Address</label>
+                <input id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm ${errors.email ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 ${currentTheme.focusRing} ${currentTheme.focusBorder}`}`} />
+                {errors.email && <p className="text-xs text-red-500 font-medium pl-1 mt-0.5">{errors.email}</p>}
               </div>
 
-              {/* Dynamic Structural Strength Evaluator Bar */}
-              {formData.password && (
-                <div className="mt-2 space-y-1.5">
-
-                  <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${strength.color} ${strength.width} transition-all duration-300 ease-out`}
-                    />
-                  </div>
-
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500">
-                      Password strength:
-                    </span>
-
-                    <span
-                      className={`font-semibold ${
-                        strength.label === 'Weak'
-                          ? 'text-red-500'
-                          : strength.label === 'Medium'
-                          ? 'text-yellow-600'
-                          : 'text-green-600'
-                      }`}
-                    >
-                      {strength.label}
-                    </span>
-                  </div>
+              {/* Password */}
+              <div className="space-y-1">
+                <label htmlFor="password" className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">Password</label>
+                <div className="relative">
+                  <input id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} placeholder="••••••••" className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm pr-12 ${errors.password ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 ${currentTheme.focusRing} ${currentTheme.focusBorder}`}`} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className={`absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-bold text-gray-400 hover:${currentTheme.textColor} transition-colors focus:outline-none`}>
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
                 </div>
-              )}
 
-              {errors.password && (
-                <p className="mt-1.5 text-xs text-red-600 font-medium">
-                  {errors.password}
-                </p>
-              )}
-            </div>
-
-            {/* Verification Credential Shadow Sync Parameter */}
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Confirm Password
-              </label>
-
-              <div className="relative">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  className={`block w-full px-4 py-2.5 bg-orange-50/30 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition duration-200 sm:text-sm pr-12 ${
-                    errors.confirmPassword
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-orange-200'
-                  }`}
-                />
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
-                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-sm font-medium text-gray-400 hover:text-orange-600 transition-colors focus:outline-none"
-                >
-                  {showConfirmPassword ? 'Hide' : 'Show'}
-                </button>
+                {/* Password Strength Indicator Bar */}
+                {formData.password && (
+                  <div className="mt-1.5 space-y-1 px-1">
+                    <div className="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
+                      <div className={`h-full ${strength.color} ${strength.width} transition-all duration-300`} />
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] text-gray-400 font-medium">
+                      <span>Password strength:</span>
+                      <span className="font-bold text-gray-600">{strength.label}</span>
+                    </div>
+                  </div>
+                )}
+                {errors.password && <p className="text-xs text-red-500 font-medium pl-1 mt-0.5">{errors.password}</p>}
               </div>
 
-              {errors.confirmPassword && (
-                <p className="mt-1.5 text-xs text-red-600 font-medium">
-                  {errors.confirmPassword}
-                </p>
-              )}
+              {/* Confirm Password */}
+              <div className="space-y-1">
+                <label htmlFor="confirmPassword" className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">Confirm Password</label>
+                <div className="relative">
+                  <input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm pr-12 ${errors.confirmPassword ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 ${currentTheme.focusRing} ${currentTheme.focusBorder}`}`} />
+                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className={`absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-bold text-gray-400 hover:${currentTheme.textColor} transition-colors focus:outline-none`}>
+                    {showConfirmPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                {errors.confirmPassword && <p className="text-xs text-red-500 font-medium pl-1 mt-0.5">{errors.confirmPassword}</p>}
+              </div>
+
+              <button type="submit" className={`w-full mt-2 flex justify-center py-3 px-4 rounded-xl shadow-md text-sm font-bold text-white ${currentTheme.bgColor} opacity-90 hover:opacity-100 active:scale-[0.99] transition-all duration-500 outline-none`}>
+                Create Account
+              </button>
+            </form>
+
+            <div className="text-center">
+              <p className="text-sm text-gray-400 font-medium">
+                Already have an account?{' '}
+                <button type="button" onClick={() => navigate('/login')} className={`font-bold ${currentTheme.textColor} hover:underline transition-all duration-500`}>
+                  Sign in
+                </button>
+              </p>
             </div>
           </div>
-
-          {/* Action Dispatch Triggers */}
-          <div className="pt-2">
-            <button
-              type="submit"
-              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-200"
-            >
-              Create Account
-            </button>
-          </div>
-        </form>
-
-        {/* Backward Link Navigation Vector */}
-        <div className="text-center mt-4">
-          <p className="text-sm text-gray-600">
-            Already have an account?{' '}
-
-            <button
-              type="button"
-              onClick={() => navigate('/login')}
-              className="font-semibold text-orange-600 hover:text-orange-500 focus:outline-none underline-offset-4 hover:underline transition-all"
-            >
-              Sign in
-            </button>
-          </p>
         </div>
 
       </div>
