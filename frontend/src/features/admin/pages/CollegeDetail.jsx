@@ -33,7 +33,7 @@ function CollegeDetail() {
                     />
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6 space-y-4">
+                <div className=" rounded-lg shadow p-6 space-y-4">
                     <p>
                         <strong>Email:</strong>
                         {" "}
@@ -78,7 +78,7 @@ function CollegeDetail() {
                                     (dept, index) => (
                                         <span
                                             key={index}
-                                            className="bg-gray-100 px-3 py-1 rounded"
+                                            className=" px-3 py-1 rounded"
                                         >
                                             {dept}
                                         </span>
@@ -115,7 +115,7 @@ function CollegeDetail() {
                     value={`#${college.stats.performanceRank}`}
                 />
             </div>
-            <div className="bg-white rounded-lg shadow p-6 mt-6 space-y-6">
+            <div className=" rounded-lg shadow p-6 mt-6 space-y-6">
                 {/* Participation */}
                 <div>
                     <div
@@ -202,7 +202,7 @@ function CollegeDetail() {
                 </div>
             }
             <button onClick={() => navigate("/admin/colleges")}
-                className="mt-6 px-5 py-2 rounded-lg bg-gray-900 text-white hover:bg-black transition cursor-pointer"
+                className="mt-6 px-5 py-2 rounded-lg bg-blue-900 text-white hover:bg-black transition cursor-pointer"
             >
                 Back
             </button>

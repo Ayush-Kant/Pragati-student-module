@@ -5,9 +5,9 @@ import { useNavigate } from "react-router-dom";
 export default function CollegeTable({ colleges }) {
   const navigate = useNavigate();
   return (
-    <div className="bg-white rounded-lg shadow mt-6 overflow-x-auto">
+    <div className=" rounded-lg shadow mt-6 overflow-x-auto">
       <table className="w-full">
-        <thead className="bg-gray-100">
+        <thead className="">
           <tr>
             <th className="p-3 text-left">College</th>
             <th className="p-3 text-left">Location</th>
@@ -45,7 +45,7 @@ export default function CollegeTable({ colleges }) {
                     .map((dept, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-gray-100 rounded"
+                        className="px-2 py-1  rounded"
                       >
                         {dept}
                       </span>

@@ -34,7 +34,7 @@ export default function CollegeManagement() {
                 Approve institutions, monitor placement performance
             </p>
             {/* Search + Filters */}
-            <div className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row gap-4">
+            <div className=" p-4 rounded-lg shadow flex flex-col md:flex-row gap-4">
                 {/* Search */}
                 <input
                     type="text"

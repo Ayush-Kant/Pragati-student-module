@@ -7,7 +7,7 @@ function CollegeRankingTable({ rankings = [] }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow mt-6 p-6">
+    <div className=" rounded-lg shadow mt-6 p-6">
       <h2 className="text-xl font-bold mb-6">
         Performance Rankings
       </h2>
@@ -45,7 +45,7 @@ function CollegeRankingTable({ rankings = [] }) {
                   transition
                   ${
                     college.rank === 1
-                      ? "border-l-[6px] border-yellow-400 bg-yellow-50"
+                      ? "border-l-[6px] border-yellow-400 "
                       : ""
                   }
                 `}

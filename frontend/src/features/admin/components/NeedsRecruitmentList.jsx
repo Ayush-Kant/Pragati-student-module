@@ -1,6 +1,6 @@
 function NeedsRecruitmentList({ colleges = [] }) {
     return (
-        <div className="bg-white rounded-lg shadow p-5 mt-6">
+        <div className=" rounded-lg shadow p-5 mt-6">
             <div className="flex items-center gap-2 mb-4">
                 <span className="text-yellow-500 text-xl">
                     ⚠️
@@ -13,7 +13,7 @@ function NeedsRecruitmentList({ colleges = [] }) {
                 colleges.length === 0 ?
                     (
                         <div
-                            className="bg-green-100 text-green-700 p-3 rounded"
+                            className=" text-green-700 p-3 rounded"
                         >
                             All colleges have active drives 🎉
                         </div>
@@ -25,7 +25,7 @@ function NeedsRecruitmentList({ colleges = [] }) {
                                 colleges.map((college) => (
                                     <div
                                         key={college.collegeId}
-                                        className=" bg-yellow-50 border-l-4 border-yellow-400 rounded p-3"
+                                        className="  border-l-4 border-yellow-400 rounded p-3"
                                     >
                                         <div className="flex justify-between">
                                             <div>
