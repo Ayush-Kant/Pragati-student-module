@@ -2,17 +2,44 @@ export const mockColleges = [
   {
     collegeId: 1, name: "BITS Pilani", email: "admin@bits.ac.in",
     location: "Rajasthan", departments: ["CSE", "ECE", "MBA"],
-    studentStrength: 5000, status: "approved", verifiedAt: "2025-03-01T10:00:00Z"
+    studentStrength: 5000, status: "approved", verifiedAt: "2025-03-01T10:00:00Z",
+    rejectionReason:null, suspensionReason:null,
+    stats:{
+        totalStudentsEnrolled:320,
+        totalSelected:160,
+        activeDriveCount:4,
+        participationRate:64.5,
+        selectionRate:52.5,
+        performanceRank:1
+    }
   },
   {
     collegeId: 2, name: "NIT Trichy", email: "admin@nit.ac.in",
     location: "Tamil Nadu", departments: ["CSE", "Mech"],
-    studentStrength: 3500, status: "pending", verifiedAt: null
+    studentStrength: 3500, status: "pending", verifiedAt: null,
+    rejectionReason:null, suspensionReason:null,
+    stats:{
+        totalStudentsEnrolled:320,
+        totalSelected:142,
+        activeDriveCount:3,
+        participationRate:64.5,
+        selectionRate:52.5,
+        performanceRank:2
+    }
   },
   {
     collegeId: 3, name: "VIT Vellore", email: "placements@vit.ac.in",
     location: "Tamil Nadu", departments: ["CSE", "ECE", "Civil"],
-    studentStrength: 8000, status: "suspended", verifiedAt: null
+    studentStrength: 8000, status: "suspended", verifiedAt: null,
+    rejectionReason:null, suspensionReason:"Placement reports were missing.",
+    stats:{
+        totalStudentsEnrolled:320,
+        totalSelected:142,
+        activeDriveCount:3,
+        participationRate:64.5,
+        selectionRate:52.5,
+        performanceRank:2
+    }
   },
   
 ];

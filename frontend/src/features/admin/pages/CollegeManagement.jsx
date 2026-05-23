@@ -47,7 +47,7 @@ export default function CollegeManagement() {
                 <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="border p-2 rounded"
+                    className="border p-2 rounded cursor-pointer"
                 >
                     <option value="all">All</option>
                     <option value="pending">Pending</option>
@@ -75,7 +75,7 @@ export default function CollegeManagement() {
                             prev => prev - 1
                         )}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 border rounded"
+                        className="px-4 py-2 border rounded cursor-pointer"
                     >
                         Prev
                     </button>
@@ -87,7 +87,7 @@ export default function CollegeManagement() {
                         disabled={
                             currentPage === totalPages
                         }
-                        className="px-4 py-2 border rounded"
+                        className="px-4 py-2 border rounded cursor-pointer"
                     >
                         Next
                     </button>

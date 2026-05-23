@@ -49,6 +49,7 @@ function App() {
           <Route path='profile'      element={<AdminProfile />} />
           <Route path='companies'    element={<AdminCompanies />} />
           <Route path='colleges'     element={<AdminCollege />} />
+          <Route path='colleges/:id' element={<CollegeDetail />} />
           <Route path='students'     element={<AdminStudent />} />
           <Route path='mentors'      element={<AdminMentors />} />
           <Route path='assesments'   element={<AdminAssesment />} />
@@ -56,7 +57,6 @@ function App() {
           <Route path='drives'       element={<AdminDrives />} />
           <Route path='notification' element={<AdminNotifications />} />
           <Route path='disputes'     element={<AdminDisputes />} />
-          <Route path='colleges/:id' element={<CollegeDetail />} />
         </Route>
 
         {/* ── Student ───────────────────────────────────────────────── */}
