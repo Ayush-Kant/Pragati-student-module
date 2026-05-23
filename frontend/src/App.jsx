@@ -26,6 +26,7 @@ import AdminNotifications from './features/admin/adminNotifications/AdminNotific
 // ── Student Module ───────────────────────────────────────────────────────────
 import { AuthProvider, StudentRoutes } from './features/student';
 import VerificationPage from './features/student/pages/public/VerificationPage';
+import CollegeDetail from "./features/admin/pages/CollegeDetail";
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           <Route path='profile'      element={<AdminProfile />} />
           <Route path='companies'    element={<AdminCompanies />} />
           <Route path='colleges'     element={<AdminCollege />} />
+          <Route path='colleges/:id' element={<CollegeDetail />} />
           <Route path='students'     element={<AdminStudent />} />
           <Route path='mentors'      element={<AdminMentors />} />
           <Route path='assesments'   element={<AdminAssesment />} />
