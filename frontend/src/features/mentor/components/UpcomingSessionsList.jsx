@@ -1,44 +1,47 @@
 import React from "react";
 
+const avatarColors = ["#FEE2E2", "#DBEAFE", "#D1FAE5", "#FEF3C7"];
+const avatarTextColors = ["#EF4444", "#3B82F6", "#10B981", "#F59E0B"];
+
 const UpcomingSessionsList = ({ sessions }) => {
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm">
-      <div className="flex justify-between items-center mb-4">
-        <p className="font-bold text-sm text-gray-700">Upcoming Sessions</p>
-        <span className="text-blue-500 text-xs cursor-pointer font-medium">View Calendar</span>
+    <div style={{ background: "#fff", borderRadius: "12px", padding: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+        <p style={{ fontSize: "12px", fontWeight: "600", color: "#1F2937", margin: 0 }}>📅 Upcoming Sessions</p>
+        <span style={{ fontSize: "10px", color: "#4F46E5", cursor: "pointer" }}>View Calendar</span>
       </div>
-
       {!sessions || sessions.length === 0 ? (
-        <p className="text-gray-400 text-sm">No upcoming sessions</p>
+        <p style={{ color: "#9CA3AF", fontSize: "12px" }}>No upcoming sessions</p>
       ) : (
-        <div className="flex flex-col gap-4">
-          {sessions.map((session, index) => {
-            const date = new Date(session.scheduledAt);
-            const dateStr = date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
-            const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-            const avatarColors = ["bg-pink-400", "bg-blue-400", "bg-green-400"];
-            return (
-              <div key={session.sessionId} className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-full ${avatarColors[index % avatarColors.length]} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
-                  {session.title.charAt(0)}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-800">{session.title}</p>
-                  <p className="text-xs text-gray-400">{session.mentor || "Mentor"}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-500">📅 {dateStr}</p>
-                  <p className="text-xs text-gray-400">🕐 {timeStr}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        sessions.map((session, index) => (
+          <div key={session.sessionId} style={{
+            display: "flex", alignItems: "center", gap: "10px",
+            padding: "8px 0",
+            borderBottom: index < sessions.length - 1 ? "1px solid #F3F4F6" : "none"
+          }}>
+            <div style={{
+              width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0,
+              background: avatarColors[index % avatarColors.length],
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "12px", fontWeight: "700",
+              color: avatarTextColors[index % avatarTextColors.length]
+            }}>
+              {session.title.charAt(0)}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: "11px", fontWeight: "600", color: "#1F2937", margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {session.title}
+              </p>
+              <p style={{ fontSize: "10px", color: "#6B7280", margin: 0 }}>
+                {new Date(session.scheduledAt).toLocaleString("en-US", {
+                  month: "numeric", day: "numeric", year: "numeric",
+                  hour: "numeric", minute: "2-digit", hour12: true
+                })}
+              </p>
+            </div>
+          </div>
+        ))
       )}
-
-      <button className="mt-4 text-blue-500 text-xs font-medium flex items-center gap-1">
-        View All Sessions →
-      </button>
     </div>
   );
 };
