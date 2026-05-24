@@ -1,4 +1,4 @@
-﻿// MentorDashboard.jsx
+// MentorDashboard.jsx
 import React from "react";
 import useMentorDashboard from "../hooks/useMentorDashboard";
 import StatsRow from "../components/StatsRow";
@@ -16,6 +16,13 @@ const BAR_COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 const Dashboard = () => {
   const { data, loading, error } = useMentorDashboard();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
+
+  React.useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (loading) return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#f8f9fc" }}>
@@ -49,8 +56,8 @@ const Dashboard = () => {
         boxShadow: "2px 0 8px rgba(0,0,0,0.06)", display: "flex",
         flexDirection: "column", padding: "16px 12px", gap: "2px",
         overflowY: "auto", zIndex: 50,
-        position: window.innerWidth < 768 ? "fixed" : "relative",
-        left: window.innerWidth < 768 ? (sidebarOpen ? "0" : "-200px") : "0",
+        position: windowWidth < 768 ? "fixed" : "relative",
+        left: windowWidth < 768 ? (sidebarOpen ? "0" : "-200px") : "0",
         top: 0, height: "100vh",
         transition: "left 0.3s ease"
       }}>
@@ -60,7 +67,7 @@ const Dashboard = () => {
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            style={{ display: window.innerWidth < 768 ? "block" : "none", background: "none", border: "none", fontSize: "18px", cursor: "pointer" }}
+            style={{ display: windowWidth < 768 ? "block" : "none", background: "none", border: "none", fontSize: "18px", cursor: "pointer" }}
           >✕</button>
         </div>
 
@@ -108,13 +115,14 @@ const Dashboard = () => {
         <div style={{
           background: "#fff", padding: "10px 16px",
           display: "flex", justifyContent: "space-between", alignItems: "center",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.06)", flexShrink: 0
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)", flexShrink: 0,
+          gap: "10px", flexWrap: "wrap"
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <button
               onClick={() => setSidebarOpen(true)}
               style={{
-                display: window.innerWidth < 768 ? "block" : "none",
+                display: windowWidth < 768 ? "block" : "none",
                 background: "none", border: "none", fontSize: "20px", cursor: "pointer"
               }}
             >☰</button>
@@ -124,7 +132,7 @@ const Dashboard = () => {
               style={{
                 border: "1px solid #E5E7EB", borderRadius: "20px",
                 padding: "6px 16px", fontSize: "12px",
-                width: window.innerWidth < 640 ? "140px" : "260px",
+                width: windowWidth < 640 ? "130px" : "260px",
                 outline: "none"
               }}
             />
