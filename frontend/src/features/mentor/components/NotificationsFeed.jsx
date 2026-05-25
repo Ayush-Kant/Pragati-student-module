@@ -1,46 +1,45 @@
 import React from "react";
 
-const avatarColors = ["bg-blue-400", "bg-orange-400", "bg-green-400", "bg-purple-400"];
-
 const getIcon = (type) => {
   switch (type) {
-    case "submission": return { icon: "📄", bg: "bg-blue-100" };
-    case "session":    return { icon: "🎥", bg: "bg-green-100" };
-    case "review":     return { icon: "✅", bg: "bg-orange-100" };
-    default:           return { icon: "🔔", bg: "bg-gray-100" };
+    case "submission": return { icon: "📄", bg: "#EEF2FF" };
+    case "session":    return { icon: "🎥", bg: "#ECFDF5" };
+    case "review":     return { icon: "✅", bg: "#F0FDF4" };
+    default:           return { icon: "🔔", bg: "#FEF3C7" };
   }
 };
 
-const timeAgo = ["2h ago", "4h ago", "6h ago", "1d ago"];
-
 const NotificationsFeed = ({ notifications }) => {
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm">
-      <div className="flex justify-between items-center mb-4">
-        <p className="font-bold text-sm text-gray-700">Recent Activity</p>
-        <span className="text-blue-500 text-xs cursor-pointer font-medium">View All</span>
+    <div style={{ background: "#fff", borderRadius: "12px", padding: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+        <p style={{ fontSize: "12px", fontWeight: "600", color: "#1F2937", margin: 0 }}>🔔 Recent Activity</p>
+        <span style={{ fontSize: "10px", color: "#4F46E5", cursor: "pointer" }}>View All</span>
       </div>
-
       {!notifications || notifications.length === 0 ? (
-        <p className="text-gray-400 text-sm">No new notifications</p>
+        <p style={{ color: "#9CA3AF", fontSize: "12px" }}>No new notifications</p>
       ) : (
-        <div className="flex flex-col gap-4">
-          {notifications.map((item, index) => {
-            const { icon, bg } = getIcon(item.type);
-            return (
-              <div key={index} className="flex items-start gap-3">
-                <div className={`w-8 h-8 rounded-full ${bg} flex items-center justify-center text-sm flex-shrink-0`}>
-                  {icon}
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs text-gray-700 font-medium leading-snug">{item.message}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{item.subtext || ""}</p>
-                </div>
-                <span className="text-xs text-gray-400 flex-shrink-0">{timeAgo[index % timeAgo.length]}</span>
+        notifications.map((item, index) => {
+          const { icon, bg } = getIcon(item.type);
+          return (
+            <div key={index} style={{
+              display: "flex", alignItems: "center", gap: "10px",
+              padding: "7px 0",
+              borderBottom: index < notifications.length - 1 ? "1px solid #F3F4F6" : "none"
+            }}>
+              <div style={{
+                width: "28px", height: "28px", borderRadius: "8px",
+                background: bg, display: "flex", alignItems: "center",
+                justifyContent: "center", fontSize: "13px", flexShrink: 0
+              }}>
+                {icon}
               </div>
-            );
-          })}
-        </div>
+              <span style={{ fontSize: "11px", color: "#374151", lineHeight: "1.4" }}>
+                {item.message}
+              </span>
+            </div>
+          );
+        })
       )}
     </div>
   );

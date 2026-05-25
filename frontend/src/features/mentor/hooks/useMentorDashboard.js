@@ -1,43 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-export const useMentorDashboard = () => {
-  const [data, setData] = useState({
-    stats: {
-      totalMentees: 48,
-      activeSessions: 16,
-      assignmentsDue: 24,
-      tasksAssigned: 36,
-      placementProgress: 72
-    },
-    progressOverview: {
-      excellent: 12,
-      good: 19,
-      average: 11,
-      needsImprovement: 6
-    },
-    domains: [
-      { name: 'Web Development', count: 16, color: '#3b82f6' },
-      { name: 'UI/UX Design', count: 12, color: '#10b981' },
-      { name: 'Data Science', count: 8, color: '#f59e0b' },
-      { name: 'Digital Marketing', count: 7, color: '#ec4899' },
-      { name: 'Others', count: 5, color: '#8b5cf6' }
-    ],
-    upcomingSessions: [
-      { id: 1, topic: 'UI/UX Design Review', mentor: 'Riya Sharma', time: '10:00 AM', date: '20 May, 2026' },
-      { id: 2, topic: 'Mock Interview', mentor: 'Arjun Verma', time: '02:30 PM', date: '21 May, 2026' },
-      { id: 3, topic: 'Career Guidance', mentor: 'Neha Patel', time: '11:15 AM', date: '22 May, 2026' }
-    ],
-    leaderboard: [
-      { id: 1, name: 'Riya Sharma', domain: 'UI/UX Design', score: 92 },
-      { id: 2, name: 'Anjali Verma', domain: 'Web Development', score: 89 },
-      { id: 3, name: 'Neha Patel', domain: 'Data Science', score: 87 }
-    ],
-    notifications: [
-      { id: 1, text: 'Riya Sharma completed assignment 2', time: '5 mins ago' },
-      { id: 2, text: 'Anjali Verma submitted project proposal', time: '1 hour ago' },
-      { id: 3, text: 'Karan Singh completed mock review', time: '2 hours ago' }
-    ]
-  });
-
-  return { data, loading: false, error: null };
+const mockDashboard = {
+  activeDrives: 3,
+  pendingReviews: 7,
+  totalMentees: 48,
+  activeSessions: 16,
+  assessments: 24,
+  tasksAssigned: 36,
+  placementProgress: 9,
+  upcomingSessions: [
+    { sessionId: "ses_01", title: "UI/UX Design Session", scheduledAt: "2025-05-24T11:00:00Z" },
+    { sessionId: "ses_02", title: "Mock Interview", scheduledAt: "2025-05-24T12:00:00Z" },
+    { sessionId: "ses_03", title: "Career Guidance", scheduledAt: "2025-05-25T10:00:00Z" }
+  ],
+  topStudents: [
+    { studentId: "std_01", name: "Riya Sharma", domain: "UI/UX Design", readinessScore: 92 },
+    { studentId: "std_02", name: "Arjun Verma", domain: "Web Development", readinessScore: 89 },
+    { studentId: "std_03", name: "Neha Patel", domain: "Data Science", readinessScore: 87 },
+    { studentId: "std_04", name: "Ravi Kumar", readinessScore: 74 },
+    { studentId: "std_05", name: "Ananya Singh", readinessScore: 70 }
+  ],
+  recentNotifications: [
+    { type: "submission", message: "Riya Sharma completed assessment" },
+    { type: "review", message: "Arjun Verma submitted project Portfolio Website" },
+    { type: "session", message: "Karan Patel joined session" },
+    { type: "submission", message: "Karan Singh completed task Resume Optimization" }
+  ],
+  menteesByDomain: [
+    { domain: "Web Development", count: 16 },
+    { domain: "UI/UX Design", count: 12 },
+    { domain: "Average", count: 12 },
+    { domain: "Data Science", count: 8 },
+    { domain: "Digital Marketing", count: 5 }
+  ],
+  jobReadinessScore: 72,
+  menteesProgress: [
+    { name: "Excellent", value: 12, percent: 25 },
+    { name: "Good", value: 18, percent: 37 },
+    { name: "Average", value: 12, percent: 25 },
+    { name: "Needs Improvement", value: 6, percent: 13 }
+  ]
 };
+
+const useMentorDashboard = () => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    setData(mockDashboard);
+    setLoading(false);
+  }, []);
+
+  return { data, loading, error };
+};
+
+export default useMentorDashboard;

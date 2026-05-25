@@ -1,7 +1,7 @@
 import { Toaster } from "react-hot-toast";
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-// ── Auth Pages (Ikkada nee project folder path correct ga evvu) ──
+// ── Auth Pages  ──
 import LoginPage from "./features/student/pages/auth/LoginPage";
 import RegisterPage from "./features/student/pages/auth/RegisterPage";
 
@@ -33,7 +33,7 @@ function App() {
     <AuthProvider>
       <Toaster />
       <Routes>
-        {/* URL khali ga '/' unte direct ga /login ki automatic ga vellipothadi */}
+        
         <Route path="/" element={<Navigate to="/login" replace />} />
         
         {/* ── Auth Routes ────────────────────────────────────────── */}
