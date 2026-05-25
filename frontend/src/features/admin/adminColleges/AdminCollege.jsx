@@ -1,11 +1,5 @@
-import React from 'react'
+import CollegeManagement from "../pages/CollegeManagement";
 
-const AdminCollege = () => {
-  return (
-    <div>
-      Admin College
-    </div>
-  )
+ export default function AdminCollege() {
+  return <CollegeManagement />;
 }
-
-export default AdminCollege
