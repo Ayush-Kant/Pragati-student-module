@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // useNavigate ఇంపోర్ట్ చేసాం
+import { useNavigate } from 'react-router-dom'; 
 import studentImage from "./images/student.png";
 import manager from "./images/managers.png";
 import mentor from "./images/mentor.png";
 
 const AuthPage = () => {
-  const navigate = useNavigate(); // నావిగేషన్ హుక్ initialize చేసాం
+  const navigate = useNavigate(); 
   const [view, setView] = useState('login'); 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
@@ -130,7 +130,7 @@ const AuthPage = () => {
             <div className="text-center">
               <p className="text-sm text-gray-400 font-medium">
                 Don't have an account?{' '}
-                {/* ఇక్కడ నావిగేషన్ మార్చబడింది */}
+               
                 <button
                   onClick={() => navigate('/register')}
                   className={`font-bold ${current.textColor} hover:underline transition-all duration-500`}
