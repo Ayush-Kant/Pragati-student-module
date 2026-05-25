@@ -2,13 +2,15 @@ import useCollegeDetail from "../hooks/useCollegeDetail";
 import CollegeStatusBadge from "../components/CollegeStatusBadge";
 import CollegeStatsCard from "../components/CollegeStatsCard";
 import CollegeActionButtons from "../components/CollegeActionButtons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 function CollegeDetail() {
-    const { college } = useCollegeDetail();
+    const { college, darkMode } = useOutletContext();
+    const { college: collegeFromHook } = useCollegeDetail();
+    const pageCollege = collegeFromHook || college;
     const navigate = useNavigate();
 
-    if (!college) {
+    if (!pageCollege) {
         return (
             <div className="p-6">
                 College not found
@@ -18,43 +20,45 @@ function CollegeDetail() {
 
     return (
         <>
-            <div className="p-6">
-                <h1 className="text-3xl font-bold mb-4">
-                    {college.name}
+            <div className={`p-6 transition ${darkMode ? "bg-slate-950 text-white" : "bg-white text-slate-900"}`}>
+                <h1 className={`text-3xl font-bold mb-4 ${darkMode ? "text-white" : "text-slate-900"}`}>
+                    {pageCollege.name}
                 </h1>
 
                 <div className="flex items-center gap-4 mt-3 mb-4">
                     <CollegeStatusBadge
-                        status={college.status}
-                        collegeName={college.name}
+                        status={pageCollege.status}
+                        collegeName={pageCollege.name}
                     />
                     <CollegeActionButtons
-                        status={college.status}
+                        status={pageCollege.status}
+                        collegeName={pageCollege.name}
+                        collegeId={pageCollege.collegeId}
                     />
                 </div>
 
-                <div className=" rounded-lg shadow p-6 space-y-4">
-                    <p>
+                <div className={`rounded-lg shadow p-6 space-y-4 transition ${darkMode ? "bg-slate-900 shadow-black/30" : "bg-white shadow-slate-200"}`}>
+                    <p className={darkMode ? "text-slate-300" : "text-slate-700"}>
                         <strong>Email:</strong>
                         {" "}
-                        {college.email}
+                        {pageCollege.email}
                     </p>
 
-                    <p>
+                    <p className={darkMode ? "text-slate-300" : "text-slate-700"}>
                         <strong>Location:</strong>
                         {" "}
-                        {college.location}
+                        {pageCollege.location}
                     </p>
 
-                    <p>
+                    <p className={darkMode ? "text-slate-300" : "text-slate-700"}>
                         <strong>Students:</strong>
                         {" "}
-                        {college.studentStrength}
+                        {pageCollege.studentStrength}
                     </p>
                     {
-                        college.status === "approved"
+                        pageCollege.status === "approved"
                         &&
-                        college.verifiedAt
+                        pageCollege.verifiedAt
                         &&
                         <p>
                             <strong>
@@ -63,7 +67,7 @@ function CollegeDetail() {
                             {" "}
                             {
                                 new Date(
-                                    college.verifiedAt
+                                    pageCollege.verifiedAt
                                 )
                                     .toLocaleDateString()
                             }
@@ -74,11 +78,11 @@ function CollegeDetail() {
                         <strong>Departments:</strong>
                         <div className="flex gap-2 mt-2 flex-wrap">
                             {
-                                college.departments.map(
+                                pageCollege?.departments?.map(
                                     (dept, index) => (
                                         <span
-                                            key={index}
-                                            className=" px-3 py-1 rounded"
+                                            key={`${pageCollege.collegeId}-${index}`}
+                                            className={`px-3 py-1 rounded transition ${darkMode ? "bg-slate-800 text-slate-200" : "bg-gray-100 text-slate-700"}`}
                                         >
                                             {dept}
                                         </span>
@@ -95,47 +99,46 @@ function CollegeDetail() {
                 <CollegeStatsCard
                     title="Total Enrolled"
                     value={
-                        college.stats.totalStudentsEnrolled
+                        pageCollege.stats.totalStudentsEnrolled
                     }
+                    darkMode={darkMode}
                 />
                 <CollegeStatsCard
                     title="Total Selected"
                     value={
-                        college.stats.totalSelected
+                        pageCollege?.stats?.totalSelected ?? 0
                     }
+                    darkMode={darkMode}
                 />
                 <CollegeStatsCard
                     title="Active Drives"
                     value={
-                        college.stats.activeDriveCount
+                        pageCollege.stats.activeDriveCount
                     }
+                    darkMode={darkMode}
                 />
                 <CollegeStatsCard
                     title="Performance Rank"
-                    value={`#${college.stats.performanceRank}`}
+                    value={`#${pageCollege.stats.performanceRank}`}
+                    darkMode={darkMode}
                 />
             </div>
-            <div className=" rounded-lg shadow p-6 mt-6 space-y-6">
+            <div className={`rounded-lg shadow p-6 mt-6 space-y-6 transition ${darkMode ? "bg-slate-900 shadow-black/30" : "bg-white shadow-slate-200"}`}>
                 {/* Participation */}
                 <div>
-                    <div
-                        className="flex justify-between mb-2"
-                    >
+                    <div className="flex justify-between mb-2">
                         <span>
                             Participation Rate
                         </span>
                         <span>
-                            {college.stats.participationRate}%
+                            {pageCollege.stats.participationRate}%
                         </span>
                     </div>
-                    <div
-                        className="w-full bg-gray-200 rounded-full h-4"
-                    >
-                        <div
-                            className="bg-blue-500 h-4 rounded-full"
+                    <div className={`w-full rounded-full h-4 transition ${darkMode ? "bg-slate-700" : "bg-gray-200"}`}>
+                        <div className="bg-blue-500 h-4 rounded-full"
                             style={{
                                 width:
-                                    `${college.stats.participationRate}%`
+                                    `${pageCollege.stats.participationRate}%`
                             }}
                         />
                     </div>
@@ -143,24 +146,20 @@ function CollegeDetail() {
 
                 {/* Selection */}
                 <div>
-                    <div
-                        className="flex justify-between mb-2"
-                    >
+                    <div className="flex justify-between mb-2">
                         <span>
                             Selection Rate
                         </span>
                         <span>
-                            {college.stats.selectionRate}%
+                            {pageCollege?.stats?.selectionRate ?? 0}%
                         </span>
                     </div>
-                    <div
-                        className="w-full bg-gray-200 rounded-full h-4"
-                    >
+                    <div className={`w-full rounded-full h-4 transition ${darkMode ? "bg-slate-700" : "bg-gray-200"}`}>
                         <div
                             className="bg-green-500 h-4 rounded-full"
                             style={{
                                 width:
-                                    `${college.stats.selectionRate}%`
+                                    `${pageCollege.stats.selectionRate}%`
                             }}
                         />
                     </div>
@@ -170,42 +169,44 @@ function CollegeDetail() {
             {/* rejection/suspension */}
             {
                 (
-                    college.status === "rejected"
+                    pageCollege.status === "rejected"
                     ||
-                    college.status === "suspended"
+                    pageCollege.status === "suspended"
                 )
                 &&
-                <div className={`mt-6 p-4 rounded-lg border-l-4
-                                    ${college.status === "rejected"
+                <div className={`mt-6 p-4 rounded-lg border-l-4 transition
+                                    ${pageCollege.status === "rejected"
                         ?
-                        "bg-red-300 border-red-500 text-red-700"
+                        `${darkMode ? "bg-red-900 border-red-500 text-red-200" : "bg-red-200 border-red-500 text-red-700"}`
                         :
-                        "bg-gray-400 border-gray-500 text-gray-700"
+                        `${darkMode ? "bg-slate-800 border-slate-500 text-slate-200" : "bg-gray-200 border-gray-400 text-gray-700"}`
                     }
                                 `} >
                     <h3 className="font-bold mb-2">
                         {
-                            college.status === "rejected"
+                            pageCollege.status === "rejected"
                                 ?
-                                "Rejection Reason"
+                                "❌ Rejection Reason"
                                 :
-                                "Suspension Reason"
+                                "⚠️ Suspension Reason"
                         }
                     </h3>
                     <p>
                         {
-                            college.rejectionReason
+                            pageCollege.rejectionReason
                             ||
-                            college.suspensionReason
+                            pageCollege.suspensionReason
                         }
                     </p>
                 </div>
             }
+            <div className="mt-6 flex">
             <button onClick={() => navigate("/admin/colleges")}
-                className="mt-6 px-5 py-2 rounded-lg bg-blue-900 text-white hover:bg-black transition cursor-pointer"
+                className="mt-6 px-5 py-2 rounded-lg bg-blue-700 text-white hover:bg-black transition cursor-pointer"
             >
                 Back
             </button>
+            </div>
         </>
     )
 }

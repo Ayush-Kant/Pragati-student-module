@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api/admin",
+  baseURL: "http://localhost:5000",
 });
 
 export const getAdminProfile = async () => {
@@ -17,7 +17,7 @@ export const updateAdminProfile = async (profileData) => {
 //For college needing recruitment
 export const getNeedsRecruitment = async () => {
   try {
-    const response = await api.get(
+    const response = await API.get(
       "/api/v1/admin/colleges/needs-recruitment"
     );
     return response.data;
@@ -31,7 +31,7 @@ export const getNeedsRecruitment = async () => {
 //To fetch rankings of college
 export const getCollegeRankings = async () => {
   try {
-    const response = await api.get(
+    const response = await API.get(
       "/api/v1/admin/colleges/rankings"
     );
     return response.data;
@@ -42,13 +42,52 @@ export const getCollegeRankings = async () => {
   }
 }
 
-// getColleges()
-// getCollegeById()
-// getCollegeStats()
+export const approveCollege = async (id) => {
+  try {
+    const response = await API.put(
+      `/api/v1/admin/colleges/${id}/approve`
+    );
+    return response.data;
+  }
+  catch (error) {
+    throw error;
+  }
+};
 
-// approveCollege()
-// rejectCollege()
-// suspendCollege()
 
-// getCollegeRankings()
-// getNeedsRecruitment()
+export const rejectCollege = async (
+  id,
+  reason
+) => {
+  try {
+    const response = await API.put(
+      `/api/v1/admin/colleges/${id}/reject`,
+      {
+        reason
+      }
+    );
+    return response.data;
+  }
+  catch (error) {
+    throw error;
+  }
+};
+
+
+export const suspendCollege = async (
+  id,
+  reason
+) => {
+  try {
+    const response = await API.put(
+      `/api/v1/admin/colleges/${id}/suspend`,
+      {
+        reason
+      }
+    );
+    return response.data;
+  }
+  catch (error) {
+    throw error;
+  }
+};

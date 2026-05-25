@@ -60,11 +60,12 @@ const AdminLayout = () => {
 
             <Outlet
               context={{
-              profile,
-              loading,
-              error,
-              saveProfile
-            }}
+                profile,
+                loading,
+                error,
+                saveProfile,
+                darkMode,
+              }}
           />
 
           </main>

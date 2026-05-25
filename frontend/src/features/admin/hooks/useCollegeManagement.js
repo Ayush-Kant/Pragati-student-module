@@ -5,15 +5,27 @@ import { getNeedsRecruitment } from "../services/adminService";
 import { getCollegeRankings } from "../services/adminService";
 
 function useCollegeManagement() {
-
+    const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("all");
     const [department, setDepartment] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-
     const [debouncedSearch, setDebouncedSearch] = useState(search);
     const [needsRecruitment, setNeedsRecruitment] = useState([]);
     const [rankings, setRankings] = useState([]);
+
+    const fetchColleges = async () => {
+        try {
+            // later replace mock data with API
+            // const data = await getColleges();
+
+            // temporary
+            return mockColleges;
+        }
+        catch (error) {
+            console.log(error);
+        }
+    };
 
 
     useEffect(() => {
@@ -30,27 +42,39 @@ function useCollegeManagement() {
     useEffect(() => {
         const fetchNeedsRecruitment = async () => {
             try {
+                setLoading(true)
                 const data = await getNeedsRecruitment();
                 setNeedsRecruitment(data.colleges);
             }
             catch (error) {
-                console.log(error);
+                console.error(
+                    "Failed to fetch Needs recuitment:",
+                    error
+                );
+            }
+            finally {
+                setLoading(false);
             }
         };
         fetchNeedsRecruitment();
     }, []);
 
+
     useEffect(() => {
         const fetchRankings = async () => {
             try {
-                const data =
-                    await getCollegeRankings();
-                setRankings(
-                    data.rankings
-                );
+                setLoading(true);
+                const data = await getCollegeRankings();
+                setRankings(data.rankings);
             }
             catch (error) {
-                console.log(error);
+                console.error(
+                    "Failed to fetch rankings:",
+                    error
+                );
+            }
+            finally {
+                setLoading(false);
             }
         };
         fetchRankings();
@@ -110,7 +134,9 @@ function useCollegeManagement() {
         setCurrentPage,
         totalPages,
         needsRecruitment,
-        rankings
+        rankings,
+        fetchColleges,
+        loading
     };
 }
 
