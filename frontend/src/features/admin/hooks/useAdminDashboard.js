@@ -4,7 +4,7 @@ import {
   fetchDashboardFunnel,
   fetchCompanyStats,
   fetchCollegePerformance,
-  fetchActivityFeed,
+  fetchActivityFeed
 } from "../services/adminService";
 
 // Mock Data

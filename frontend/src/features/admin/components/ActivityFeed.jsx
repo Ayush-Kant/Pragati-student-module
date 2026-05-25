@@ -75,7 +75,6 @@ const ActivityFeed = ({ activities }) => {
                 const relativeTime = activityDate && !isNaN(activityDate)
                     ? formatDistanceToNow(activityDate, { addSuffix: true })
                     : "Unknown time";
-
                 return (
                     <div
                         key={activity?.logId || index}

@@ -63,7 +63,6 @@ const CollegePerformanceTable = ({ colleges }) => {
                         );
                         const progressColor = getProgressColor(selectionRate);
                         const isTopRank = index === 0;
-
                         return (
                             <tr
                                 key={college.collegeId || index}
@@ -75,7 +74,6 @@ const CollegePerformanceTable = ({ colleges }) => {
                   ${isTopRank ? "border-l-4 border-l-yellow-400 bg-yellow-50/40" : ""}
                 `}
                             >
-
                                 {/* Rank */}
                                 <td className="py-4 px-4 font-semibold text-gray-800">
                                     <div className="flex items-center gap-2">

@@ -21,7 +21,6 @@ const AdminDashboard = () => {
     if (loading) {
         return (
             <div className="p-4 sm:p-6 space-y-6 bg-gray-50 min-h-screen">
-
                 {/* Header Skeleton */}
                 <div className="space-y-2">
                     <div className="h-8 w-60 bg-gray-200 rounded animate-pulse"></div>
@@ -55,7 +54,6 @@ const AdminDashboard = () => {
 
     return (
         <div className="p-4 sm:p-6 bg-gray-50 min-h-screen space-y-6">
-
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>

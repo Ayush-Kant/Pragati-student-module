@@ -7,8 +7,6 @@ import {
 } from "lucide-react";
 
 const AdminStatsRow = ({ stats }) => {
-
-  // Safety fallback
   const safeStats = {
     totalDrives: Math.max(0, stats?.totalDrives || 0),
     totalStudents: Math.max(0, stats?.totalStudents || 0),
@@ -91,7 +89,6 @@ const AdminStatsRow = ({ stats }) => {
             <div className={`text-3xl ${card.textColor}`}>
               <card.icon size={30} />
             </div>
-
           </div>
 
           {/* Label */}
