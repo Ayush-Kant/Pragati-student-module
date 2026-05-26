@@ -1,15 +1,19 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Navigate, Route } from "react-router-dom";
+import PrivateRoute from "../../../routes/PrivateRoute";
+import RoleRoute from "../../../routes/RoleRoute";
+import { CollegeLayout } from "../layouts/CollegeLayout";
+import Dashboard from "../../mentor/pages/Dashboard";
 
-import Dashboard from "../features/admin/pages/Dashboard";
 
-const AppRoutes = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
+const collegeRoute = (
+  <Route element={<PrivateRoute />}>
+    <Route element={<RoleRoute allowedRoles={['college']} />}>
+      <Route path="college" element={<CollegeLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
+      </Route>
+    </Route>
+  </Route>
+);
 
-export default AppRoutes;
+export default collegeRoute;

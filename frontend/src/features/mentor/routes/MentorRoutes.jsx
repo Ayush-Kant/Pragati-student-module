@@ -1,15 +1,18 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import MentorLayout from '../components/layout/MentorLayout';
-import Dashboard from '../pages/Dashboard';
+import { Route, Navigate } from "react-router-dom";
+import PrivateRoute from "../../../routes/PrivateRoute";
+import RoleRoute from "../../../routes/RoleRoute";
+import MentorLayout from "../components/layout/MentorLayout";
+import Dashboard from "../pages/Dashboard";
 
-export default function MentorRoutes() {
-  return (
-    <Routes>
-      <Route element={<MentorLayout />}>
-        {/* Index point par direct bina kisi error ke dashboard match hoga */}
-        <Route path="/" element={<Dashboard />} />
+const mentorRoute = (
+  <Route element={<PrivateRoute />}>
+    <Route element={<RoleRoute allowedRoles={['mentor']} />}>
+      <Route path="mentor" element={<MentorLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
       </Route>
-    </Routes>
-  );
-}
+    </Route>
+  </Route>
+);
+
+export default mentorRoute;
