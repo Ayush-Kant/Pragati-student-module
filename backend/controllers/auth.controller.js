@@ -100,12 +100,28 @@ export const register = async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const uuid = randomUUID();
-
-    const user = await pool.query(
+     const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+    const user = await client.query(
       `INSERT INTO auth_users (email, password_hash, role, uuid_id)
-       VALUES ($1, $2, $3, $4)`,
+       VALUES ($1, $2, $3, $4)
+       RETURNING id` ,
       [email, passwordHash, role, uuid]
     );
+    const userId = user.rows[0].id;
+    await client.query(
+      `INSERT INTO users (auth_user_id, email, role, created_at, phone, username)
+       VALUES ($1, $2, $3, NOW(), $4, $5)`,
+      [userId, email, role, null, email.split('@')[0]]
+    );
+
+    await client.query("COMMIT");
+  }
+  catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  }
     const token = jwt.sign(
       {
         userId: uuid,
