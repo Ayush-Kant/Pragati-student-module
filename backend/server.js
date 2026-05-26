@@ -1,6 +1,10 @@
 import express from "express";
 import connectDB from "./config/db.js";
 import cors from "cors";
+import mentorRoutes from "./routes/mentor.routes.js";
+import adminDashboardRoutes from './routes/admin.dashboard.routes.js';
+import adminCollegeRoutes from './routes/admin.college.routes.js'
+import contentRoutes from "./routes/content.routes.js";
 
 import studentRoutes from "./routes/studentRoutes.js";
 
@@ -13,6 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use("/api/student", studentRoutes);
+app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
+app.use('/api/v1/admin/colleges', adminCollegeRoutes);
+app.use("/api/mentor", contentRoutes);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
