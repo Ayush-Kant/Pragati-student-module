@@ -1,53 +1,54 @@
 import React from "react";
 
-const badgeColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
-const badgeNumbers = ["1", "2", "3"];
-const avatarColors = ["bg-pink-400", "bg-blue-400", "bg-green-400", "bg-purple-400", "bg-orange-400"];
-const domainColors = ["text-blue-500", "text-green-500", "text-purple-500"];
-
 const TopStudentsLeaderboard = ({ students }) => {
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm">
-      <div className="flex justify-between items-center mb-4">
-        <p className="font-bold text-sm text-gray-700">Top Performing Mentees</p>
-        <span className="text-blue-500 text-xs cursor-pointer font-medium">View Leaderboard</span>
+    <div style={{ background: "#fff", borderRadius: "12px", padding: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+        <p style={{ fontSize: "12px", fontWeight: "600", color: "#1F2937", margin: 0 }}>🏆 Top Students</p>
+        <span style={{ fontSize: "10px", color: "#4F46E5", cursor: "pointer" }}>View Leaderboard</span>
       </div>
-
       {!students || students.length === 0 ? (
-        <p className="text-gray-400 text-sm">No students found</p>
+        <p style={{ color: "#9CA3AF", fontSize: "12px" }}>No students found</p>
       ) : (
-        <div className="flex flex-col gap-4">
-          {students.map((student, index) => (
-            <div key={student.studentId} className="flex items-center gap-3">
-              {/* Badge */}
-              <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-black flex-shrink-0"
-                style={{ backgroundColor: index < 3 ? badgeColors[index] : "#9CA3AF" }}>
-                {index + 1}
-              </div>
-
-              {/* Avatar */}
-              <div className={`w-9 h-9 rounded-full ${avatarColors[index % avatarColors.length]} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
-                {student.name.charAt(0)}
-              </div>
-
-              {/* Name + Domain */}
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-800">{student.name}</p>
-                <p className={`text-xs ${domainColors[index % domainColors.length]}`}>
-                  {student.domain || "General"}
-                </p>
-              </div>
-
-              {/* Score */}
-              <p className="text-sm font-bold text-blue-600">{student.readinessScore}%</p>
+        students.map((student, index) => (
+          <div key={student.studentId} style={{
+            display: "flex", alignItems: "center", gap: "8px",
+            padding: "6px 0",
+            borderBottom: index < students.length - 1 ? "1px solid #F3F4F6" : "none"
+          }}>
+            <span style={{ fontSize: "12px", fontWeight: "700", width: "16px", color: index === 0 ? "#F59E0B" : "#9CA3AF", flexShrink: 0 }}>
+              {index + 1}
+            </span>
+            <div style={{
+              width: "26px", height: "26px", borderRadius: "50%", flexShrink: 0,
+              background: index === 0 ? "#FEF3C7" : "#EEF2FF",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "11px", fontWeight: "700",
+              color: index === 0 ? "#F59E0B" : "#4F46E5"
+            }}>
+              {student.name.charAt(0)}
             </div>
-          ))}
-        </div>
+            <span style={{
+              flex: 1, fontSize: "11px",
+              fontWeight: index === 0 ? "700" : "500",
+              color: index === 0 ? "#F59E0B" : "#374151",
+              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
+            }}>
+              {student.name}
+            </span>
+            <span style={{ fontSize: "11px", color: "#6B7280", width: "24px", textAlign: "right", flexShrink: 0 }}>
+              {student.readinessScore}
+            </span>
+            <div style={{ width: "60px", height: "6px", background: "#F3F4F6", borderRadius: "4px", flexShrink: 0 }}>
+              <div style={{
+                width: `${Math.min(student.readinessScore, 100)}%`,
+                height: "6px", borderRadius: "4px",
+                background: index === 0 ? "#F59E0B" : "#4F46E5"
+              }} />
+            </div>
+          </div>
+        ))
       )}
-
-      <button className="mt-4 text-blue-500 text-xs font-medium flex items-center gap-1">
-        View Full Leaderboard →
-      </button>
     </div>
   );
 };

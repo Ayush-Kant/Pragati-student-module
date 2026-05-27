@@ -585,18 +585,18 @@
 
 // export default AdminSidebar;
 import {
-  FaHome,
+  FaBorderAll,
   FaBuilding,
-  FaSchool,
+  FaGraduationCap,
   FaUsers,
   FaUserTie,
-  FaClipboardList,
+  FaClipboardCheck,
   FaBook,
   FaRocket,
   FaBell,
   FaGavel,
-   FaTimes,
-} from "react-icons/fa";
+  FaXmark,
+} from "react-icons/fa6";
 
 import { NavLink } from "react-router-dom";
 
@@ -609,86 +609,86 @@ function AdminSidebar({
 }) {
 
   const menuSections = [
+  {
+    heading: "Overview",
+    items: [
+      {
+        title: "Dashboard",
+        path: "/admin",
+        icon: <FaBorderAll />,
+      },
+    ],
+  },
 
-    {
-      heading: "Overview",
-      items: [
-        {
-          title: "Dashboard",
-          path: "/admin",
-          icon: <FaHome />,
-        },
-      ],
-    },
+  {
+    heading: "Management",
+    items: [
+      {
+        title: "Companies",
+        path: "/admin/companies",
+        icon: <FaBuilding />,
+      },
+      {
+        title: "Colleges",
+        path: "/admin/colleges",
+        icon: <FaGraduationCap />,
+      },
+      {
+        title: "Students",
+        path: "/admin/students",
+        icon: <FaUsers />,
+      },
+      {
+        title: "Mentors",
+        path: "/admin/mentors",
+        icon: <FaUserTie />,
+      },
+    ],
+  },
 
-    {
-      heading: "Management",
-      items: [
-        {
-          title: "Companies",
-          path: "/admin/companies",
-          icon: <FaBuilding />,
-        },
-        {
-          title: "Colleges",
-          path: "/admin/colleges",
-          icon: <FaSchool />,
-        },
-        {
-          title: "Students",
-          path: "/admin/students",
-          icon: <FaUsers />,
-        },
-        {
-          title: "Mentors",
-          path: "/admin/mentors",
-          icon: <FaUserTie />,
-        },
-      ],
-    },
+  {
+    heading: "Academics",
+    items: [
+      {
+        title: "Assessments",
+        path: "/admin/assesments",
+        icon: <FaClipboardCheck />,
+      },
+      {
+        title: "Training LMS",
+        path: "/admin/training",
+        icon: <FaBook />,
+      },
+    ],
+  },
 
-    {
-      heading: "Academics",
-      items: [
-        {
-          title: "Assessments",
-          path: "/admin/assesments",
-          icon: <FaClipboardList />,
-        },
-        {
-          title: "Training LMS",
-          path: "/admin/training",
-          icon: <FaBook />,
-        },
-      ],
-    },
+  {
+    heading: "Recruitment",
+    items: [
+      {
+        title: "Drives",
+        path: "/admin/drives",
+        icon: <FaRocket />,
+      },
+    ],
+  },
 
-    {
-      heading: "Recruitment",
-      items: [
-        {
-          title: "Drives",
-          path: "/admin/drives",
-          icon: <FaRocket />,
-        },
-      ],
-    },
+  {
+    heading: "Communications",
+    items: [
+      {
+        title: "Notifications",
+        path: "/admin/notification",
+        icon: <FaBell />,
+      },
+      {
+        title: "Disputes",
+        path: "/admin/disputes",
+        icon: <FaGavel />,
+      },
+    ],
+  },
 
-    {
-      heading: "Communications",
-      items: [
-        {
-          title: "Notifications",
-          path: "/admin/notification",
-          icon: <FaBell />,
-        },
-        {
-          title: "Disputes",
-          path: "/admin/disputes",
-          icon: <FaGavel />,
-        },
-      ],
-    },
 
   ];
 
@@ -720,7 +720,7 @@ function AdminSidebar({
     text-gray-500
   "
 >
-  <FaTimes />
+  <FaXmark />
 </button>
 
       {/* Logo */}
@@ -784,10 +784,49 @@ function AdminSidebar({
                 `}
               >
 
+                
                 {/* Icon */}
-                <div className="text-lg">
-                  {item.icon}
-                </div>
+         <div
+            className={`
+            flex items-center justify-center
+            w-10 h-10 rounded-xl
+            text-lg shadow-sm
+
+          ${
+              item.title === "Dashboard"
+              ? "bg-[#22C55E] text-white"
+
+              : item.title === "Companies"
+              ? "bg-[#FF7A30] text-white"
+
+              : item.title === "Colleges"
+              ? "bg-[#D9A11A] text-white"
+
+              : item.title === "Students"
+              ? "bg-[#7C4DFF] text-white"
+
+              : item.title === "Mentors"
+              ? "bg-[#0E7AC4] text-white"
+
+              : item.title === "Assessments"
+              ? "bg-[#12234A] text-white"
+
+              : item.title === "Training LMS"
+              ? "bg-[#21C7E6] text-white"
+
+              : item.title === "Drives"
+              ? "bg-[#F35B57] text-white"
+
+              : item.title === "Notifications"
+              ? "bg-[#E85AA9] text-white"
+
+              : "bg-[#6C8CFF] text-white"
+            }
+         `}
+          >
+              {item.icon}
+          </div>
+            {/* Icon */}
 
                 {/* Title */}
                 <span className="font-medium text-sm">
