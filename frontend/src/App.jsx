@@ -3,10 +3,10 @@
 import { Toaster } from "react-hot-toast";
 import {Routes,Route} from 'react-router-dom'
 import Dashboard from './features/mentor/pages/Dashboard';
-
 import AdminProfile from './features/admin/pages/AdminProfile'
 import AdminLayout from './features/admin/adminLayout'
 import AdminDashboard from './features/admin/adminDashboard/AdminDashboard'
+import ProfilePage from './features/student/pages/profile/ProfilePage';
 // import AdminProfile from './features/admin/adminProfile/AdminProfile'
 import AdminAssesment from './features/admin/adminAssesments/AdminAssesment'
 import AdminCollege from './features/admin/adminColleges/AdminCollege'
@@ -40,7 +40,10 @@ function App() {
           <Route path='notification' element={<AdminNotifications/>}/>
           <Route path='disputes' element={<AdminDisputes/>}/>
         </Route>
+        {/* ================= STUDENT ROUTES ================= */}
+<Route path='/student/profile' element={<ProfilePage/>}/>
       </Routes>
+      
     </>
   )
 }
