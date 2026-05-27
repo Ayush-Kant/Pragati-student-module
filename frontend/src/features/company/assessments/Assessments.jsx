@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./Assessments.css";
 
+import { FiSearch, FiFilter } from "react-icons/fi";
+
 const assessmentData = [
   {
     id: 1,
@@ -45,7 +47,7 @@ const assessmentData = [
 ];
 
 const Assessments = () => {
-  const [showPanel, setShowPanel] = useState(true);
+  const [showPanel, setShowPanel] = useState(false);
 
   const [questions, setQuestions] = useState([
     {
@@ -84,11 +86,16 @@ const Assessments = () => {
   return (
     <div className="assessments-wrapper">
 
-      <div
-        className={`assessments-layout ${
-          showPanel ? "split" : "full"
-        }`}
-      >
+      {/* OVERLAY */}
+
+      {showPanel && (
+        <div
+          className="assessment-overlay"
+          onClick={() => setShowPanel(false)}
+        ></div>
+      )}
+
+      <div className="assessments-layout">
 
         {/* LEFT SECTION */}
 
@@ -104,14 +111,12 @@ const Assessments = () => {
               </p>
             </div>
 
-            {!showPanel && (
-              <button
-                className="create-btn"
-                onClick={() => setShowPanel(true)}
-              >
-                + Create Test
-              </button>
-            )}
+            <button
+              className="create-btn"
+              onClick={() => setShowPanel(true)}
+            >
+              + Create Test
+            </button>
 
           </div>
 
@@ -119,16 +124,28 @@ const Assessments = () => {
 
             <div className="filters-row">
 
-              <input
-                type="text"
-                placeholder="Search assessments..."
-              />
+  <div className="search-box">
 
-              <button>Type</button>
+    <FiSearch className="search-icon" />
 
-              <button>Difficulty</button>
+    <input
+      type="text"
+      placeholder="Search assessments..."
+    />
 
-            </div>
+  </div>
+
+  <button className="filter-btn">
+    <FiFilter />
+    Type
+  </button>
+
+  <button className="filter-btn">
+    <FiFilter />
+    Difficulty
+  </button>
+
+</div>
 
             <div className="table-wrapper">
 
