@@ -40,6 +40,7 @@ async function runMigrations() {
       "001_create_users_mentors.sql",
       "003_create_admin_dashboard.sql",
       "002_create_content_tables.sql",
+      "005_create_company_tables.sql",
       "Students.sql",
     ];
 
