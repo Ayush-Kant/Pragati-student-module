@@ -1,320 +1,133 @@
-import React from "react";
+// AdminProfileCard.jsx
+// Sidebar component — has its OWN background colors, no logo
 
-const DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-const SLOTS = ["09:00 AM", "02:00 PM", "07:00 PM"];
+const AdminProfileCard = ({ profile, onEditClick }) => {
+  const initial = profile?.fullName?.charAt(0)?.toUpperCase() || "A";
 
-const LEVEL_BADGES = {
-  EXPERT: "bg-emerald-50 text-emerald-600 border-emerald-100",
-  INTERMEDIATE: "bg-violet-50 text-violet-600 border-violet-100",
-  BEGINNER: "bg-blue-50 text-blue-600 border-blue-100",
-};
-
-const AdminProfileCard = ({ profile, onEdit }) => {
-  const availability = profile?.availability || {};
-  const coreSkills = profile?.coreSkills || [];
-  const expertise = profile?.expertise || [];
-  const certifications = profile?.certifications || [];
+  const StatBox = ({ icon, label, value, bg, color }) => (
+    <div style={{
+      background: bg, borderRadius: 14, padding: "14px 16px",
+      display: "flex", alignItems: "center", gap: 12,
+    }}>
+      <div style={{
+        width: 38, height: 38, borderRadius: 10, background: color + "22",
+        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0,
+      }}>{icon}</div>
+      <div>
+        <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, textTransform: "uppercase", letterSpacing: .5 }}>{label}</div>
+        <div style={{ fontSize: 13, color: "#1e293b", fontWeight: 700, marginTop: 2 }}>{value || "—"}</div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 font-sans pb-12">
-      {/* ── HERO BANNER HEADER ── */}
-      <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200">
-        <div className="h-44 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative">
-          {/* Wave/overlay decoration */}
-          <div className="absolute inset-0 bg-black/10" />
+    <div style={{
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      gap: 14,
+      fontFamily: "'Segoe UI', system-ui, sans-serif",
+    }}>
+
+      {/* ── Avatar card ── */}
+      <div style={{
+        background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)",
+        borderRadius: 20, padding: "28px 20px", textAlign: "center",
+        position: "relative", overflow: "hidden",
+      }}>
+        {/* decorative circles */}
+        <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(255,255,255,.06)" }} />
+        <div style={{ position: "absolute", bottom: -30, left: -20, width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,.04)" }} />
+
+        <div style={{
+          width: 80, height: 80, borderRadius: "50%",
+          background: profile?.avatarUrl ? "transparent" : "linear-gradient(135deg,#818cf8,#a78bfa)",
+          margin: "0 auto 12px",
+          border: "3px solid rgba(255,255,255,.25)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 30, fontWeight: 800, color: "#fff", overflow: "hidden",
+          boxShadow: "0 8px 24px rgba(0,0,0,.3)",
+        }}>
+          {profile?.avatarUrl
+            ? <img src={profile.avatarUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" />
+            : initial}
         </div>
 
-        <div className="px-6 md:px-8 pb-8 relative flex flex-col items-center md:flex-row md:items-end justify-between gap-6">
-          {/* Avatar and Name */}
-          <div className="-mt-16 flex flex-col items-center md:items-start text-center md:text-left md:flex-row gap-5 z-10">
-            <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-900 shadow-xl flex items-center justify-center overflow-hidden">
-              {profile?.avatarUrl ? (
-                <img
-                  src={profile.avatarUrl}
-                  alt="avatar"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-5xl font-extrabold text-white">
-                  {profile?.fullName?.charAt(0)?.toUpperCase() || "A"}
-                </span>
-              )}
-            </div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", marginBottom: 4 }}>{profile?.fullName}</div>
+        <div style={{ fontSize: 13, color: "#a5b4fc", marginBottom: 10 }}>{profile?.displayTitle}</div>
 
-            <div className="md:mb-3">
-              <div className="flex flex-col md:flex-row md:items-center gap-2.5">
-                <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                  {profile?.fullName}
-                </h1>
-                <span className="text-[10px] font-extrabold bg-blue-50 text-blue-600 border border-blue-100 px-3 py-1 rounded-full uppercase tracking-wider self-center">
-                  {profile?.role?.replace("_", " ")}
-                </span>
-              </div>
-              <p className="text-sm text-slate-500 font-medium mt-1">{profile?.displayTitle}</p>
-            </div>
-          </div>
+        <span style={{
+          background: "rgba(99,102,241,.35)", color: "#c7d2fe",
+          borderRadius: 99, padding: "4px 14px", fontSize: 11, fontWeight: 700,
+          letterSpacing: .5, textTransform: "uppercase", border: "1px solid rgba(165,180,252,.3)",
+        }}>
+          {profile?.role?.replace("_", " ") || "Admin"}
+        </span>
 
-          {/* Edit Profile CTA Button */}
-          <button
-            onClick={onEdit}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-3 rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer z-10"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-              />
-            </svg>
-            Edit Profile
-          </button>
+        {/* Edit button */}
+        <button
+          onClick={onEditClick}
+          style={{
+            marginTop: 16, width: "100%",
+            background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+            border: "none", borderRadius: 10, padding: "10px",
+            color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(99,102,241,.4)",
+            transition: "opacity .15s",
+          }}
+          onMouseEnter={e => e.target.style.opacity = ".85"}
+          onMouseLeave={e => e.target.style.opacity = "1"}
+        >
+          ✏ Edit Profile
+        </button>
+      </div>
+
+      {/* ── Contact info ── */}
+      <div style={{ background: "#f0f9ff", borderRadius: 16, padding: 16, border: "1px solid #bae6fd" }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "#0369a1", letterSpacing: .5, marginBottom: 12, textTransform: "uppercase" }}>Contact</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <StatBox icon="✉" label="Email" value={profile?.email} bg="#fff" color="#6366f1" />
+          <StatBox icon="📞" label="Phone" value={profile?.contactInfo?.phone || profile?.phone} bg="#fff" color="#22c55e" />
+          <StatBox icon="🌐" label="Timezone" value={profile?.contactInfo?.timezone} bg="#fff" color="#f59e0b" />
         </div>
       </div>
 
-      {/* ── 2-COLUMN MAIN DASHBOARD CONTENT ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Side: Basic & Socials */}
-        <div className="space-y-6 lg:col-span-1">
-          {/* Quick Info Contact */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
-              Contact & Basic Info
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">Email Address</span>
-                <p className="text-xs font-bold text-slate-700 mt-0.5 break-all">
-                  {profile?.email}
-                </p>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">Phone Number</span>
-                <p className="text-xs font-bold text-slate-700 mt-0.5">
-                  {profile?.contactInfo?.phone || profile?.phone || "Not provided"}
-                </p>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">Location / Timezone</span>
-                <p className="text-xs font-bold text-slate-700 mt-0.5">
-                  {profile?.contactInfo?.timezone || "Not configured"}
-                </p>
-              </div>
-              {profile?.bio && (
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Introduction</span>
-                  <p className="text-xs text-slate-500 font-medium leading-relaxed mt-1">
-                    {profile.bio}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Social Links */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
-              Social Links
-            </h3>
-            <div className="space-y-3">
-              <a
-                href={profile?.socialLinks?.linkedin || "#"}
-                target="_blank"
-                rel="noreferrer"
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-100 text-xs font-bold ${
-                  profile?.socialLinks?.linkedin
-                    ? "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                    : "bg-slate-50/50 text-slate-400 cursor-not-allowed"
-                } transition`}
-              >
-                <span className="text-lg">🔗</span>
-                <span className="truncate">
-                  {profile?.socialLinks?.linkedin
-                    ? profile.socialLinks.linkedin.replace("https://", "")
-                    : "LinkedIn Not Added"}
-                </span>
-              </a>
-
-              <a
-                href={profile?.socialLinks?.github || "#"}
-                target="_blank"
-                rel="noreferrer"
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-100 text-xs font-bold ${
-                  profile?.socialLinks?.github
-                    ? "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                    : "bg-slate-50/50 text-slate-400 cursor-not-allowed"
-                } transition`}
-              >
-                <span className="text-lg">🌐</span>
-                <span className="truncate">
-                  {profile?.socialLinks?.github
-                    ? profile.socialLinks.github.replace("https://", "")
-                    : "GitHub/Portfolio Not Added"}
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side: Onboarding details */}
-        <div className="space-y-6 lg:col-span-2">
-          {/* Professional Bio Section */}
-          {profile?.bio2 && (
-            <div className="bg-white rounded-2xl border border-slate-200 border-l-4 border-l-violet-600 p-6 shadow-sm">
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3">
-                Professional Journey
-              </h3>
-              <p className="text-xs text-slate-600 font-medium leading-relaxed">
-                {profile.bio2}
-              </p>
-            </div>
-          )}
-
-          {/* Experience, Skills & Credentials */}
-          <div className="bg-white rounded-2xl border border-slate-200 border-l-4 border-l-emerald-500 p-6 shadow-sm space-y-6">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                Expertise & Skills
-              </h3>
-              <span className="text-xs font-bold text-emerald-600">
-                {profile?.designation} ({profile?.yearsExp})
-              </span>
-            </div>
-
-            {/* Expertise Area tags */}
-            {expertise.length > 0 && (
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-2">
-                  Areas of Specialization
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {expertise.map((tag) => (
-                    <span
-                      key={tag}
-                      className="bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Core Skills List */}
-            {coreSkills.length > 0 && (
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-2">
-                  Top Skills
-                </span>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                  {coreSkills.map((sk, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between px-3 py-2.5 border border-slate-100 rounded-xl bg-slate-50/50"
-                    >
-                      <span className="text-xs font-bold text-slate-800">{sk.name}</span>
-                      <span
-                        className={`text-[8px] font-extrabold px-2 py-0.5 rounded border ${
-                          LEVEL_BADGES[sk.level] || LEVEL_BADGES.BEGINNER
-                        }`}
-                      >
-                        {sk.level}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Certifications List */}
-            {certifications.length > 0 && (
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-2.5">
-                  Industry Credentials
-                </span>
-                <div className="grid grid-cols-1 gap-2">
-                  {certifications.map((cert, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-2 border border-slate-100 rounded-xl px-3.5 py-2.5 bg-slate-50/30 text-xs text-slate-700 font-bold"
-                    >
-                      <span className="text-violet-600 text-lg">📄</span>
-                      <span className="truncate">{cert.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+      {/* ── Role & Permissions ── */}
+      <div style={{ background: "#fdf4ff", borderRadius: 16, padding: 16, border: "1px solid #e9d5ff" }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "#7c3aed", letterSpacing: .5, marginBottom: 12, textTransform: "uppercase" }}>Permissions</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {(profile?.permissions || []).map(p => (
+            <span key={p} style={{
+              background: "#ede9fe", color: "#6d28d9",
+              borderRadius: 99, padding: "4px 10px", fontSize: 11, fontWeight: 600,
+            }}>
+              {p.replace("_", " ")}
+            </span>
+          ))}
         </div>
       </div>
 
-      {/* ── Availability Slots Grid ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 border-l-4 border-l-emerald-500 p-6 shadow-sm">
-        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
-          Weekly Availability Schedule
-        </h3>
-
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px] border-collapse">
-            <thead>
-              <tr>
-                <th className="w-24" />
-                {DAYS.map((day) => (
-                  <th
-                    key={day}
-                    className="text-xs font-bold text-slate-400 text-center pb-3 uppercase tracking-wider"
-                  >
-                    {day}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {SLOTS.map((slot) => (
-                <tr key={slot}>
-                  <td className="py-3 pr-4 text-left whitespace-nowrap">
-                    <div className="text-xs font-bold text-slate-700">{slot}</div>
-                    <div className="text-[10px] text-slate-400 font-medium mt-0.5">(45 mins)</div>
-                  </td>
-
-                  {DAYS.map((day) => {
-                    const key = `${day}_${slot}`;
-                    const isSelected = !!availability[key];
-
-                    return (
-                      <td key={day} className="p-1 text-center">
-                        <div
-                          className={`min-h-[45px] flex flex-col items-center justify-center rounded-xl border text-center ${
-                            isSelected
-                              ? "bg-emerald-50 border-emerald-300 text-emerald-600 font-bold text-[9px] uppercase px-1 py-1"
-                              : "border-slate-100 text-slate-300 font-light text-sm"
-                          }`}
-                        >
-                          {isSelected ? (
-                            <>
-                              <span>{slot.split(" ")[0]}</span>
-                              <span className="text-[8px] opacity-80 font-extrabold">Active</span>
-                            </>
-                          ) : (
-                            "-"
-                          )}
-                        </div>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* ── Social links ── */}
+      <div style={{ background: "#f0fdf4", borderRadius: 16, padding: 16, border: "1px solid #bbf7d0" }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "#15803d", letterSpacing: .5, marginBottom: 12, textTransform: "uppercase" }}>Social Links</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {[
+            { icon: "🔗", label: "LinkedIn", val: profile?.socialLinks?.linkedin },
+            { icon: "💻", label: "GitHub", val: profile?.socialLinks?.github },
+          ].map(s => (
+            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 10, background: "#fff", borderRadius: 10, padding: "10px 12px" }}>
+              <span style={{ fontSize: 16 }}>{s.icon}</span>
+              <div>
+                <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{s.label}</div>
+                <div style={{ fontSize: 12, color: s.val ? "#2563eb" : "#cbd5e1", fontWeight: 600 }}>
+                  {s.val || "Not added"}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
+
     </div>
   );
 };
