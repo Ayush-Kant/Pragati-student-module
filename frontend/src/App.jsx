@@ -4,8 +4,6 @@ import { Routes, Route } from "react-router-dom";
 
 import AppRoutes from "./routes/AppRoutes";
 
-import Header from "./components/Header";
-
 import AdminLayout from "./features/admin/adminLayout";
 import AdminDashboard from "./features/admin/adminDashboard/AdminDashboard";
 import AdminProfile from "./features/admin/adminProfile/AdminProfile";
@@ -22,8 +20,6 @@ import AdminNotifications from "./features/admin/adminNotifications/AdminNotific
 function App() {
   return (
     <>
-      <Header />
-
       <Routes>
 
         {/* COMPANY ROUTES */}

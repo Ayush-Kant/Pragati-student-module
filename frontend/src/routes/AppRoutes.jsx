@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
 
 import CompanyDashboard from "../features/company/pages/CompanyDashboard";
+import CompanySettings from "../features/company/pages/CompanySettings";
 
 /* Existing Pages */
 import Drives from "../pages/Drives";
@@ -12,7 +13,6 @@ import Training from "../pages/Training";
 import Messages from "../pages/Messages";
 import Offers from "../features/company/offers/Offers";
 import Reports from "../pages/Reports";
-import Settings from "../pages/Settings";
 
 /* New Assessments Feature */
 import Assessments from "../features/company/assessments/Assessments";
@@ -71,7 +71,7 @@ const AppRoutes = () => {
 
         <Route
           path="/settings"
-          element={<Settings />}
+          element={<CompanySettings />}
         />
 
       </Route>

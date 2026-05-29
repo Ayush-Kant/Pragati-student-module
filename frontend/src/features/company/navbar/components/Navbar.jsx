@@ -1,4 +1,5 @@
 import "./../styles/navbar.css";
+import { useNavigate } from "react-router-dom";
 
 import {
   FiBell,
@@ -7,6 +8,12 @@ import {
 } from "react-icons/fi";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  const handleSettingsClick = () => {
+    navigate("/settings");
+  };
+
   return (
     <header className="navbar">
       <div className="navbar-left">
@@ -36,7 +43,11 @@ const Navbar = () => {
           <FiBell size={18} />
         </div>
 
-        <div className="nav-icon">
+        <div 
+          className="nav-icon"
+          onClick={handleSettingsClick}
+          style={{ cursor: "pointer" }}
+        >
           <FiSettings size={18} />
         </div>
 

@@ -55,3 +55,40 @@ export const getActivityFeed = async () => {
 
   return response.data;
 };
+
+/* Company Settings */
+
+export const getCompanySettings = async () => {
+  const response = await API.get("/settings");
+
+  return response.data;
+};
+
+export const updateCompanySettings = async (
+  settingsData
+) => {
+  const response = await API.put(
+    "/settings",
+    settingsData
+  );
+
+  return response.data;
+};
+
+export const uploadCompanyLogo = async (file) => {
+  const formData = new FormData();
+
+  formData.append("logo", file);
+
+  const response = await API.post(
+    "/logo",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};
