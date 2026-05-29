@@ -1,4 +1,3 @@
-import { CountUp } from "react-countup";
 import {
   Rocket,
   UserRound,
