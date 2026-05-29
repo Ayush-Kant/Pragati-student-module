@@ -1,8 +1,9 @@
 
 import AppRoutes from "./routes/AppRoutes";
+import Messages from "./pages/Messages";
 
-function App() {
-  return <AppRoutes />;
+//function App() {
+//  return <AppRoutes />;
 
 import Header from "./components/Header"
 import './App.css'
@@ -26,7 +27,7 @@ function App() {
     <> 
 
     <Header />
-    <h1 className='text-amber-200 text-9xl'>Hello World</h1>
+    
 
     <Routes>
       {/* ================= ADMIN ROUTES ================= */}
@@ -40,6 +41,7 @@ function App() {
         <Route path='assesments' element={<AdminAssesment/>}/>
         <Route path='training' element={<AdminTraining/>}/>
         <Route path='drives' element={<AdminDrives/>}/>
+        <Route path='messages' element={<Messages/>}/>
         <Route path='notification' element={<AdminNotifications/>}/>
         <Route path='disputes' element={<AdminDisputes/>}/>
       </Route>
@@ -49,4 +51,4 @@ function App() {
  
 }
 
-export default App;
+export default App; 
