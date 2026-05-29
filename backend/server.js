@@ -6,6 +6,7 @@ import adminCollegeRoutes from './routes/admin.college.routes.js'
 import contentRoutes from "./routes/content.routes.js";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
+import adminCompanyRoutes from './routes/admin.company.routes.js'
 
 const PORT = process.env.PORT || 5001;
 
@@ -33,6 +34,8 @@ app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use('/api/v1/admin/colleges', adminCollegeRoutes);
 
 app.use("/api/mentor", contentRoutes);
+
+app.use("/api/companies",adminCompanyRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.listen(PORT, () => {
