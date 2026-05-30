@@ -42,7 +42,7 @@ export default function Step2Curriculum({ courseData, onUpdate, onNext, onBack }
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       {/* Left Overview Panel Component */}
       <div className="space-y-4">
-        <CurriculumOverview modules={modules} />
+        <CurriculumOverview courseData={courseData} modules={modules} />
       </div>
 
       {/* Right Canvas Main Builder Panel Container */}

@@ -24,18 +24,18 @@ export default function ReorderSectionsModal({ modules, onClose, onSave }) {
     setLocalSections(reordered);
   };
 
-  // Reorder lessons inside a module via buttons
-  const moveLesson = (moduleIdx, lessonIdx, direction) => {
-    const nextIndex = lessonIdx + direction;
-    const moduleLessons = localSections[moduleIdx].lessons || [];
-    if (nextIndex < 0 || nextIndex >= moduleLessons.length) return;
+  // Reorder lectures inside a module via buttons (FIXED property name)
+  const moveLesson = (moduleIdx, lectureIdx, direction) => {
+    const nextIndex = lectureIdx + direction;
+    const moduleLectures = localSections[moduleIdx].lectures || []; // Fixed: .lessons -> .lectures
+    if (nextIndex < 0 || nextIndex >= moduleLectures.length) return;
 
     const updated = [...localSections];
-    const updatedLessons = [...moduleLessons];
-    const [removed] = updatedLessons.splice(lessonIdx, 1);
-    updatedLessons.splice(nextIndex, 0, removed);
+    const updatedLectures = [...moduleLectures];
+    const [removed] = updatedLectures.splice(lectureIdx, 1);
+    updatedLectures.splice(nextIndex, 0, removed);
 
-    updated[moduleIdx].lessons = updatedLessons;
+    updated[moduleIdx].lectures = updatedLectures; // Fixed: .lessons -> .lectures
     setLocalSections(updated);
   };
 
@@ -45,9 +45,9 @@ export default function ReorderSectionsModal({ modules, onClose, onSave }) {
   };
 
   // --- HTML5 Drag & Drop Logic ---
-  const handleDragStart = (type, moduleIndex, lessonIndex = null) => {
+  const handleDragStart = (type, moduleIndex, lectureIndex = null) => {
     if (!reorderMode) return;
-    setDragItem({ type, moduleIndex, lessonIndex });
+    setDragItem({ type, moduleIndex, lessonIndex: lectureIndex }); // Kept state shape matching your drop handlers
   };
 
   const handleDragOver = (e) => {
@@ -70,21 +70,21 @@ export default function ReorderSectionsModal({ modules, onClose, onSave }) {
     setDragItem(null);
   };
 
-  const handleDropLesson = (e, targetModuleIndex, targetLessonIndex) => {
+  const handleDropLesson = (e, targetModuleIndex, targetLectureIndex) => {
     e.stopPropagation(); // Stop parent module container from intercepting the drop
     if (!dragItem || dragItem.type !== "lesson") return;
 
     const updated = [...localSections];
 
-    // Remove from source module
-    const sourceLessons = [...updated[dragItem.moduleIndex].lessons];
-    const [movedLesson] = sourceLessons.splice(dragItem.lessonIndex, 1);
-    updated[dragItem.moduleIndex].lessons = sourceLessons;
+    // Remove from source module (Fixed: .lessons -> .lectures)
+    const sourceLectures = [...(updated[dragItem.moduleIndex].lectures || [])];
+    const [movedLecture] = sourceLectures.splice(dragItem.lessonIndex, 1);
+    updated[dragItem.moduleIndex].lectures = sourceLectures;
 
-    // Add to target module
-    const targetLessons = [...(updated[targetModuleIndex].lessons || [])];
-    targetLessons.splice(targetLessonIndex, 0, movedLesson);
-    updated[targetModuleIndex].lessons = targetLessons;
+    // Add to target module (Fixed: .lessons -> .lectures)
+    const targetLectures = [...(updated[targetModuleIndex].lectures || [])];
+    targetLectures.splice(targetLectureIndex, 0, movedLecture);
+    updated[targetModuleIndex].lectures = targetLectures;
 
     setLocalSections(updated);
     setDragItem(null);
@@ -170,30 +170,31 @@ export default function ReorderSectionsModal({ modules, onClose, onSave }) {
                 </div>
               </div>
 
-              {/* Nested Lessons Dropzone Area */}
+              {/* Nested Lectures Dropzone Area */}
               <div
                 className="p-2 space-y-2 bg-gray-50 min-h-[40px]"
                 onDragOver={handleDragOver}
                 onDrop={(e) => {
-                  // Fallback: If dropped on the empty area of the module's lesson block, push to the end
+                  // Fallback: Drop on empty area pushes to the end (Fixed: .lessons -> .lectures)
                   if (dragItem && dragItem.type === "lesson") {
                     handleDropLesson(
                       e,
                       moduleIdx,
-                      (module.lessons || []).length,
+                      (module.lectures || []).length,
                     );
                   }
                 }}
               >
-                {module.lessons?.map((lesson, lessonIdx) => (
+                {/* FIXED: Swapped module.lessons to module.lectures */}
+                {module.lectures?.map((lecture, lectureIdx) => (
                   <div
-                    key={lesson.id || `lesson-${moduleIdx}-${lessonIdx}`}
+                    key={lecture.id || `lecture-${moduleIdx}-${lectureIdx}`}
                     draggable={reorderMode}
                     onDragStart={() =>
-                      handleDragStart("lesson", moduleIdx, lessonIdx)
+                      handleDragStart("lesson", moduleIdx, lectureIdx)
                     }
                     onDragOver={handleDragOver}
-                    onDrop={(e) => handleDropLesson(e, moduleIdx, lessonIdx)}
+                    onDrop={(e) => handleDropLesson(e, moduleIdx, lectureIdx)}
                     className={`flex justify-between items-center pl-4 pr-2 py-2 bg-white rounded border select-none transition-all ${
                       reorderMode ? "hover:border-blue-300" : ""
                     }`}
@@ -204,23 +205,23 @@ export default function ReorderSectionsModal({ modules, onClose, onSave }) {
                         className={`text-gray-400 ${reorderMode ? "cursor-grab active:cursor-grabbing" : "opacity-30"}`}
                       />
                       <span className="text-xs text-gray-700 truncate">
-                        {lesson.title}
+                        {lecture.title}
                       </span>
                     </div>
 
                     <div className="flex gap-1">
                       <button
                         type="button"
-                        disabled={lessonIdx === 0}
-                        onClick={() => moveLesson(moduleIdx, lessonIdx, -1)}
+                        disabled={lectureIdx === 0}
+                        onClick={() => moveLesson(moduleIdx, lectureIdx, -1)}
                         className="px-1.5 py-0.5 bg-white border rounded text-[9px] font-bold disabled:opacity-40 hover:bg-gray-50"
                       >
                         ▲
                       </button>
                       <button
                         type="button"
-                        disabled={lessonIdx === module.lessons.length - 1}
-                        onClick={() => moveLesson(moduleIdx, lessonIdx, 1)}
+                        disabled={lectureIdx === module.lectures.length - 1}
+                        onClick={() => moveLesson(moduleIdx, lectureIdx, 1)}
                         className="px-1.5 py-0.5 bg-white border rounded text-[9px] font-bold disabled:opacity-40 hover:bg-gray-50"
                       >
                         ▼
@@ -229,9 +230,10 @@ export default function ReorderSectionsModal({ modules, onClose, onSave }) {
                   </div>
                 ))}
 
-                {(!module.lessons || module.lessons.length === 0) && (
+                {/* FIXED: Adjusted condition checking */}
+                {(!module.lectures || module.lectures.length === 0) && (
                   <div className="text-center py-2 text-[11px] text-gray-400 italic">
-                    No lessons in this module
+                    No lectures in this module
                   </div>
                 )}
               </div>

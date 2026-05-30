@@ -13,7 +13,7 @@ const STEPS = [
 ];
 
 export default function CreateCourse() {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(2);
   const [courseData, setCourseData] = useState({
     title: "",
     shortDescription: "",
