@@ -118,7 +118,7 @@ export default function CoursesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-6">
+    <div className="min-h-screen bg-[#f8fafc] p-2">
       <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Courses</h1>
@@ -136,7 +136,10 @@ export default function CoursesPage() {
             <Download size={18} /> Export Report
           </button>
 
-          <Link className="cursor-pointer flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700">
+          <Link
+            className="cursor-pointer flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700"
+            to={"./create"}
+          >
             <Plus size={18} /> Create New Course
           </Link>
         </div>
