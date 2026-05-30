@@ -47,3 +47,81 @@ CREATE INDEX IF NOT EXISTS idx_companies_industry
 
 CREATE INDEX IF NOT EXISTS idx_company_stats_engagement
   ON company_stats(engagement_score DESC);
+
+INSERT INTO companies
+(
+    name,
+    email,
+    industry,
+    size,
+    location,
+    status
+)
+VALUES
+(
+    'TechNova Solutions',
+    'hr@technova.com',
+    'Software',
+    '500-1000',
+    'Hyderabad',
+    'pending'
+),
+(
+    'DataSphere Pvt Ltd',
+    'careers@datasphere.com',
+    'Data Analytics',
+    '100-500',
+    'Bangalore',
+    'approved'
+);
+
+INSERT INTO company_stats
+(
+    company_id,
+    offer_acceptance_rate,
+    interview_to_hire_rate,
+    avg_response_time_days,
+    total_jobs_posted,
+    total_hires,
+    engagement_score
+)
+VALUES
+(
+    1,
+    78.5,
+    35.0,
+    24,
+    12,
+    8,
+    82.5
+),
+(
+    2,
+    91.2,
+    48.5,
+    12,
+    30,
+    20,
+    95.8
+);
+
+INSERT INTO drives
+(
+    mentor_id,
+    company_id,
+    title,
+    status,
+    location,
+    start_date,
+    end_date
+)
+VALUES
+(
+    1,
+    2,
+    'Software Engineer Hiring Drive',
+    'active',
+    'Bangalore',
+    NOW(),
+    NOW() + INTERVAL '30 days'
+);

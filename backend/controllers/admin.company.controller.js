@@ -89,7 +89,7 @@ const getCompanyDrives = async (req, res) => {
 
 const approveCompany = async (req, res) => {
     try {
-        const company = await service.approveCompany(req.params.id,req.user.id);
+        const company = await service.approveCompany(req.params.id);
         if (!company) {
             return res.status(404).json({
                 message: 'Company not found',
@@ -137,8 +137,7 @@ const rejectCompany = async (req, res) => {
 
     const company = await service.rejectCompany(
       req.params.id,
-      reason,
-      req.user.id
+      reason
     );
 
     if (!company) {
@@ -184,8 +183,7 @@ const suspendCompany = async (req, res) => {
 
     const company = await service.suspendCompany(
       req.params.id,
-      reason,
-      req.user.id
+      reason
     );
 
     if (!company) {
@@ -229,8 +227,7 @@ const reinstateCompany = async (req, res) => {
   try {
     const company =
       await service.reinstateCompany(
-        req.params.id,
-        req.user.id
+        req.params.id
       );
 
     if (!company) {
