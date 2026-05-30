@@ -25,8 +25,6 @@ router.get('/:id/stats',validator.validateCompanyId,controller.getCompanyStats);
 
 router.get('/:id/drives',validator.validateCompanyId,controller.getCompanyDrives);
 
-
-
 router.put('/:id/approve',validator.validateCompanyId,controller.approveCompany);
 
 router.put('/:id/reject',validator.validateCompanyId,validator.validateRejectBody,controller.rejectCompany);
