@@ -1,203 +1,124 @@
-// services/company.email.service.js
+// company.email.service.js
 
-import { Resend } from "resend";
+import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy client — instantiated on first send so a missing key doesn't crash the server at startup
+let _resend = null;
+const getClient = () => {
+    if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+    return _resend;
+};
 
-const sendEmail = async (to, subject, html) => {
-  try {
-    const response = await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to,
-      subject,
-      html,
+const FROM = 'onboarding@resend.dev';
+
+const sendApprovalEmail = async (to, companyName) => {
+    await getClient().emails.send({
+        from:    FROM,
+        to,
+        subject: 'Your registration has been approved — Pragati',
+        html: `
+      <h2>Welcome to Pragati, ${companyName}!</h2>
+      <p>Your company registration has been <strong>approved</strong>.</p>
+      <p>You can now access your dashboard, post recruitment drives, and connect with top student talent.</p>
+      <p>Log in to get started and complete your company profile.</p>
+      <br/>
+      <p>— The Pragati Team</p>
+    `,
     });
-
-    console.log("Email sent:", response);
-  } catch (error) {
-    console.error(
-      "Email sending failed:",
-      error.message
-    );
-  }
 };
 
-const sendApprovalEmail = async (
-  companyEmail,
-  companyName
-) => {
-  await sendEmail(
-    companyEmail,
-    "Your registration has been approved",
-    `
-      <h2>Welcome, ${companyName}!</h2>
+const sendRejectionEmail = async (to, companyName, reason) => {
+    await getClient().emails.send({
+        from:    FROM,
+        to,
+        subject: 'Registration update — Pragati',
+        html: `
+      <h2>Dear ${companyName},</h2>
+      <p>After review, we were unable to approve your company registration at this time.</p>
+      <p><strong>Reason:</strong> ${reason}</p>
+      <p>Please address the above and resubmit your application, or contact our support team if you have questions.</p>
+      <br/>
+      <p>— The Pragati Team</p>
+    `,
+    });
+};
 
-      <p>Your company registration has been approved on <strong>Pragati</strong>.</p>
+const sendSuspensionEmail = async (to, companyName, reason) => {
+    await getClient().emails.send({
+        from:    FROM,
+        to,
+        subject: 'Account suspended — Pragati',
+        html: `
+      <h2>Dear ${companyName},</h2>
+      <p>Your company account on <strong>Pragati</strong> has been suspended.</p>
+      <p><strong>Reason:</strong> ${reason}</p>
+      <p>If you believe this is an error or wish to appeal, please contact our support team.</p>
+      <br/>
+      <p>— The Pragati Team</p>
+    `,
+    });
+};
 
-      <p>You can now:</p>
+const sendReinstatementEmail = async (to, companyName) => {
+    await getClient().emails.send({
+        from:    FROM,
+        to,
+        subject: 'Account reinstated — Pragati',
+        html: `
+      <h2>Dear ${companyName},</h2>
+      <p>Your company account on <strong>Pragati</strong> has been <strong>reinstated</strong>.</p>
+      <p>You now have full access to the platform again. Please ensure your account complies with our policies going forward.</p>
+      <p>Log in to resume your activity.</p>
+      <br/>
+      <p>— The Pragati Team</p>
+    `,
+    });
+};
 
+const sendDriveInviteEmail = async (to, companyName, driveName, deadline) => {
+    await getClient().emails.send({
+        from:    FROM,
+        to,
+        subject: `You're invited to join ${driveName} — Pragati`,
+        html: `
+      <h2>Dear ${companyName},</h2>
+      <p>You have been invited to participate in the recruitment drive: <strong>${driveName}</strong>.</p>
+      <p><strong>Application Deadline:</strong> ${deadline}</p>
+      <p>Log in to your dashboard to review the drive details and confirm your participation.</p>
+      <br/>
+      <p>— The Pragati Team</p>
+    `,
+    });
+};
+
+// TODO: Wire this up to a cron job (node-cron or job queue) — not request-triggered.
+const sendWeeklyReportEmail = async (to, companyName, stats, rank) => {
+    await getClient().emails.send({
+        from:    FROM,
+        to,
+        subject: 'Your weekly performance summary — Pragati',
+        html: `
+      <h2>Weekly Report — ${companyName}</h2>
+      <p>Here's your performance snapshot for this week:</p>
       <ul>
-        <li>Create recruitment drives</li>
-        <li>Manage applicants</li>
-        <li>Connect with colleges</li>
+        <li><strong>Ranking:</strong> #${rank}</li>
+        <li><strong>Engagement Score:</strong> ${stats.engagementScore}</li>
+        <li><strong>Total Hires:</strong> ${stats.totalHires}</li>
+        <li><strong>Offer Acceptance Rate:</strong> ${stats.offerAcceptanceRate}%</li>
+        <li><strong>Interview-to-Hire Rate:</strong> ${stats.interviewToHireRate}%</li>
       </ul>
-
-      <p>Please log in to your dashboard to continue.</p>
-
+      <p>Log in to your dashboard for the full breakdown.</p>
       <br/>
-
-      <p>— Pragati Team</p>
-    `
-  );
-};
-
-
-const sendRejectionEmail = async (
-  companyEmail,
-  companyName,
-  reason
-) => {
-  await sendEmail(
-    companyEmail,
-    "Registration update",
-    `
-      <h2>Hello ${companyName},</h2>
-
-      <p>We were unable to approve your registration at this time.</p>
-
-      <p><strong>Reason:</strong> ${reason}</p>
-
-      <p>
-        Please review the issue and reapply.
-      </p>
-
-      <p>
-        For help, contact support.
-      </p>
-
-      <br/>
-
-      <p>— Pragati Team</p>
-    `
-  );
-};
-
-
-const sendSuspensionEmail = async (
-  companyEmail,
-  companyName,
-  reason
-) => {
-  await sendEmail(
-    companyEmail,
-    "Account suspended",
-    `
-      <h2>Hello ${companyName},</h2>
-
-      <p>
-        Your company account has been suspended.
-      </p>
-
-      <p><strong>Reason:</strong> ${reason}</p>
-
-      <p>
-        If you believe this is a mistake,
-        please contact support or submit an appeal.
-      </p>
-
-      <br/>
-
-      <p>— Pragati Team</p>
-    `
-  );
-};
-
-const sendReinstatementEmail = async (
-  companyEmail,
-  companyName
-) => {
-  await sendEmail(
-    companyEmail,
-    "Account reinstated",
-    `
-      <h2>Hello ${companyName},</h2>
-
-      <p>
-        Your company account has been reinstated.
-      </p>
-
-      <p>
-        You may now continue using Pragati normally.
-      </p>
-
-      <br/>
-
-      <p>— Pragati Team</p>
-    `
-  );
-};
-
-const sendDriveInviteEmail = async (
-  companyEmail,
-  companyName,
-  driveName,
-  deadline
-) => {
-  await sendEmail(
-    companyEmail,
-    `You're invited to join ${driveName}`,
-    `
-      <h2>Hello ${companyName},</h2>
-
-      <p>
-        You have been invited to participate in:
-      </p>
-
-      <p>
-        <strong>${driveName}</strong>
-      </p>
-
-      <p>
-        Application Deadline: ${deadline}
-      </p>
-
-      <br/>
-
-      <p>— Pragati Team</p>
-    `
-  );
-};
-
-const sendWeeklyReportEmail = async (
-  companyEmail,
-  companyName,
-  statsHtml
-) => {
-  await sendEmail(
-    companyEmail,
-    "Your weekly performance summary",
-    `
-      <h2>Hello ${companyName},</h2>
-
-      <p>
-        Here is your weekly performance report:
-      </p>
-
-      ${statsHtml}
-
-      <br/>
-
-      <p>— Pragati Team</p>
-    `
-  );
+      <p>— The Pragati Team</p>
+    `,
+    });
 };
 
 export {
-  sendEmail,
-  sendApprovalEmail,
-  sendRejectionEmail,
-  sendSuspensionEmail,
-  sendReinstatementEmail,
-  sendDriveInviteEmail,
-  sendWeeklyReportEmail,
+    sendApprovalEmail,
+    sendRejectionEmail,
+    sendSuspensionEmail,
+    sendReinstatementEmail,
+    sendDriveInviteEmail,
+    sendWeeklyReportEmail,
 };

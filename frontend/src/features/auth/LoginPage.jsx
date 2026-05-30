@@ -89,26 +89,29 @@ const AuthPage = () => {
       setSubmitMessage({ type: 'error', text: 'Please fix the highlighted fields.' });
       return;
     }
-
     setIsSubmitting(true);
     setErrors({});
     setSubmitMessage({ type: '', text: '' });
 
-    const result = await loginApi({
-      email: formData.email.trim().toLowerCase(),
-      password: formData.password,
-    });
-     navigate(`/${result.role}/dashboard`);
+    try {
+      const result = await loginApi({
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      });
 
-    setIsSubmitting(false);
-
-    if (result.success) {
-      setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
-      login(result.role, result.token);
-      return;
+      if (result.success) {
+        setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
+        login(result.role, result.token);
+        navigate(`/${result.role}/dashboard`);
+      } else {
+        setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
+      }
+    } catch (err) {
+      setSubmitMessage({ type: 'error', text: 'An unexpected error occurred. Please try again.' });
+      console.error('Login error:', err);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
   };
 
   return (
