@@ -1,11 +1,5 @@
-import React from 'react'
+import CompanyManagement from "../pages/CompanyManagement";
 
-const AdminCompanies = () => {
-  return (
-    <div>
-      Admin Companies
-    </div>
-  )
+export default function AdminCompanies() {
+  return <CompanyManagement />;
 }
-
-export default AdminCompanies
