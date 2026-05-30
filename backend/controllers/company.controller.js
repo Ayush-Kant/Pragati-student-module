@@ -1,256 +1,316 @@
-// company.controller.js
+// admin.company.controller.js
 
 import * as service from '../services/company.service.js';
-import {
-    sendApprovalEmail,
-    sendRejectionEmail,
-    sendSuspensionEmail,
-    sendReinstatementEmail,
-} from '../services/company.email.service.js';
 
-// ─────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────
+import {sendApprovalEmail} from '../services/company.email.service.js';
+import {sendRejectionEmail} from '../services/company.email.service.js';
+import {sendSuspensionEmail} from '../services/company.email.service.js';
+import {sendReinstatementEmail} from '../services/company.email.service.js';
 
-const handleServiceError = (err, res) => {
-    if (err.statusCode === 409) {
-        return res.status(409).json({
-            error:   true,
-            message: err.message,
-            code:    err.code || 'INVALID_STATE',
+const getAllCompanies = async (req, res) => {
+    try {
+        const data = await service.getAllCompanies(req.query);
+
+        res.status(200).json({
+        companies: data,
+        total: data.length,
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 20,
+        });
+    } 
+    catch (err) {
+        res.status(500).json({
+        error: err.message,
         });
     }
-    console.error('[CompanyController]', err);
-    return res.status(500).json({
-        error:   true,
-        message: 'An unexpected error occurred. Please try again.',
-        code:    'INTERNAL_ERROR',
-    });
 };
 
-// Fire-and-forget email — never blocks the response, never fails the request.
-const fireEmail = async (fn, ...args) => {
-    try {
-        await fn(...args);
-    } catch (emailErr) {
-        console.error('[CompanyEmail] Failed to send email:', emailErr.message);
-    }
-};
-
-// ─────────────────────────────────────────────────────────────
-// LIST — GET /api/v1/admin/companies
-// ─────────────────────────────────────────────────────────────
-const listCompanies = async (req, res) => {
-    try {
-        const { rows, total } = await service.listCompanies(req.query);
-        return res.status(200).json({
-            companies: rows,
-            total,
-            page:  parseInt(req.query.page)  || 1,
-            limit: parseInt(req.query.limit) || 20,
-        });
-    } catch (err) {
-        return handleServiceError(err, res);
-    }
-};
-
-// ─────────────────────────────────────────────────────────────
-// DETAIL — GET /api/v1/admin/companies/:id
-// ─────────────────────────────────────────────────────────────
 const getCompanyById = async (req, res) => {
     try {
-        const company = await service.getCompanyById(req.params.id);
+        const company = await service.getCompanyById(
+        req.params.id
+        );
+
         if (!company) {
-            return res.status(404).json({
-                error:   true,
-                message: 'Company not found.',
-                code:    'NOT_FOUND',
-            });
+        return res.status(404).json({
+            message: 'Company not found',
+        });
         }
-        return res.status(200).json({ company });
-    } catch (err) {
-        return handleServiceError(err, res);
+
+        res.json(company);
+    } 
+    catch (err) {
+        res.status(500).json({
+        error: err.message,
+        });
     }
 };
 
-// ─────────────────────────────────────────────────────────────
-// STATS — GET /api/v1/admin/companies/:id/stats
-// ─────────────────────────────────────────────────────────────
+
 const getCompanyStats = async (req, res) => {
     try {
-        const stats = await service.getCompanyStats(req.params.id);
+        const stats = await service.getCompanyStats(
+        req.params.id
+        );
+
         if (!stats) {
-            return res.status(404).json({
-                error:   true,
-                message: 'Stats not found for this company.',
-                code:    'NOT_FOUND',
-            });
+        return res.status(404).json({
+            message: 'Stats not found',
+        });
         }
-        return res.status(200).json({ stats });
-    } catch (err) {
-        return handleServiceError(err, res);
+
+        res.json(stats);
+    }
+    catch (err) {
+        res.status(500).json({
+        error: err.message,
+        });
     }
 };
 
-// ─────────────────────────────────────────────────────────────
-// DRIVES — GET /api/v1/admin/companies/:id/drives
-// ─────────────────────────────────────────────────────────────
+
 const getCompanyDrives = async (req, res) => {
     try {
-        const drives = await service.getCompanyDrives(req.params.id);
-        return res.status(200).json({ drives });
-    } catch (err) {
-        return handleServiceError(err, res);
+        const drives = await service.getCompanyDrives(
+        req.params.id
+        );
+
+        res.json({
+        drives,
+        });
+    }
+    catch (err) {
+        res.status(500).json({
+        error: err.message,
+        });
     }
 };
 
-// ─────────────────────────────────────────────────────────────
-// APPROVE — POST /api/v1/admin/companies/:id/approve
-// ─────────────────────────────────────────────────────────────
+
 const approveCompany = async (req, res) => {
     try {
-        const company = await service.approveCompany(req.params.id, req.user.id);
+        const company = await service.approveCompany(req.params.id);
         if (!company) {
             return res.status(404).json({
-                error:   true,
-                message: 'Company not found.',
-                code:    'NOT_FOUND',
+                message: 'Company not found',
             });
         }
-        fireEmail(sendApprovalEmail, company.email, company.name);
-        return res.status(200).json({
+
+        if (company.alreadyApproved) {
+            return res.status(409).json({
+                error: 'Company is already approved.',
+            });
+        }
+
+        try {
+            await sendApprovalEmail(
+                company.email,
+                company.name
+            );
+        } 
+        catch (emailErr) {
+            console.error(
+                'Approval email failed:',
+                emailErr.message
+            );
+        }
+
+        res.json({
             success: true,
-            message: 'Company approved successfully.',
+            message:'Company approved and notification email sent.',
             company: {
-                companyId:  company.companyId,
-                status:     company.status,
-                verifiedAt: company.verifiedAt,
+                companyId: company.companyId,
+                status: company.status,
             },
         });
     } catch (err) {
-        return handleServiceError(err, res);
+        res.status(500).json({
+        error: err.message,
+        });
     }
 };
 
-// ─────────────────────────────────────────────────────────────
-// REJECT — POST /api/v1/admin/companies/:id/reject
-// ─────────────────────────────────────────────────────────────
+
 const rejectCompany = async (req, res) => {
-    try {
-        const { reason } = req.body;
-        const company = await service.rejectCompany(req.params.id, reason, req.user.id);
-        if (!company) {
-            return res.status(404).json({
-                error:   true,
-                message: 'Company not found.',
-                code:    'NOT_FOUND',
-            });
-        }
-        fireEmail(sendRejectionEmail, company.email, company.name, reason);
-        return res.status(200).json({
-            success: true,
-            message: 'Company rejected.',
-            company: {
-                companyId:       company.companyId,
-                status:          company.status,
-                rejectionReason: company.rejectionReason,
-            },
-        });
-    } catch (err) {
-        return handleServiceError(err, res);
+  try {
+    const { reason } = req.body;
+
+    const company = await service.rejectCompany(
+      req.params.id,
+      reason
+    );
+
+    if (!company) {
+      return res.status(404).json({
+        message: 'Company not found',
+      });
     }
+
+    try {
+      await sendRejectionEmail(
+        company.email,
+        company.name,
+        reason
+      );
+    } catch (emailErr) {
+      console.error(
+        'Rejection email failed:',
+        emailErr.message
+      );
+    }
+
+    res.json({
+      success: true,
+      message:
+        'Company rejected and notification email sent.',
+      company: {
+        companyId: company.companyId,
+        status: company.status,
+        rejectionReason:
+          company.rejectionReason,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
 };
 
-// ─────────────────────────────────────────────────────────────
-// SUSPEND — POST /api/v1/admin/companies/:id/suspend
-// ─────────────────────────────────────────────────────────────
 const suspendCompany = async (req, res) => {
-    try {
-        const { reason } = req.body;
-        const company = await service.suspendCompany(req.params.id, reason, req.user.id);
-        if (!company) {
-            return res.status(404).json({
-                error:   true,
-                message: 'Company not found.',
-                code:    'NOT_FOUND',
-            });
-        }
-        fireEmail(sendSuspensionEmail, company.email, company.name, reason);
-        return res.status(200).json({
-            success: true,
-            message: 'Company suspended.',
-            company: {
-                companyId:        company.companyId,
-                status:           company.status,
-                suspensionReason: company.suspensionReason,
-            },
-        });
-    } catch (err) {
-        return handleServiceError(err, res);
+  try {
+    const { reason } = req.body;
+
+    const company = await service.suspendCompany(
+      req.params.id,
+      reason
+    );
+
+    if (!company) {
+      return res.status(404).json({
+        message: 'Company not found',
+      });
     }
+
+    try {
+      await sendSuspensionEmail(
+        company.email,
+        company.name,
+        reason
+      );
+    } catch (emailErr) {
+      console.error(
+        'Suspension email failed:',
+        emailErr.message
+      );
+    }
+
+    res.json({
+      success: true,
+      message:
+        'Company suspended and notification email sent.',
+      company: {
+        companyId: company.companyId,
+        status: company.status,
+        suspensionReason:
+          company.suspensionReason,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
 };
 
-// ─────────────────────────────────────────────────────────────
-// REINSTATE — POST /api/v1/admin/companies/:id/reinstate
-// ─────────────────────────────────────────────────────────────
 const reinstateCompany = async (req, res) => {
-    try {
-        const company = await service.reinstateCompany(req.params.id, req.user.id);
-        if (!company) {
-            return res.status(404).json({
-                error:   true,
-                message: 'Company not found.',
-                code:    'NOT_FOUND',
-            });
-        }
-        fireEmail(sendReinstatementEmail, company.email, company.name);
-        return res.status(200).json({
-            success: true,
-            message: 'Company reinstated.',
-            company: {
-                companyId:  company.companyId,
-                status:     company.status,
-                verifiedAt: company.verifiedAt,
-            },
-        });
-    } catch (err) {
-        return handleServiceError(err, res);
+  try {
+    const company =
+      await service.reinstateCompany(
+        req.params.id
+      );
+
+    if (!company) {
+      return res.status(404).json({
+        message: 'Company not found',
+      });
     }
+
+    try {
+      await sendReinstatementEmail(
+        company.email,
+        company.name
+      );
+    } catch (emailErr) {
+      console.error(
+        'Reinstatement email failed:',
+        emailErr.message
+      );
+    }
+
+    res.json({
+      success: true,
+      message:
+        'Company reinstated successfully.',
+      company: {
+        companyId: company.companyId,
+        status: company.status,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
 };
 
-// ─────────────────────────────────────────────────────────────
-// RANKINGS — GET /api/v1/admin/companies/rankings
-// ─────────────────────────────────────────────────────────────
-const getCompanyRankings = async (req, res) => {
-    try {
-        const rankings = await service.getCompanyRankings(req.query.limit);
-        return res.status(200).json({ rankings });
-    } catch (err) {
-        return handleServiceError(err, res);
-    }
+const getCompanyRankings = async (
+  req,
+  res
+) => {
+  try {
+    const data =
+      await service.getCompanyRankings(
+        req.query.limit
+      );
+
+    res.json({
+      rankings: data,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
 };
 
-// ─────────────────────────────────────────────────────────────
-// ACTIVE DRIVES — GET /api/v1/admin/companies/active-drives
-// ─────────────────────────────────────────────────────────────
-const getActiveDrives = async (req, res) => {
-    try {
-        const drives = await service.getActiveDrives();
-        return res.status(200).json({ drives });
-    } catch (err) {
-        return handleServiceError(err, res);
-    }
+const getActiveDriveCompanies = async (
+  req,
+  res
+) => {
+  try {
+    const data =
+      await service.getActiveDriveCompanies();
+
+    res.json({
+      companies: data,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
 };
 
 export {
-    listCompanies,
-    getCompanyById,
-    getCompanyStats,
-    getCompanyDrives,
-    approveCompany,
-    rejectCompany,
-    suspendCompany,
-    reinstateCompany,
-    getCompanyRankings,
-    getActiveDrives,
+  getAllCompanies,
+  getCompanyById,
+  getCompanyStats,
+  getCompanyDrives,
+  approveCompany,
+  rejectCompany,
+  suspendCompany,
+  reinstateCompany,
+  getCompanyRankings,
+  getActiveDriveCompanies,
 };

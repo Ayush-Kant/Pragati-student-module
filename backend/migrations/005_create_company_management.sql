@@ -1,52 +1,83 @@
--- Migration 005: Company Management Module
--- Extends the minimal 'companies' table created in 003 and adds company_stats.
+-- ============================================================
+-- COMPANIES TABLE
+-- ============================================================
 
--- ─────────────────────────────────────────────────────────────
--- ALTER: companies (add missing columns for full management)
--- ─────────────────────────────────────────────────────────────
-ALTER TABLE companies
-  ADD COLUMN IF NOT EXISTS user_id          INTEGER REFERENCES users(id),
-  ADD COLUMN IF NOT EXISTS email            VARCHAR(255) UNIQUE,
-  ADD COLUMN IF NOT EXISTS industry         VARCHAR(100),
-  ADD COLUMN IF NOT EXISTS size             VARCHAR(50),   -- e.g. '1-50', '51-200', '201-500', '500+'
-  ADD COLUMN IF NOT EXISTS location         VARCHAR(255),
-  ADD COLUMN IF NOT EXISTS status           VARCHAR(50) NOT NULL DEFAULT 'pending'
-                                            CHECK (status IN ('pending','approved','rejected','suspended')),
-  ADD COLUMN IF NOT EXISTS rejection_reason  TEXT,
-  ADD COLUMN IF NOT EXISTS suspension_reason TEXT,
-  ADD COLUMN IF NOT EXISTS verified_at      TIMESTAMPTZ;
+CREATE TABLE IF NOT EXISTS companies (
+    id SERIAL PRIMARY KEY,
 
--- ─────────────────────────────────────────────────────────────
--- TABLE: company_stats
--- Aggregated performance metrics per company
--- ─────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS company_stats (
-  id                        SERIAL PRIMARY KEY,
-  company_id                INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  offer_acceptance_rate     NUMERIC(5,2)  DEFAULT 0.00,  -- %
-  interview_to_hire_rate    NUMERIC(5,2)  DEFAULT 0.00,  -- %
-  avg_response_time_days    NUMERIC(6,2)  DEFAULT 0.00,  -- days
-  total_jobs_posted         INTEGER       NOT NULL DEFAULT 0,
-  total_hires               INTEGER       NOT NULL DEFAULT 0,
-  engagement_score          NUMERIC(6,2)  DEFAULT 0.00,
-  last_updated              TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-  UNIQUE(company_id)
+    user_id INTEGER REFERENCES users(id),
+
+    name VARCHAR(255) NOT NULL,
+
+    email VARCHAR(255) UNIQUE NOT NULL,
+
+    industry VARCHAR(100),
+
+    size VARCHAR(50),
+
+    location VARCHAR(255),
+
+    status VARCHAR(50) NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending','approved','rejected','suspended')),
+
+    rejection_reason TEXT,
+
+    suspension_reason TEXT,
+
+    verified_at TIMESTAMPTZ,
+
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
+-- COMPANY STATS TABLE
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS company_stats (
+    id SERIAL PRIMARY KEY,
+
+    company_id INTEGER NOT NULL
+    REFERENCES companies(id)
+    ON DELETE CASCADE,
+
+    offer_acceptance_rate NUMERIC(5,2) DEFAULT 0.00,
+
+    interview_to_hire_rate NUMERIC(5,2) DEFAULT 0.00,
+
+    avg_response_time_days NUMERIC(6,2) DEFAULT 0.00,
+
+    total_jobs_posted INTEGER DEFAULT 0,
+
+    total_hires INTEGER DEFAULT 0,
+
+    engagement_score NUMERIC(6,2) DEFAULT 0.00,
+
+    last_updated TIMESTAMPTZ DEFAULT NOW(),
+
+    UNIQUE(company_id)
+);
+
+-- ============================================================
 -- INDEXES
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
+
 CREATE INDEX IF NOT EXISTS idx_companies_status
-  ON companies(status);
+ON companies(status);
 
 CREATE INDEX IF NOT EXISTS idx_companies_name
-  ON companies(name);
+ON companies(name);
 
 CREATE INDEX IF NOT EXISTS idx_companies_industry
-  ON companies(industry);
+ON companies(industry);
 
 CREATE INDEX IF NOT EXISTS idx_company_stats_engagement
-  ON company_stats(engagement_score DESC);
+ON company_stats(engagement_score DESC);
+
+-- ============================================================
+-- SAMPLE DATA
+-- ============================================================
 
 INSERT INTO companies
 (
@@ -61,7 +92,7 @@ VALUES
 (
     'TechNova Solutions',
     'hr@technova.com',
-    'Software',
+    'Software Development',
     '500-1000',
     'Hyderabad',
     'pending'
@@ -105,23 +136,3 @@ VALUES
     95.8
 );
 
-INSERT INTO drives
-(
-    mentor_id,
-    company_id,
-    title,
-    status,
-    location,
-    start_date,
-    end_date
-)
-VALUES
-(
-    1,
-    2,
-    'Software Engineer Hiring Drive',
-    'active',
-    'Bangalore',
-    NOW(),
-    NOW() + INTERVAL '30 days'
-);
