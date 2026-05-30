@@ -11,7 +11,14 @@ import { AuthProvider} from './context/AuthContext';
 import VerificationPage from './features/student/pages/public/VerificationPage';
 import StudentRoutes from "./features/student/routes/StudentRoutes";
 import AdminRoute from "./features/admin/routes/AdminRoutes";
-import mentorRoute from "./features/mentor/routes/MentorRoutes";
+// import mentorRoute from "./features/mentor/routes/MentorRoutes";
+import MentorLayout from "./features/mentor/MentorLayout";
+import Activities from "./features/mentor/pages/Activities";
+import CreateActivity from "./features/mentor/pages/CreateActivity";
+import ActivityTemplates from "./features/mentor/pages/ActivityTemplates";
+import ManageDeadlines from "./features/mentor/pages/ManageDeadlines";
+import BulkAssignActivity from "./features/mentor/pages/BulkAssignActivity";
+import ActivityCalendar from "./features/mentor/pages/ActivityCalendar";
 import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
 
@@ -28,7 +35,15 @@ function App() {
         <Route path='/register' element={<RegisterPage />} />
 
         {/* ── Mentor ────────────────────────────────────────────────── */}
-        {mentorRoute}
+        {/* <Route path="/mentor" element={<MentorLayout />}>
+          <Route path="activities" element={<Activities />} />
+          <Route path="activities/create" element={<CreateActivity />} />
+          <Route path="activities/templates" element={<ActivityTemplates />} />
+          <Route path="activities/deadlines" element={<ManageDeadlines />} />
+          <Route path="activities/bulk-assign" element={<BulkAssignActivity />} />
+          <Route path="activities/calendar" element={<ActivityCalendar />} />
+          {/* Add other mentor routes here as needed */}
+        {/* </Route> */}
 
         {/* ── Admin ─────────────────────────────────────────────────── */}
        

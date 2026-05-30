@@ -44,9 +44,29 @@ const useActivities = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // TODO: Add filtering logic here
+  const addActivity = (newActivity) => {
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      const activity = {
+        ...newActivity,
+        id: activities.length + 1,
+        status: newActivity.status || 'pending',
+        assignedCount: 0,
+        submissionCount: 0,
+      };
+      setActivities([activity, ...activities]);
+      setStats(prev => ({
+        ...prev,
+        total: prev.total + 1,
+        pending: prev.pending + (activity.status === 'pending' ? 1 : 0),
+        drafts: prev.drafts + (activity.status === 'draft' ? 1 : 0),
+      }));
+      setLoading(false);
+    }, 500);
+  };
 
-  return { activities, stats, loading, error };
+  return { activities, stats, loading, error, addActivity };
 };
 
 export default useActivities;

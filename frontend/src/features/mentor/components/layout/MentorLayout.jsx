@@ -1,16 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import { LayoutDashboard, Users, CalendarDays, ClipboardList, ListTodo, LineChart, Settings, Search, Bell, HelpCircle } from 'lucide-react';
 
 export default function MentorLayout() {
   const menuItems = [
-    { name: 'Dashboard', active: true, icon: '📊' },
-    { name: 'My Mentees', active: false, icon: '👥' },
-    { name: 'Sessions', active: false, icon: '📅' },
-    { name: 'Assessments', active: false, icon: '📝' },
-    { name: 'Tasks & Assignments', active: false, icon: '📋' },
-    { name: 'Reports & Analytics', active: false, icon: '📉' },
-    { name: 'Settings', active: false, icon: '⚙️' }
+    { name: 'Dashboard', active: true, icon: <LayoutDashboard className="w-5 h-5" /> },
+    { name: 'My Mentees', active: false, icon: <Users className="w-5 h-5" /> },
+    { name: 'Sessions', active: false, icon: <CalendarDays className="w-5 h-5" /> },
+    { name: 'Assessments', active: false, icon: <ClipboardList className="w-5 h-5" /> },
+    { name: 'Tasks & Assignments', active: false, icon: <ListTodo className="w-5 h-5" /> },
+    { name: 'Reports & Analytics', active: false, icon: <LineChart className="w-5 h-5" /> },
+    { name: 'Settings', active: false, icon: <Settings className="w-5 h-5" /> }
   ];
+
+  const [mentorName, setMentorName] = useState('Mentor User');
+  const [initials, setInitials] = useState('MU');
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const decoded = jwtDecode(token);
+        if (decoded.name) {
+          setMentorName(decoded.name);
+          setInitials(decoded.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase());
+        } else if (decoded.email) {
+          const emailName = decoded.email.split('@')[0];
+          const formattedName = emailName.charAt(0).toUpperCase() + emailName.slice(1).replace(/[^a-zA-Z0-9]/g, ' ');
+          setMentorName(formattedName);
+          setInitials(formattedName.substring(0, 2).toUpperCase());
+        }
+      }
+    } catch (e) {
+      console.error('Failed to decode token', e);
+    }
+  }, []);
 
   return (
     <div style={{ 
@@ -59,7 +84,7 @@ export default function MentorLayout() {
               fontWeight: item.active ? '600' : '500',
               fontSize: '14px'
             }}>
-              <span style={{ fontSize: '16px' }}>{item.icon}</span>
+              {item.icon}
               {item.name}
             </div>
           ))}
@@ -67,7 +92,9 @@ export default function MentorLayout() {
 
         {/* Support Vector Box */}
         <div style={{ backgroundColor: '#f0f9ff', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
-          <span style={{ fontSize: '20px' }}>🦉</span>
+          <div className="flex justify-center mb-2">
+            <HelpCircle className="w-8 h-8 text-sky-500" />
+          </div>
           <h4 style={{ margin: '6px 0 2px 0', fontSize: '13px', color: '#0f172a', fontWeight: '700' }}>Need Help?</h4>
           <p style={{ margin: 0, fontSize: '11px', color: '#64748b', marginBottom: '10px' }}>Our Support Desk is open</p>
           <button style={{ width: '100%', padding: '8px', backgroundColor: '#0ea5e9', color: '#ffffff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>Get Support</button>
@@ -98,18 +125,22 @@ export default function MentorLayout() {
               placeholder="Search for opportunities, profiles, faqs..." 
               style={{ width: '100%', padding: '10px 16px 10px 38px', borderRadius: '999px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontSize: '13px', outline: 'none' }} 
             />
-            <span style={{ position: 'absolute', left: '14px', top: '10px', color: '#94a3b8', fontSize: '14px' }}>🔍</span>
+            <span style={{ position: 'absolute', left: '14px', top: '10px', color: '#94a3b8' }}>
+              <Search className="w-4 h-4 mt-0.5" />
+            </span>
           </div>
 
           {/* User Profile */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-            <span style={{ fontSize: '20px', cursor: 'pointer' }}>🔔</span>
+            <span style={{ cursor: 'pointer', color: '#64748b' }}>
+              <Bell className="w-5 h-5" />
+            </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: '#0ea5e9', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '14px' }}>
-                AS
+                {initials}
               </div>
               <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b', lineHeight: '1.2' }}>Arjun Sharma</div>
+                <div style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b', lineHeight: '1.2' }}>{mentorName}</div>
                 <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>Mentor Console</div>
               </div>
             </div>
