@@ -10,7 +10,7 @@ import * as controller from '../controllers/company.controller.js';
 
 const router = express.Router();
 
-// router.use(authMiddleware,roleMiddleware('admin'));
+router.use(authMiddleware,roleMiddleware('admin'));
 
 router.get('/',validator.validatePagination,controller.getAllCompanies);
 
