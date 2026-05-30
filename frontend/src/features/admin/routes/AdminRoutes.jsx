@@ -14,14 +14,16 @@ import AdminAssesment from "../adminAssesments/AdminAssesment";
 import AdminProfile from "../pages/AdminProfile";
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
+import CompanyDetail from "../pages/CompanyDetail";
 
 const AdminRoute = (
-     <Route element={<PrivateRoute />}>
-     <Route element={<RoleRoute allowedRoles={['admin']} />}>
+    //  <Route element={<PrivateRoute />}>
+    //  <Route element={<RoleRoute allowedRoles={['admin']} />}>
       <Route path="admin" element={<AdminLayout />}>
           <Route index   path="dashboard"       element={<AdminDashboard />} />
           <Route path='profile'      element={<AdminProfile />} />
           <Route path='companies'    element={<AdminCompanies />} />
+          <Route path="companies/:id" element={<CompanyDetail />} />
           <Route path='colleges'     element={<AdminCollege />} />
           <Route path='colleges/:id' element={<CollegeDetail />} />
           <Route path='students'     element={<AdminStudent />} />
@@ -32,8 +34,8 @@ const AdminRoute = (
           <Route path='notification' element={<AdminNotifications />} />
           <Route path='disputes'     element={<AdminDisputes />} />
         </Route>
-        </Route>
-        </Route>
+        // </Route>
+        // </Route>
 )
 
 export default AdminRoute;
