@@ -1,5 +1,7 @@
+import { RecruitmentDrives } from '../features/company/drives/pages/RecruitmentDrives';
+
 const Drives = () => {
-  return <h1>Drives Page</h1>;
+  return <RecruitmentDrives />;
 };
 
 export default Drives;

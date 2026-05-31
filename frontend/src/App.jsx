@@ -1,6 +1,10 @@
+import "./App.css";
+
+import { Routes, Route } from "react-router-dom";
 
 import AppRoutes from "./routes/AppRoutes";
 import Messages from "./pages/Messages";
+
 
 //function App() {
 //  return <AppRoutes />;
@@ -52,3 +56,4 @@ function App() {
 }
 
 export default App; 
+

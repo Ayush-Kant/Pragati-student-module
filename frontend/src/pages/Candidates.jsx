@@ -1,5 +1,7 @@
+import CandidateManagement from '../features/company/candidates/pages/CandidateManagement';
+
 const Candidates = () => {
-  return <h1>Candidates Page</h1>;
+  return <CandidateManagement />;
 };
 
 export default Candidates;
