@@ -1,7 +1,7 @@
 import CompanyStatusBadge from "./CompanyStatusBadge";
 import CompanyActionBar from "./CompanyActionBar";
 
-export default function CompanyTable({ companies, darkMode }) {
+export default function CompanyTable({ companies, darkMode, onStatusChange, actionLoading }) {
   return (
     <div
       className={`overflow-x-auto rounded-lg shadow mt-6 ${darkMode
@@ -60,7 +60,7 @@ export default function CompanyTable({ companies, darkMode }) {
                 {company.engagementScore}
               </td>
               <td className="p-4">
-                <CompanyActionBar company={company} />
+                <CompanyActionBar company={company} onStatusChange={onStatusChange} actionLoading={actionLoading} showViewButton={true} />
               </td>
             </tr>
           ))}
