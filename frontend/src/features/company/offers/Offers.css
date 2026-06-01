@@ -1,14 +1,14 @@
 .offers-page {
-  padding: 24px;
-  background: #f5f7fb;
-  min-height: calc(100vh - 70px);
+  padding: 0;
+  background: transparent;
+  min-height: auto;
 }
 
 .offers-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .offers-header h1 {

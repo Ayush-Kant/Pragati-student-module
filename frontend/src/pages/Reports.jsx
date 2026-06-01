@@ -234,11 +234,11 @@ export default function ReportsAnalyticsFull() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="overflow-x-hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* ── Page Header ── */}
-      <div className="bg-white border-b border-gray-100 px-4 sm:px-8 py-5 flex items-start justify-between sticky top-0 z-20 gap-4">
+      <div className="bg-white border-b border-gray-100 px-4 sm:px-8 py-5 flex items-start justify-between z-20 gap-4 mb-5">
         <div className="min-w-0">
           <h1 className="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight truncate">Reports & Analytics</h1>
           <p className="text-xs sm:text-sm text-gray-400 mt-1 truncate">Comprehensive insights into your recruitment performance</p>
@@ -255,7 +255,7 @@ export default function ReportsAnalyticsFull() {
         </div>
       </div>
 
-      <div className="px-4 sm:px-8 py-6 max-w-9xl mx-auto space-y-6">
+      <div className="px-4 sm:px-8 py-0 max-w-9xl mx-auto space-y-6">
 
         {/* ── Core KPIs (Stays exactly 3 columns) ── */}
         <div>

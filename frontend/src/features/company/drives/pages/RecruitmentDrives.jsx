@@ -80,7 +80,7 @@ export const RecruitmentDrives = () => {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-8">
+      <div>
         <DrivesHeader onCreateClick={() => setIsDrawerOpen(true)} />
         <DriveFilters
           filters={filters}

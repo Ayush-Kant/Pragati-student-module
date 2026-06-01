@@ -1,13 +1,11 @@
 .company-dashboard {
-  padding: 24px;
-
-  background: #f6f8fb;
-
-  min-height: 100vh;
+  padding: 0;
+  background: transparent;
+  min-height: auto;
 }
 
 .dashboard-header {
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
 .dashboard-header h1 {

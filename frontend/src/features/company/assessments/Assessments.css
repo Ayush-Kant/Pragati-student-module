@@ -1,14 +1,13 @@
 .assessments-wrapper {
-  padding: 24px;
-  background: #f5f7fb;
-  min-height: calc(100vh - 70px);
+  padding: 0;
+  background: transparent;
   overflow-x: hidden;
 }
 
 .assessments-layout {
   display: flex;
   width: 100%;
-  min-height: calc(100vh - 120px);
+  min-height: auto;
 }
 
 .assessments-left {
@@ -23,7 +22,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .assessments-header h1 {
@@ -212,10 +211,10 @@
 
 .create-panel {
   position: fixed;
-  top: 0;
+  top: 68px;
   right: 0;
   width: 520px;
-  height: 100vh;
+  height: calc(100vh - 68px);
   background: #ffffff;
   z-index: 200;
   display: flex;

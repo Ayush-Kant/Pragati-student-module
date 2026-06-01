@@ -58,8 +58,8 @@ const CandidateManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+    <div>
+      <div className="w-full">
         {/* Header */}
         <CandidateHeader />
 

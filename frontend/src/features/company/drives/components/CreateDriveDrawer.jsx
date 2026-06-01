@@ -32,9 +32,9 @@ export const CreateDriveDrawer = ({ isOpen, onClose }) => {
       <div
         className="
           fixed
-          top-0
+          top-[68px]
           right-0
-          h-screen
+          h-[calc(100vh-68px)]
           w-[420px]
           bg-white
           shadow-2xl

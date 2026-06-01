@@ -18,7 +18,7 @@ const MainLayout = () => {
        <main
   style={{
     marginLeft: "280px",
-    marginTop: "20px",
+    marginTop: "68px",
     padding: "24px",
     flex: 1,
     minHeight: "100vh",
