@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useOutletContext } from "react-router-dom";
 import { getCompanyById } from "../services/companyService";
+import CompanyStatsRow from "../components/CompanyStatsRow";
+import CompanyActivityLog from "../components/CompanyActivityLog";
+import CompanyDrivesList from "../components/CompanyDrivesList";
+import CompanyPerformanceMetrics from "../components/CompanyPerformanceMetrics";
+import CompanyHeader from "../components/CompanyHeader";
+import CompanyActionBar from "../components/CompanyActionBar";
+import { updateCompanyStatus } from "../services/companyService";
+import toast from "react-hot-toast";
 
 export default function CompanyDetail() {
   const { id } = useParams();
@@ -20,52 +28,53 @@ export default function CompanyDetail() {
         setLoading(false);
       }
     };
-
     fetchCompany();
   }, [id]);
-
   if (loading) {
     return <div className="p-4">Loading...</div>;
   }
-
   if (!company) {
     return <div className="p-4">Company not found</div>;
   }
+
+  const handleStatusChange = async (
+    companyId,
+    newStatus
+  ) => {
+    try {
+      await updateCompanyStatus(
+        companyId,
+        newStatus
+      );
+      const updatedCompany = await getCompanyById(companyId);
+      setCompany({ ...updatedCompany });
+      toast.success(
+        `Company ${newStatus} successfully`
+      );
+    } catch (error) {
+      toast.error("Something went wrong");
+      console.error(error);
+    }
+  };
 
   return (
     <div
       className={`p-6 ${darkMode ? "text-white" : "text-slate-900"
         }`}
     >
-      <h1 className="text-3xl font-bold mb-4">
-        {company.name}
-      </h1>
+      <CompanyHeader company={company} />
+      <CompanyActionBar company={company} onStatusChange={handleStatusChange} showViewButton={false} />
+      <CompanyStatsRow company={company} />
+      <CompanyPerformanceMetrics company={company} />
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="border rounded-lg p-4">
-          <p>
-            <strong>Industry:</strong> {company.industry}
-          </p>
-        </div>
+      <div className="grid md:grid-cols-2 gap-6 mt-6">
+        <CompanyActivityLog
+          activityLogs={company.activityLogs}
+        />
 
-        <div className="border rounded-lg p-4">
-          <p>
-            <strong>Location:</strong> {company.location}
-          </p>
-        </div>
-
-        <div className="border rounded-lg p-4">
-          <p>
-            <strong>Status:</strong> {company.status}
-          </p>
-        </div>
-
-        <div className="border rounded-lg p-4">
-          <p>
-            <strong>Engagement Score:</strong>{" "}
-            {company.engagementScore}
-          </p>
-        </div>
+        <CompanyDrivesList
+          activeDrives={company.activeDrives}
+        />
       </div>
     </div>
   );

@@ -2,8 +2,12 @@ import { useOutletContext } from "react-router-dom";
 import useCompanyManagement from "../hooks/useCompanyManagement";
 import CompanyTable from "../components/CompanyTable";
 import CompanyFilterBar from "../components/CompanyFilterBar";
+import { updateCompanyStatus } from "../services/companyService";
+import toast from "react-hot-toast";
+import { useState } from "react";
 
 export default function CompanyManagement() {
+    const [actionLoading, setActionLoading] = useState(false);
     const { darkMode } = useOutletContext();
     const {
         loading,
@@ -20,7 +24,26 @@ export default function CompanyManagement() {
         setLocation,
         status,
         setStatus,
+        fetchCompanies,
     } = useCompanyManagement();
+
+    const handleStatusChange = async (
+        companyId,
+        newStatus
+    ) => {
+        try {
+            await updateCompanyStatus(
+                companyId,
+                newStatus
+            );
+            fetchCompanies();
+            toast.success(
+                `Company ${newStatus} successfully`
+            );
+        } catch (error) {
+            toast.error("Something went wrong");
+        }
+    };
 
     return (
         <div className={`p-4 transition ${darkMode ? "text-white" : "text-slate-900"}`}>
@@ -63,6 +86,8 @@ export default function CompanyManagement() {
                                 <CompanyTable
                                     companies={currentCompanies}
                                     darkMode={darkMode}
+                                    onStatusChange={handleStatusChange}
+                                    actionLoading={actionLoading}
                                 />
                             )
                         }

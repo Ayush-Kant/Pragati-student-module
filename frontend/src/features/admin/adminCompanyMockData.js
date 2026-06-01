@@ -13,16 +13,23 @@ export const mockCompanies = [
     totalJobs: 120,
     totalHires: 75,
     acceptanceRate: 82,
+    website: "https://google.com",
+    offerAcceptanceRate: 79,
+    interviewToHireConversion: 45,
+    averageResponseTime: "2.5 Days",
     activityLogs: [
       {
         id: 1,
         action: "Company Approved",
-        date: "2025-08-01"
+        actor: "Admin",
+        timestamp: "2025-08-05 10:45 AM",
+        
       },
       {
         id: 2,
         action: "Posted New Internship Drive",
-        date: "2025-08-10"
+        actor: "System",
+        timestamp: "2025-08-06 03:15 PM",
       }
     ],
 
@@ -30,12 +37,16 @@ export const mockCompanies = [
       {
         id: 1,
         title: "SDE Intern Hiring",
-        status: "active"
+        status: "active",
+        startDate: "2025-08-01",
+        endDate: "2025-08-30",
       },
       {
         id: 2,
         title: "Cloud Engineer Drive",
-        status: "active"
+        status: "active",
+        startDate: "2025-08-01",
+        endDate: "2025-08-30",
       }
     ]
   },
@@ -53,28 +64,38 @@ export const mockCompanies = [
     totalJobs: 105,
     totalHires: 68,
     acceptanceRate: 79,
+    website: "https://amazon.com",
+    offerAcceptanceRate: 80,
+    interviewToHireConversion: 49,
+    averageResponseTime: "1.3 Days",
     activityLogs: [
       {
         id: 1,
         action: "Company Approved",
-        date: "2025-07-20"
+        actor: "System",
+        timestamp: "2025-08-06 03:15 PM",
       },
       {
         id: 2,
         action: "Posted AI Research Internship",
-        date: "2025-08-08"
+        actor: "Admin",
+        timestamp: "2025-06-08 01:15 PM",
       }
     ],
     activeDrives: [
       {
         id: 1,
         title: "Software Engineer Intern",
-        status: "active"
+        status: "active",
+        startDate: "2025-06-01",
+        endDate: "2025-06-25",
       },
       {
         id: 2,
         title: "AI/ML Internship Program",
-        status: "active"
+        status: "active",
+        startDate: "2025-08-01",
+        endDate: "2025-08-30",
       }
     ]
   },
@@ -92,25 +113,33 @@ export const mockCompanies = [
     totalJobs: 140,
     totalHires: 90,
     acceptanceRate: 75,
+    website: "https://amazon.com",
+    offerAcceptanceRate: 75,
+    interviewToHireConversion: 42,
+    averageResponseTime: "2.3 Days",
     activityLogs: [
       {
         id: 1,
         action: "Company Suspended",
-        date: "2025-08-05"
+        actor: "System",
+        timestamp: "2025-08-06 03:15 PM",
       },
       {
         id: 2,
         action: "Compliance Review Initiated",
-        date: "2025-08-06"
+        actor: "System",
+        timestamp: "2025-08-06 03:15 PM",
       }
     ],
     activeDrives: [
       {
         id: 1,
         title: "Backend Engineer Hiring",
-        status: "paused"
+        status: "paused",
+        startDate: "2025-08-11",
+        endDate: "2025-09-11",
       }
-    ]
+    ],
   },
   {
     id: 4,
@@ -126,23 +155,31 @@ export const mockCompanies = [
     totalJobs: 60,
     totalHires: 35,
     acceptanceRate: 81,
+    website: "https://amazon.com",
+    offerAcceptanceRate: 70,
+    interviewToHireConversion: 40,
+    averageResponseTime: "2 Days",
     activityLogs: [
       {
         id: 1,
         action: "Company Registration Submitted",
-        date: "2025-08-12"
+        actor: "System",
+        timestamp: "2025-08-06 03:15 PM",
       },
       {
         id: 2,
         action: "Awaiting Admin Approval",
-        date: "2025-08-13"
+        actor: "System",
+        timestamp: "2025-08-06 03:15 PM",
       }
     ],
     activeDrives: [
       {
         id: 1,
         title: "Frontend Engineer Internship",
-        status: "pending"
+        status: "pending",
+        startDate: "2025-08-01",
+        endDate: "2025-08-30",
       }
     ]
   },
@@ -160,16 +197,23 @@ export const mockCompanies = [
     totalJobs: 40,
     totalHires: 18,
     acceptanceRate: 62,
+
+    website: "https://amazon.com",
+    offerAcceptanceRate: 95,
+    interviewToHireConversion: 60,
+    averageResponseTime: "5 Days",
     activityLogs: [
       {
         id: 1,
         action: "Application Rejected",
-        date: "2025-08-02"
+        actor: "Admin",
+        timestamp: "2025-08-06 03:15 PM",
       },
       {
         id: 2,
         action: "Profile Review Completed",
-        date: "2025-08-01"
+        actor: "System",
+        timestamp: "2025-08-06 03:15 PM",
       }
     ],
     activeDrives: []
@@ -188,28 +232,38 @@ export const mockCompanies = [
     totalJobs: 72,
     totalHires: 44,
     acceptanceRate: 85,
+    website: "https://amazon.com",
+    offerAcceptanceRate: 50,
+    interviewToHireConversion: 41,
+    averageResponseTime: "3.3 Days",
     activityLogs: [
       {
         id: 1,
         action: "Company Registration Submitted",
-        date: "2025-08-09"
+        actor: "Admin",
+        timestamp: "2025-08-06 03:15 PM",
       },
       {
         id: 2,
         action: "Documents Under Verification",
-        date: "2025-08-10"
+        actor: "Admin",
+        timestamp: "2025-08-06 03:15 PM",
       }
     ],
     activeDrives: [
       {
         id: 1,
         title: "UI/UX Design Internship",
-        status: "pending"
+        status: "pending",
+        startDate: "2025-08-01",
+        endDate: "2025-08-30",
       },
       {
         id: 2,
         title: "Software Development Internship",
-        status: "pending"
+        status: "pending",
+        startDate: "2025-08-01",
+        endDate: "2025-08-30",
       }
     ]
   },
