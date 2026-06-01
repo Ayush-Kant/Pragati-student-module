@@ -1,5 +1,7 @@
+import InterviewsPage from '../features/company/pages/InterviewsPage';
+
 const Interviews = () => {
-  return <h1>Interviews Page</h1>;
+  return <InterviewsPage />;
 };
 
 export default Interviews;

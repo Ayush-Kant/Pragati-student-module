@@ -18,10 +18,10 @@ const MainLayout = () => {
        <main
   style={{
     marginLeft: "280px",
-    marginTop: "20px",
-    padding: "24px",
+    marginTop: "68px",   /* clear the fixed 68px navbar */
+    padding: "12px 24px 24px",
     flex: 1,
-    minHeight: "100vh",
+    minHeight: "calc(100vh - 68px)",
     background: "#F8FAFC",
     boxSizing: "border-box",
     overflowX: "hidden",
