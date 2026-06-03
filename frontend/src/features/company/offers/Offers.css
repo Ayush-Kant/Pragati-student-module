@@ -1,3 +1,5 @@
+/* ─── Page Layout ──────────────────────────────────────────────────────────── */
+
 .offers-page {
   padding: 0;
   background: transparent;
@@ -43,6 +45,8 @@
   box-shadow: 0 8px 20px rgba(45, 194, 107, 0.25);
 }
 
+/* ─── Stats ────────────────────────────────────────────────────────────────── */
+
 .offers-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -69,12 +73,16 @@
   font-size: 15px;
 }
 
+/* ─── Table Card ───────────────────────────────────────────────────────────── */
+
 .offers-table-card {
   background: white;
   border-radius: 18px;
   border: 1px solid #e5e7eb;
   overflow: hidden;
 }
+
+/* ─── Filters ──────────────────────────────────────────────────────────────── */
 
 .offers-filters {
   display: flex;
@@ -116,8 +124,67 @@
 
 .filter-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
+/* ─── Filter Dropdowns ─────────────────────────────────────────────────────── */
+
+.filter-dropdown-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-top: 8px;
+  min-width: 160px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 50;
+  overflow: hidden;
+}
+
+.role-dropdown-menu {
+  width: max-content;
+  min-width: 260px;
+  max-width: calc(100vw - 48px);
+  padding: 4px;
+  overflow: visible;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  border-radius: 6px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  color: #667085;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.dropdown-item:hover {
+  background: #f1f5f9;
+  color: #101828;
+}
+
+.dropdown-item.active {
+  background: #dbeafe;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* ─── Table ────────────────────────────────────────────────────────────────── */
 
 .table-wrapper {
   overflow-x: auto;
@@ -147,6 +214,8 @@
   color: #101828;
   vertical-align: middle;
 }
+
+/* ─── Table Cell Styles ────────────────────────────────────────────────────── */
 
 .candidate-cell {
   display: flex;
@@ -207,69 +276,100 @@
   color: #64748b;
 }
 
-.actions {
+/* ─── Row Action Menu ──────────────────────────────────────────────────────── */
+
+.offer-actions-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.offer-menu-btn {
   display: flex;
   align-items: center;
-  gap: 18px;
-  font-size: 18px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
   color: #64748b;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.filter-dropdown-wrapper {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.filter-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  margin-top: 8px;
-  min-width: 160px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  z-index: 50;
-  overflow: hidden;
-}
-
-.role-dropdown-menu {
-  width: max-content;
-  min-width: 260px;
-  max-width: calc(100vw - 48px);
-  padding: 4px;
-  overflow: visible;
-}
-
-.dropdown-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 12px 16px;
-  border-radius: 6px;
-  border: none;
-  background: white;
-  cursor: pointer;
-  font-size: 14px;
-  color: #667085;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  overflow: visible;
-  text-overflow: clip;
-}
-
-.dropdown-item:hover {
+.offer-menu-btn:hover {
   background: #f1f5f9;
   color: #101828;
 }
 
-.dropdown-item.active {
-  background: #dbeafe;
-  color: #2563eb;
-  font-weight: 600;
+.offer-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  width: 176px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 200;
+  animation: offerMenuIn 0.12s ease;
 }
+
+@keyframes offerMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.offer-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.offer-dropdown-item:hover {
+  background: #f8fafc;
+  color: #101828;
+}
+
+.offer-dropdown-item--danger {
+  color: #dc2626;
+}
+
+.offer-dropdown-item--danger:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.offer-dropdown-icon {
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.offer-dropdown-divider {
+  height: 1px;
+  background: #f0f2f5;
+  margin: 4px 0;
+}
+
+/* ─── Empty State ──────────────────────────────────────────────────────────── */
 
 .empty-state {
   text-align: center;
@@ -278,15 +378,15 @@
   font-size: 16px;
 }
 
-@media (max-width: 1200px) {
+/* ─── Responsive ───────────────────────────────────────────────────────────── */
 
+@media (max-width: 1200px) {
   .offers-stats {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-
   .offers-page {
     padding: 16px;
   }
