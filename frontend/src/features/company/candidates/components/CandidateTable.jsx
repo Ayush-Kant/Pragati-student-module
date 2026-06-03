@@ -1,6 +1,6 @@
 import { CandidateRow } from './CandidateRow';
 
-export const CandidateTable = ({ candidates, loading, onSelectCandidate, onMenuClick }) => {
+export const CandidateTable = ({ candidates, loading, onSelectCandidate, onMenuClick, onEdit }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -57,6 +57,7 @@ export const CandidateTable = ({ candidates, loading, onSelectCandidate, onMenuC
               candidate={candidate}
               onSelect={onSelectCandidate}
               onMenuClick={onMenuClick}
+              onEdit={onEdit}
             />
           ))}
         </tbody>

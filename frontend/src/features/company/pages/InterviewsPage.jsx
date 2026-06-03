@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import toast from "react-hot-toast";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   FiPlus,
   FiSearch,
@@ -102,6 +104,8 @@ const ROUND_TYPES = [
   "HR Round",
   "Final Round",
 ];
+
+const STATUS_FILTERS = ["Scheduled", "Completed"];
 
 /* ─────────────────────────────────────────────
    Schedule Interview Modal
@@ -295,6 +299,180 @@ const ScheduleModal = ({ onClose, onSubmit }) => {
 };
 
 /* ─────────────────────────────────────────────
+   Edit Interview Modal
+───────────────────────────────────────────── */
+const EditInterviewModal = ({ interview, onClose, onSave }) => {
+  // Convert display date ("May 15, 2026") → YYYY-MM-DD for the date input
+  const toInputDate = (displayDate) => {
+    try {
+      const d = new Date(displayDate + " 00:00:00");
+      if (isNaN(d)) return "";
+      return d.toISOString().slice(0, 10);
+    } catch {
+      return "";
+    }
+  };
+
+  // Convert display time ("10:00 AM") → HH:MM for the time input
+  const toInputTime = (displayTime) => {
+    try {
+      const [timePart, meridiem] = displayTime.split(" ");
+      let [h, m] = timePart.split(":").map(Number);
+      if (meridiem === "PM" && h !== 12) h += 12;
+      if (meridiem === "AM" && h === 12) h = 0;
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    } catch {
+      return "";
+    }
+  };
+
+  const [form, setForm] = useState({
+    candidate: interview.candidate || "",
+    interviewer: interview.interviewer || "",
+    date: toInputDate(interview.date),
+    time: toInputTime(interview.time),
+    roundType: interview.round || ROUND_TYPES[0],
+    status: interview.status || "Scheduled",
+  });
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const validate = () => {
+    const errs = {};
+    if (!form.candidate.trim()) errs.candidate = "Candidate name is required";
+    if (!form.interviewer.trim()) errs.interviewer = "Interviewer is required";
+    if (!form.date) errs.date = "Date is required";
+    if (!form.time) errs.time = "Time is required";
+    if (!form.roundType) errs.roundType = "Round type is required";
+    if (!form.status) errs.status = "Status is required";
+    return errs;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+
+    const dateObj = new Date(form.date + "T00:00:00");
+    const dateStr = dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+    const [h, m] = form.time.split(":").map(Number);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 || 12;
+    const timeStr = `${hour12}:${String(m).padStart(2, "0")} ${ampm}`;
+
+    const roundTypeMap = {
+      "Technical Round 1": "technical",
+      "Technical Round 2": "technical",
+      "HR Round": "hr",
+      "Final Round": "final",
+    };
+
+    onSave({
+      candidate: form.candidate.trim(),
+      interviewer: form.interviewer.trim(),
+      date: dateStr,
+      time: timeStr,
+      round: form.roundType,
+      roundType: roundTypeMap[form.roundType] || "technical",
+      status: form.status,
+    });
+  };
+
+  useEffect(() => {
+    const handler = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-box" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+        <div className="modal-header">
+          <h2 id="edit-modal-title">Edit Interview</h2>
+          <button className="modal-close" onClick={onClose} aria-label="Close modal">
+            <FiX size={20} />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body">
+
+            <div className="form-group">
+              <label htmlFor="edit-candidate">Candidate Name</label>
+              <div className="input-wrap">
+                <FiUser size={16} className="input-icon" />
+                <input id="edit-candidate" type="text" name="candidate" className="form-control" value={form.candidate} onChange={handleChange} placeholder="e.g. Rahul Patil" />
+              </div>
+              {errors.candidate && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.candidate}</p>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="edit-interviewer">Interviewer</label>
+              <div className="input-wrap">
+                <FiUser size={16} className="input-icon" />
+                <input id="edit-interviewer" type="text" name="interviewer" className="form-control" value={form.interviewer} onChange={handleChange} placeholder="e.g. Priya Sharma" />
+              </div>
+              {errors.interviewer && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.interviewer}</p>}
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="edit-date">Date</label>
+                <div className="input-wrap">
+                  <FiCalendar size={16} className="input-icon" />
+                  <input id="edit-date" type="date" name="date" className="form-control" value={form.date} onChange={handleChange} />
+                </div>
+                {errors.date && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.date}</p>}
+              </div>
+              <div className="form-group">
+                <label htmlFor="edit-time">Time</label>
+                <div className="input-wrap">
+                  <FiClock size={16} className="input-icon" />
+                  <input id="edit-time" type="time" name="time" className="form-control" value={form.time} onChange={handleChange} />
+                </div>
+                {errors.time && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.time}</p>}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="edit-roundType">Round Type</label>
+              <div className="select-wrap">
+                <select id="edit-roundType" name="roundType" className="form-control" style={{ paddingLeft: "14px" }} value={form.roundType} onChange={handleChange}>
+                  {ROUND_TYPES.map((r) => <option key={r} value={r}>{r}</option>)}
+                </select>
+                <FiChevronDown size={16} className="chevron-icon" />
+              </div>
+              {errors.roundType && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.roundType}</p>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="edit-status">Status</label>
+              <div className="select-wrap">
+                <select id="edit-status" name="status" className="form-control" style={{ paddingLeft: "14px" }} value={form.status} onChange={handleChange}>
+                  {STATUS_FILTERS.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+                <FiChevronDown size={16} className="chevron-icon" />
+              </div>
+              {errors.status && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.status}</p>}
+            </div>
+
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn-submit">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────────
    Actions dropdown cell
 ───────────────────────────────────────────── */
 const ActionsCell = ({ onEdit, onDelete }) => {
@@ -334,7 +512,7 @@ const ActionsCell = ({ onEdit, onDelete }) => {
 /* ─────────────────────────────────────────────
    Interviews Table
 ───────────────────────────────────────────── */
-const InterviewsTable = ({ interviews, onDelete }) => (
+const InterviewsTable = ({ interviews, onEdit, onDelete }) => (
   <div className="interviews-table-wrap">
     <table className="interviews-table">
       <thead>
@@ -393,7 +571,7 @@ const InterviewsTable = ({ interviews, onDelete }) => (
             {/* Actions */}
             <td>
               <ActionsCell
-                onEdit={() => alert(`Edit interview for ${row.candidate}`)}
+                onEdit={() => onEdit(row)}
                 onDelete={() => onDelete(row.id)}
               />
             </td>
@@ -408,19 +586,37 @@ const InterviewsTable = ({ interviews, onDelete }) => (
    Main Interviews Page
 ───────────────────────────────────────────── */
 const InterviewsPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const shouldOpenScheduleInterview = Boolean(location.state?.openScheduleInterview);
   const [interviews, setInterviews] = useState(MOCK_INTERVIEWS);
   const [search, setSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [roundFilter, setRoundFilter] = useState("");
+  const [openFilter, setOpenFilter] = useState(null);
+  const [showModal, setShowModal] = useState(shouldOpenScheduleInterview);
+  const [editingInterview, setEditingInterview] = useState(null);
 
-  /* Filter by search */
+  useEffect(() => {
+    if (shouldOpenScheduleInterview) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, navigate, shouldOpenScheduleInterview]);
+
+  /* Filter by search, status, and round type */
   const filtered = interviews.filter((i) => {
-    const q = search.toLowerCase();
-    return (
+    const q = search.trim().toLowerCase();
+    const matchesSearch = !q || (
       i.candidate.toLowerCase().includes(q) ||
       i.interviewer.toLowerCase().includes(q) ||
       i.round.toLowerCase().includes(q) ||
       i.status.toLowerCase().includes(q)
     );
+
+    const matchesStatus = !statusFilter || i.status === statusFilter;
+    const matchesRound = !roundFilter || i.round === roundFilter;
+
+    return matchesSearch && matchesStatus && matchesRound;
   });
 
   /* Add new interview from modal */
@@ -468,10 +664,23 @@ const InterviewsPage = () => {
         status: "Scheduled",
       },
     ]);
+    toast.success("Interview scheduled successfully");
   };
 
   const handleDelete = (id) => {
     setInterviews((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  const handleEdit = (interview) => {
+    setEditingInterview(interview);
+  };
+
+  const handleSaveEdit = (updatedFields) => {
+    setInterviews((prev) =>
+      prev.map((i) => (i.id === editingInterview.id ? { ...i, ...updatedFields } : i))
+    );
+    toast.success("Interview updated successfully");
+    setEditingInterview(null);
   };
 
   return (
@@ -506,24 +715,92 @@ const InterviewsPage = () => {
             />
           </div>
 
-          <button className="filter-btn">
-            <FiFilter size={14} />
-            <span>Status</span>
-          </button>
+          <div className="interviews-filter-wrap">
+            <button
+              className="filter-btn"
+              onClick={() => setOpenFilter((current) => current === "status" ? null : "status")}
+              type="button"
+            >
+              <FiFilter size={14} />
+              <span>Status</span>
+            </button>
 
-          <button className="filter-btn">
-            <FiFilter size={14} />
-            <span>Round Type</span>
-          </button>
+            {openFilter === "status" && (
+              <div className="interviews-filter-dropdown">
+                <button
+                  className={`interviews-filter-option ${!statusFilter ? "active" : ""}`}
+                  onClick={() => {
+                    setStatusFilter("");
+                    setOpenFilter(null);
+                  }}
+                  type="button"
+                >
+                  All Statuses
+                </button>
+                {STATUS_FILTERS.map((status) => (
+                  <button
+                    key={status}
+                    className={`interviews-filter-option ${statusFilter === status ? "active" : ""}`}
+                    onClick={() => {
+                      setStatusFilter(status);
+                      setOpenFilter(null);
+                    }}
+                    type="button"
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="interviews-filter-wrap">
+            <button
+              className="filter-btn"
+              onClick={() => setOpenFilter((current) => current === "round" ? null : "round")}
+              type="button"
+            >
+              <FiFilter size={14} />
+              <span>Round Type</span>
+            </button>
+
+            {openFilter === "round" && (
+              <div className="interviews-filter-dropdown round-filter-dropdown">
+                <button
+                  className={`interviews-filter-option ${!roundFilter ? "active" : ""}`}
+                  onClick={() => {
+                    setRoundFilter("");
+                    setOpenFilter(null);
+                  }}
+                  type="button"
+                >
+                  All Rounds
+                </button>
+                {ROUND_TYPES.map((round) => (
+                  <button
+                    key={round}
+                    className={`interviews-filter-option ${roundFilter === round ? "active" : ""}`}
+                    onClick={() => {
+                      setRoundFilter(round);
+                      setOpenFilter(null);
+                    }}
+                    type="button"
+                  >
+                    {round}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Table */}
         {filtered.length > 0 ? (
-          <InterviewsTable interviews={filtered} onDelete={handleDelete} />
+          <InterviewsTable interviews={filtered} onEdit={handleEdit} onDelete={handleDelete} />
         ) : (
           <div style={{ padding: "48px 24px", textAlign: "center", color: "#9ca3af" }}>
             <FiCalendar size={36} style={{ marginBottom: 12, opacity: 0.4 }} />
-            <p style={{ fontSize: 15 }}>No interviews found matching your search.</p>
+            <p style={{ fontSize: 15 }}>No interviews found</p>
           </div>
         )}
       </div>
@@ -533,6 +810,15 @@ const InterviewsPage = () => {
         <ScheduleModal
           onClose={() => setShowModal(false)}
           onSubmit={handleSchedule}
+        />
+      )}
+
+      {/* Edit Interview Modal */}
+      {editingInterview && (
+        <EditInterviewModal
+          interview={editingInterview}
+          onClose={() => setEditingInterview(null)}
+          onSave={handleSaveEdit}
         />
       )}
     </div>

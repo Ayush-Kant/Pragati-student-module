@@ -1,7 +1,24 @@
+import { useState, useEffect, useRef } from 'react';
 import { FiMoreVertical } from 'react-icons/fi';
+import { Eye, Pencil } from 'lucide-react';
 import { StatusBadge } from './StatusBadge';
 
-export const CandidateRow = ({ candidate, onSelect, onMenuClick }) => {
+export const CandidateRow = ({ candidate, onSelect, onEdit }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [isMenuOpen]);
+
   return (
     <tr className="border-b border-gray-100 hover:bg-blue-50/50 cursor-pointer transition-colors duration-200">
       {/* Candidate Info */}
@@ -43,15 +60,44 @@ export const CandidateRow = ({ candidate, onSelect, onMenuClick }) => {
 
       {/* Actions */}
       <td className="px-6 py-5">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onMenuClick(candidate);
-          }}
-          className="p-2 hover:bg-gray-200/60 rounded-lg transition-colors duration-150"
-        >
-          <FiMoreVertical size={20} className="text-gray-500" />
-        </button>
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMenuOpen(prev => !prev);
+            }}
+            className="p-2 hover:bg-gray-200/60 rounded-lg transition-colors duration-150"
+          >
+            <FiMoreVertical size={20} className="text-gray-500" />
+          </button>
+
+          {isMenuOpen && (
+            <div className="absolute right-0 top-[calc(100%+4px)] w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-1.5 z-50">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMenuOpen(false);
+                  onSelect(candidate);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition text-left"
+              >
+                <Eye size={15} className="text-gray-400" />
+                View Profile
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMenuOpen(false);
+                  onEdit(candidate);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition text-left"
+              >
+                <Pencil size={15} className="text-gray-400" />
+                Edit Candidate
+              </button>
+            </div>
+          )}
+        </div>
       </td>
     </tr>
   );

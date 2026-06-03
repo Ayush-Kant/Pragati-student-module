@@ -109,6 +109,13 @@ export const useCandidates = () => {
     }
   }, []);
 
+  // Update all candidate fields (used by Edit modal)
+  const updateCandidate = useCallback((id, updatedFields) => {
+    setCandidates(prev =>
+      prev.map(c => c.id === id ? { ...c, ...updatedFields } : c)
+    );
+  }, []);
+
   return {
     candidates: filteredCandidates,
     allCandidates: candidates,
@@ -118,6 +125,7 @@ export const useCandidates = () => {
     updateFilter,
     resetFilters,
     updateCandidateStatus,
+    updateCandidate,
     getUniqueValues,
     totalCandidates: filteredCandidates.length
   };

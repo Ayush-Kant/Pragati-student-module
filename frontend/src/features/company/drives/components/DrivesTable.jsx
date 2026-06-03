@@ -1,6 +1,6 @@
 import { DriveRow } from './DriveRow';
 
-export const DrivesTable = ({ drives }) => {
+export const DrivesTable = ({ drives, onView, onEdit, onViewCandidates, onChangeStage, onDelete }) => {
   return (
     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
       <table className="w-full">
@@ -15,9 +15,25 @@ export const DrivesTable = ({ drives }) => {
           </tr>
         </thead>
         <tbody>
-          {drives.map((drive) => (
-            <DriveRow key={drive.id} drive={drive} />
-          ))}
+          {drives.length === 0 ? (
+            <tr>
+              <td colSpan="6" className="text-center py-12 text-gray-500 font-medium bg-white">
+                No drives found
+              </td>
+            </tr>
+          ) : (
+            drives.map((drive) => (
+              <DriveRow
+                key={drive.id}
+                drive={drive}
+                onView={onView}
+                onEdit={onEdit}
+                onViewCandidates={onViewCandidates}
+                onChangeStage={onChangeStage}
+                onDelete={onDelete}
+              />
+            ))
+          )}
         </tbody>
       </table>
     </div>

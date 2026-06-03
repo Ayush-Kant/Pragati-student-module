@@ -1,16 +1,47 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
-export const CreateDriveDrawer = ({ isOpen, onClose }) => {
+const defaultDriveForm = {
+  driveName: '',
+  college: '',
+  date: '',
+  description: '',
+};
+
+export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
+  const [form, setForm] = useState(defaultDriveForm);
+
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === 'Escape' && isOpen) {
+        setForm(defaultDriveForm);
         onClose();
       }
     };
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleClose = () => {
+    setForm(defaultDriveForm);
+    onClose();
+  };
+
+  const handlePublish = () => {
+    if (!form.driveName.trim()) return;
+
+    onCreate?.(form);
+    setForm(defaultDriveForm);
+    onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -25,7 +56,7 @@ export const CreateDriveDrawer = ({ isOpen, onClose }) => {
           backdrop-blur-sm
           z-40
         "
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Drawer */}
@@ -53,7 +84,7 @@ export const CreateDriveDrawer = ({ isOpen, onClose }) => {
             </h2>
 
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="
                 mt-2
                 ml-4
@@ -76,24 +107,34 @@ export const CreateDriveDrawer = ({ isOpen, onClose }) => {
 
           {/* Form Content */}
           <div className="p-6 space-y-5">
-          {/* Job Title */}
+          {/* Drive Name */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Job Title</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Drive Name</label>
             <input
+              name="driveName"
               type="text"
-              placeholder="e.g., Senior Software Engineer"
+              placeholder="e.g., Senior Software Engineer Drive"
+              value={form.driveName}
+              onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
             />
           </div>
 
-          {/* Department */}
+          {/* College */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Department</label>
-            <select className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm appearance-none">
-              <option>Engineering</option>
-              <option>Sales</option>
-              <option>Marketing</option>
-              <option>HR</option>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">College</label>
+            <select
+              name="college"
+              value={form.college}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm appearance-none"
+            >
+              <option value="">Select college</option>
+              <option>IIT Hyderabad</option>
+              <option>NIT Warangal</option>
+              <option>VIT Chennai</option>
+              <option>SRM University</option>
+              <option>JNTU Hyderabad</option>
             </select>
           </div>
 
@@ -195,21 +236,27 @@ export const CreateDriveDrawer = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* Application Deadline */}
+          {/* Date */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Application Deadline</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Date</label>
             <input
+              name="date"
               type="date"
+              value={form.date}
+              onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
             />
           </div>
 
-          {/* Job Description */}
+          {/* Description */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Job Description</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
             <textarea
+              name="description"
               placeholder="Describe the role, responsibilities, and requirements..."
               rows="6"
+              value={form.description}
+              onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm resize-none"
             />
           </div>
@@ -222,12 +269,15 @@ export const CreateDriveDrawer = ({ isOpen, onClose }) => {
         {/* Sticky Footer Buttons */}
         <div className="fixed bottom-0 right-0 w-[420px] bg-white border-t border-gray-100 px-6 py-4 flex gap-3">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
           >
             Save Draft
           </button>
-          <button className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg transition-all">
+          <button
+            onClick={handlePublish}
+            className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg transition-all"
+          >
             Publish Drive
           </button>
         </div>

@@ -1,4 +1,5 @@
 import "./Offers.css";
+import { useState } from "react";
 
 import {
   FiSearch,
@@ -61,6 +62,52 @@ const offersData = [
 ];
 
 const Offers = () => {
+  const [filters, setFilters] = useState({
+    search: '',
+    status: '',
+    role: '',
+  });
+  
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+
+  // Get unique statuses and roles from data
+  const statuses = ['Accepted', 'Pending', 'Sent', 'Declined'];
+  const roles = [...new Set(offersData.map(offer => offer.role))].sort();
+
+  // Filter logic
+  const filteredOffers = offersData.filter(offer => {
+    const matchSearch = offer.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+                       offer.role.toLowerCase().includes(filters.search.toLowerCase());
+    const matchStatus = !filters.status || offer.status === filters.status;
+    const matchRole = !filters.role || offer.role === filters.role;
+    
+    return matchSearch && matchStatus && matchRole;
+  });
+
+  const handleSearchChange = (e) => {
+    setFilters(prev => ({
+      ...prev,
+      search: e.target.value
+    }));
+  };
+
+  const handleStatusSelect = (status) => {
+    setFilters(prev => ({
+      ...prev,
+      status: status
+    }));
+    setStatusDropdownOpen(false);
+  };
+
+  const handleRoleSelect = (role) => {
+    setFilters(prev => ({
+      ...prev,
+      role: role
+    }));
+    setRoleDropdownOpen(false);
+  };
+
   return (
     <div className="offers-page">
 
@@ -116,106 +163,166 @@ const Offers = () => {
             <input
               type="text"
               placeholder="Search offers..."
+              value={filters.search}
+              onChange={handleSearchChange}
             />
 
           </div>
 
-          <button className="filter-btn">
-            <FiFilter />
-            Status
-          </button>
+          {/* Status Filter Dropdown */}
+          <div className="filter-dropdown-wrapper">
+            <button 
+              className="filter-btn"
+              onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+            >
+              <FiFilter />
+              {filters.status || 'Status'}
+            </button>
+            
+            {statusDropdownOpen && (
+              <div className="filter-dropdown-menu">
+                <button
+                  className={`dropdown-item ${!filters.status ? 'active' : ''}`}
+                  onClick={() => handleStatusSelect('')}
+                >
+                  All Statuses
+                </button>
+                {statuses.map(status => (
+                  <button
+                    key={status}
+                    className={`dropdown-item ${filters.status === status ? 'active' : ''}`}
+                    onClick={() => handleStatusSelect(status)}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
-          <button className="filter-btn">
-            <FiFilter />
-            Role
-          </button>
+          {/* Role Filter Dropdown */}
+          <div className="filter-dropdown-wrapper role-filter-dropdown">
+            <button 
+              className="filter-btn"
+              onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
+            >
+              <FiFilter />
+              {filters.role || 'Role'}
+            </button>
+            
+            {roleDropdownOpen && (
+              <div className="filter-dropdown-menu role-dropdown-menu">
+                <button
+                  className={`dropdown-item ${!filters.role ? 'active' : ''}`}
+                  onClick={() => handleRoleSelect('')}
+                >
+                  All Roles
+                </button>
+                {roles.map(role => (
+                  <button
+                    key={role}
+                    className={`dropdown-item ${filters.role === role ? 'active' : ''}`}
+                    onClick={() => handleRoleSelect(role)}
+                  >
+                    {role}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
         </div>
 
         <div className="table-wrapper">
 
-          <table className="offers-table">
+          {filteredOffers.length === 0 ? (
+            <div className="empty-state">
+              <p>No offers found</p>
+            </div>
+          ) : (
+            <table className="offers-table">
 
-            <thead>
+              <thead>
 
-              <tr>
-                <th>CANDIDATE</th>
-                <th>ROLE</th>
-                <th>PACKAGE</th>
-                <th>STATUS</th>
-                <th>JOINING DATE</th>
-                <th>ACTIONS</th>
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {offersData.map((offer, index) => (
-
-                <tr key={index}>
-
-                  <td>
-
-                    <div className="candidate-cell">
-
-                      <div className="avatar">
-                        {offer.initials}
-                      </div>
-
-                      <span>{offer.name}</span>
-
-                    </div>
-
-                  </td>
-
-                  <td>{offer.role}</td>
-
-                  <td className="package">
-                    {offer.package}
-                  </td>
-
-                  <td>
-
-                    <span
-                      className={`status-badge ${offer.status.toLowerCase()}`}
-                    >
-                      {offer.status}
-                    </span>
-
-                  </td>
-
-                  <td>
-
-                    <div className="joining-date">
-
-                      <FiCalendar />
-
-                      {offer.joining}
-
-                    </div>
-
-                  </td>
-
-                  <td>
-
-                    <div className="actions">
-
-                      <FiDownload />
-
-                      <FiMoreVertical />
-
-                    </div>
-
-                  </td>
-
+                <tr>
+                  <th>CANDIDATE</th>
+                  <th>ROLE</th>
+                  <th>PACKAGE</th>
+                  <th>STATUS</th>
+                  <th>JOINING DATE</th>
+                  <th>ACTIONS</th>
                 </tr>
 
-              ))}
+              </thead>
 
-            </tbody>
+              <tbody>
 
-          </table>
+                {filteredOffers.map((offer, index) => (
+
+                  <tr key={index}>
+
+                    <td>
+
+                      <div className="candidate-cell">
+
+                        <div className="avatar">
+                          {offer.initials}
+                        </div>
+
+                        <span>{offer.name}</span>
+
+                      </div>
+
+                    </td>
+
+                    <td>{offer.role}</td>
+
+                    <td className="package">
+                      {offer.package}
+                    </td>
+
+                    <td>
+
+                      <span
+                        className={`status-badge ${offer.status.toLowerCase()}`}
+                      >
+                        {offer.status}
+                      </span>
+
+                    </td>
+
+                    <td>
+
+                      <div className="joining-date">
+
+                        <FiCalendar />
+
+                        {offer.joining}
+
+                      </div>
+
+                    </td>
+
+                    <td>
+
+                      <div className="actions">
+
+                        <FiDownload />
+
+                        <FiMoreVertical />
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+          )}
 
         </div>
 

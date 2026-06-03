@@ -1,9 +1,22 @@
-import { useState } from 'react';
-import { MoreVertical, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { MoreVertical } from 'lucide-react';
 import { TrainingStatusBadge } from './TrainingStatusBadge';
 
 export const TrainingRow = ({ program, onMenuClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [isDropdownOpen]);
 
   const renderProgressBar = (percentage, type = 'completion') => {
     const numValue = parseInt(percentage);
@@ -23,7 +36,6 @@ export const TrainingRow = ({ program, onMenuClick }) => {
 
   const handleMenuItemClick = (action) => {
     setIsDropdownOpen(false);
-    // Can be extended to handle different actions
     onMenuClick(program, action);
   };
 
@@ -58,45 +70,46 @@ export const TrainingRow = ({ program, onMenuClick }) => {
         <TrainingStatusBadge status={program.status} />
       </td>
       <td className="px-6 py-4">
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            onClick={() => setIsDropdownOpen(prev => !prev)}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <MoreVertical className="w-4 h-4 text-gray-400" />
           </button>
-          {/* Dropdown Menu */}
+
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+            <div className="absolute right-0 top-[calc(100%+4px)] w-52 bg-white border border-gray-200 rounded-xl shadow-xl py-1.5 z-50">
               <button
                 onClick={() => handleMenuItemClick('view')}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 first:rounded-t-lg"
+                className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
               >
-                View Details
+                View Program
               </button>
               <button
                 onClick={() => handleMenuItemClick('edit')}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
               >
                 Edit Program
               </button>
               <button
                 onClick={() => handleMenuItemClick('manage')}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
               >
                 Manage Students
               </button>
               <button
                 onClick={() => handleMenuItemClick('complete')}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
               >
                 Mark Complete
               </button>
+              <div className="my-1 border-t border-gray-100" />
               <button
                 onClick={() => handleMenuItemClick('delete')}
-                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 last:rounded-b-lg"
+                className="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition"
               >
-                Delete
+                Delete Program
               </button>
             </div>
           )}

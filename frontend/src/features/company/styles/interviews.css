@@ -137,6 +137,50 @@
   color: #3b82f6;
 }
 
+.interviews-filter-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.interviews-filter-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 50;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+  padding: 4px;
+  overflow: hidden;
+}
+
+.interviews-filter-option {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #374151;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.interviews-filter-option:hover {
+  background: #f1f5f9;
+}
+
+.interviews-filter-option.active {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+}
+
 /* ─── Table ─── */
 
 .interviews-table-wrap {
@@ -685,6 +729,10 @@
   .filter-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .interviews-filter-wrap {
+    width: 100%;
   }
 
   .filter-btn span {

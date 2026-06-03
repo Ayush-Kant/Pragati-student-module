@@ -1,5 +1,6 @@
 import './App.css'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 
 // Layouts
 import MainLayout from './layout/MainLayout'
@@ -32,6 +33,7 @@ import AdminNotifications from './features/admin/adminNotifications/AdminNotific
 
 function App() {
   return (
+    <>
     <Routes>
 
       {/* ── COMPANY ROUTES (MainLayout: Navbar + Sidebar) ── */}
@@ -68,6 +70,8 @@ function App() {
       <Route path='*' element={<Navigate to='/' replace />} />
 
     </Routes>
+    <Toaster position="top-right" />
+    </>
   )
 }
 
