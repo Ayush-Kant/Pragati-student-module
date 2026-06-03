@@ -2,8 +2,7 @@ import { Navigate, Route } from "react-router-dom";
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
 import { CollegeLayout } from "../layouts/CollegeLayout";
-import Dashboard from "../../mentor/pages/Dashboard";
-
+import Dashboard from "../pages/Dashboard";  // 
 
 const collegeRoute = (
   <Route element={<PrivateRoute />}>
