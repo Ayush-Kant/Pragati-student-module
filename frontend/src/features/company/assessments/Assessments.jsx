@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./Assessments.css";
 
 import { FiSearch, FiFilter } from "react-icons/fi";
@@ -46,8 +46,81 @@ const assessmentData = [
   },
 ];
 
+const TYPE_FILTERS = ["Technical", "Aptitude", "Design"];
+const DIFFICULTY_FILTERS = ["Easy", "Medium", "Hard"];
+
+const AssessmentActionsMenu = ({
+  assessment,
+  onView,
+  onEdit,
+  onDuplicate,
+  onDelete,
+}) => {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const handleAction = (action) => {
+    action(assessment);
+    setOpen(false);
+  };
+
+  return (
+    <div className="assessment-actions-wrap" ref={menuRef}>
+      <button
+        className="assessment-actions-trigger"
+        onClick={() => setOpen((current) => !current)}
+        type="button"
+        aria-label={`Actions for ${assessment.title}`}
+      >
+        ⋮
+      </button>
+
+      {open && (
+        <div className="assessment-actions-menu">
+          <button type="button" onClick={() => handleAction(onView)}>
+            View Assessment
+          </button>
+          <button type="button" onClick={() => handleAction(onEdit)}>
+            Edit Assessment
+          </button>
+          <button type="button" onClick={() => handleAction(onDuplicate)}>
+            Duplicate Assessment
+          </button>
+          <button type="button" onClick={() => handleAction(onDelete)}>
+            Delete Assessment
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Assessments = () => {
   const [showPanel, setShowPanel] = useState(false);
+  const [assessments, setAssessments] = useState(assessmentData);
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState("");
+  const [openFilter, setOpenFilter] = useState(null);
+  const [dialogMode, setDialogMode] = useState(null);
+  const [selectedAssessment, setSelectedAssessment] = useState(null);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    type: "Technical",
+    difficulty: "Medium",
+    duration: "",
+  });
 
   const [questions, setQuestions] = useState([
     {
@@ -81,6 +154,76 @@ const Assessments = () => {
     setQuestions(
       questions.filter((question) => question.id !== id)
     );
+  };
+
+  const filteredAssessments = assessments.filter((item) => {
+    const query = search.trim().toLowerCase();
+    const matchesSearch = !query || (
+      item.title.toLowerCase().includes(query) ||
+      item.type.toLowerCase().includes(query) ||
+      item.difficulty.toLowerCase().includes(query)
+    );
+    const matchesType = !typeFilter || item.type === typeFilter;
+    const matchesDifficulty = !difficultyFilter || item.difficulty === difficultyFilter;
+
+    return matchesSearch && matchesType && matchesDifficulty;
+  });
+
+  const closeAssessmentDialog = () => {
+    setDialogMode(null);
+    setSelectedAssessment(null);
+  };
+
+  const handleViewAssessment = (assessment) => {
+    setSelectedAssessment(assessment);
+    setDialogMode("view");
+  };
+
+  const handleEditAssessment = (assessment) => {
+    setSelectedAssessment(assessment);
+    setEditForm({
+      title: assessment.title,
+      type: assessment.type,
+      difficulty: assessment.difficulty,
+      duration: assessment.duration,
+    });
+    setDialogMode("edit");
+  };
+
+  const handleDuplicateAssessment = (assessment) => {
+    setAssessments((currentAssessments) => [
+      ...currentAssessments,
+      {
+        ...assessment,
+        id: Date.now(),
+        title: `${assessment.title} (Copy)`,
+      },
+    ]);
+  };
+
+  const handleDeleteRequest = (assessment) => {
+    setSelectedAssessment(assessment);
+    setDialogMode("delete");
+  };
+
+  const handleSaveAssessment = (event) => {
+    event.preventDefault();
+
+    setAssessments((currentAssessments) =>
+      currentAssessments.map((assessment) =>
+        assessment.id === selectedAssessment.id
+          ? { ...assessment, ...editForm }
+          : assessment
+      )
+    );
+    closeAssessmentDialog();
+  };
+
+  const handleConfirmDelete = () => {
+    setAssessments((currentAssessments) =>
+      currentAssessments.filter((assessment) => assessment.id !== selectedAssessment.id)
+    );
+    closeAssessmentDialog();
   };
 
   return (
@@ -131,19 +274,89 @@ const Assessments = () => {
     <input
       type="text"
       placeholder="Search assessments..."
+      value={search}
+      onChange={(event) => setSearch(event.target.value)}
     />
 
   </div>
 
-  <button className="filter-btn">
-    <FiFilter />
-    Type
-  </button>
+  <div className="assessment-filter-wrap">
+    <button
+      className="filter-btn"
+      onClick={() => setOpenFilter((current) => current === "type" ? null : "type")}
+      type="button"
+    >
+      <FiFilter />
+      Type
+    </button>
 
-  <button className="filter-btn">
-    <FiFilter />
-    Difficulty
-  </button>
+    {openFilter === "type" && (
+      <div className="assessment-filter-dropdown">
+        <button
+          className={`assessment-filter-option ${!typeFilter ? "active" : ""}`}
+          onClick={() => {
+            setTypeFilter("");
+            setOpenFilter(null);
+          }}
+          type="button"
+        >
+          All Types
+        </button>
+        {TYPE_FILTERS.map((type) => (
+          <button
+            className={`assessment-filter-option ${typeFilter === type ? "active" : ""}`}
+            key={type}
+            onClick={() => {
+              setTypeFilter(type);
+              setOpenFilter(null);
+            }}
+            type="button"
+          >
+            {type}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <div className="assessment-filter-wrap">
+    <button
+      className="filter-btn"
+      onClick={() => setOpenFilter((current) => current === "difficulty" ? null : "difficulty")}
+      type="button"
+    >
+      <FiFilter />
+      Difficulty
+    </button>
+
+    {openFilter === "difficulty" && (
+      <div className="assessment-filter-dropdown">
+        <button
+          className={`assessment-filter-option ${!difficultyFilter ? "active" : ""}`}
+          onClick={() => {
+            setDifficultyFilter("");
+            setOpenFilter(null);
+          }}
+          type="button"
+        >
+          All Difficulties
+        </button>
+        {DIFFICULTY_FILTERS.map((difficulty) => (
+          <button
+            className={`assessment-filter-option ${difficultyFilter === difficulty ? "active" : ""}`}
+            key={difficulty}
+            onClick={() => {
+              setDifficultyFilter(difficulty);
+              setOpenFilter(null);
+            }}
+            type="button"
+          >
+            {difficulty}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
 
 </div>
 
@@ -166,7 +379,7 @@ const Assessments = () => {
 
                 <tbody>
 
-                  {assessmentData.map((item) => (
+                  {filteredAssessments.length > 0 ? filteredAssessments.map((item) => (
 
                     <tr key={item.id}>
 
@@ -190,11 +403,27 @@ const Assessments = () => {
 
                       <td>{item.candidates}</td>
 
-                      <td>⋮</td>
+                      <td>
+                        <AssessmentActionsMenu
+                          assessment={item}
+                          onView={handleViewAssessment}
+                          onEdit={handleEditAssessment}
+                          onDuplicate={handleDuplicateAssessment}
+                          onDelete={handleDeleteRequest}
+                        />
+                      </td>
 
                     </tr>
 
-                  ))}
+                  )) : (
+                    <tr>
+                      <td colSpan="6">
+                        <div className="assessments-empty-state">
+                          No assessments found
+                        </div>
+                      </td>
+                    </tr>
+                  )}
 
                 </tbody>
 
@@ -205,6 +434,171 @@ const Assessments = () => {
           </div>
 
         </div>
+
+        {dialogMode && selectedAssessment && (
+          <div
+            className="assessment-dialog-overlay"
+            onClick={(event) => event.target === event.currentTarget && closeAssessmentDialog()}
+          >
+            <div className="assessment-dialog" role="dialog" aria-modal="true">
+              <div className="assessment-dialog-header">
+                <h2>
+                  {dialogMode === "view" && "View Assessment"}
+                  {dialogMode === "edit" && "Edit Assessment"}
+                  {dialogMode === "delete" && "Delete Assessment"}
+                </h2>
+
+                <button
+                  className="assessment-dialog-close"
+                  onClick={closeAssessmentDialog}
+                  type="button"
+                  aria-label="Close dialog"
+                >
+                  ×
+                </button>
+              </div>
+
+              {dialogMode === "view" && (
+                <div className="assessment-dialog-body">
+                  <div className="assessment-detail-row">
+                    <span>Assessment Title</span>
+                    <strong>{selectedAssessment.title}</strong>
+                  </div>
+                  <div className="assessment-detail-row">
+                    <span>Type</span>
+                    <strong>{selectedAssessment.type}</strong>
+                  </div>
+                  <div className="assessment-detail-row">
+                    <span>Difficulty</span>
+                    <strong>{selectedAssessment.difficulty}</strong>
+                  </div>
+                  <div className="assessment-detail-row">
+                    <span>Duration</span>
+                    <strong>{selectedAssessment.duration}</strong>
+                  </div>
+                  <div className="assessment-detail-row">
+                    <span>Candidate Count</span>
+                    <strong>{selectedAssessment.candidates}</strong>
+                  </div>
+                </div>
+              )}
+
+              {dialogMode === "edit" && (
+                <form onSubmit={handleSaveAssessment}>
+                  <div className="assessment-dialog-body">
+                    <label>
+                      Assessment Title
+                      <input
+                        type="text"
+                        value={editForm.title}
+                        onChange={(event) =>
+                          setEditForm((current) => ({
+                            ...current,
+                            title: event.target.value,
+                          }))
+                        }
+                        required
+                      />
+                    </label>
+
+                    <label>
+                      Type
+                      <select
+                        value={editForm.type}
+                        onChange={(event) =>
+                          setEditForm((current) => ({
+                            ...current,
+                            type: event.target.value,
+                          }))
+                        }
+                      >
+                        {TYPE_FILTERS.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      Difficulty
+                      <select
+                        value={editForm.difficulty}
+                        onChange={(event) =>
+                          setEditForm((current) => ({
+                            ...current,
+                            difficulty: event.target.value,
+                          }))
+                        }
+                      >
+                        {DIFFICULTY_FILTERS.map((difficulty) => (
+                          <option key={difficulty} value={difficulty}>
+                            {difficulty}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      Duration
+                      <input
+                        type="text"
+                        value={editForm.duration}
+                        onChange={(event) =>
+                          setEditForm((current) => ({
+                            ...current,
+                            duration: event.target.value,
+                          }))
+                        }
+                        required
+                      />
+                    </label>
+                  </div>
+
+                  <div className="assessment-dialog-footer">
+                    <button
+                      className="assessment-dialog-secondary"
+                      onClick={closeAssessmentDialog}
+                      type="button"
+                    >
+                      Cancel
+                    </button>
+                    <button className="assessment-dialog-primary" type="submit">
+                      Save
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {dialogMode === "delete" && (
+                <>
+                  <div className="assessment-dialog-body">
+                    <p className="assessment-delete-message">
+                      Are you sure you want to delete this assessment?
+                    </p>
+                  </div>
+
+                  <div className="assessment-dialog-footer">
+                    <button
+                      className="assessment-dialog-secondary"
+                      onClick={closeAssessmentDialog}
+                      type="button"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="assessment-dialog-danger"
+                      onClick={handleConfirmDelete}
+                      type="button"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* RIGHT PANEL */}
 
