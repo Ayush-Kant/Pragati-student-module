@@ -6,6 +6,7 @@ import ActivityTypePicker from '../components/activities/ActivityTypePicker';
 import QuizConfigFields from '../components/activities/QuizConfigFields';
 import CodingConfigFields from '../components/activities/CodingConfigFields';
 import RubricBuilder from '../components/activities/RubricBuilder';
+import LoadingOverlay from '../../../components/common/LoadingOverlay';
 
 const CreateActivity = () => {
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ const CreateActivity = () => {
     addToCalendar: false,
     maxScore: 100,
   });
+
+  const todayStr = new Date().toISOString().split('T')[0];
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -50,6 +53,21 @@ const CreateActivity = () => {
     if (!formData.dueDate) {
         toast.error('Due date is required.');
         return;
+    }
+
+    // Validate dates are not in the past
+    const now = new Date();
+    const due = new Date(formData.dueDate);
+    if (due.setHours(0,0,0,0) < new Date(todayStr).setHours(0,0,0,0)) {
+      toast.error('Due date cannot be in the past.');
+      return;
+    }
+    if (formData.assignDate) {
+      const assign = new Date(formData.assignDate);
+      if (assign.setHours(0,0,0,0) < new Date(todayStr).setHours(0,0,0,0)) {
+        toast.error('Assign date cannot be in the past.');
+        return;
+      }
     }
     
     setIsSubmitting(true);
@@ -82,6 +100,7 @@ const CreateActivity = () => {
 
   return (
     <div className="flex flex-col lg:flex-row flex-wrap bg-gray-100 min-h-screen">
+      {isSubmitting && <LoadingOverlay message="Creating activity..." />}
       <div className="w-full p-4 sm:p-6 lg:w-2/3">
         <Link to="/mentor/activities" className="mb-4 inline-block text-sm text-gray-600 hover:text-gray-900">
           &larr; Back to Activity
@@ -130,8 +149,8 @@ const CreateActivity = () => {
             <h2 className="text-lg font-semibold text-gray-800">2. Assignment Details</h2>
             <div className="grid grid-cols-1 gap-6 mt-4 md:grid-cols-3">
               <div>
-                <label htmlFor="assignTo" className="block text-sm font-medium text-gray-700">Assign To*</label>
-                <select id="assignTo" name="assignTo" value={formData.assignTo} onChange={handleInputChange} className="block w-full mt-1 border border-gray-300 px-3 py-2 rounded-md shadow-sm">
+                  <label htmlFor="assignTo" className="block text-sm font-medium text-gray-700">Assign To*</label>
+                  <select id="assignTo" name="assignTo" value={formData.assignTo} onChange={handleInputChange} className="block w-full mt-1 border border-gray-300 px-3 py-2 rounded-md shadow-sm">
                   <option>Select mentees or groups</option>
                   <option value="all">All Mentees</option>
                   <option value="groupA">Group A</option>
@@ -139,7 +158,7 @@ const CreateActivity = () => {
               </div>
               <div>
                 <label htmlFor="assignDate" className="block text-sm font-medium text-gray-700">Assign Date</label>
-                <input type="date" name="assignDate" id="assignDate" value={formData.assignDate} onChange={handleInputChange} className="block w-full mt-1 border border-gray-300 px-3 py-2 rounded-md shadow-sm" />
+                  <input type="date" name="assignDate" id="assignDate" value={formData.assignDate} onChange={handleInputChange} min={todayStr} className="block w-full mt-1 border border-gray-300 px-3 py-2 rounded-md shadow-sm" />
               </div>
               <div>
                 <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">Due Date*</label>
@@ -149,7 +168,7 @@ const CreateActivity = () => {
                   id="dueDate" 
                   value={formData.dueDate} 
                   onChange={handleInputChange} 
-                  min={new Date().toISOString().split('T')[0]}
+                    min={todayStr}
                   className="block w-full mt-1 border border-gray-300 px-3 py-2 rounded-md shadow-sm" 
                 />
               </div>

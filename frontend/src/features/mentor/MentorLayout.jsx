@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { ActivityProvider } from './context/ActivityContext';
-import { Search, Bell, MessageSquare, ChevronDown, Home, Users, Calendar, ClipboardList, BookOpen, PlayCircle, Activity, BarChart2, Folder, Settings, HelpCircle } from 'lucide-react';
+import { Search, Bell, MessageSquare, ChevronDown, Home, Users, Calendar, ClipboardList, BookOpen, PlayCircle, Activity, BarChart2, Folder, Settings, HelpCircle, Menu, X } from 'lucide-react';
 
-const MentorNavbar = () => (
+const MentorNavbar = ({ onToggleMobile }) => (
 
-  <header className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200">
+  <header className="flex items-center justify-between px-4 md:px-6 py-3 bg-white border-b border-gray-200">
     <div className="flex items-center flex-1">
+      {/* Mobile menu button */}
+      <button onClick={onToggleMobile} className="md:hidden p-2 mr-2 text-gray-600 hover:text-gray-800">
+        <Menu className="w-6 h-6" />
+      </button>
       {/* Search Bar */}
       <div className="relative w-full max-w-xl ml-4">
         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
@@ -112,14 +116,40 @@ const MentorSidebar = () => {
 };
 
 const MentorLayout = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const toggleMobile = () => setMobileOpen((s) => !s);
+
   return (
     <ActivityProvider>
       <div className="flex h-screen bg-gray-50">
-        <MentorSidebar />
+        {/* Desktop sidebar */}
+        <div className="hidden md:flex">
+          <MentorSidebar />
+        </div>
+
+        {/* Mobile overlay sidebar */}
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div className="absolute inset-0 bg-black opacity-40" onClick={toggleMobile} />
+            <div className="relative z-10 w-64 h-full bg-white border-r border-gray-200">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                <div className="text-lg font-semibold">UPTOSKILLS</div>
+                <button onClick={toggleMobile} className="p-2 text-gray-600 hover:text-gray-800">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="h-[calc(100%-56px)] overflow-y-auto">
+                <MentorSidebar />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col flex-1 overflow-hidden">
-          <MentorNavbar />
+          <MentorNavbar onToggleMobile={toggleMobile} />
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-            <div className="container px-6 py-8 mx-auto xl:px-10">
+            <div className="container px-4 sm:px-6 lg:px-8 py-6 mx-auto xl:px-10">
               <Outlet />
             </div>
           </main>

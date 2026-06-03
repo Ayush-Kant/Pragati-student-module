@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useActivityContext } from '../context/ActivityContext';
 
 const mockDashboard = {
   activeDrives: 3,
@@ -43,14 +44,73 @@ const mockDashboard = {
 };
 
 const useMentorDashboard = () => {
+  const { activities } = useActivityContext ? useActivityContext() : { activities: [] };
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setData(mockDashboard);
-    setLoading(false);
-  }, []);
+    try {
+      // derive menteesProgress from activities
+      const totalAssigned = activities?.reduce((sum, a) => sum + (a.assignedCount || 0), 0) || 0;
+
+      // If no assigned data, fallback to mock
+      if (!activities || activities.length === 0 || totalAssigned === 0) {
+        setData(mockDashboard);
+        setLoading(false);
+        return;
+      }
+
+      // compute estimated completed count per activity
+      const completionCounts = activities.map(a => {
+        const assigned = a.assignedCount || 0;
+        const submitted = a.submissionCount || 0;
+        const completed = Math.min(assigned, submitted);
+        const completionRate = assigned > 0 ? completed / assigned : 0;
+        return { assigned, completed, completionRate };
+      });
+
+      // Aggregate mentee counts into buckets weighted by assigned counts
+      const buckets = {
+        Excellent: 0,
+        Good: 0,
+        Average: 0,
+        'Needs Improvement': 0
+      };
+
+      completionCounts.forEach(cc => {
+        const weight = cc.assigned;
+        const pct = cc.completionRate;
+        if (pct >= 0.8) buckets.Excellent += weight;
+        else if (pct >= 0.6) buckets.Good += weight;
+        else if (pct >= 0.4) buckets.Average += weight;
+        else buckets['Needs Improvement'] += weight;
+      });
+
+      const totalInBuckets = Object.values(buckets).reduce((s, v) => s + v, 0) || 1;
+
+      const menteesProgress = [
+        { name: 'Excellent', value: buckets.Excellent, percent: Math.round((buckets.Excellent / totalInBuckets) * 100) },
+        { name: 'Good', value: buckets.Good, percent: Math.round((buckets.Good / totalInBuckets) * 100) },
+        { name: 'Average', value: buckets.Average, percent: Math.round((buckets.Average / totalInBuckets) * 100) },
+        { name: 'Needs Improvement', value: buckets['Needs Improvement'], percent: Math.round((buckets['Needs Improvement'] / totalInBuckets) * 100) }
+      ];
+
+      const newDashboard = {
+        ...mockDashboard,
+        menteesProgress,
+        // Optionally update totals based on activities
+        totalMentees: mockDashboard.totalMentees,
+      };
+
+      setData(newDashboard);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to compute dashboard data');
+      setData(mockDashboard);
+      setLoading(false);
+    }
+  }, [activities]);
 
   return { data, loading, error };
 };

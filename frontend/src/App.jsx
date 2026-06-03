@@ -8,6 +8,7 @@ import RegisterPage from "./features/auth/RegisterPage";
 
 // ── Student Module ───────────────────────────────────────────────────────────
 import { AuthProvider} from './context/AuthContext';
+import PrivateRoute from "./routes/PrivateRoute";
 import VerificationPage from './features/student/pages/public/VerificationPage';
 import StudentRoutes from "./features/student/routes/StudentRoutes";
 import AdminRoute from "./features/admin/routes/AdminRoutes";
@@ -34,16 +35,19 @@ function App() {
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
 
-        {/* ── Mentor ────────────────────────────────────────────────── */}
-        {/* <Route path="/mentor" element={<MentorLayout />}>
-          <Route path="activities" element={<Activities />} />
-          <Route path="activities/create" element={<CreateActivity />} />
-          <Route path="activities/templates" element={<ActivityTemplates />} />
-          <Route path="activities/deadlines" element={<ManageDeadlines />} />
-          <Route path="activities/bulk-assign" element={<BulkAssignActivity />} />
-          <Route path="activities/calendar" element={<ActivityCalendar />} />
-          {/* Add other mentor routes here as needed */}
-        {/* </Route> */}
+        {/* ── Mentor (protected) ─────────────────────────────────────────── */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/mentor" element={<MentorLayout />}>
+            <Route index element={<Activities />} />
+            <Route path="activities" element={<Activities />} />
+            <Route path="activities/create" element={<CreateActivity />} />
+            <Route path="activities/templates" element={<ActivityTemplates />} />
+            <Route path="activities/deadlines" element={<ManageDeadlines />} />
+            <Route path="activities/bulk-assign" element={<BulkAssignActivity />} />
+            <Route path="activities/calendar" element={<ActivityCalendar />} />
+            {/* Add other mentor routes here as needed */}
+          </Route>
+        </Route>
 
         {/* ── Admin ─────────────────────────────────────────────────── */}
        
