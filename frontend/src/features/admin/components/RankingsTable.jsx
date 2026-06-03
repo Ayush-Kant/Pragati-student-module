@@ -5,28 +5,28 @@ function RankingsTable({
     if (rankings.length === 0) {
         return (
             <div
-                className={`rounded-lg shadow mt-6 p-6 transition ${darkMode
+                className={`rounded-lg shadow mt-6 p-12 transition text-center ${darkMode
                         ? "bg-slate-950 shadow-black/30 border border-slate-700"
-                        : "bg-white"
+                        : "bg-white shadow-sm"
                     }`}
             >
+                <div className="text-4xl mb-3">📊</div>
                 <h2
-                    className={`text-2xl font-bold mb-6 ${darkMode
+                    className={`text-xl font-bold mb-2 ${darkMode
                             ? "text-white"
                             : "text-slate-900"
                         }`}
                 >
-                    Company Performance Rankings
+                    No Rankings Available
                 </h2>
-
-                <div
-                    className={`text-center py-10 ${darkMode
+                <p
+                    className={`${darkMode
                             ? "text-slate-400"
                             : "text-gray-500"
                         }`}
                 >
-                    No ranking data available
-                </div>
+                    Once companies start their hiring process, their rankings will appear here.
+                </p>
             </div>
         );
     }

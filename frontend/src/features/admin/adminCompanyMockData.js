@@ -269,6 +269,36 @@ export const mockCompanies = [
   },
 ];
 
+export const mockActiveDrives = [
+  {
+    id: 1,
+    companyId: 1,
+    companyName: "Google",
+    companyStatus: "Approved",
+    driveName: "SDE Intern Hiring",
+    startDate: "2025-08-01",
+    endDate: "2025-08-30",
+  },
+  {
+    id: 2,
+    companyId: 2,
+    companyName: "Microsoft",
+    companyStatus: "Approved",
+    driveName: "Cloud Engineer Drive",
+    startDate: "2025-08-05",
+    endDate: "2025-09-01",
+  },
+  {
+    id: 3,
+    companyId: 3,
+    companyName: "Amazon",
+    companyStatus: "Suspended",
+    driveName: "Backend Engineer Hiring",
+    startDate: "2025-08-10",
+    endDate: "2025-09-15",
+  },
+];
+
 export const mockRankings = [
   {
     rank: 1,

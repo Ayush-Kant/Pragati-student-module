@@ -54,6 +54,7 @@ export default function CompanyTable({ companies, darkMode, onStatusChange, acti
               <td className="p-4">
                 <CompanyStatusBadge
                   status={company.status}
+                  darkMode={darkMode}
                 />
               </td>
               <td className="p-4">
