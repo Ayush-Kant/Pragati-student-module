@@ -1,4 +1,4 @@
-import { mockCompanies } from "../adminCompanyMockData";
+import { mockCompanies, mockRankings } from "../adminCompanyMockData";
 
 export const getCompanies = async () => {
   return mockCompanies;

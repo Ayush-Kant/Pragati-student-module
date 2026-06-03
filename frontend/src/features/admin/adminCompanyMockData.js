@@ -23,7 +23,7 @@ export const mockCompanies = [
         action: "Company Approved",
         actor: "Admin",
         timestamp: "2025-08-05 10:45 AM",
-        
+
       },
       {
         id: 2,
@@ -266,5 +266,56 @@ export const mockCompanies = [
         endDate: "2025-08-30",
       }
     ]
+  },
+];
+
+export const mockRankings = [
+  {
+    rank: 1,
+    company: "Google",
+    engagementScore: 95,
+    acceptanceRate: 92,
+    interviewToHire: 48,
+    hiresMade: 75,
+  },
+  {
+    rank: 2,
+    company: "Microsoft",
+    engagementScore: 92,
+    acceptanceRate: 89,
+    interviewToHire: 45,
+    hiresMade: 68,
+  },
+  {
+    rank: 3,
+    company: "Amazon",
+    engagementScore: 88,
+    acceptanceRate: 84,
+    interviewToHire: 42,
+    hiresMade: 90,
+  },
+  {
+    rank: 4,
+    company: "Adobe",
+    engagementScore: 87,
+    acceptanceRate: 82,
+    interviewToHire: 40,
+    hiresMade: 44,
+  },
+  {
+    rank: 5,
+    company: "Meta",
+    engagementScore: 84,
+    acceptanceRate: 78,
+    interviewToHire: 38,
+    hiresMade: 35,
+  },
+  {
+    rank: 6,
+    company: "Netflix",
+    engagementScore: 79,
+    acceptanceRate: 74,
+    interviewToHire: 35,
+    hiresMade: 18,
   },
 ];

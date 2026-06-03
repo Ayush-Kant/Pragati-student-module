@@ -15,6 +15,7 @@ import AdminProfile from "../pages/AdminProfile";
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
 import CompanyDetail from "../pages/CompanyDetail";
+import CompanyRankings from "../pages/CompanyRankings";
 
 const AdminRoute = (
     //  <Route element={<PrivateRoute />}>
@@ -23,6 +24,7 @@ const AdminRoute = (
           <Route index   path="dashboard"       element={<AdminDashboard />} />
           <Route path='profile'      element={<AdminProfile />} />
           <Route path='companies'    element={<AdminCompanies />} />
+          <Route path="companies/rankings" element={<CompanyRankings />} />
           <Route path="companies/:id" element={<CompanyDetail />} />
           <Route path='colleges'     element={<AdminCollege />} />
           <Route path='colleges/:id' element={<CollegeDetail />} />
