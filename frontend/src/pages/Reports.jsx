@@ -257,10 +257,10 @@ export default function ReportsAnalyticsFull() {
 
       <div className="px-4 sm:px-8 py-0 max-w-9xl mx-auto space-y-6">
 
-        {/* ── Core KPIs (Stays exactly 3 columns) ── */}
+        {/* ── Core KPIs ── */}
         <div>
           <p className="text-xs font-semibold text-gray-400 tracking-widest uppercase mb-3">Core Recruitment KPIs</p>
-          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
             {[
               { label: "TOTAL APPLICANTS", value: "1,348", sub: "↗ 18% vs. prior", mobileSub: "↗ 18%", subColor: "text-green-500" },
               { label: "TOTAL HIRED",      value: "55",    sub: "↗ 12% offer accept", mobileSub: "↗ 12%", subColor: "text-green-500" },

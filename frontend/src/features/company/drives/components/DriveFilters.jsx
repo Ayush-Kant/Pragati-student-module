@@ -32,7 +32,7 @@ export const DriveFilters = ({ filters, updateFilter, getUniqueValues }) => {
   };
 
   return (
-    <div className="mb-6 flex items-center gap-4 bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-sm">
+    <div className="app-filter-bar mb-6 flex items-center gap-4 bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-sm">
       {/* Search Input */}
       <div className="relative flex-1 flex items-center">
         <Search

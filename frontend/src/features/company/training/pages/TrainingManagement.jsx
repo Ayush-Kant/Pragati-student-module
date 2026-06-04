@@ -189,8 +189,8 @@ export const TrainingManagement = () => {
 
 /* ─── Shared modal shell ──────────────────────────────────────────────────── */
 const ModalShell = ({ title, subtitle, onClose, children, footer }) => (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-    <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
+  <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="responsive-modal-panel relative bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
       <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
         <div>
           <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
@@ -202,7 +202,7 @@ const ModalShell = ({ title, subtitle, onClose, children, footer }) => (
       </div>
       <div className="p-8">{children}</div>
       {footer && (
-        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+        <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
           {footer}
         </div>
       )}
@@ -424,8 +424,8 @@ const ManageStudentsModal = ({ program, onClose, onUpdate }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
+    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div className="responsive-modal-panel relative bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
         <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
           <div>
             <h3 className="text-2xl font-bold text-gray-900">Manage Students</h3>
@@ -480,7 +480,7 @@ const ManageStudentsModal = ({ program, onClose, onUpdate }) => {
           )}
         </div>
 
-        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
           <button
             onClick={onClose}
             className="px-6 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition"
@@ -495,8 +495,8 @@ const ManageStudentsModal = ({ program, onClose, onUpdate }) => {
 
 /* ─── Delete Confirmation Modal ───────────────────────────────────────────── */
 const DeleteConfirmModal = ({ program, onClose, onDelete }) => (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-    <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 max-h-[85vh] overflow-y-auto">
+  <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="responsive-modal-panel relative bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 max-h-[85vh] overflow-y-auto">
       <div className="p-8">
         <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-6">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -510,7 +510,7 @@ const DeleteConfirmModal = ({ program, onClose, onDelete }) => (
           This action cannot be undone.
         </p>
       </div>
-      <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+      <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
         <button
           onClick={onClose}
           className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition"

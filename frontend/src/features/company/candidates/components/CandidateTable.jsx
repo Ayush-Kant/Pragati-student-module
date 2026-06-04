@@ -26,7 +26,7 @@ export const CandidateTable = ({ candidates, loading, onSelectCandidate, onMenuC
   }
 
   return (
-    <div className="overflow-x-auto bg-white rounded-xl border border-gray-100 shadow-sm">
+    <div className="responsive-table-wrap overflow-x-auto bg-white rounded-xl border border-gray-100 shadow-sm">
       <table className="min-w-full divide-y divide-gray-100">
         <thead className="bg-gray-50/50">
           <tr>

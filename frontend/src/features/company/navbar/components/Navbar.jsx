@@ -2,6 +2,7 @@ import "./../styles/navbar.css";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { GlobalSearch } from "./GlobalSearch";
 
 import { FiBell, FiSettings, FiSearch } from "react-icons/fi";
 import {
@@ -74,7 +75,7 @@ function useOutsideClick(ref, callback) {
 // ─── Notification Dropdown ───────────────────────────────────────────────────
 
 const NotificationDropdown = ({ notifications, onMarkRead, onMarkAllRead }) => (
-  <div className="absolute right-0 top-[calc(100%+10px)] w-80 bg-white border border-gray-100 rounded-2xl shadow-2xl z-[2000] overflow-hidden">
+  <div className="navbar-notification-dropdown absolute right-0 top-[calc(100%+10px)] w-80 bg-white border border-gray-100 rounded-2xl shadow-2xl z-[2000] overflow-hidden">
     {/* Header */}
     <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
       <span className="font-bold text-gray-900 text-[15px]">Notifications</span>
@@ -156,8 +157,8 @@ const ProfileDropdown = ({ onSelect }) => {
 // ─── Modal Shell ─────────────────────────────────────────────────────────────
 
 const Modal = ({ title, subtitle, onClose, children, footer }) => (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[3000] flex items-center justify-center p-4">
-    <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+  <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[3000] flex items-center justify-center p-4">
+    <div className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
       {/* Header */}
       <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
         <div>
@@ -177,7 +178,7 @@ const Modal = ({ title, subtitle, onClose, children, footer }) => (
 
       {/* Footer */}
       {footer && (
-        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+        <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
           {footer}
         </div>
       )}
@@ -452,8 +453,8 @@ const LogoutModal = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[3000] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[3000] flex items-center justify-center p-4">
+      <div className="responsive-modal-panel bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-8">
           <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
             <LogOut size={22} />
@@ -464,7 +465,7 @@ const LogoutModal = ({ onClose }) => {
             your account.
           </p>
         </div>
-        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+        <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
           <button
             onClick={onClose}
             className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition"
@@ -497,6 +498,12 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
+  // Global search
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
+  const searchInputRef = useRef(null);
+  const [globalSearchKey, setGlobalSearchKey] = useState(null);
+
   // Modals
   const [activeModal, setActiveModal] = useState(null); // 'profile' | 'settings' | 'password' | 'logout'
 
@@ -526,6 +533,24 @@ const Navbar = () => {
 
   const closeModal = () => setActiveModal(null);
 
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setIsGlobalSearchOpen(value.length > 0);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (window.__globalSearchKeyDown) {
+      window.__globalSearchKeyDown(e);
+    }
+  };
+
+  const handleSearchFocus = () => {
+    if (searchQuery.length > 0) {
+      setIsGlobalSearchOpen(true);
+    }
+  };
+
   return (
     <>
       <header className="navbar">
@@ -539,7 +564,26 @@ const Navbar = () => {
         <div className="navbar-center">
           <div className="search-box">
             <FiSearch size={16} className="search-icon" />
-            <input type="text" placeholder="Search..." />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyDown={handleSearchKeyDown}
+              onFocus={handleSearchFocus}
+              ref={searchInputRef}
+            />
+            {isGlobalSearchOpen && (
+              <GlobalSearch
+                isOpen={isGlobalSearchOpen}
+                searchQuery={searchQuery}
+                onClose={() => {
+                  setIsGlobalSearchOpen(false);
+                  setSearchQuery('');
+                }}
+                onKeyDown={handleSearchKeyDown}
+              />
+            )}
           </div>
         </div>
 

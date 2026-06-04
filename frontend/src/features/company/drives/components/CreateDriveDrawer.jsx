@@ -74,6 +74,7 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
           flex
           flex-col
           rounded-l-3xl
+          responsive-drawer
         "
       >
         <div className="pt-24">
@@ -149,7 +150,7 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
           </div>
 
           {/* Mini Info Cards 1 */}
-          <div className="grid grid-cols-2 gap-3 my-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-5">
             <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
               <p className="text-xs font-medium text-blue-500">
                 Candidates
@@ -217,7 +218,7 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
           </div>
 
           {/* Mini Info Cards 2 */}
-          <div className="grid grid-cols-2 gap-3 my-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-5">
             <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4">
               <p className="text-xs font-medium text-purple-500">
                 Interviews
@@ -267,7 +268,7 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
         </div>
 
         {/* Sticky Footer Buttons */}
-        <div className="fixed bottom-0 right-0 w-[420px] bg-white border-t border-gray-100 px-6 py-4 flex gap-3">
+        <div className="responsive-drawer-footer fixed bottom-0 right-0 w-[420px] bg-white border-t border-gray-100 px-6 py-4 flex gap-3">
           <button
             onClick={handleClose}
             className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"

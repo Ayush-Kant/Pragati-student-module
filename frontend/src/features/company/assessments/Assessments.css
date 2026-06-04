@@ -663,7 +663,20 @@
 
 /* RESPONSIVE */
 
-@media (max-width: 1200px) {
+@media (max-width: 1023px) {
+  .filters-row {
+    flex-wrap: wrap;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .assessment-table {
+    min-width: 860px;
+  }
+
   .create-panel {
     width: 100%;
   }
@@ -706,6 +719,43 @@
   }
 
   .create-panel {
+    width: 100%;
+  }
+
+  .assessment-dialog-overlay {
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .assessment-dialog {
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-btn {
+    width: 100%;
+  }
+
+  .assessment-filter-dropdown {
+    left: 0;
+    right: auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .assessment-filter-option {
+    white-space: normal;
+  }
+
+  .assessment-dialog-footer {
+    flex-direction: column;
+  }
+
+  .assessment-dialog-secondary,
+  .assessment-dialog-primary,
+  .assessment-dialog-danger {
     width: 100%;
   }
 }

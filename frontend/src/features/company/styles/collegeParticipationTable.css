@@ -63,3 +63,14 @@
 .college-table-wrapper tbody tr:last-child td {
   border-bottom: none;
 }
+
+@media (max-width: 1023px) {
+  .college-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .college-table-wrapper table {
+    min-width: 640px;
+  }
+}

@@ -74,6 +74,8 @@
   padding: 0 14px;
 
   gap: 10px;
+
+  position: relative;
 }
 
 .search-icon {
@@ -131,6 +133,26 @@
   font-weight: 600;
 }
 
+@media screen and (max-width: 1023px) {
+  .navbar {
+    gap: 12px;
+  }
+
+  .navbar-left,
+  .navbar-right {
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .navbar-center {
+    min-width: 0;
+  }
+
+  .navbar .search-box {
+    width: min(420px, 100%);
+  }
+}
+
 @media screen and (max-width: 768px) {
   .navbar-center input {
     display: none;
@@ -138,5 +160,15 @@
 
   .navbar-left h2 {
     display: none;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .navbar-notification-dropdown {
+    position: fixed !important;
+    top: 76px !important;
+    right: 12px !important;
+    left: 12px !important;
+    width: auto !important;
   }
 }

@@ -172,10 +172,10 @@ const EditCandidateModal = ({ candidate, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden"
+        className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden"
       >
         {/* Header */}
         <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
@@ -281,7 +281,7 @@ const EditCandidateModal = ({ candidate, onClose, onSave }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+        <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}

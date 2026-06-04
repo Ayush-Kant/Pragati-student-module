@@ -36,7 +36,7 @@ export const CandidateDrawer = ({
       />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-[68px] h-[calc(100vh-68px)] w-96 bg-white shadow-2xl z-50 overflow-y-auto animate-slideIn">
+      <div className="responsive-drawer fixed right-0 top-[68px] h-[calc(100vh-68px)] w-96 bg-white shadow-2xl z-50 overflow-y-auto animate-slideIn">
         {/* Close Button - Positioned inside drawer */}
         <button
           onClick={onClose}

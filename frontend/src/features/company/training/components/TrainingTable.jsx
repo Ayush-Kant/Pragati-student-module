@@ -10,8 +10,8 @@ export const TrainingTable = ({ programs, onMenuClick }) => {
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-      <table className="w-full">
+    <div className="responsive-table-wrap bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <table className="training-table-min w-full">
         <thead>
           <tr className="border-b border-slate-200 bg-gray-50">
             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Program</th>

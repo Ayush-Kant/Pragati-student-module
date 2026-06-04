@@ -141,8 +141,8 @@ const OfferActionsMenu = ({ offer, onView, onEdit, onDownload, onDelete }) => {
 // ─── View Offer Modal ─────────────────────────────────────────────────────────
 
 const ViewOfferModal = ({ offer, onClose }) => (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-    <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+  <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
       {/* Header */}
       <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
         <div>
@@ -209,7 +209,7 @@ const ViewOfferModal = ({ offer, onClose }) => (
       </div>
 
       {/* Footer */}
-      <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+      <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
         <button
           onClick={onClose}
           className="px-6 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition"
@@ -267,10 +267,10 @@ const EditOfferModal = ({ offer, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Header */}
         <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
@@ -391,7 +391,7 @@ const EditOfferModal = ({ offer, onClose, onSave }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+        <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
@@ -414,8 +414,8 @@ const EditOfferModal = ({ offer, onClose, onSave }) => {
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 
 const DeleteOfferModal = ({ offer, onClose, onDelete }) => (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-    <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+  <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div className="responsive-modal-panel bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
       <div className="p-8">
         <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-6">
           <Trash2 size={22} />
@@ -427,7 +427,7 @@ const DeleteOfferModal = ({ offer, onClose, onDelete }) => (
           This action cannot be undone.
         </p>
       </div>
-      <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+      <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
         <button
           type="button"
           onClick={onClose}
@@ -547,7 +547,7 @@ const Offers = () => {
         </button>
       </div>
 
-      <div className="offers-stats">
+      <div className="offers-stats grid grid-cols-4">
         <div className="stat-card">
           <h2 style={{ color: "#101828" }}>42</h2>
           <p>Total Offers</p>

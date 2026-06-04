@@ -186,3 +186,30 @@
   background: #42a5f5;
   color: #ffffff;
 }
+
+@media (max-width: 768px) {
+  .quick-action-modal-overlay {
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .quick-action-modal {
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+
+  .quick-action-modal-footer {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-action-modal-footer {
+    flex-direction: column;
+  }
+
+  .quick-action-cancel,
+  .quick-action-send {
+    width: 100%;
+  }
+}

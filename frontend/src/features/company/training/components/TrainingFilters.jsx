@@ -19,7 +19,7 @@ export const TrainingFilters = ({ filters, updateFilter, getUniqueValues }) => {
   };
 
   return (
-    <div className="flex items-center justify-between gap-4 bg-white border border-slate-200 rounded-t-2xl px-5 py-5 shadow-sm">
+    <div className="app-filter-bar flex items-center justify-between gap-4 bg-white border border-slate-200 rounded-t-2xl px-5 py-5 shadow-sm">
       {/* Search Input */}
       <div className="relative flex-1 flex items-center">
         <Search
@@ -53,7 +53,7 @@ export const TrainingFilters = ({ filters, updateFilter, getUniqueValues }) => {
       </div>
 
       {/* Filters on the right */}
-      <div className="flex items-center gap-4">
+      <div className="app-filter-group flex items-center gap-4">
         {/* Status Filter Dropdown */}
         <div className="relative">
           <button
