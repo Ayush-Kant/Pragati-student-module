@@ -69,9 +69,8 @@ export const TrainingFilters = ({ filters, updateFilter, getUniqueValues }) => {
             <div className="absolute right-0 mt-2 w-[160px] bg-white border border-slate-200 rounded-lg shadow-lg z-50">
               <button
                 onClick={() => handleStatusSelect('')}
-                className={`block w-full text-left px-4 py-2 text-sm first:rounded-t-lg last:rounded-b-lg ${
-                  !filters.status ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
-                }`}
+                className={`block w-full text-left px-4 py-2 text-sm first:rounded-t-lg last:rounded-b-lg ${!filters.status ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
               >
                 All Statuses
               </button>
@@ -79,9 +78,8 @@ export const TrainingFilters = ({ filters, updateFilter, getUniqueValues }) => {
                 <button
                   key={status}
                   onClick={() => handleStatusSelect(status)}
-                  className={`block w-full text-left px-4 py-2 text-sm last:rounded-b-lg ${
-                    filters.status === status ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+                  className={`block w-full text-left px-4 py-2 text-sm last:rounded-b-lg ${filters.status === status ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                    }`}
                 >
                   {status}
                 </button>
@@ -105,9 +103,8 @@ export const TrainingFilters = ({ filters, updateFilter, getUniqueValues }) => {
             <div className="absolute right-0 mt-2 w-[180px] bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
               <button
                 onClick={() => handleMentorSelect('')}
-                className={`block w-full text-left px-4 py-2 text-sm first:rounded-t-lg ${
-                  !filters.mentor ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
-                }`}
+                className={`block w-full text-left px-4 py-2 text-sm first:rounded-t-lg ${!filters.mentor ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
               >
                 All Mentors
               </button>
@@ -115,9 +112,8 @@ export const TrainingFilters = ({ filters, updateFilter, getUniqueValues }) => {
                 <button
                   key={mentor}
                   onClick={() => handleMentorSelect(mentor)}
-                  className={`block w-full text-left px-4 py-2 text-sm last:rounded-b-lg ${
-                    filters.mentor === mentor ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+                  className={`block w-full text-left px-4 py-2 text-sm last:rounded-b-lg ${filters.mentor === mentor ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                    }`}
                 >
                   {mentor}
                 </button>

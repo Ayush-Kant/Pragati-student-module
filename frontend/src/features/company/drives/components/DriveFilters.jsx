@@ -15,11 +15,11 @@ export const DriveFilters = ({ filters, updateFilter, getUniqueValues }) => {
   }, []);
 
   const statuses = ['All Statuses', 'Active', 'Assessment', 'Interview', 'Screening'];
-  
+
   // Get unique values from the drive data for department/role
   const rawDepts = getUniqueValues('department') || [];
   const departments = ['All Departments', ...rawDepts];
-  
+
   const years = ['All Years', '2024', '2025', '2026', '2027'];
 
   const handleSelect = (type, value) => {
@@ -80,11 +80,10 @@ export const DriveFilters = ({ filters, updateFilter, getUniqueValues }) => {
               <div
                 key={status}
                 onClick={() => handleSelect('status', status)}
-                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${
-                  (filters.status === status || (!filters.status && status === 'All Statuses'))
+                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${(filters.status === status || (!filters.status && status === 'All Statuses'))
                     ? 'text-blue-600 bg-blue-50/50'
                     : 'text-gray-700'
-                }`}
+                  }`}
               >
                 {status}
               </div>
@@ -108,11 +107,10 @@ export const DriveFilters = ({ filters, updateFilter, getUniqueValues }) => {
               <div
                 key={dept}
                 onClick={() => handleSelect('department', dept)}
-                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${
-                  (filters.department === dept || (!filters.department && dept === 'All Departments'))
+                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${(filters.department === dept || (!filters.department && dept === 'All Departments'))
                     ? 'text-blue-600 bg-blue-50/50'
                     : 'text-gray-700'
-                }`}
+                  }`}
               >
                 {dept}
               </div>
@@ -136,11 +134,10 @@ export const DriveFilters = ({ filters, updateFilter, getUniqueValues }) => {
               <div
                 key={year}
                 onClick={() => handleSelect('year', year)}
-                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${
-                  (filters.year === year || (!filters.year && year === 'All Years'))
+                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${(filters.year === year || (!filters.year && year === 'All Years'))
                     ? 'text-blue-600 bg-blue-50/50'
                     : 'text-gray-700'
-                }`}
+                  }`}
               >
                 {year}
               </div>

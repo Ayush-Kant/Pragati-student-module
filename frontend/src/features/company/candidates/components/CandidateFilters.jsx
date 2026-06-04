@@ -16,10 +16,10 @@ export const CandidateFilters = ({ filters, updateFilter, getUniqueValues }) => 
   }, []);
 
   const statuses = ['All Statuses', 'Shortlisted', 'Assessment', 'Interview'];
-  
+
   const rawColleges = getUniqueValues('college') || [];
   const colleges = ['All Colleges', ...rawColleges];
-  
+
   const rawRoles = getUniqueValues('role') || [];
   const roles = ['All Roles', ...rawRoles];
 
@@ -81,11 +81,10 @@ export const CandidateFilters = ({ filters, updateFilter, getUniqueValues }) => 
               <div
                 key={status}
                 onClick={() => handleSelect('status', status)}
-                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${
-                  (filters.status === status || (!filters.status && status === 'All Statuses'))
+                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${(filters.status === status || (!filters.status && status === 'All Statuses'))
                     ? 'text-blue-600 bg-blue-50/50'
                     : 'text-gray-700'
-                }`}
+                  }`}
               >
                 {status}
               </div>
@@ -109,11 +108,10 @@ export const CandidateFilters = ({ filters, updateFilter, getUniqueValues }) => 
               <div
                 key={college}
                 onClick={() => handleSelect('college', college)}
-                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${
-                  (filters.college === college || (!filters.college && college === 'All Colleges'))
+                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${(filters.college === college || (!filters.college && college === 'All Colleges'))
                     ? 'text-blue-600 bg-blue-50/50'
                     : 'text-gray-700'
-                }`}
+                  }`}
               >
                 {college}
               </div>
@@ -137,11 +135,10 @@ export const CandidateFilters = ({ filters, updateFilter, getUniqueValues }) => 
               <div
                 key={role}
                 onClick={() => handleSelect('role', role)}
-                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${
-                  (filters.role === role || (!filters.role && role === 'All Roles'))
+                className={`px-5 py-3 hover:bg-gray-50 text-[14px] cursor-pointer transition font-medium ${(filters.role === role || (!filters.role && role === 'All Roles'))
                     ? 'text-blue-600 bg-blue-50/50'
                     : 'text-gray-700'
-                }`}
+                  }`}
               >
                 {role}
               </div>

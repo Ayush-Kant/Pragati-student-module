@@ -1,4 +1,4 @@
-.assessments-wrapper {
+﻿.assessments-wrapper {
   padding: 0;
   background: transparent;
   overflow-x: hidden;
@@ -532,7 +532,7 @@
   gap: 14px;
 }
 
-.double-row > div {
+.double-row>div {
   flex: 1;
 }
 

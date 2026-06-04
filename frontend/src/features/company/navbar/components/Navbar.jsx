@@ -93,21 +93,18 @@ const NotificationDropdown = ({ notifications, onMarkRead, onMarkAllRead }) => (
         <button
           key={n.id}
           onClick={() => onMarkRead(n.id)}
-          className={`w-full text-left px-5 py-3.5 flex items-start gap-3 transition hover:bg-gray-50 ${
-            n.read ? "opacity-60" : ""
-          }`}
+          className={`w-full text-left px-5 py-3.5 flex items-start gap-3 transition hover:bg-gray-50 ${n.read ? "opacity-60" : ""
+            }`}
         >
           {/* Unread dot */}
           <span
-            className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${
-              n.read ? "bg-gray-200" : "bg-blue-500"
-            }`}
+            className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${n.read ? "bg-gray-200" : "bg-blue-500"
+              }`}
           />
           <div>
             <p
-              className={`text-sm leading-snug ${
-                n.read ? "text-gray-500 font-normal" : "text-gray-800 font-semibold"
-              }`}
+              className={`text-sm leading-snug ${n.read ? "text-gray-500 font-normal" : "text-gray-800 font-semibold"
+                }`}
             >
               {n.title}
             </p>
@@ -144,9 +141,8 @@ const ProfileDropdown = ({ onSelect }) => {
           {item.danger && <div className="my-1 border-t border-gray-100" />}
           <button
             onClick={() => onSelect(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition hover:bg-gray-50 text-left ${
-              item.danger ? "text-red-600 hover:bg-red-50" : "text-gray-700"
-            }`}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition hover:bg-gray-50 text-left ${item.danger ? "text-red-600 hover:bg-red-50" : "text-gray-700"
+              }`}
           >
             <item.icon size={15} className="flex-shrink-0 opacity-70" />
             {item.label}
@@ -295,14 +291,12 @@ const AccountSettingsModal = ({ onClose }) => {
       </div>
       <button
         onClick={() => setSettings((p) => ({ ...p, [field]: !p[field] }))}
-        className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
-          settings[field] ? "bg-blue-600" : "bg-gray-200"
-        }`}
+        className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${settings[field] ? "bg-blue-600" : "bg-gray-200"
+          }`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
-            settings[field] ? "translate-x-5" : "translate-x-0"
-          }`}
+          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${settings[field] ? "translate-x-5" : "translate-x-0"
+            }`}
         />
       </button>
     </div>
@@ -394,9 +388,8 @@ const ChangePasswordModal = ({ onClose }) => {
           type={show[field] ? "text" : "password"}
           value={form[field]}
           onChange={(e) => handleChange(field, e.target.value)}
-          className={`w-full px-4 py-3 pr-10 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${
-            errors[field] ? "border-red-400 bg-red-50" : "border-gray-200"
-          }`}
+          className={`w-full px-4 py-3 pr-10 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${errors[field] ? "border-red-400 bg-red-50" : "border-gray-200"
+            }`}
           placeholder="••••••••"
         />
         <button
@@ -451,7 +444,7 @@ const LogoutModal = ({ onClose }) => {
 
   const handleLogout = () => {
     // Clear any local auth state if present
-    try { localStorage.clear(); } catch (_) {}
+    try { localStorage.clear(); } catch (_) { }
     toast.success("Logged out successfully");
     onClose();
     // Navigate to login if route exists, otherwise root
