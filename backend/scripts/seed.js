@@ -18,31 +18,8 @@ async function seedData() {
         mentors, 
         users, 
         auth_users,
-        students,
-        dashboard_stats,
-        dashboard_activities,
-        dashboard_reports
+        students
       RESTART IDENTITY CASCADE;
-    `);
-
-    console.log("Inserting dashboard stats...");
-    await client.query(`
-      INSERT INTO dashboard_stats (total_students, active_drives, placements, total_companies, revenue)
-      VALUES (1250, 18, 423, 42, 850000.00)
-    `);
-
-    console.log("Inserting dashboard activities...");
-    await client.query(`
-      INSERT INTO dashboard_activities (title, description, status)
-      VALUES ('New Student Registered', 'Rahul Sharma completed registration', 'success')
-    `);
-
-    console.log("Inserting dashboard reports...");
-    await client.query(`
-      INSERT INTO dashboard_reports (report_type, report_data) VALUES 
-      ('placement', '{"monthly": [10, 20, 30, 40], "categories": ["IT", "Non-IT"]}'),
-      ('revenue', '{"monthly": [50000, 60000, 70000], "growth": "15%"}'),
-      ('admission', '{"total": 1250, "new": 150, "dropped": 5}')
     `);
 
     console.log("Inserting auth_users...");
