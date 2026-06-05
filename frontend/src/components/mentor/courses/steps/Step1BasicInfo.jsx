@@ -64,6 +64,11 @@ export default function Step1BasicInfo({
     onUpdate({ fullDescription: editorRef.current.innerHTML });
   };
 
+  const drives = [
+    { driveId: 1, driveName: "Winter Backend Engineering cohort 2026" },
+    { driveId: 2, driveName: "Happy" },
+
+  ];
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Left Form Content Pane Column */}
@@ -337,8 +342,9 @@ export default function Step1BasicInfo({
             }`}
           >
             <option value="">Select active recruitment drive</option>
-            <option value="drive-101">Tech Hiring Drive 2026</option>
-            <option value="drive-102">UI/UX Internship Drive</option>
+            {drives.map((drive) => (
+              <option value={drive.driveId}>{drive.driveName}</option>
+            ))}
           </select>
           {touched.driveId && !courseData.driveId && (
             <p className="text-red-500 text-xs mt-1">

@@ -53,7 +53,7 @@ export default function CourseTable({
               <tbody>
                 {paginatedCourses.map((course) => (
                   <CourseTableRow 
-                    key={course.id} 
+                    key={course.courseId} 
                     course={course} 
                     onArchive={onArchive} 
                     onView={onView}

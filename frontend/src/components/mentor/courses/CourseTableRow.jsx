@@ -49,7 +49,7 @@ export default function CourseTableRow({ course, onArchive, onView, onEdit }) {
         <div className="flex items-center justify-center gap-2">
           {/* View details action button connected */}
           <button 
-            onClick={() => onView(course.id)} 
+            onClick={() => onView(course.courseId)} 
             className="cursor-pointer rounded-xl border border-gray-200 p-2 text-gray-600 transition hover:bg-gray-100"
           >
             <Eye size={18} />
@@ -57,7 +57,7 @@ export default function CourseTableRow({ course, onArchive, onView, onEdit }) {
           
           {/* Edit details action button connected */}
           <button 
-            onClick={() => onEdit(course.id)} 
+            onClick={() => onEdit(course.courseId)} 
             className="cursor-pointer rounded-xl border border-gray-200 p-2 text-gray-600 transition hover:bg-gray-100"
           >
             <Pencil size={18} />
@@ -69,7 +69,7 @@ export default function CourseTableRow({ course, onArchive, onView, onEdit }) {
             </button>
             <div className="absolute right-0 top-12 z-20 hidden w-44 rounded-xl border border-gray-100 bg-white p-2 shadow-xl group-hover:block before:absolute before:-top-4 before:left-0 before:h-4 before:w-full">
               <button
-                onClick={() => onArchive(course.id)}
+                onClick={() => onArchive(course.courseId)}
                 className="cursor-pointer w-full rounded-lg px-4 py-2 text-left text-sm text-orange-600 transition hover:bg-orange-50"
               >
                 Archive

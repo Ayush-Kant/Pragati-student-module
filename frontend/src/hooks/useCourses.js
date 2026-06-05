@@ -18,7 +18,7 @@ export function useCourses() {
     } finally {
       setLoading(false);
     }
-  });
+  }, []);
 
   const fetchCourseById = useCallback(async (id) => {
     setLoading(true);
@@ -35,7 +35,7 @@ export function useCourses() {
     } finally {
       setLoading(false);
     }
-  });
+  }, []);
 
   const handleCreateCourse = async (formData) => {
     setLoading(true);
@@ -75,7 +75,9 @@ export function useCourses() {
     setError(null);
     try {
       await courseService.archiveCourse(id);
-      setCourses((prev) => prev.filter((c) => c.id !== id));
+      setCourses((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, status: "Archived" } : c)),
+      );
     } catch (err) {
       setError(err.response?.data?.message || "Failed to archive course node.");
       throw err;
@@ -83,7 +85,7 @@ export function useCourses() {
       setLoading(false);
     }
   };
-
+  
   return {
     courses,
     currentCourse,

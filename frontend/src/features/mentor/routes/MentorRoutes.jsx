@@ -7,7 +7,7 @@ import Courses from "../../../pages/mentor/CoursesPage";
 import CreateCourse from "../../../pages/mentor/CreateCoursePage";
 
 const mentorRoute = (
-  <Route>
+  <Route element={<PrivateRoute />}>
     <Route element={<RoleRoute allowedRoles={["mentor"]} />}>
       <Route path="mentor" element={<MentorLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />

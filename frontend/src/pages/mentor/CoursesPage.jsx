@@ -1,68 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Download, Plus } from "lucide-react";
 import CourseStatCards from "../../components/mentor/courses/CourseStatCards";
 import CourseTable from "../../components/mentor/courses/CourseTable";
 import { Link } from "react-router-dom";
-
-const INITIAL_COURSES = [
-  {
-    id: 1,
-    title: "JavaScript Fundamentals",
-    description: "Learn basics from scratch",
-    category: "Web Development",
-    mentor: "Arjun Sharma",
-    students: 124,
-    status: "Published",
-    image: "https://cdn-icons-png.flaticon.com/512/5968/5968292.png",
-  },
-  {
-    id: 2,
-    title: "Python for Beginners",
-    description: "Comprehensive guide",
-    category: "Data Science",
-    mentor: "Neha Patel",
-    students: 98,
-    status: "Published",
-    image: "https://cdn-icons-png.flaticon.com/512/5968/5968350.png",
-  },
-  {
-    id: 3,
-    title: "React.js Complete Guide",
-    description: "Build modern web apps",
-    category: "Web Development",
-    mentor: "Riya Sharma",
-    students: 156,
-    status: "Published",
-    image: "https://cdn-icons-png.flaticon.com/512/1126/1126012.png",
-  },
-  {
-    id: 4,
-    title: "UI/UX Design Principles",
-    description: "Learn design guidelines",
-    category: "Design",
-    mentor: "Arjun Verma",
-    students: 87,
-    status: "Draft",
-    image: "https://cdn-icons-png.flaticon.com/512/5968/5968705.png",
-  },
-  {
-    id: 5,
-    title: "SQL Database Management",
-    description: "Master structured queries",
-    category: "Data Science",
-    mentor: "Neha Patel",
-    students: 65,
-    status: "Draft",
-    image: "https://cdn-icons-png.flaticon.com/512/4248/4248443.png",
-  },
-];
+import { useCourses } from "../../hooks/useCourses.js";
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState(INITIAL_COURSES);
+  const { courses, loading, error, fetchCourses, handleArchiveCourse } =
+    useCourses();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState({});
+
+  // Fetch courses on mount and when filters change
+  useEffect(() => {
+    fetchCourses(filters);
+  }, [fetchCourses, filters]);
 
   // 1. Fully operational Native Data CSV Export Action Function
   const handleExportReport = () => {
@@ -73,7 +28,7 @@ export default function CoursesPage() {
       headers.join(","),
       ...courses.map(
         (c) =>
-          `${c.id},"${c.title}","${c.category}","${c.mentor}",${c.students},"${c.status}"`,
+          `${c.courseId},"${c.title}","${c.category}","${c.mentor}",${c.students},"${c.status}"`,
       ),
     ];
 
@@ -86,24 +41,35 @@ export default function CoursesPage() {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleArchive = (id) => {
-    setCourses((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: "Archived" } : c)),
-    );
+  const handleArchive = async (id) => {
+    try {
+      await handleArchiveCourse(id);
+      await fetchCourses(filters);
+    } catch (err) {
+      console.error("Archiving routine failed:", err);
+    }
   };
-
   // Reset pagination window when filters change to avoid empty view indexes
   const handleSetSearch = (val) => {
     setSearchQuery(val);
     setCurrentPage(1);
+    setFilters((prev) => ({ ...prev, search: val }));
   };
   const handleSetCategory = (val) => {
     setSelectedCategory(val);
     setCurrentPage(1);
+    setFilters((prev) => ({
+      ...prev,
+      category: val === "All" ? undefined : val,
+    }));
   };
   const handleSetStatus = (val) => {
     setSelectedStatus(val);
     setCurrentPage(1);
+    setFilters((prev) => ({
+      ...prev,
+      status: val === "All" ? undefined : val,
+    }));
   };
 
   const filteredCourses = courses.filter((course) => {
@@ -145,22 +111,29 @@ export default function CoursesPage() {
         </div>
       </div>
 
-      <CourseStatCards />
+      {loading && <p className="text-center py-8">Loading courses...</p>}
+      {error && <p className="text-center text-red-500 py-8">Error: {error}</p>}
 
-      <CourseTable
-        courses={filteredCourses}
-        searchQuery={searchQuery}
-        setSearchQuery={handleSetSearch}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={handleSetCategory}
-        selectedStatus={selectedStatus}
-        setSelectedStatus={handleSetStatus}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        onArchive={handleArchive}
-        onView={(id) => alert(`Viewing ID ${id}`)}
-        onEdit={(id) => alert(`Editing ID ${id}`)}
-      />
+      {!loading && !error && (
+        <>
+          <CourseStatCards courses={courses} loading={loading} error={error} />
+
+          <CourseTable
+            courses={filteredCourses}
+            searchQuery={searchQuery}
+            setSearchQuery={handleSetSearch}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={handleSetCategory}
+            selectedStatus={selectedStatus}
+            setSelectedStatus={handleSetStatus}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            onArchive={handleArchive}
+            onView={(id) => alert(`Viewing ID ${id}`)}
+            onEdit={(id) => alert(`Editing ID ${id}`)}
+          />
+        </>
+      )}
     </div>
   );
 }

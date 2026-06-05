@@ -1,4 +1,4 @@
-import api from './api.js';
+import apiClient from "./api.js";
 
 export const courseService = {
   // GET all courses (automatically attaches Bearer <token>)
@@ -38,9 +38,7 @@ export const courseService = {
 
   // DELETE (archive) course
   archiveCourse: async (courseId) => {
-    const response = await apiClient.patch(`/mentor/courses/${courseId}`, {
-      status: "archived",
-    });
+    const response = await apiClient.delete(`/mentor/courses/${courseId}`);
     return response.data;
   },
 };

@@ -1,4 +1,4 @@
-import api from "./api.js";
+import apiClient from "./api.js";
 
 export const moduleService = {
   // POST add module

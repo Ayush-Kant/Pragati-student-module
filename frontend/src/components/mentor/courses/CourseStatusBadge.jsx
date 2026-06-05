@@ -1,9 +1,9 @@
 import React from 'react';
 
 const STATUS_STYLES = {
-  Published: "bg-emerald-100 text-emerald-700",
-  Draft: "bg-orange-100 text-orange-700",
-  Archived: "bg-gray-100 text-gray-700",
+  published: "bg-emerald-100 text-emerald-700",
+  draft: "bg-orange-100 text-orange-700",
+  archived: "bg-gray-100 text-gray-700",
 };
 
 export default function CourseStatusBadge({ status }) {
