@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import studentImage from "./images/student.png";
 import manager from "./images/managers.png";
 import mentor from "./images/mentor.png";
+import { registerApi } from './services/auth.services';
+import toast from 'react-hot-toast';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ const RegisterPage = () => {
       lightBg: 'bg-[#2563EB]/10',
       footerText: "Why Choose Uptoskills? • Build Skills, Compete, Get Hired and Earn Rewards."
     },
-    faculty: {
+    mentor: {
       title: 'Campus / Faculty',
       description: 'Organise Competitions, Manage Placements, and structure academic benchmarks.',
       image: manager,
@@ -45,8 +47,20 @@ const RegisterPage = () => {
       lightBg: 'bg-[#00a896]/10',
       footerText: "Why Campus Partner with Uptoskills? • HR Connect, Branding, AI Candidates Tracking."
     },
-    corporate: {
+    college: {
       title: 'Mentor / Corporate',
+      description: 'Speed up your hiring with AI Tools, interactive ATS, and global tracking.',
+      image: mentor,
+      bgColor: 'bg-[#EA580C]',
+      textColor: 'text-[#EA580C]',
+      borderColor: 'border-[#EA580C]',
+      focusRing: 'focus:ring-[#EA580C]/20',
+      focusBorder: 'focus:border-[#EA580C]',
+      lightBg: 'bg-[#EA580C]/10',
+      footerText: "Collaborate with Uptoskills • Easy Talent Access & AI Tools."
+    },
+    company : {
+      title: 'Corporate',
       description: 'Speed up your hiring with AI Tools, interactive ATS, and global tracking.',
       image: mentor,
       bgColor: 'bg-[#EA580C]',
@@ -89,7 +103,7 @@ const RegisterPage = () => {
     setErrors({});
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
@@ -114,7 +128,14 @@ const RegisterPage = () => {
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
     } else {
-      console.log(`Registration submitted for ${selectedRole}:`, formData);
+       const registerres = await registerApi(formData,selectedRole);
+       if(registerres.success){
+        toast.success(registerres.message || 'Registration successful! Please log in.');
+        navigate('/login');
+       }
+       else{        setErrors({ apiError: registerres.message || 'Registration failed' });
+       }
+
     }
   };
 
