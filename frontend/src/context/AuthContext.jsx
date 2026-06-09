@@ -22,6 +22,12 @@ const getRoleFromToken = (token) => {
 };
 
 export const AuthProvider = ({ children }) => {
+  // Set bypass immediately if not already set
+  if (!localStorage.getItem("BYPASS_AUTH")) {
+    localStorage.setItem("BYPASS_AUTH", "true");
+    localStorage.setItem("BYPASS_ROLE", "mentor");
+  }
+
   const [token, setToken] = useState(() => {
     // Development bypass for testing
     if (localStorage.getItem("BYPASS_AUTH") === "true") {

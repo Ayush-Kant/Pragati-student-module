@@ -8,6 +8,21 @@ import {
   formatQuizzesForExport,
   formatTasksForExport
 } from '../utils/exportUtils';
+import {
+  BarChart3,
+  ListTodo,
+  FileText,
+  HelpCircle,
+  Download,
+  Lightbulb,
+  Zap,
+  Lock,
+  Smartphone,
+  Loader,
+  Sheet,
+  File,
+  Database
+} from 'lucide-react';
 
 const ExportReport = () => {
   const [selectedFormat, setSelectedFormat] = useState('excel');
@@ -111,9 +126,12 @@ const ExportReport = () => {
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: '#0f172a', margin: '0 0 8px 0' }}>
-            📊 Export Activity Report
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <BarChart3 size={32} color="#0284c7" />
+            <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: '#0f172a', margin: 0 }}>
+              Export Activity Report
+            </h1>
+          </div>
           <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
             Export your mentoring activities, assignments, quizzes, and tasks in your preferred format
           </p>
@@ -137,35 +155,40 @@ const ExportReport = () => {
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {[
-                  { value: 'activities', label: '📋 Activities & Sessions', desc: 'All mentoring activities and sessions' },
-                  { value: 'assignments', label: '📝 Assignments', desc: 'Assignment details and submissions' },
-                  { value: 'quizzes', label: '❓ Quizzes', desc: 'Quiz performance data' },
-                  { value: 'tasks', label: '✅ Tasks', desc: 'Task management data' }
-                ].map(option => (
-                  <label key={option.value} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    backgroundColor: selectedDataType === option.value ? '#f0f9ff' : '#ffffff',
-                    border: selectedDataType === option.value ? '2px solid #0284c7' : '1px solid #e2e8f0',
-                    transition: 'all 0.2s'
-                  }}>
-                    <input
-                      type="radio"
-                      name="dataType"
-                      value={option.value}
-                      checked={selectedDataType === option.value}
-                      onChange={(e) => setSelectedDataType(e.target.value)}
-                      style={{ marginRight: '12px', cursor: 'pointer', width: '16px', height: '16px' }}
-                    />
-                    <div>
-                      <div style={{ fontWeight: '500', color: '#0f172a' }}>{option.label}</div>
-                      <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{option.desc}</div>
-                    </div>
-                  </label>
-                ))}
+                  { value: 'activities', label: 'Activities & Sessions', desc: 'All mentoring activities and sessions', icon: BarChart3 },
+                  { value: 'assignments', label: 'Assignments', desc: 'Assignment details and submissions', icon: FileText },
+                  { value: 'quizzes', label: 'Quizzes', desc: 'Quiz performance data', icon: HelpCircle },
+                  { value: 'tasks', label: 'Tasks', desc: 'Task management data', icon: ListTodo }
+                ].map(option => {
+                  const IconComponent = option.icon;
+                  return (
+                    <label key={option.value} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      backgroundColor: selectedDataType === option.value ? '#f0f9ff' : '#ffffff',
+                      border: selectedDataType === option.value ? '2px solid #0284c7' : '1px solid #e2e8f0',
+                      transition: 'all 0.2s',
+                      gap: '12px'
+                    }}>
+                      <input
+                        type="radio"
+                        name="dataType"
+                        value={option.value}
+                        checked={selectedDataType === option.value}
+                        onChange={(e) => setSelectedDataType(e.target.value)}
+                        style={{ marginRight: '0px', cursor: 'pointer', width: '16px', height: '16px' }}
+                      />
+                      <IconComponent size={20} color={selectedDataType === option.value ? '#0284c7' : '#64748b'} />
+                      <div>
+                        <div style={{ fontWeight: '500', color: '#0f172a' }}>{option.label}</div>
+                        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{option.desc}</div>
+                      </div>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -182,29 +205,36 @@ const ExportReport = () => {
               </h2>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 {[
-                  { value: 'excel', label: '📊 Excel', icon: '🟢' },
-                  { value: 'pdf', label: '📄 PDF', icon: '🔴' },
-                  { value: 'csv', label: '📋 CSV', icon: '🔵' }
-                ].map(format => (
-                  <button
-                    key={format.value}
-                    onClick={() => setSelectedFormat(format.value)}
-                    style={{
-                      padding: '16px',
-                      borderRadius: '8px',
-                      border: selectedFormat === format.value ? '2px solid #0284c7' : '1px solid #e2e8f0',
-                      backgroundColor: selectedFormat === format.value ? '#f0f9ff' : '#ffffff',
-                      cursor: 'pointer',
-                      fontWeight: selectedFormat === format.value ? '600' : '500',
-                      color: selectedFormat === format.value ? '#0284c7' : '#64748b',
-                      fontSize: '14px',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <span style={{ fontSize: '20px', display: 'block', marginBottom: '4px' }}>{format.icon}</span>
-                    {format.label}
-                  </button>
-                ))}
+                  { value: 'excel', label: 'Excel', icon: Sheet },
+                  { value: 'pdf', label: 'PDF', icon: File },
+                  { value: 'csv', label: 'CSV', icon: Database }
+                ].map(format => {
+                  const IconComponent = format.icon;
+                  return (
+                    <button
+                      key={format.value}
+                      onClick={() => setSelectedFormat(format.value)}
+                      style={{
+                        padding: '16px',
+                        borderRadius: '8px',
+                        border: selectedFormat === format.value ? '2px solid #0284c7' : '1px solid #e2e8f0',
+                        backgroundColor: selectedFormat === format.value ? '#f0f9ff' : '#ffffff',
+                        cursor: 'pointer',
+                        fontWeight: selectedFormat === format.value ? '600' : '500',
+                        color: selectedFormat === format.value ? '#0284c7' : '#64748b',
+                        fontSize: '14px',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <IconComponent size={24} color={selectedFormat === format.value ? '#0284c7' : '#94a3b8'} />
+                      {format.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -301,18 +331,22 @@ const ExportReport = () => {
               >
                 {isLoading ? (
                   <>
-                    <span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid #ffffff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                    <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} color="#ffffff" />
                     Exporting...
                   </>
                 ) : (
                   <>
-                    📥 Export as {selectedFormat.toUpperCase()}
+                    <Download size={16} />
+                    Export as {selectedFormat.toUpperCase()}
                   </>
                 )}
               </button>
-              <p style={{ fontSize: '12px', color: '#64748b', marginTop: '12px', marginBottom: 0 }}>
-                💡 The report will be downloaded to your computer in {selectedFormat.toUpperCase()} format
-              </p>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: '#64748b', marginTop: '12px', marginBottom: 0 }}>
+                <Lightbulb size={16} color="#64748b" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <p style={{ margin: 0 }}>
+                  The report will be downloaded to your computer in {selectedFormat.toUpperCase()} format
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -320,27 +354,32 @@ const ExportReport = () => {
         {/* Info Cards */}
         <div style={{ marginTop: '32px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           {[
-            { icon: '⚡', title: 'Instant Export', desc: 'Export large datasets instantly' },
-            { icon: '🔒', title: 'Secure', desc: 'Your data is processed locally' },
-            { icon: '📱', title: 'Format Flexible', desc: 'Excel, PDF, or CSV formats' }
-          ].map((card, idx) => (
-            <div key={idx} style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px',
-              padding: '20px',
-              textAlign: 'center',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              border: '1px solid #e2e8f0'
-            }}>
-              <div style={{ fontSize: '32px', marginBottom: '8px' }}>{card.icon}</div>
-              <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', margin: '0 0 4px 0' }}>
-                {card.title}
-              </h3>
-              <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>
-                {card.desc}
-              </p>
-            </div>
-          ))}
+            { icon: Zap, title: 'Instant Export', desc: 'Export large datasets instantly', color: '#f59e0b' },
+            { icon: Lock, title: 'Secure', desc: 'Your data is processed locally', color: '#10b981' },
+            { icon: Smartphone, title: 'Format Flexible', desc: 'Excel, PDF, or CSV formats', color: '#6366f1' }
+          ].map((card, idx) => {
+            const IconComponent = card.icon;
+            return (
+              <div key={idx} style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '12px',
+                padding: '20px',
+                textAlign: 'center',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                border: '1px solid #e2e8f0'
+              }}>
+                <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>
+                  <IconComponent size={32} color={card.color} />
+                </div>
+                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', margin: '0 0 4px 0' }}>
+                  {card.title}
+                </h3>
+                <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>
+                  {card.desc}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
