@@ -47,7 +47,6 @@ async function runMigrations() {
       "005_create_company_management.sql",
       "003_create_admin_dashboard.sql",
       "002_create_content_tables.sql",
-      "006_create_college_profiles.sql",
       "007_create_dashboard_tables.sql",
       "Students.sql",
     ];
