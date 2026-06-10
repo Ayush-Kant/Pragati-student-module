@@ -1,4 +1,4 @@
-const profileDummyData = {
+const editProfileDummyData = {
   collegeLogo:
     "https://images.unsplash.com/photo-1562774053-701939374585?w=500",
 
@@ -45,4 +45,4 @@ const profileDummyData = {
   },
 };
 
-export default profileDummyData;
+export default editProfileDummyData;
