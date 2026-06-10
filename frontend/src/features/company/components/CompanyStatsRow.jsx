@@ -33,7 +33,7 @@ const CompanyStatsRow = ({ stats }) => {
   ];
 
   return (
-    <div className="w-full grid grid-cols-4 gap-6 mb-8">
+    <div className="stats-grid">
       {cards.map((card, index) => {
         const Icon = card.icon;
         return (
