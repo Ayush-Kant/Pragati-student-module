@@ -2,7 +2,7 @@
  * Mock data representation for the College Institution Profile Module.
  * Models clean field parameters matching the college's public and administrative details.
  */
-export const profileDummyData = {
+export const collegeProfileDummyData = {
   collegeId: "COL-PRAGATI-2026",
   collegeName: "Pragati Institute of Technology & Management",
   establishmentYear: 2012,

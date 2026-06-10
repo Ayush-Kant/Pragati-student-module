@@ -1,4 +1,4 @@
-import { profileDummyData } from '../types/profileDummyData';
+import { collegeProfileDummyData } from '../types/collegeProfileDummyData';
 
 // Base API URL configuration routing target for the college profile data
 const API_BASE_URL = '/api/v1/college/profile';
@@ -14,7 +14,7 @@ export const profileService = {
   fetchCollegeProfile: async () => { // Changed name to clearly state it fetches College data
     if (USE_DUMMY_DATA) {
       // Emulate subtle network latency overhead for operational realism in UI
-      return new Promise((resolve) => setTimeout(() => resolve(profileDummyData), 600));
+      return new Promise((resolve) => setTimeout(() => resolve(collegeProfileDummyData), 600));
     }
 
     // Changing this to '/details' or leaving it as '/me' depends on your backend routes. 
