@@ -24,6 +24,7 @@ import BulkAssignActivity from "./features/mentor/pages/BulkAssignActivity";
 import ActivityCalendar from "./features/mentor/pages/ActivityCalendar";
 import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
+import CompanyRoute from "./features/company/routes/CompanyRoute";
 
 function App() {
   return (
@@ -63,7 +64,13 @@ function App() {
       {/* Collge */}
 
       {collegeRoute}
-  
+
+
+  {/* Company */}
+
+      {CompanyRoute}
+
+      
         {/* Public certificate verification */}
         <Route path='/verify/:code' element={<VerificationPage />} />
 
