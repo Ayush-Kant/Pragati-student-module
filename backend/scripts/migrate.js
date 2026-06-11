@@ -29,6 +29,14 @@ async function runMigrations() {
         users, 
         auth_users, 
         college_stats,
+        company_stats,
+        college_profiles,
+<<<<<<< HEAD
+=======
+        dashboard_stats,
+        dashboard_activities,
+        dashboard_reports,
+>>>>>>> 58a8a53a33b49bd9f036a85f4634dd94794f37b4
         students,
         admin_audit_log
       CASCADE;
@@ -38,8 +46,15 @@ async function runMigrations() {
     const migrationsDir = path.join(__dirname, "../migrations");
     const migrationFiles = [
       "001_create_users_mentors.sql",
+      "004_create_college_management.sql",
+      "005_create_company_management.sql",
       "003_create_admin_dashboard.sql",
       "002_create_content_tables.sql",
+<<<<<<< HEAD
+      "006_create_college_profiles.sql",
+=======
+      "007_create_dashboard_tables.sql",
+>>>>>>> 58a8a53a33b49bd9f036a85f4634dd94794f37b4
       "Students.sql",
     ];
 
