@@ -1,14 +1,16 @@
 import { Toaster } from "react-hot-toast";
 import { Routes, Route, Navigate } from 'react-router-dom';
 
+import PrivateRoute from "./routes/PrivateRoute";
+import RoleRoute from "./routes/RoleRoute";
+
 // ── Auth Pages  ──
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
 
 
 // ── Student Module ───────────────────────────────────────────────────────────
-import { AuthProvider} from './context/AuthContext';
-import PrivateRoute from "./routes/PrivateRoute";
+import { AuthProvider } from './context/AuthContext';
 import VerificationPage from './features/student/pages/public/VerificationPage';
 import StudentRoutes from "./features/student/routes/StudentRoutes";
 import AdminRoute from "./features/admin/routes/AdminRoutes";
@@ -37,15 +39,17 @@ function App() {
 
         {/* ── Mentor (protected) ─────────────────────────────────────────── */}
         <Route element={<PrivateRoute />}>
-          <Route path="/mentor" element={<MentorLayout />}>
-            <Route index element={<Activities />} />
-            <Route path="activities" element={<Activities />} />
-            <Route path="activities/create" element={<CreateActivity />} />
-            <Route path="activities/templates" element={<ActivityTemplates />} />
-            <Route path="activities/deadlines" element={<ManageDeadlines />} />
-            <Route path="activities/bulk-assign" element={<BulkAssignActivity />} />
-            <Route path="activities/calendar" element={<ActivityCalendar />} />
-            {/* Add other mentor routes here as needed */}
+          <Route element={<RoleRoute allowedRoles={['mentor']} />}>
+            <Route path="/mentor" element={<MentorLayout />}>
+              <Route index element={<Activities />} />
+              <Route path="activities" element={<Activities />} />
+              <Route path="activities/create" element={<CreateActivity />} />
+              <Route path="activities/templates" element={<ActivityTemplates />} />
+              <Route path="activities/deadlines" element={<ManageDeadlines />} />
+              <Route path="activities/bulk-assign" element={<BulkAssignActivity />} />
+              <Route path="activities/calendar" element={<ActivityCalendar />} />
+              {/* Add other mentor routes here as needed */}
+            </Route>
           </Route>
         </Route>
 
