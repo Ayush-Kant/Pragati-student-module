@@ -137,3 +137,28 @@ export const fetchActivityFeed = async () => {
   const response = await API.get("/api/admin/dashboard/activity-feed");
   return response.data;
 };
+
+// Student Detail APIs
+export const getStudentById = async (id) => {
+  try {
+    const response = await API.get(
+      `/api/v1/admin/students/${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getStudentProgress = async (id) => {
+  try {
+    const response = await API.get(
+      `/api/v1/admin/students/${id}/progress`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
