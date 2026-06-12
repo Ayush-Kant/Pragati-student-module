@@ -32,7 +32,9 @@ app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 
 app.use('/api/v1/admin/colleges', adminCollegeRoutes);
 
-app.use("/api/mentor", contentRoutes);
+app.use("/api/mentor", mentorRoutes);
+
+app.use("/api/mentor/content", contentRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.listen(PORT, () => {
