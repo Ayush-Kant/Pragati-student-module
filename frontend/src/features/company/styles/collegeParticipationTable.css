@@ -71,6 +71,6 @@
   }
 
   .college-table-wrapper table {
-    min-width: 640px;
+    min-width: 100%;
   }
 }
