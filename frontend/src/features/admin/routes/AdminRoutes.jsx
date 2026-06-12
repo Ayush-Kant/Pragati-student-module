@@ -19,10 +19,8 @@ import ActiveDrives from "../pages/ActiveDrives";
 import CompanyRankings from "../pages/CompanyRankings";
 
 const AdminRoute = (
-  <Route element={<PrivateRoute />}>
-    <Route element={<RoleRoute allowedRoles={['admin']} />}>
       <Route path="admin" element={<AdminLayout />}>
-        <Route index path="dashboard" element={<AdminDashboard />} />
+        <Route index element={<AdminDashboard />} />
         <Route path='profile' element={<AdminProfile />} />
         <Route path='companies' element={<AdminCompanies />} />
         <Route path="companies/rankings" element={<CompanyRankings />} />
@@ -38,8 +36,6 @@ const AdminRoute = (
         <Route path='notification' element={<AdminNotifications />} />
         <Route path='disputes' element={<AdminDisputes />} />
       </Route>
-    </Route>
-  </Route>
 )
 
 export default AdminRoute;
