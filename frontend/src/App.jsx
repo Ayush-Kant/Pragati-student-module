@@ -5,7 +5,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // ── Auth Pages  ──
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
-
+import EditProfileForm from "./features/college/profile/components/edit-profile/EditProfileForm";
 
 // ── Student Module ───────────────────────────────────────────────────────────
 import { AuthProvider} from './context/AuthContext';
@@ -23,7 +23,7 @@ function App() {
       <Toaster />
       <Routes>
         
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<EditProfileForm />} />
         
         {/* ── Auth Routes ────────────────────────────────────────── */}
         <Route path='/login' element={<LoginPage />} />
