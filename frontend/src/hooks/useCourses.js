@@ -85,7 +85,7 @@ export function useCourses() {
       setLoading(false);
     }
   };
-  
+
   return {
     courses,
     currentCourse,

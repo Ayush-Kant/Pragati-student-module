@@ -67,7 +67,6 @@ export default function Step1BasicInfo({
   const drives = [
     { driveId: 1, driveName: "Winter Backend Engineering cohort 2026" },
     { driveId: 2, driveName: "Happy" },
-
   ];
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
