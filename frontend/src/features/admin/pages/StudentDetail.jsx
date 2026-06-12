@@ -1,49 +1,7 @@
-// import { useOutletContext } from "react-router-dom";
-// import useStudentDetail from "../hooks/useStudentDetail";
-
-// const StudentDetail = () => {
-//     const { darkMode } = useOutletContext();
-
-//     const {
-//         student,
-//         drives,
-//         loading,
-//         error,
-//     } = useStudentDetail();
-
-//     if (loading) {
-//         return <div>Loading...</div>;
-//     }
-
-//     if (error) {
-//         return <div>{error}</div>;
-//     }
-
-//     return (
-//         <div className={darkMode ? "text-white" : "text-black"}>
-//             <h1>Student Detail</h1>
-
-//             <p>Name: {student?.name}</p>
-//             <p>Email: {student?.email}</p>
-//             <p>College: {student?.college?.name}</p>
-
-//             <h2>Drives</h2>
-
-//             {drives.map((drive) => (
-//                 <div key={drive.driveId}>
-//                     <p>{drive.driveTitle}</p>
-//                     <p>{drive.currentStage}</p>
-//                 </div>
-//             ))}
-//         </div>
-//     );
-// };
-
-// export default StudentDetail;
-
 import { useNavigate, useOutletContext } from "react-router-dom";
 import useStudentDetail from "../hooks/useStudentDetail";
 import StudentProgressTimeline from "../components/StudentProgressTimeline";
+import StudentStatusBadge from "../components/StudentStatusBadge";
 
 const StudentDetail = () => {
     const { darkMode } = useOutletContext();
@@ -89,8 +47,8 @@ const StudentDetail = () => {
             {/* Header */}
             <div
                 className={`rounded-lg shadow p-6 transition ${darkMode
-                        ? "bg-slate-900 text-white shadow-black/30"
-                        : "bg-white text-slate-900 shadow-slate-200"
+                    ? "bg-slate-900 text-white shadow-black/30"
+                    : "bg-white text-slate-900 shadow-slate-200"
                     }`}
             >
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -119,16 +77,9 @@ const StudentDetail = () => {
                             {student.email}
                         </p>
 
-                        <span
-                            className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${student.status === "verified"
-                                    ? "bg-green-100 text-green-700"
-                                    : student.status === "blocked"
-                                        ? "bg-red-100 text-red-700"
-                                        : "bg-yellow-100 text-yellow-700"
-                                }`}
-                        >
-                            {student.status}
-                        </span>
+                        <div className="mt-2">
+                            <StudentStatusBadge status={student.status} />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -136,8 +87,8 @@ const StudentDetail = () => {
             {/* Academic Details */}
             <div
                 className={`rounded-lg shadow p-6 transition ${darkMode
-                        ? "bg-slate-900 text-white shadow-black/30"
-                        : "bg-white text-slate-900 shadow-slate-200"
+                    ? "bg-slate-900 text-white shadow-black/30"
+                    : "bg-white text-slate-900 shadow-slate-200"
                     }`}
             >
                 <h2 className="text-xl font-semibold mb-4">
@@ -176,8 +127,8 @@ const StudentDetail = () => {
                                 <span
                                     key={skill}
                                     className={`px-3 py-1 rounded-full text-sm ${darkMode
-                                            ? "bg-slate-800 text-slate-200"
-                                            : "bg-gray-100 text-slate-700"
+                                        ? "bg-slate-800 text-slate-200"
+                                        : "bg-gray-100 text-slate-700"
                                         }`}
                                 >
                                     {skill}
@@ -192,8 +143,8 @@ const StudentDetail = () => {
             {drive && (
                 <div
                     className={`rounded-lg shadow p-6 transition ${darkMode
-                            ? "bg-slate-900 text-white shadow-black/30"
-                            : "bg-white text-slate-900 shadow-slate-200"
+                        ? "bg-slate-900 text-white shadow-black/30"
+                        : "bg-white text-slate-900 shadow-slate-200"
                         }`}
                 >
                     <StudentProgressTimeline
@@ -203,7 +154,7 @@ const StudentDetail = () => {
             )}
 
             {/* Drive Details */}
-            {drive && (
+            {drive ? (
                 <div
                     className={`rounded-lg shadow p-6 transition ${darkMode
                             ? "bg-slate-900 text-white shadow-black/30"
@@ -254,6 +205,15 @@ const StudentDetail = () => {
                             </blockquote>
                         </div>
                     </div>
+                </div>
+            ) : (
+                <div
+                    className={`rounded-lg shadow p-6 text-center ${darkMode
+                            ? "bg-slate-900 text-slate-300"
+                            : "bg-white text-slate-600"
+                        }`}
+                >
+                    No drive progress available for this student.
                 </div>
             )}
 
