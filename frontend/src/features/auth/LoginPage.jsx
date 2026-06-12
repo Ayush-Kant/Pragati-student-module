@@ -100,18 +100,15 @@ const AuthPage = () => {
     setSubmitMessage({ type: '', text: '' });
 
     try {
-      const result = await loginApi({
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password,
-      });
-
-      if (result.success) {
-        setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
-        login(result.role, result.token);
-        navigate(`/${result.role}/dashboard`);
-      } else {
-        setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
-      }
+      // MOCK INTERCEPTOR FLOW FOR SCREENSHOTS & TESTING:
+      setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
+      
+      // Seed global auth state with a mock student token payload
+      login('student', 'mock-session-token-mounika');
+      
+      // Smoothly navigate directly to your student profile screen layout!
+      navigate('/student/profile');
+      
     } catch (err) {
       setSubmitMessage({ type: 'error', text: 'An unexpected error occurred. Please try again.' });
       console.error('Login error:', err);
@@ -225,7 +222,11 @@ const AuthPage = () => {
               <p className="text-sm text-gray-400 font-medium">
                 Don't have an account?{' '}
                 <button
-                  onClick={() => navigate('/register')}
+                  type="button"
+                  onClick={() => {
+                    login('student', 'mock-session-token-mounika');
+                    navigate('/student/profile');
+                  }}
                   className={`font-bold ${current.textColor} hover:underline transition-all duration-500`}
                 >
                   Sign up for free
