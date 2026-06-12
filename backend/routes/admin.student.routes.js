@@ -7,7 +7,7 @@ import * as c from '../controllers/admin.student.controller.js';
 const router  = express.Router();
 
 
-// router.use(authMiddleware, roleMiddleware('admin'));
+router.use(authMiddleware, roleMiddleware('admin'));
 
 
 router.get('/',                        c.listStudents);
