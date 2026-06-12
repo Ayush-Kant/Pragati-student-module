@@ -37,7 +37,7 @@ export const TrainingAnalyticsCards = () => {
   ];
 
   return (
-    <div className="w-full grid grid-cols-4 gap-6 mb-6">
+    <div className="training-stats-grid">
       {cards.map((card, index) => {
         const Icon = card.icon;
         return (

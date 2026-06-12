@@ -6,7 +6,7 @@ import { TrainingAnalyticsCards } from '../components/TrainingAnalyticsCards';
 import { TrainingFilters } from '../components/TrainingFilters';
 import { TrainingTable } from '../components/TrainingTable';
 import { TrainingStatusBadge } from '../components/TrainingStatusBadge';
-
+import "../../styles/companyDashboard.css";
 const INITIAL_DATA = [
   {
     id: 1,
