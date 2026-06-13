@@ -1,6 +1,4 @@
 // ProfilePage.jsx
-// Main Student Profile Page — UI matches design reference exactly
-
 import { useState } from "react";
 import ProfileEditForm from "../../components/profile/ProfileEditForm";
 
@@ -46,6 +44,22 @@ const DUMMY_PROFILE = {
   batch: "2021–2025",
   status: "eligible",
   resumeUrl: null,
+  // Sourced portfolio links from profile data directly (Fixes Comment #4)
+  portfolioLinks: {
+    github: "https://github.com/mounikag",
+    linkedin: "https://linkedin.com/in/mounikag",
+    website: "https://mounikaportfolio.com"
+  }
+};
+
+// Restored skill icon mappings for consistency (Fixes Comment #3)
+const SKILL_ICONS = {
+  "React":    { bg: "bg-blue-50",   text: "text-blue-600",   icon: "⚛️" },
+  "Node.js":  { bg: "bg-green-50",  text: "text-green-600",  icon: "🟢" },
+  "Python":   { bg: "bg-yellow-50", text: "text-yellow-600", icon: "🐍" },
+  "SQL":      { bg: "bg-gray-100",  text: "text-gray-700",   icon: "𗄞" },
+  "Git":      { bg: "bg-red-50",    text: "text-red-600",    icon: "🔀" },
+  "default":  { bg: "bg-gray-50",   text: "text-gray-600",   icon: "💡" },
 };
 
 const InfoField = ({ label, value }) => (
@@ -59,14 +73,9 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState(DUMMY_PROFILE);
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [validationErrors, setValidationErrors] = useState({});
   
-  // Dynamic Portfolio Links State Setup
-  const [portfolioLinks, setPortfolioLinks] = useState({
-    github: "https://github.com/mounikag",
-    linkedin: "https://linkedin.com/in/mounikag",
-    website: "https://mounikaportfolio.com"
-  });
+  // SINGLE validationErrors state declaration (Fixes Comment #1)
+  const [validationErrors, setValidationErrors] = useState({});
 
   const [projects, setProjects] = useState([
     {
@@ -78,16 +87,24 @@ const ProfilePage = () => {
     }
   ]);
 
-  // Handle link changes dynamically with live validation integration
   const handleLinkChange = (field, value) => {
-    const updatedLinks = { ...portfolioLinks, [field]: value };
-    setPortfolioLinks(updatedLinks);
+    const updatedLinks = { ...profile.portfolioLinks, [field]: value };
+    setProfile(prev => ({ ...prev, portfolioLinks: updatedLinks }));
     
     const validation = validateSocialLinks(updatedLinks);
     setValidationErrors(validation.errors);
   };
 
   const handleSave = (updatedData) => {
+    // Perform links validation during save as well (Fixes Comment #2)
+    const currentLinks = updatedData.portfolioLinks || profile.portfolioLinks;
+    const validation = validateSocialLinks(currentLinks);
+    
+    if (!validation.isValid) {
+      setValidationErrors(validation.errors);
+      return; // Stop save if links are invalid
+    }
+
     setProfile((prev) => ({ ...prev, ...updatedData }));
     setIsEditing(false);
     setShowSuccess(true);
@@ -180,11 +197,15 @@ const ProfilePage = () => {
               <h3 className="text-base font-bold text-gray-800">Skills</h3>
               <div className="w-8 h-0.5 bg-orange-400 mb-5" />
               <div className="flex flex-wrap gap-2">
-                {profile.skills.map((skill) => (
-                  <div key={skill} className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2 border border-gray-100">
-                    <span className="text-xs font-semibold text-gray-700">{skill}</span>
-                  </div>
-                ))}
+                {profile.skills.map((skill) => {
+                  const config = SKILL_ICONS[skill] || SKILL_ICONS["default"];
+                  return (
+                    <div key={skill} className={`flex items-center gap-1.5 rounded-xl px-3 py-2 border border-gray-100 ${config.bg}`}>
+                      <span className="text-sm">{config.icon}</span>
+                      <span className={`text-xs font-semibold ${config.text}`}>{skill}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -199,7 +220,7 @@ const ProfilePage = () => {
                 <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">GitHub Profile</label>
                 <input 
                   type="url" 
-                  value={portfolioLinks.github} 
+                  value={profile.portfolioLinks.github} 
                   onChange={(e) => handleLinkChange("github", e.target.value)}
                   className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.github ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`}
                 />
@@ -209,7 +230,7 @@ const ProfilePage = () => {
                 <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">LinkedIn Profile</label>
                 <input 
                   type="url" 
-                  value={portfolioLinks.linkedin} 
+                  value={profile.portfolioLinks.linkedin} 
                   onChange={(e) => handleLinkChange("linkedin", e.target.value)}
                   className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.linkedin ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`}
                 />
@@ -219,7 +240,7 @@ const ProfilePage = () => {
                 <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Personal Website</label>
                 <input 
                   type="url" 
-                  value={portfolioLinks.website} 
+                  value={profile.portfolioLinks.website} 
                   onChange={(e) => handleLinkChange("website", e.target.value)}
                   className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.website ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`}
                 />
