@@ -4,7 +4,7 @@
 import { useState } from "react";
 import ProfileEditForm from "../../components/profile/ProfileEditForm";
 
-// ── INLINED VALIDATION LOGIC & COMPONENTS ──
+// ── VALIDATION LOGIC ──
 const validateSocialLinks = (links) => {
   const errors = {};
   const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
@@ -48,15 +48,6 @@ const DUMMY_PROFILE = {
   resumeUrl: null,
 };
 
-const SKILL_ICONS = {
-  "React":    { bg: "bg-blue-50",   icon: "⚛️" },
-  "Node.js":  { bg: "bg-green-50",  icon: "🟢" },
-  "Python":   { bg: "bg-yellow-50", icon: "🐍" },
-  "SQL":      { bg: "bg-gray-100",  icon: "𗄞" },
-  "Git":      { bg: "bg-red-50",    icon: "🔀" },
-  "default":  { bg: "bg-gray-50",   icon: "💡" },
-};
-
 const InfoField = ({ label, value }) => (
   <div className="flex flex-col gap-1">
     <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">{label}</span>
@@ -68,9 +59,15 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState(DUMMY_PROFILE);
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
   
- //  To a clean, default empty state:
-const [validationErrors, setValidationErrors] = useState({});
+  // Dynamic Portfolio Links State Setup
+  const [portfolioLinks, setPortfolioLinks] = useState({
+    github: "https://github.com/mounikag",
+    linkedin: "https://linkedin.com/in/mounikag",
+    website: "https://mounikaportfolio.com"
+  });
+
   const [projects, setProjects] = useState([
     {
       id: 1,
@@ -80,6 +77,15 @@ const [validationErrors, setValidationErrors] = useState({});
       codeLink: "#",
     }
   ]);
+
+  // Handle link changes dynamically with live validation integration
+  const handleLinkChange = (field, value) => {
+    const updatedLinks = { ...portfolioLinks, [field]: value };
+    setPortfolioLinks(updatedLinks);
+    
+    const validation = validateSocialLinks(updatedLinks);
+    setValidationErrors(validation.errors);
+  };
 
   const handleSave = (updatedData) => {
     setProfile((prev) => ({ ...prev, ...updatedData }));
@@ -173,9 +179,9 @@ const [validationErrors, setValidationErrors] = useState({});
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h3 className="text-base font-bold text-gray-800">Skills</h3>
               <div className="w-8 h-0.5 bg-orange-400 mb-5" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex flex-wrap gap-2">
                 {profile.skills.map((skill) => (
-                  <div key={skill} className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2.5 border border-gray-100">
+                  <div key={skill} className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2 border border-gray-100">
                     <span className="text-xs font-semibold text-gray-700">{skill}</span>
                   </div>
                 ))}
@@ -193,18 +199,31 @@ const [validationErrors, setValidationErrors] = useState({});
                 <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">GitHub Profile</label>
                 <input 
                   type="url" 
-                  defaultValue="https://github.com/mounikag" 
+                  value={portfolioLinks.github} 
+                  onChange={(e) => handleLinkChange("github", e.target.value)}
                   className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.github ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`}
                 />
                 <ValidationAlert message={validationErrors.github} />
               </div>
               <div>
                 <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">LinkedIn Profile</label>
-                <input type="url" defaultValue="https://linkedin.com/in/mounikag" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50/50 font-semibold text-gray-700" />
+                <input 
+                  type="url" 
+                  value={portfolioLinks.linkedin} 
+                  onChange={(e) => handleLinkChange("linkedin", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.linkedin ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`}
+                />
+                <ValidationAlert message={validationErrors.linkedin} />
               </div>
               <div>
                 <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Personal Website</label>
-                <input type="url" defaultValue="https://mounikaportfolio.com" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50/50 font-semibold text-gray-700" />
+                <input 
+                  type="url" 
+                  value={portfolioLinks.website} 
+                  onChange={(e) => handleLinkChange("website", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.website ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`}
+                />
+                <ValidationAlert message={validationErrors.website} />
               </div>
             </div>
           </div>
@@ -220,8 +239,10 @@ const [validationErrors, setValidationErrors] = useState({});
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {projects.map((project) => (
                 <div key={project.id} className="p-4 border border-gray-100 rounded-2xl bg-gray-50/50 relative group">
-                  <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleDeleteProject(project.id)} className="text-gray-400 hover:text-red-600 text-xs bg-white border border-gray-200 p-1.5 rounded-lg shadow-sm">🗑️</button>
+                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => handleDeleteProject(project.id)} className="text-gray-400 hover:text-red-600 text-xs bg-white border border-gray-200 p-1.5 rounded-lg shadow-sm">
+                      🗑️
+                    </button>
                   </div>
                   <h4 className="font-bold text-gray-800 text-sm">{project.title}</h4>
                   <p className="text-xs text-gray-500 mt-1 leading-relaxed">{project.description}</p>
@@ -232,7 +253,7 @@ const [validationErrors, setValidationErrors] = useState({});
         </div>
 
         {isEditing && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
             <ProfileEditForm profile={profile} onSave={handleSave} onCancel={() => setIsEditing(false)} />
           </div>
         )}
