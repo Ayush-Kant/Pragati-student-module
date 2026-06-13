@@ -1,66 +1,21 @@
+<<<<<<< HEAD
 import { useState } from 'react';
 
 import ProfileEditForm from '../../components/profile/ProfileEditForm';
 import ProjectCard from '../../components/profile/ProjectCard';
 import ValidationAlert from '../../components/profile/ValidationAlert';
+=======
+// ProfilePage.jsx
+import { useState } from "react";
+import ProfileEditForm from "../../components/profile/ProfileEditForm";
+>>>>>>> 39c36154 (fix: remove duplicate state, map links from profile state, restore skill icons, and enforce submit validation)
 
 <<<<<<< HEAD
 // Basic URL validation used for social links
 const validateSocialLinks = (links = {}) => {
-    const errors = {};
-    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
-=======
-// ── VALIDATION LOGIC ──
-const validateSocialLinks = (links) => {
-  const errors = {};
-  const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
->>>>>>> ee9e2aca (fix: resolve review comments on structure, dynamic values, and valid validation mapping)
-
-    if (links.github && !urlRegex.test(links.github)) {
-        errors.github = 'Please enter a valid GitHub URL (e.g., https://github.com/username)';
-    }
-    if (links.linkedin && !urlRegex.test(links.linkedin)) {
-        errors.linkedin = 'Please enter a valid LinkedIn profile link';
-    }
-    if (links.website && !urlRegex.test(links.website)) {
-        errors.website = 'Please enter a valid website portfolio domain URL';
-    }
-
-    return { isValid: Object.keys(errors).length === 0, errors };
-};
-
-// ── MOCK SYSTEM CONSTANTS ──
-const DUMMY_PROFILE = {
-    name: 'Vaishnavi Chaudhari',
-    phone: '9876543210',
-    city: 'Pune',
-    department: 'Computer Engineering',
-    cgpa: 8.7,
-    skills: ['React', 'Node.js', 'Python', 'SQL', 'Git'],
-    email: 'vaishnavi@college.edu',
-    rollNo: '2021CE047',
-    batch: '2021–2025',
-    status: 'eligible',
-    resumeUrl: null,
-    portfolioLinks: {
-        github: 'https://github.com/mounikag',
-        linkedin: 'https://linkedin.com/in/mounikag',
-        website: 'https://mounikaportfolio.com',
-    },
-};
-
-<<<<<<< HEAD
-const SKILL_ICONS = {
-    React: { bg: 'bg-blue-50', icon: '⚛️' },
-    'Node.js': { bg: 'bg-green-50', icon: '🟢' },
-    Python: { bg: 'bg-yellow-50', icon: '🐍' },
-    SQL: { bg: 'bg-gray-100', icon: '🗄️' },
-    Git: { bg: 'bg-red-50', icon: '🔀' },
-    default: { bg: 'bg-gray-50', icon: '💡' },
     import { useState } from 'react';
 
     import ProfileEditForm from '../../components/profile/ProfileEditForm';
-    import ProjectCard from '../../components/profile/ProjectCard';
     import ValidationAlert from '../../components/profile/ValidationAlert';
 
     // Basic URL validation used for social links
@@ -81,7 +36,6 @@ const SKILL_ICONS = {
         return { isValid: Object.keys(errors).length === 0, errors };
     };
 
-    // ── MOCK SYSTEM CONSTANTS ──
     const DUMMY_PROFILE = {
         name: 'Vaishnavi Chaudhari',
         phone: '9876543210',
@@ -309,43 +263,5 @@ const SKILL_ICONS = {
     };
 
     export default ProfilePage;
-                        < div className = "grid grid-cols-1 md:grid-cols-2 gap-4" >
-    {
-        projects.map((project) => (
-            <div key={project.id} className="p-4 border border-gray-100 rounded-2xl bg-gray-50/50 relative group">
-                <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleDeleteProject(project.id)} className="text-gray-400 hover:text-red-600 text-xs bg-white border border-gray-200 p-1.5 rounded-lg shadow-sm">🗑️</button>
-                </div>
-                <h4 className="font-bold text-gray-800 text-sm">{project.title}</h4>
-                <p className="text-xs text-gray-500 mt-1 leading-relaxed">{project.description}</p>
-            </div>
-        ))
-    }
-                        </div >
-                    </div >
-                </div >
-
-    { isEditing && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
-            <ProfileEditForm initialData={profile} onSave={handleSave} onCancel={() => setIsEditing(false)} onLinkChange={handleLinkChange} validationErrors={validationErrors} />
-        </div>
-    )}
-            </div >
-        </div >
-<<<<<<< HEAD
-    );
-=======
-
-        {isEditing && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
-            <ProfileEditForm profile={profile} onSave={handleSave} onCancel={() => setIsEditing(false)} />
-          </div>
-        )}
-
-      </div>
-    </div>
-  );
->>>>>>> ee9e2aca (fix: resolve review comments on structure, dynamic values, and valid validation mapping)
-};
-
-export default ProfilePage;
+    className = {`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.linkedin ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`
+}
