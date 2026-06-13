@@ -24,14 +24,10 @@ import CertificatesPage from "../pages/public/CertificatesPage";
 
 const studentRoute = (
   <>
-    {/* Public Override for Screenshots */}
-    <Route path="/" element={<ProfilePage />} />
-    <Route path="student/profile" element={<ProfilePage />} />
-
     {/* Public */}
-    <Route path="login"           element={<LoginPage />} />
-    <Route path="register"        element={<RegisterPage />} />
-    <Route path="verify/:code"    element={<VerificationPage />} />
+    <Route path="login"          element={<LoginPage />} />
+    <Route path="register"       element={<RegisterPage />} />
+    <Route path="verify/:code"   element={<VerificationPage />} />
 
     {/* Private */}
     <Route element={<PrivateRoute />}>
@@ -40,6 +36,7 @@ const studentRoute = (
           <Route index element={<Navigate to="dashboard" replace />} /> 
           <Route path="onboarding"              element={<OnboardingWizard />} />
           <Route path="dashboard"               element={<DashboardPage />} />
+          <Route path="profile"                 element={<ProfilePage />} />
           <Route path="courses"                 element={<CoursesPage />} />
           <Route path="courses/:courseId"       element={<CourseDetailPage />} />
           <Route path="sessions"                element={<SessionsPage />} />
