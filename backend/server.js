@@ -11,6 +11,6 @@ app.use("/api/mentor", mentorRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
     app.listen(PORT, () => {
-        console.log(`âœ… Server running on PORT : ${PORT}`)
+        console.log(`✅ Server running on PORT : ${PORT}`)
     })
 })

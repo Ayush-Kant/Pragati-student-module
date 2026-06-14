@@ -1,4 +1,3 @@
--- base tables
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     full_name VARCHAR(255) NOT NULL,
@@ -7,7 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Ensure full_name exists if the table was already created
 ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
 
 CREATE TABLE IF NOT EXISTS mentors (
@@ -48,7 +46,6 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- dashboard related tables
 CREATE TABLE IF NOT EXISTS recruitment_drives (
     id SERIAL PRIMARY KEY,
     mentor_id INT REFERENCES mentors(id) ON DELETE CASCADE,
@@ -75,11 +72,23 @@ CREATE TABLE IF NOT EXISTS student_progress (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives(mentor_id);
-CREATE INDEX IF NOT EXISTS idx_live_sessions_mentor_id_scheduled_at ON live_sessions(mentor_id, scheduled_at);
-CREATE INDEX IF NOT EXISTS idx_student_progress_student_id ON student_progress(student_id);
-CREATE INDEX IF NOT EXISTS idx_student_progress_drive_id ON student_progress(drive_id);
+
+DO $$
+BEGIN
+    IF to_regclass('public.live_sessions') IS NOT NULL THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_live_sessions_mentor_id_scheduled_at ON live_sessions(mentor_id, scheduled_at)';
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF to_regclass('public.student_progress') IS NOT NULL THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_student_progress_student_id ON student_progress(student_id)';
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_student_progress_drive_id ON student_progress(drive_id)';
+    END IF;
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_submissions_assessment_id ON submissions(assessment_id);
 CREATE INDEX IF NOT EXISTS idx_assessments_course_id ON assessments(course_id);
 CREATE INDEX IF NOT EXISTS idx_courses_mentor_id ON courses(mentor_id);
