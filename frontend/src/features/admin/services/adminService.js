@@ -137,3 +137,107 @@ export const fetchActivityFeed = async () => {
   const response = await API.get("/api/admin/dashboard/activity-feed");
   return response.data;
 };
+
+// Student Detail APIs
+export const getStudentById = async (id) => {
+  try {
+    const response = await API.get(
+      `/api/v1/admin/students/${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getStudentProgress = async (id) => {
+  try {
+    const response = await API.get(
+      `/api/v1/admin/students/${id}/progress`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getStudents = async (params = {}) => {
+  try {
+    const response = await API.get(
+      "/api/v1/admin/students",
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    throw error;
+  }
+};
+
+export const verifyStudent = async (studentId) => {
+  try {
+    const response = await API.patch(
+      `/api/v1/admin/students/${studentId}/verify`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying student:", error);
+    throw error;
+  }
+};
+
+export const blockStudent = async (studentId, reason) => {
+  try {
+    const response = await API.patch(
+      `/api/v1/admin/students/${studentId}/block`,
+      { reason }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error blocking student:", error);
+    throw error;
+  }
+};
+
+export const unblockStudent = async (studentId) => {
+  try {
+    const response = await API.patch(
+      `/api/v1/admin/students/${studentId}/unblock`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error unblocking student:", error);
+    throw error;
+  }
+};
+
+export const resetStudentPassword = async (studentId) => {
+  try {
+    const response = await API.post(
+      `/api/v1/admin/students/${studentId}/reset-pw`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    throw error;
+  }
+};
+
+export const exportStudents = async (params = {}) => {
+  try {
+    const response = await API.get(
+      "/api/v1/admin/students/export",
+      {
+        params,
+        responseType: "blob",
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error exporting students:", error);
+    throw error;
+  }
+};
