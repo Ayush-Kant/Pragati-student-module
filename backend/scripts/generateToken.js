@@ -1,16 +1,17 @@
+import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 
-const generateToken = (user) => {
-  return jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "7d",
-    },
-  );
-};
+dotenv.config();
 
-export default generateToken;
+const token = jwt.sign(
+  {
+    companyId: "11111111-1111-1111-1111-111111111111",
+  },
+  process.env.JWT_SECRET,
+  {
+    expiresIn: "7d",
+  },
+);
+
+console.log("\nTOKEN:\n");
+console.log(token);

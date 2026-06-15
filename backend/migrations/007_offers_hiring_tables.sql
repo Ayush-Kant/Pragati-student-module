@@ -130,6 +130,59 @@ CREATE TABLE IF NOT EXISTS candidate_drive_mapping (
     UNIQUE (candidate_id, drive_id)
 );
 
+CREATE TABLE IF NOT EXISTS candidates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    college_id UUID,
+    current_location VARCHAR(255),
+    resume_url TEXT,
+    graduation_year INTEGER,
+    cgpa NUMERIC(4, 2),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS interviews_v2 (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    drive_id UUID NOT NULL REFERENCES recruitment_drives_v2 (id) ON DELETE CASCADE,
+    candidate_id UUID NOT NULL REFERENCES candidates (id) ON DELETE CASCADE,
+    round_number INTEGER NOT NULL,
+    mode VARCHAR(50) CHECK (
+        mode IN ('ONLINE', 'OFFLINE', 'HYBRID')
+    ),
+    scheduled_at TIMESTAMPTZ NOT NULL,
+    interviewer_name VARCHAR(255),
+    meeting_link TEXT,
+    feedback TEXT,
+    score NUMERIC(5, 2),
+    status VARCHAR(50) DEFAULT 'SCHEDULED' CHECK (
+        status IN (
+            'SCHEDULED',
+            'COMPLETED',
+            'CANCELLED',
+            'NO_SHOW'
+        )
+    ),
+    result VARCHAR(50) CHECK (
+        result IN ('PASS', 'FAIL', 'PENDING')
+    ),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_candidates_email ON candidates (email);
+
+CREATE INDEX idx_candidates_college ON candidates (college_id);
+
+CREATE INDEX idx_interviews_v2_drive ON interviews_v2 (drive_id);
+
+CREATE INDEX idx_interviews_v2_candidate ON interviews_v2 (candidate_id);
+
+CREATE INDEX idx_interviews_v2_scheduled ON interviews_v2 (scheduled_at);
+
 CREATE INDEX idx_offers_v2_drive ON offers_v2 (drive_id);
 
 CREATE INDEX idx_offers_v2_candidate ON offers_v2 (candidate_id);

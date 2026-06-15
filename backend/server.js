@@ -10,6 +10,7 @@ import companyRoutes from "./modules/company/routes/companyProfile.routes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 import offerRoutes from "./modules/offers/routes/offer.routes.js";
+import reportsRoutes from "./modules/companyReports/routes/reports.routes.js";
 
 import dotenv from "dotenv";
 
@@ -45,6 +46,8 @@ app.use("/api/mentor", contentRoutes);
 app.use("/api/v1/company", companyRoutes);
 
 app.use("/api/v1/company/offers", offerRoutes);
+
+app.use("/api/v1/company/reports", reportsRoutes);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
