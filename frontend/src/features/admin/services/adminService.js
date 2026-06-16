@@ -17,77 +17,52 @@ export const updateAdminProfile = async (profileData) => {
 //For college needing recruitment
 export const getNeedsRecruitment = async () => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/colleges/needs-recruitment"
-    );
+    const response = await API.get("/api/v1/admin/colleges/needs-recruitment");
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 //To fetch rankings of college
 export const getCollegeRankings = async () => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/colleges/rankings"
-    );
+    const response = await API.get("/api/v1/admin/colleges/rankings");
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 export const approveCollege = async (id) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/approve`
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/approve`);
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     throw error;
   }
 };
 
-
-export const rejectCollege = async (
-  id,
-  reason
-) => {
+export const rejectCollege = async (id, reason) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/reject`,
-      {
-        reason
-      }
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/reject`, {
+      reason,
+    });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     throw error;
   }
 };
 
-
-export const suspendCollege = async (
-  id,
-  reason
-) => {
+export const suspendCollege = async (id, reason) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/suspend`,
-      {
-        reason
-      }
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/suspend`, {
+      reason,
+    });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     throw error;
   }
 };
