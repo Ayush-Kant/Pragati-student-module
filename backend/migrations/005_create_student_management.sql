@@ -46,3 +46,45 @@ CREATE INDEX idx_sdp_student           ON student_drive_progress(student_id);
 CREATE INDEX idx_sdp_drive             ON student_drive_progress(drive_id);
 
 
+INSERT INTO students (
+    full_name,
+    email,
+    gpa,
+    skills,
+    enrollment_year
+)
+VALUES (
+    'Rahul Sharma',
+    'rahul@test.com',
+    8.5,
+    ARRAY['MERN','Node.js'],
+    2023
+);
+
+INSERT INTO students (
+    full_name,
+    email,
+    gpa,
+    skills,
+    enrollment_year,
+    status
+)
+VALUES
+(
+    'Priya Patel',
+    'priya@test.com',
+    9.1,
+    ARRAY['Python','AI'],
+    2022,
+    'verified'
+),
+(
+    'Arjun Kumar',
+    'arjun@test.com',
+    7.8,
+    ARRAY['Java','Spring Boot'],
+    2023,
+    'blocked'
+);
+
+SELECT * FROM students;;
