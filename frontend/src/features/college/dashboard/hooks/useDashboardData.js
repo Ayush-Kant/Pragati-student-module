@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { dashboardService } from '../services/dashboardService';
 
 export const useDashboardData = () => {
-  // Setup data states matching responsibilities
+  // Setup data states matching component layout properties
   const [dashboardStats, setDashboardStats] = useState([]);
   const [activities, setActivities] = useState([]);
   const [placementData, setPlacementData] = useState([]);
@@ -20,21 +20,16 @@ export const useDashboardData = () => {
     setError(null);
     try {
       const response = await dashboardService.getDashboardSummary();
-      if (response.success && response.data) {
-        setDashboardStats(response.data.dashboardStats);
+      
+      // MAPPED TO MATCH TEAM DUMMY DATA STRUCTURE EXACTLY (Fixes Issue #2)
+      if (response && response.success && response.data) {
+        setDashboardStats(response.data.stats);
         setActivities(response.data.activities);
-        setPlacementData(response.data.placementData);
-        setRevenueData(response.data.revenueData);
-        setAdmissionsData(response.data.admissionsData);
-
-        // Verification Log prints details dynamically to your F12 Console
-        console.log("🔥 RISHABH'S METRICS VERIFICATION:", {
-          dashboardStats: response.data.dashboardStats,
-          activities: response.data.activities,
-          placementData: response.data.placementData,
-          revenueData: response.data.revenueData,
-          admissionsData: response.data.admissionsData,
-        });
+        setPlacementData(response.data.placements);
+        setRevenueData(response.data.revenue);
+        setAdmissionsData(response.data.admissions);
+        
+        // ❌ REMOVED VERIFICATION CONSOLE LOGS (Fixes Issue #4)
       }
     } catch (err) {
       setError(err.message || "An unexpected error occurred.");
@@ -43,12 +38,12 @@ export const useDashboardData = () => {
     }
   }, []);
 
-  // Fetch automatically on mount
+  // Fetch automatically on component layout initialization
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  // Expose states to components
+  // Expose system states and actions directly to view components
   return {
     dashboardStats,
     activities,
