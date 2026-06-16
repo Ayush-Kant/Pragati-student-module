@@ -12,7 +12,7 @@ API.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 API.interceptors.response.use(
@@ -23,7 +23,7 @@ API.interceptors.response.use(
       window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export const getAdminProfile = async () => {
@@ -39,77 +39,52 @@ export const updateAdminProfile = async (profileData) => {
 //For college needing recruitment
 export const getNeedsRecruitment = async () => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/colleges/needs-recruitment"
-    );
+    const response = await API.get("/api/v1/admin/colleges/needs-recruitment");
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 //To fetch rankings of college
 export const getCollegeRankings = async () => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/colleges/rankings"
-    );
+    const response = await API.get("/api/v1/admin/colleges/rankings");
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 export const approveCollege = async (id) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/approve`
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/approve`);
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     throw error;
   }
 };
 
-
-export const rejectCollege = async (
-  id,
-  reason
-) => {
+export const rejectCollege = async (id, reason) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/reject`,
-      {
-        reason
-      }
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/reject`, {
+      reason,
+    });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     throw error;
   }
 };
 
-
-export const suspendCollege = async (
-  id,
-  reason
-) => {
+export const suspendCollege = async (id, reason) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/suspend`,
-      {
-        reason
-      }
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/suspend`, {
+      reason,
+    });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     throw error;
   }
 };
@@ -141,9 +116,7 @@ export const fetchActivityFeed = async () => {
 // Student Detail APIs
 export const getStudentById = async (id) => {
   try {
-    const response = await API.get(
-      `/api/v1/admin/students/${id}`
-    );
+    const response = await API.get(`/api/v1/admin/students/${id}`);
 
     return response.data;
   } catch (error) {
@@ -153,9 +126,7 @@ export const getStudentById = async (id) => {
 
 export const getStudentProgress = async (id) => {
   try {
-    const response = await API.get(
-      `/api/v1/admin/students/${id}/progress`
-    );
+    const response = await API.get(`/api/v1/admin/students/${id}/progress`);
 
     return response.data;
   } catch (error) {
@@ -165,10 +136,7 @@ export const getStudentProgress = async (id) => {
 
 export const getStudents = async (params = {}) => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/students",
-      { params }
-    );
+    const response = await API.get("/api/v1/admin/students", { params });
     return response.data;
   } catch (error) {
     console.error("Error fetching students:", error);
@@ -179,7 +147,7 @@ export const getStudents = async (params = {}) => {
 export const verifyStudent = async (studentId) => {
   try {
     const response = await API.patch(
-      `/api/v1/admin/students/${studentId}/verify`
+      `/api/v1/admin/students/${studentId}/verify`,
     );
     return response.data;
   } catch (error) {
@@ -192,7 +160,7 @@ export const blockStudent = async (studentId, reason) => {
   try {
     const response = await API.patch(
       `/api/v1/admin/students/${studentId}/block`,
-      { reason }
+      { reason },
     );
     return response.data;
   } catch (error) {
@@ -204,7 +172,7 @@ export const blockStudent = async (studentId, reason) => {
 export const unblockStudent = async (studentId) => {
   try {
     const response = await API.patch(
-      `/api/v1/admin/students/${studentId}/unblock`
+      `/api/v1/admin/students/${studentId}/unblock`,
     );
     return response.data;
   } catch (error) {
@@ -216,7 +184,7 @@ export const unblockStudent = async (studentId) => {
 export const resetStudentPassword = async (studentId) => {
   try {
     const response = await API.post(
-      `/api/v1/admin/students/${studentId}/reset-pw`
+      `/api/v1/admin/students/${studentId}/reset-pw`,
     );
     return response.data;
   } catch (error) {
@@ -227,13 +195,10 @@ export const resetStudentPassword = async (studentId) => {
 
 export const exportStudents = async (params = {}) => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/students/export",
-      {
-        params,
-        responseType: "blob",
-      }
-    );
+    const response = await API.get("/api/v1/admin/students/export", {
+      params,
+      responseType: "blob",
+    });
 
     return response.data;
   } catch (error) {
