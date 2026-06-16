@@ -14,6 +14,9 @@ const pgConfig = {
   max: 5,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 15000,
+  ssl: process.env.NODE_ENV === "production"
+    ? { rejectUnauthorized: true }
+    : false,
 };
 
 export const pool = new Pool(pgConfig);

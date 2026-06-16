@@ -14,6 +14,9 @@ import AdminAssesment from "../adminAssesments/AdminAssesment";
 import AdminProfile from "../pages/AdminProfile";
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
+import CompanyDetail from "../pages/CompanyDetail";
+import ActiveDrives from "../pages/ActiveDrives";
+import CompanyRankings from "../pages/CompanyRankings";
 
 const AdminRoute = (
   <Route element={<PrivateRoute />}>

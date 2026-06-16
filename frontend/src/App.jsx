@@ -14,6 +14,7 @@ import AdminRoute from "./features/admin/routes/AdminRoutes";
 import mentorRoute from "./features/mentor/routes/MentorRoutes";
 import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
+import CompanyRoute from "./features/company/routes/CompanyRoute";
 
 function App() {
   return (
@@ -40,7 +41,13 @@ function App() {
       {/* Collge */}
 
       {collegeRoute}
-  
+
+
+  {/* Company */}
+
+      {CompanyRoute}
+
+      
         {/* Public certificate verification */}
         <Route path='/verify/:code' element={<VerificationPage />} />
 

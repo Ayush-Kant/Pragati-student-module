@@ -4,6 +4,7 @@ import mentorRoutes from "./routes/mentor.routes.js";
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
 import contentRoutes from "./routes/content.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
 
