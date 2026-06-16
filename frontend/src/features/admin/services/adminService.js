@@ -38,18 +38,9 @@ export const getCollegeRankings = async () => {
 
 export const approveCollege = async (id) => {
   try {
-<<<<<<< HEAD
     const response = await API.put(`/api/v1/admin/colleges/${id}/approve`);
     return response.data;
   } catch (error) {
-=======
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/approve`
-    );
-    return response.data;
-  }
-  catch (error) {
->>>>>>> parent of ebaa280 (Merge branch 'feature/admin-student-management-fe' of https://github.com/krishnabackup/Pragati into feature/admin-student-management-fe)
     throw error;
   }
 };
@@ -74,8 +65,4 @@ export const suspendCollege = async (id, reason) => {
   } catch (error) {
     throw error;
   }
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> parent of 281a7a8 (feat:Student Management Page)
