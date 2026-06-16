@@ -8,7 +8,6 @@ import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
-import adminStudentRoutes from './routes/admin.student.routes.js';
 
 const PORT = process.env.PORT || 5001;
 
@@ -16,8 +15,6 @@ const app = express();
 
 
 app.use("/api/mentor", mentorRoutes);
-
-app.use('/api/v1/admin/students', adminStudentRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
     app.listen(PORT, () => {
