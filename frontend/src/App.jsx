@@ -1,6 +1,5 @@
 import { Toaster } from "react-hot-toast";
 import { Routes, Route, Navigate } from 'react-router-dom';
-import ProfileManagementPage from './features/student/profile/pages/ProfileManagementPage';
 
 // ── Auth Pages  ──
 import LoginPage from "./features/auth/LoginPage";
@@ -39,7 +38,6 @@ function App() {
         {/* ── Student ───────────────────────────────────────────────── */}
         {StudentRoutes}
 
-<Route path='/student/manage-profile' element={<ProfileManagementPage/>}/>
       {/* Collge */}
 
       {collegeRoute}
