@@ -1,7 +1,11 @@
-import StudentManagement from "../pages/StudentManagement";
+import React from 'react'
 
 const AdminStudent = () => {
-  return <StudentManagement />;
-};
+  return (
+    <div>
+      Admin Students
+    </div>
+  )
+}
 
-export default AdminStudent;
+export default AdminStudent
