@@ -41,14 +41,7 @@ app.use("/api/mentor", contentRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
-<<<<<<< HEAD
   app.listen(PORT, () => {
     console.log(`✅ Server running on PORT : ${PORT}`);
   });
 });
-=======
-    app.listen(PORT, () => {
-        console.log(`âœ… Server running on PORT : ${PORT}`)
-    })
-})
->>>>>>> parent of cbdde3d (Fix backend schema and migration updates)

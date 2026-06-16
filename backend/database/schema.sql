@@ -17,8 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-<<<<<<< HEAD
-<< << << < HEAD = = = = = = =
+<< << << < HEAD << << << < HEAD = = = = = = =
 -- If users table already exists, just add the column safely
 ALTER TABLE users
 ADD COLUMN IF NOT EXISTS firebase_uid VARCHAR(128) UNIQUE;
@@ -28,10 +27,13 @@ ADD COLUMN IF NOT EXISTS firebase_uid VARCHAR(128) UNIQUE;
 )
 ALTER TABLE users
 ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
-=======
+
+= = = = = = =
 -- Ensure full_name exists if the table was already created
-ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
->>>>>>> parent of cbdde3d (Fix backend schema and migration updates)
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
+
+>> >> >> > parent of cbdde3d ( Fix backend schema and migration updates )
 
 CREATE TABLE IF NOT EXISTS mentors (
     id SERIAL PRIMARY KEY,
@@ -110,29 +112,7 @@ CREATE TABLE IF NOT EXISTS student_progress (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-<<<<<<< HEAD
-<< << << < HEAD
-CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives (mentor_id);
-
-DO $$
-BEGIN
-    IF to_regclass('public.live_sessions') IS NOT NULL THEN
-        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_live_sessions_mentor_id_scheduled_at ON live_sessions(mentor_id, scheduled_at)';
-    END IF;
-END $$;
-
-DO $$
-BEGIN
-    IF to_regclass('public.student_progress') IS NOT NULL THEN
-        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_student_progress_student_id ON student_progress(student_id)';
-        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_student_progress_drive_id ON student_progress(drive_id)';
-    END IF;
-END $$;
-
-= = = = = = =
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_users_firebase_uid ON users (firebase_uid);
-
+-- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives (mentor_id);
 
 CREATE INDEX IF NOT EXISTS idx_live_sessions_mentor_id_scheduled_at ON live_sessions (mentor_id, scheduled_at);
@@ -141,21 +121,8 @@ CREATE INDEX IF NOT EXISTS idx_student_progress_student_id ON student_progress (
 
 CREATE INDEX IF NOT EXISTS idx_student_progress_drive_id ON student_progress (drive_id);
 
->> >> >> > parent of bb45ed9 (
-    Revert "chore: bootstrap backend and database setup"
-)
 CREATE INDEX IF NOT EXISTS idx_submissions_assessment_id ON submissions (assessment_id);
 
 CREATE INDEX IF NOT EXISTS idx_assessments_course_id ON assessments (course_id);
 
 CREATE INDEX IF NOT EXISTS idx_courses_mentor_id ON courses (mentor_id);
-=======
--- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives(mentor_id);
-CREATE INDEX IF NOT EXISTS idx_live_sessions_mentor_id_scheduled_at ON live_sessions(mentor_id, scheduled_at);
-CREATE INDEX IF NOT EXISTS idx_student_progress_student_id ON student_progress(student_id);
-CREATE INDEX IF NOT EXISTS idx_student_progress_drive_id ON student_progress(drive_id);
-CREATE INDEX IF NOT EXISTS idx_submissions_assessment_id ON submissions(assessment_id);
-CREATE INDEX IF NOT EXISTS idx_assessments_course_id ON assessments(course_id);
-CREATE INDEX IF NOT EXISTS idx_courses_mentor_id ON courses(mentor_id);
->>>>>>> parent of cbdde3d (Fix backend schema and migration updates)
