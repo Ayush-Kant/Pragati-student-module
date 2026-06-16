@@ -1,11 +1,23 @@
+<<<<<<< HEAD
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
+=======
+-- base tables
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    firebase_uid VARCHAR(128) UNIQUE,        -- ← ADD THIS for Firebase Auth link
+>>>>>>> parent of bb45ed9 (Revert "chore: bootstrap backend and database setup")
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     role VARCHAR(50) DEFAULT 'student',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+<<<<<<< HEAD
+=======
+-- If users table already exists, just add the column safely
+ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_uid VARCHAR(128) UNIQUE;
+>>>>>>> parent of bb45ed9 (Revert "chore: bootstrap backend and database setup")
 ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
 
 CREATE TABLE IF NOT EXISTS mentors (
@@ -72,6 +84,7 @@ CREATE TABLE IF NOT EXISTS student_progress (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+<<<<<<< HEAD
 CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives(mentor_id);
 
 DO $$
@@ -89,6 +102,14 @@ BEGIN
     END IF;
 END $$;
 
+=======
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_users_firebase_uid ON users(firebase_uid);
+CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives(mentor_id);
+CREATE INDEX IF NOT EXISTS idx_live_sessions_mentor_id_scheduled_at ON live_sessions(mentor_id, scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_student_progress_student_id ON student_progress(student_id);
+CREATE INDEX IF NOT EXISTS idx_student_progress_drive_id ON student_progress(drive_id);
+>>>>>>> parent of bb45ed9 (Revert "chore: bootstrap backend and database setup")
 CREATE INDEX IF NOT EXISTS idx_submissions_assessment_id ON submissions(assessment_id);
 CREATE INDEX IF NOT EXISTS idx_assessments_course_id ON assessments(course_id);
 CREATE INDEX IF NOT EXISTS idx_courses_mentor_id ON courses(mentor_id);
