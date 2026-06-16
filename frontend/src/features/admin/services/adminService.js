@@ -74,4 +74,8 @@ export const suspendCollege = async (id, reason) => {
   } catch (error) {
     throw error;
   }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> parent of 281a7a8 (feat:Student Management Page)
