@@ -6,6 +6,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
 import EditProfileForm from "./features/college/profile/components/edit-profile/EditProfileForm";
+import DashboardLayout from "./features/college/dashboard/components/layout/DashboardLayout";
+import StatsGrid from "./features/college/dashboard/components/stats/StatsGrid";
 
 // ── Student Module ───────────────────────────────────────────────────────────
 import { AuthProvider} from './context/AuthContext';
@@ -23,7 +25,15 @@ function App() {
       <Toaster />
       <Routes>
         
-        <Route path="/" element={<EditProfileForm />} />
+        <Route
+  path="/"
+  element={
+    <DashboardLayout>
+      <div className="p-6">
+        <StatsGrid/> </div>
+    </DashboardLayout>
+  }
+/>
         
         {/* ── Auth Routes ────────────────────────────────────────── */}
         <Route path='/login' element={<LoginPage />} />
