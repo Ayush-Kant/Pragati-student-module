@@ -6,6 +6,8 @@ import adminCollegeRoutes from "./routes/admin.college.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import cors from "cors";
+import companyRoutes from "./routes/company.routes.js";
+import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRouter from "./routes/auth.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 
