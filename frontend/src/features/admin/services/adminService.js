@@ -111,8 +111,4 @@ export const fetchCollegePerformance = async () => {
 export const fetchActivityFeed = async () => {
   const response = await API.get("/api/admin/dashboard/activity-feed");
   return response.data;
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> parent of cd46b91 (Merge branch 'develop' into feature/admin-student-management-be)

@@ -19,32 +19,42 @@ verified_at       TIMESTAMPTZ,
 created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-
 -- TABLE: student_drive_progress
 -- Tracks each student's pipeline state within a specific drive
 CREATE TABLE IF NOT EXISTS student_drive_progress (
-id                      SERIAL PRIMARY KEY,
-student_id              INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
-drive_id                INTEGER NOT NULL REFERENCES recruitment_drives(id) ON DELETE CASCADE,
-current_stage           VARCHAR(50) NOT NULL DEFAULT 'applied'
-CHECK (current_stage IN ('applied','tested','training','shortlisted','interviews','selected')),
-assessment_score        INTEGER DEFAULT 0,
-assignments_submitted   INTEGER DEFAULT 0,
-assignments_total       INTEGER DEFAULT 0,
-mentor_feedback         TEXT,
-updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-UNIQUE(student_id, drive_id)
+    id SERIAL PRIMARY KEY,
+    student_id INTEGER NOT NULL REFERENCES students (id) ON DELETE CASCADE,
+    drive_id INTEGER NOT NULL REFERENCES recruitment_drives (id) ON DELETE CASCADE,
+    current_stage VARCHAR(50) NOT NULL DEFAULT 'applied' CHECK (
+        current_stage IN (
+            'applied',
+            'tested',
+            'training',
+            'shortlisted',
+            'interviews',
+            'selected'
+        )
+    ),
+    assessment_score INTEGER DEFAULT 0,
+    assignments_submitted INTEGER DEFAULT 0,
+    assignments_total INTEGER DEFAULT 0,
+    mentor_feedback TEXT,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (student_id, drive_id)
 );
 
-
 -- INDEXES
-CREATE INDEX idx_students_status       ON students(status);
-CREATE INDEX idx_students_college      ON students(college_id);
-CREATE INDEX idx_students_name         ON students(name);
-CREATE INDEX idx_students_skills       ON students USING GIN(skills);
-CREATE INDEX idx_sdp_student           ON student_drive_progress(student_id);
-CREATE INDEX idx_sdp_drive             ON student_drive_progress(drive_id);
+CREATE INDEX idx_students_status ON students (status);
 
+CREATE INDEX idx_students_college ON students (college_id);
+
+CREATE INDEX idx_students_name ON students (name);
+
+CREATE INDEX idx_students_skills ON students USING GIN (skills);
+
+CREATE INDEX idx_sdp_student ON student_drive_progress (student_id);
+
+CREATE INDEX idx_sdp_drive ON student_drive_progress (drive_id);
 
 INSERT INTO students (
     full_name,
@@ -87,4 +97,5 @@ VALUES
     'blocked'
 );
 
-SELECT * FROM students;;
+SELECT * FROM students;
+;
