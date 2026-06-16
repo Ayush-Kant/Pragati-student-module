@@ -1,4 +1,5 @@
 import React from 'react';
+import { getStatusClass } from "../../utils/dashboardHelpers";
 
 export default function ActivityCard({ activity }) {
   return (
@@ -11,7 +12,9 @@ export default function ActivityCard({ activity }) {
 
       <div className="flex justify-between mt-2 text-xs text-gray-500">
         <span>{activity.time}</span>
-        <span>{activity.status}</span>
+        <span className={getStatusClass(activity.status)}>
+          {activity.status}
+        </span>
       </div>
     </div>
   );

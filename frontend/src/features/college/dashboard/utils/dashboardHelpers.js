@@ -1,15 +1,15 @@
 export const getStatusClass = (status) => {
   switch (status) {
     case "success":
-      return "success";
+      return "text-green-600";
 
     case "warning":
-      return "warning";
+      return "text-yellow-600";
 
     case "info":
-      return "info";
+      return "text-blue-600";
 
     default:
-      return "";
+      return "text-gray-600";
   }
 };
