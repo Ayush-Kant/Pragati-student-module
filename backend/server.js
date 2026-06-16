@@ -27,6 +27,21 @@ app.use(
     credentials: true,
   }),
 );
+<<<<<<< HEAD
+=======
+
+app.use("/api/auth", authRouter);
+
+app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
+
+app.use('/api/v1/admin/colleges', adminCollegeRoutes);
+
+app.use('/api/companies', companyRoutes);
+
+app.use("/api/mentor", contentRoutes);
+
+app.use("/api/student/notifications", notificationRoutes);
+>>>>>>> parent of cd46b91 (Merge branch 'develop' into feature/admin-student-management-be)
 
 app.use("/api/auth", authRouter);
 

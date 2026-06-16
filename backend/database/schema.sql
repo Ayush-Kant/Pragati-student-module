@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 git revert --continue<<<<<<< HEAD
 =======
 -- base tables
@@ -25,12 +26,19 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     firebase_uid VARCHAR(128) UNIQUE,        -- ← ADD THIS for Firebase Auth link
 >>>>>>> parent of 4f79d2f (Merge branch 'develop' into feature/admin-student-management-fe)
+=======
+-- base tables
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    firebase_uid VARCHAR(128) UNIQUE,        -- ← ADD THIS for Firebase Auth link
+>>>>>>> parent of cd46b91 (Merge branch 'develop' into feature/admin-student-management-be)
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     role VARCHAR(50) DEFAULT 'student',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 << << << < HEAD << << << < HEAD = = = = = = =
@@ -53,6 +61,8 @@ ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
 =======
 =======
 >>>>>>> parent of 4f79d2f (Merge branch 'develop' into feature/admin-student-management-fe)
+=======
+>>>>>>> parent of cd46b91 (Merge branch 'develop' into feature/admin-student-management-be)
 -- If users table already exists, just add the column safely
 ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_uid VARCHAR(128) UNIQUE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
@@ -137,6 +147,7 @@ CREATE TABLE IF NOT EXISTS student_progress (
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives (mentor_id);
 
@@ -154,6 +165,8 @@ CREATE INDEX IF NOT EXISTS idx_courses_mentor_id ON courses (mentor_id);
 =======
 =======
 >>>>>>> parent of 4f79d2f (Merge branch 'develop' into feature/admin-student-management-fe)
+=======
+>>>>>>> parent of cd46b91 (Merge branch 'develop' into feature/admin-student-management-be)
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_users_firebase_uid ON users(firebase_uid);
 CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives(mentor_id);
