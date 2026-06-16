@@ -7,8 +7,6 @@ import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
-import connectDB from "./config/db.js";
-import mentorRoutes from "./routes/mentor.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 
 
