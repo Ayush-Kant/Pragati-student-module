@@ -5,10 +5,11 @@ import adminDashboardRoutes from './routes/admin.dashboard.routes.js';
 import adminCollegeRoutes from './routes/admin.college.routes.js';
 import companyRoutes from './routes/company.routes.js';
 import contentRoutes from "./routes/content.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 const app = express();
 
@@ -36,6 +37,8 @@ app.use('/api/v1/admin/colleges', adminCollegeRoutes);
 app.use('/api/companies', companyRoutes);
 
 app.use("/api/mentor", contentRoutes);
+
+app.use("/api/student/notifications", notificationRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.listen(PORT, () => {
