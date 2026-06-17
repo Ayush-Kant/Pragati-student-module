@@ -1,14 +1,17 @@
-// college.email.service.js
-
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy client — instantiated on first send so a missing key doesn't crash the server at startup
+let _resend = null;
+const getClient = () => {
+    if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+    return _resend;
+};
 
 // Use this sender for all emails during development and testing:
 // onboarding@resend.dev
 
 const sendApprovalEmail = async (collegeEmail, collegeName) => {
-    await resend.emails.send({
+    await getClient().emails.send({
         from:    'onboarding@resend.dev',
         to:      collegeEmail,
         subject: 'Your College Registration Has Been Approved — Pragati',
@@ -24,7 +27,7 @@ const sendApprovalEmail = async (collegeEmail, collegeName) => {
 };
 
 const sendRejectionEmail = async (collegeEmail, collegeName, reason) => {
-    await resend.emails.send({
+    await getClient().emails.send({
         from:    'onboarding@resend.dev',
         to:      collegeEmail,
         subject: 'Update on Your College Registration — Pragati',
@@ -40,7 +43,7 @@ const sendRejectionEmail = async (collegeEmail, collegeName, reason) => {
 };
 
 const sendSuspensionEmail = async (collegeEmail, collegeName, reason) => {
-    await resend.emails.send({
+    await getClient().emails.send({
         from:    'onboarding@resend.dev',
         to:      collegeEmail,
         subject: 'Important: Your Account Has Been Suspended — Pragati',
