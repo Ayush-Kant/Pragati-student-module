@@ -17,6 +17,7 @@ import RoleRoute from "../../../routes/RoleRoute";
 import CompanyDetail from "../pages/CompanyDetail";
 import ActiveDrives from "../pages/ActiveDrives";
 import CompanyRankings from "../pages/CompanyRankings";
+import MentorDetail from "../pages/MentorDetail";
 
 const AdminRoute = (
   <Route element={<PrivateRoute />}>
