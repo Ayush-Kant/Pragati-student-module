@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import apiClient from "./api.js";
-=======
-import api from "./api.js";
->>>>>>> e5ed351 (fix merge confilts)
 
 export const moduleService = {
   // POST add module
