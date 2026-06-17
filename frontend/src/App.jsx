@@ -31,14 +31,6 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* ── Mentor ────────────────────────────────────────────────── */}
-        {mentorRoute}
-
-        {/* ── Admin ─────────────────────────────────────────────────── */}
-
-        {AdminRoute}
-
-
         {/* Mentor */}
         {mentorRoute}
 
@@ -55,15 +47,9 @@ function App() {
         {CompanyRoute}
 
         {/* Public Certificate Verification */}
-        <Route
-          path="/verify/:code"
-          element={<VerificationPage />}
-        />
+        <Route path="/verify/:code" element={<VerificationPage />} />
 
-        <Route
-          path="*"
-          element={<NotFoundPage />}
-        />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AuthProvider>
   );
