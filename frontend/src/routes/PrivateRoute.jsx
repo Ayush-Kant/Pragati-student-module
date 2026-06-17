@@ -3,15 +3,12 @@ import { useAuth } from "../context/AuthContext";
 
 const PrivateRoute = () => {
   const { isAuthenticated, userRole } = useAuth();
-  
-  // Allow bypass via localStorage for development
-  const bypassAuth = localStorage.getItem("BYPASS_AUTH") === "true";
-  
-  if (!isAuthenticated && !bypassAuth) {
+
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!userRole && !bypassAuth) {
+  if (!userRole) {
     return <Navigate to="/login" replace />;
   }
 

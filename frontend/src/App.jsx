@@ -1,15 +1,14 @@
 import { Toaster } from "react-hot-toast";
-import { Routes, Route, Navigate } from 'react-router-dom';
-import ProfileManagementPage from './features/student/profile/pages/ProfileManagementPage';
+import { Routes, Route, Navigate } from "react-router-dom";
+import ProfileManagementPage from "./features/student/profile/pages/ProfileManagementPage";
 
 // ── Auth Pages  ──
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
 
-
 // ── Student Module ───────────────────────────────────────────────────────────
-import { AuthProvider} from './context/AuthContext';
-import VerificationPage from './features/student/pages/public/VerificationPage';
+import { AuthProvider } from "./context/AuthContext";
+import VerificationPage from "./features/student/pages/public/VerificationPage";
 import StudentRoutes from "./features/student/routes/StudentRoutes";
 import AdminRoute from "./features/admin/routes/AdminRoutes";
 import mentorRoute from "./features/mentor/routes/MentorRoutes";
@@ -22,36 +21,36 @@ function App() {
     <AuthProvider>
       <Toaster />
       <Routes>
-        
-        <Route path="/" element={<Navigate to="/mentor/dashboard" replace />} />
-        
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
         {/* ── Auth Routes ────────────────────────────────────────── */}
-        <Route path='/login' element={<LoginPage />} />
-        <Route path='/register' element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* ── Mentor ────────────────────────────────────────────────── */}
         {mentorRoute}
 
         {/* ── Admin ─────────────────────────────────────────────────── */}
-       
+
         {AdminRoute}
 
         {/* ── Student ───────────────────────────────────────────────── */}
         {StudentRoutes}
 
-<Route path='/student/manage-profile' element={<ProfileManagementPage/>}/>
-      {/* Collge */}
+        <Route
+          path="/student/manage-profile"
+          element={<ProfileManagementPage />}
+        />
+        {/* Collge */}
 
-      {collegeRoute}
+        {collegeRoute}
 
+        {/* Company */}
 
-  {/* Company */}
+        {CompanyRoute}
 
-      {CompanyRoute}
-
-      
         {/* Public certificate verification */}
-        <Route path='/verify/:code' element={<VerificationPage />} />
+        <Route path="/verify/:code" element={<VerificationPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

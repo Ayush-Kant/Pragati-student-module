@@ -22,17 +22,7 @@ const getRoleFromToken = (token) => {
 };
 
 export const AuthProvider = ({ children }) => {
-  // Set bypass immediately if not already set
-  if (!localStorage.getItem("BYPASS_AUTH")) {
-    localStorage.setItem("BYPASS_AUTH", "true");
-    localStorage.setItem("BYPASS_ROLE", "mentor");
-  }
-
   const [token, setToken] = useState(() => {
-    // Development bypass for testing
-    if (localStorage.getItem("BYPASS_AUTH") === "true") {
-      return "test-token";
-    }
     const stored = localStorage.getItem("token");
     if (stored && isTokenValid(stored)) return stored;
     if (stored) localStorage.removeItem("token");
@@ -40,10 +30,6 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [userRole, setUserRole] = useState(() => {
-    // Development bypass for testing
-    if (localStorage.getItem("BYPASS_AUTH") === "true") {
-      return localStorage.getItem("BYPASS_ROLE") || "mentor";
-    }
     const stored = localStorage.getItem("token");
     return stored && isTokenValid(stored) ? getRoleFromToken(stored) : null;
   });
