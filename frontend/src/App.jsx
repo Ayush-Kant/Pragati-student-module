@@ -2,7 +2,7 @@ import { Toaster } from "react-hot-toast";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileManagementPage from "./features/student/profile/pages/ProfileManagementPage";
 
-// ── Auth Pages  ──
+// Auth Pages
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
 
@@ -10,16 +10,20 @@ import RegisterPage from "./features/auth/RegisterPage";
 import { AuthProvider } from "./context/AuthContext";
 import VerificationPage from "./features/student/pages/public/VerificationPage";
 import StudentRoutes from "./features/student/routes/StudentRoutes";
+
+// Admin / Mentor / College / Company Routes
 import AdminRoute from "./features/admin/routes/AdminRoutes";
 import mentorRoute from "./features/mentor/routes/MentorRoutes";
 import collegeRoute from "./features/college/routes/AppRoutes";
-import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
+
+import NotFoundPage from "./routes/NotFoundPage";
 
 function App() {
   return (
     <AuthProvider>
       <Toaster />
+
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
 
@@ -34,25 +38,32 @@ function App() {
 
         {AdminRoute}
 
-        {/* ── Student ───────────────────────────────────────────────── */}
+
+        {/* Mentor */}
+        {mentorRoute}
+
+        {/* Admin */}
+        {AdminRoute}
+
+        {/* Student */}
         {StudentRoutes}
 
-        <Route
-          path="/student/manage-profile"
-          element={<ProfileManagementPage />}
-        />
-        {/* Collge */}
-
+        {/* College */}
         {collegeRoute}
 
         {/* Company */}
-
         {CompanyRoute}
 
-        {/* Public certificate verification */}
-        <Route path="/verify/:code" element={<VerificationPage />} />
+        {/* Public Certificate Verification */}
+        <Route
+          path="/verify/:code"
+          element={<VerificationPage />}
+        />
 
-        <Route path="*" element={<NotFoundPage />} />
+        <Route
+          path="*"
+          element={<NotFoundPage />}
+        />
       </Routes>
     </AuthProvider>
   );
