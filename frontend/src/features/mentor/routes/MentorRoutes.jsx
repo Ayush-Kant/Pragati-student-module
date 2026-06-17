@@ -3,7 +3,6 @@ import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
 import MentorLayout from "../components/layout/MentorLayout";
 import Dashboard from "../pages/Dashboard";
-import ExportReport from "../pages/ExportReport";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
@@ -11,7 +10,6 @@ const mentorRoute = (
       <Route path="mentor" element={<MentorLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="export-report" element={<ExportReport />} />
       </Route>
     </Route>
   </Route>
