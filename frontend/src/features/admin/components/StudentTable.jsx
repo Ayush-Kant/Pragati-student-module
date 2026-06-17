@@ -4,7 +4,7 @@ import StudentActionButtons from "./StudentActionButtons";
 import { useNavigate } from "react-router-dom";
 
 
-const StudentTable = ({ students, darkMode = false }) => {
+const StudentTable = ({ students, darkMode=false }) => {
   const navigate = useNavigate();
 
   if (!students?.length) {
@@ -35,15 +35,7 @@ const StudentTable = ({ students, darkMode = false }) => {
               key={student.id}
               className={`border-b transition ${darkMode ? "border-slate-700 hover:bg-slate-950" : "border-gray-200 hover:bg-slate-50"}`}
             >
-              <td className={`py-5 px-4`}>
-                <button
-                  onClick={() => navigate(`/admin/students/${student.id}`)}
-                  className={`font-medium hover:underline cursor-pointer ${darkMode ? "text-blue-400" : "text-blue-600"
-                    }`}
-                >
-                  {student.name}
-                </button>
-              </td>
+              <td className={`py-5 px-4 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{student.name}</td>
 
               <td className={`p-3 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
                 {student.email}
@@ -64,7 +56,7 @@ const StudentTable = ({ students, darkMode = false }) => {
               </td>
               <td className={`p-3 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
                 <StudentActionButtons student={student} />
-              </td>
+            </td>
             </tr>
           ))}
         </tbody>
