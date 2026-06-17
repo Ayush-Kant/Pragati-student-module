@@ -1,18 +1,15 @@
 import React from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 export default function MentorLayout() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  
   const menuItems = [
-    { name: 'Dashboard', path: 'dashboard', active: location.pathname.includes('dashboard'), icon: '📊' },
-    { name: 'My Mentees', path: 'mentees', active: false, icon: '👥' },
-    { name: 'Sessions', path: 'sessions', active: false, icon: '📅' },
-    { name: 'Assessments', path: 'assessments', active: false, icon: '📝' },
-    { name: 'Tasks & Assignments', path: 'tasks', active: false, icon: '📋' },
-    { name: 'Export Report', path: 'export-report', active: location.pathname.includes('export-report'), icon: '📊' },
-    { name: 'Settings', path: 'settings', active: false, icon: '⚙️' }
+    { name: 'Dashboard', active: true, icon: '📊' },
+    { name: 'My Mentees', active: false, icon: '👥' },
+    { name: 'Sessions', active: false, icon: '📅' },
+    { name: 'Assessments', active: false, icon: '📝' },
+    { name: 'Tasks & Assignments', active: false, icon: '📋' },
+    { name: 'Reports & Analytics', active: false, icon: '📉' },
+    { name: 'Settings', active: false, icon: '⚙️' }
   ];
 
   return (
@@ -50,7 +47,7 @@ export default function MentorLayout() {
         {/* Menu Items */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
           {menuItems.map((item, idx) => (
-            <div key={idx} onClick={() => navigate(item.path)} style={{
+            <div key={idx} style={{
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
@@ -60,8 +57,7 @@ export default function MentorLayout() {
               backgroundColor: item.active ? '#f0f9ff' : 'transparent',
               color: item.active ? '#0284c7' : '#64748b',
               fontWeight: item.active ? '600' : '500',
-              fontSize: '14px',
-              transition: 'all 0.2s'
+              fontSize: '14px'
             }}>
               <span style={{ fontSize: '16px' }}>{item.icon}</span>
               {item.name}
