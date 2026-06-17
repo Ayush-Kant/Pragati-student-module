@@ -1,53 +1,62 @@
 // src/features/college/dashboard/services/dashboardService.js
 
-// 1. DUMMY DATA INTEGRATION
 const dashboardApiResponse = {
   success: true,
   data: {
-    dashboardStats: [
-      { id: "stat-1", label: "Total Students", value: "12,450", change: "+4.2%", isPositive: true },
-      { id: "stat-2", label: "Placement Rate", value: "89.4%", change: "+1.8%", isPositive: true },
-      { id: "stat-3", label: "Active Courses", value: "48", change: "0%", isPositive: true },
-      { id: "stat-4", label: "Outstanding Fees", value: "$23,150", change: "-5.2%", isPositive: false }
+    // matches: response.data.stats in useDashboardData
+    stats: [
+      { id: 1, title: 'Total Students',  value: '2,450', change: '+12%', trend: 'up' },
+      { id: 2, title: 'Active Drives',   value: 18,      change: '+4%',  trend: 'up' },
+      { id: 3, title: 'Placements',      value: 423,     change: '+8%',  trend: 'up' },
+      { id: 4, title: 'Revenue',         value: '₹8.5L', change: '+15%', trend: 'up' },
+      { id: 5, title: 'Companies',       value: 42,      change: '+5%',  trend: 'up' },
+      { id: 6, title: 'Applications',    value: 320,     change: '+10%', trend: 'up' },
     ],
+
+    // matches: response.data.activities in useDashboardData
     activities: [
-      { id: "act-1", type: "admission", text: "New student enrollment completed for B.Tech CS", timestamp: "10 mins ago" },
-      { id: "act-2", type: "placement", text: "Microsoft scheduled a campus drive for next month", timestamp: "1 hour ago" },
-      { id: "act-3", type: "revenue", text: "Quarter 2 tuition fee reconciliation completed", timestamp: "4 hours ago" }
+      { id: 1, title: 'New Student Registered',    description: 'Rahul Sharma completed registration.',      time: '2 hours ago', status: 'success' },
+      { id: 2, title: 'Placement Drive Created',   description: 'TCS Hiring Drive created successfully.',    time: '5 hours ago', status: 'info'    },
+      { id: 3, title: 'Company Approved',          description: 'Infosys profile approved.',                 time: '1 day ago',   status: 'success' },
+      { id: 4, title: 'Profile Updated',           description: 'College profile updated successfully.',     time: '2 days ago',  status: 'warning' },
     ],
-    placementData: [
-      { year: "2023", placed: 450, total: 500 },
-      { year: "2024", placed: 520, total: 550 },
-      { year: "2025", placed: 580, total: 600 }
+
+    // matches: response.data.placements in useDashboardData
+    placements: [
+      { month: 'Jan', placements: 25 },
+      { month: 'Feb', placements: 30 },
+      { month: 'Mar', placements: 38 },
+      { month: 'Apr', placements: 44 },
+      { month: 'May', placements: 52 },
+      { month: 'Jun', placements: 61 },
     ],
-    revenueData: [
-      { quarter: "Q1", collected: 450000, pending: 25000 },
-      { quarter: "Q2", collected: 520000, pending: 15000 },
-      { quarter: "Q3", collected: 490000, pending: 30000 }
+
+    // matches: response.data.revenue in useDashboardData
+    revenue: [
+      { month: 'Jan', revenue: 50000 },
+      { month: 'Feb', revenue: 65000 },
+      { month: 'Mar', revenue: 72000 },
+      { month: 'Apr', revenue: 81000 },
+      { month: 'May', revenue: 93000 },
+      { month: 'Jun', revenue: 105000 },
     ],
-    admissionsData: [
-      { stream: "Engineering", applications: 1200, admissions: 350 },
-      { stream: "Management", applications: 850, admissions: 200 },
-      { stream: "Science", applications: 600, admissions: 150 }
-    ]
-  }
+
+    // matches: response.data.admissions in useDashboardData
+    admissions: [
+      { month: 'Jan', admissions: 120 },
+      { month: 'Feb', admissions: 145 },
+      { month: 'Mar', admissions: 180 },
+      { month: 'Apr', admissions: 220 },
+      { month: 'May', admissions: 260 },
+      { month: 'Jun', admissions: 300 },
+    ],
+  },
 };
 
-// 2. SERVICE LAYER & API INTEGRATION STRUCTURE
 export const dashboardService = {
   getDashboardSummary: async () => {
-    return new Promise((resolve, reject) => {
-      // Simulating a 800ms network latency
-      setTimeout(() => {
-        // Toggle to false to test Error Handling logic
-        const simulateSuccess = true; 
-
-        if (simulateSuccess) {
-          resolve(dashboardApiResponse);
-        } else {
-          reject(new Error("Network Error: Failed to fetch dashboard summary from server."));
-        }
-      }, 800);
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(dashboardApiResponse), 400);
     });
-  }
+  },
 };
