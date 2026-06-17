@@ -122,6 +122,27 @@ const Assessments = () => {
     duration: "",
   });
 
+
+  const [testTitle, setTestTitle] =
+    useState("");
+
+  const [testType, setTestType] =
+    useState("Technical");
+
+  const [difficulty, setDifficulty] =
+    useState("Medium");
+
+  const [duration, setDuration] =
+    useState("");
+
+  const [passingScore, setPassingScore] =
+    useState("");
+const [searchTerm, setSearchTerm] =
+useState("");
+const [selectedType, setSelectedType] =
+  useState("All");
+  const [selectedDifficulty, setSelectedDifficulty] =
+  useState("All");
   const [questions, setQuestions] = useState([
     {
       id: 1,
@@ -132,27 +153,36 @@ const Assessments = () => {
         "A database",
         "A component",
       ],
-    },
+    }
+    ,
   ]);
 
   const addQuestion = () => {
-    const newQuestion = {
-      id: Date.now(),
-      question: "",
-      options: [
-        "Option 1",
-        "Option 2",
-        "Option 3",
-        "Option 4",
-      ],
-    };
+  console.log("Add Question Clicked");
 
-    setQuestions([...questions, newQuestion]);
+  const newQuestion = {
+    id: Date.now(),
+    question: "",
+    options: [
+      "Option 1",
+      "Option 2",
+      "Option 3",
+      "Option 4",
+    ],
   };
 
+  setQuestions((prevQuestions) => [
+    ...prevQuestions,
+    newQuestion,
+  ]);
+};
+
+    
   const deleteQuestion = (id) => {
     setQuestions(
-      questions.filter((question) => question.id !== id)
+      questions.filter(
+        (question) => question.id !== id
+      )
     );
   };
 
@@ -226,10 +256,33 @@ const Assessments = () => {
     closeAssessmentDialog();
   };
 
-  return (
-    <div className="assessments-wrapper">
+  const publishAssessment = () => {
+    if (!testTitle.trim()) return;
 
-      {/* OVERLAY */}
+    const newAssessment = {
+      id: Date.now(),
+      title: testTitle,
+      type: testType,
+      difficulty,
+      duration: `${duration || 0} mins`,
+      candidates: 0,
+    };
+
+    setAssessments([
+      ...assessments,
+      newAssessment,
+    ]);
+
+    setShowPanel(false);
+
+    setTestTitle("");
+    setTestType("Technical");
+    setDifficulty("Medium");
+    setDuration("");
+    setPassingScore("");
+  };
+
+  return (<div className="assessments-wrapper">
 
       {showPanel && (
         <div
@@ -239,8 +292,6 @@ const Assessments = () => {
       )}
 
       <div className="assessments-layout">
-
-        {/* LEFT SECTION */}
 
         <div className="assessments-left">
 
@@ -267,96 +318,26 @@ const Assessments = () => {
 
             <div className="filters-row">
 
-  <div className="search-box">
+              <div className="search-box">
 
-    <FiSearch className="search-icon" />
+                <FiSearch className="search-icon" />
 
     <input
       type="text"
       placeholder="Search assessments..."
-      value={search}
-      onChange={(event) => setSearch(event.target.value)}
     />
 
-  </div>
+              </div>
 
-  <div className="assessment-filter-wrap">
-    <button
-      className="filter-btn"
-      onClick={() => setOpenFilter((current) => current === "type" ? null : "type")}
-      type="button"
-    >
-      <FiFilter />
-      Type
-    </button>
+  <button className="filter-btn">
+    <FiFilter />
+    Type
+  </button>
 
-    {openFilter === "type" && (
-      <div className="assessment-filter-dropdown">
-        <button
-          className={`assessment-filter-option ${!typeFilter ? "active" : ""}`}
-          onClick={() => {
-            setTypeFilter("");
-            setOpenFilter(null);
-          }}
-          type="button"
-        >
-          All Types
-        </button>
-        {TYPE_FILTERS.map((type) => (
-          <button
-            className={`assessment-filter-option ${typeFilter === type ? "active" : ""}`}
-            key={type}
-            onClick={() => {
-              setTypeFilter(type);
-              setOpenFilter(null);
-            }}
-            type="button"
-          >
-            {type}
-          </button>
-        ))}
-      </div>
-    )}
-  </div>
-
-  <div className="assessment-filter-wrap">
-    <button
-      className="filter-btn"
-      onClick={() => setOpenFilter((current) => current === "difficulty" ? null : "difficulty")}
-      type="button"
-    >
-      <FiFilter />
-      Difficulty
-    </button>
-
-    {openFilter === "difficulty" && (
-      <div className="assessment-filter-dropdown">
-        <button
-          className={`assessment-filter-option ${!difficultyFilter ? "active" : ""}`}
-          onClick={() => {
-            setDifficultyFilter("");
-            setOpenFilter(null);
-          }}
-          type="button"
-        >
-          All Difficulties
-        </button>
-        {DIFFICULTY_FILTERS.map((difficulty) => (
-          <button
-            className={`assessment-filter-option ${difficultyFilter === difficulty ? "active" : ""}`}
-            key={difficulty}
-            onClick={() => {
-              setDifficultyFilter(difficulty);
-              setOpenFilter(null);
-            }}
-            type="button"
-          >
-            {difficulty}
-          </button>
-        ))}
-      </div>
-    )}
-  </div>
+  <button className="filter-btn">
+    <FiFilter />
+    Difficulty
+  </button>
 
 </div>
 
@@ -379,7 +360,7 @@ const Assessments = () => {
 
                 <tbody>
 
-                  {filteredAssessments.length > 0 ? filteredAssessments.map((item) => (
+                  {assessmentData.map((item) => (
 
                     <tr key={item.id}>
 
@@ -415,7 +396,7 @@ const Assessments = () => {
 
                     </tr>
 
-                  )) : (
+                  ))  (
                     <tr>
                       <td colSpan="6">
                         <div className="assessments-empty-state">
@@ -434,171 +415,6 @@ const Assessments = () => {
           </div>
 
         </div>
-
-        {dialogMode && selectedAssessment && (
-          <div
-            className="assessment-dialog-overlay"
-            onClick={(event) => event.target === event.currentTarget && closeAssessmentDialog()}
-          >
-            <div className="assessment-dialog" role="dialog" aria-modal="true">
-              <div className="assessment-dialog-header">
-                <h2>
-                  {dialogMode === "view" && "View Assessment"}
-                  {dialogMode === "edit" && "Edit Assessment"}
-                  {dialogMode === "delete" && "Delete Assessment"}
-                </h2>
-
-                <button
-                  className="assessment-dialog-close"
-                  onClick={closeAssessmentDialog}
-                  type="button"
-                  aria-label="Close dialog"
-                >
-                  ×
-                </button>
-              </div>
-
-              {dialogMode === "view" && (
-                <div className="assessment-dialog-body">
-                  <div className="assessment-detail-row">
-                    <span>Assessment Title</span>
-                    <strong>{selectedAssessment.title}</strong>
-                  </div>
-                  <div className="assessment-detail-row">
-                    <span>Type</span>
-                    <strong>{selectedAssessment.type}</strong>
-                  </div>
-                  <div className="assessment-detail-row">
-                    <span>Difficulty</span>
-                    <strong>{selectedAssessment.difficulty}</strong>
-                  </div>
-                  <div className="assessment-detail-row">
-                    <span>Duration</span>
-                    <strong>{selectedAssessment.duration}</strong>
-                  </div>
-                  <div className="assessment-detail-row">
-                    <span>Candidate Count</span>
-                    <strong>{selectedAssessment.candidates}</strong>
-                  </div>
-                </div>
-              )}
-
-              {dialogMode === "edit" && (
-                <form onSubmit={handleSaveAssessment}>
-                  <div className="assessment-dialog-body">
-                    <label>
-                      Assessment Title
-                      <input
-                        type="text"
-                        value={editForm.title}
-                        onChange={(event) =>
-                          setEditForm((current) => ({
-                            ...current,
-                            title: event.target.value,
-                          }))
-                        }
-                        required
-                      />
-                    </label>
-
-                    <label>
-                      Type
-                      <select
-                        value={editForm.type}
-                        onChange={(event) =>
-                          setEditForm((current) => ({
-                            ...current,
-                            type: event.target.value,
-                          }))
-                        }
-                      >
-                        {TYPE_FILTERS.map((type) => (
-                          <option key={type} value={type}>
-                            {type}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-
-                    <label>
-                      Difficulty
-                      <select
-                        value={editForm.difficulty}
-                        onChange={(event) =>
-                          setEditForm((current) => ({
-                            ...current,
-                            difficulty: event.target.value,
-                          }))
-                        }
-                      >
-                        {DIFFICULTY_FILTERS.map((difficulty) => (
-                          <option key={difficulty} value={difficulty}>
-                            {difficulty}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-
-                    <label>
-                      Duration
-                      <input
-                        type="text"
-                        value={editForm.duration}
-                        onChange={(event) =>
-                          setEditForm((current) => ({
-                            ...current,
-                            duration: event.target.value,
-                          }))
-                        }
-                        required
-                      />
-                    </label>
-                  </div>
-
-                  <div className="assessment-dialog-footer">
-                    <button
-                      className="assessment-dialog-secondary"
-                      onClick={closeAssessmentDialog}
-                      type="button"
-                    >
-                      Cancel
-                    </button>
-                    <button className="assessment-dialog-primary" type="submit">
-                      Save
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {dialogMode === "delete" && (
-                <>
-                  <div className="assessment-dialog-body">
-                    <p className="assessment-delete-message">
-                      Are you sure you want to delete this assessment?
-                    </p>
-                  </div>
-
-                  <div className="assessment-dialog-footer">
-                    <button
-                      className="assessment-dialog-secondary"
-                      onClick={closeAssessmentDialog}
-                      type="button"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="assessment-dialog-danger"
-                      onClick={handleConfirmDelete}
-                      type="button"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* RIGHT PANEL */}
 
@@ -625,6 +441,10 @@ const Assessments = () => {
 
               <input
                 type="text"
+                value={testTitle}
+                onChange={(e) =>
+                  setTestTitle(e.target.value)
+                }
                 placeholder="e.g., React Developer Assessment"
               />
 
@@ -634,7 +454,12 @@ const Assessments = () => {
 
                   <label>Test Type</label>
 
-                  <select>
+                  <select
+                    value={testType}
+                    onChange={(e) =>
+                      setTestType(e.target.value)
+                    }
+                  >
                     <option>Technical</option>
                     <option>Behavioural</option>
                     <option>Aptitude</option>
@@ -647,7 +472,12 @@ const Assessments = () => {
 
                   <label>Difficulty</label>
 
-                  <select>
+                  <select
+                    value={difficulty}
+                    onChange={(e) =>
+                      setDifficulty(e.target.value)
+                    }
+                  >
                     <option>Easy</option>
                     <option>Medium</option>
                     <option>Hard</option>
@@ -665,6 +495,10 @@ const Assessments = () => {
 
                   <input
                     type="number"
+                    value={duration}
+                    onChange={(e) =>
+                      setDuration(e.target.value)
+                    }
                     placeholder="60"
                   />
 
@@ -676,6 +510,10 @@ const Assessments = () => {
 
                   <input
                     type="number"
+                    value={passingScore}
+                    onChange={(e) =>
+                      setPassingScore(e.target.value)
+                    }
                     placeholder="70"
                   />
 
@@ -687,15 +525,15 @@ const Assessments = () => {
 
                 <label>Questions</label>
 
-                <button
-                  className="add-question-btn"
-                  onClick={addQuestion}
-                >
-                  + Add Question
-                </button>
+               <button
+  type="button"
+  className="add-question-btn"
+  onClick={addQuestion}
+>
+  + Add Question
+</button>
 
               </div>
-
               {questions.map((question, index) => (
 
                 <div
@@ -705,7 +543,9 @@ const Assessments = () => {
 
                   <div className="question-top">
 
-                    <p>Question {index + 1}</p>
+                    <p>
+                      Question {index + 1}
+                    </p>
 
                     <button
                       className="delete-btn"
@@ -722,7 +562,14 @@ const Assessments = () => {
                     type="text"
                     value={question.question}
                     placeholder="Enter your question..."
-                    readOnly
+                    onChange={(e) => {
+                      const updatedQuestions = [...questions];
+
+                      updatedQuestions[index].question =
+                        e.target.value;
+
+                      setQuestions(updatedQuestions);
+                    }}
                   />
 
                   <div className="options-grid">
@@ -731,18 +578,27 @@ const Assessments = () => {
                       (option, optionIndex) => (
 
                         <label key={optionIndex}>
+  <input
+    type="radio"
+    name={`question-${question.id}`}
+    defaultChecked={optionIndex === 1}
+  />
 
-                          <input
-                            type="radio"
-                            name={`question-${question.id}`}
-                            defaultChecked={
-                              optionIndex === 1
-                            }
-                          />
+  <input
+    type="text"
+    value={option}
+    onChange={(e) => {
+      const updatedQuestions = [...questions];
 
-                          {option}
+      updatedQuestions[index].options[
+        optionIndex
+      ] = e.target.value;
 
-                        </label>
+      setQuestions(updatedQuestions);
+    }}
+    placeholder={`Option ${optionIndex + 1}`}
+  />
+</label>
 
                       )
                     )}
@@ -752,6 +608,35 @@ const Assessments = () => {
                 </div>
 
               ))}
+              </div>
+
+            <div className="assign-drive-box">
+
+              <h3>
+                Assign Assessment To Drive
+              </h3>
+
+              <select>
+                <option>
+                  Select Drive
+                </option>
+
+                <option>
+                  React Hiring Drive
+                </option>
+
+                <option>
+                  Frontend Hiring Drive
+                </option>
+
+                <option>
+                  Campus Recruitment Drive
+                </option>
+              </select>
+
+              <button className="assign-btn">
+                Assign Assessment
+              </button>
 
             </div>
 
@@ -763,7 +648,7 @@ const Assessments = () => {
 
               <button
                 className="publish-btn"
-                onClick={() => setShowPanel(false)}
+                onClick={publishAssessment}
               >
                 Publish Test
               </button>
@@ -777,6 +662,7 @@ const Assessments = () => {
       </div>
 
     </div>
+
   );
 };
 
