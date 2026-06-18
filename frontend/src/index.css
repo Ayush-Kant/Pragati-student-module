@@ -89,3 +89,5 @@
     flex: 1 1 100%;
   }
 }
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
