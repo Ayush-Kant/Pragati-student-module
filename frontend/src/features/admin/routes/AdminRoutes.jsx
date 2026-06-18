@@ -17,6 +17,7 @@ import RoleRoute from "../../../routes/RoleRoute";
 import CompanyDetail from "../pages/CompanyDetail";
 import ActiveDrives from "../pages/ActiveDrives";
 import CompanyRankings from "../pages/CompanyRankings";
+import MentorDetail from "../pages/MentorDetail";
 
 const AdminRoute = (
       <Route path="admin" element={<AdminLayout />}>
@@ -35,6 +36,7 @@ const AdminRoute = (
         <Route path='drives' element={<AdminDrives />} />
         <Route path='notification' element={<AdminNotifications />} />
         <Route path='disputes' element={<AdminDisputes />} />
+        <Route path="/admin/mentors/:id" element={<MentorDetail />} />
       </Route>
 )
 
