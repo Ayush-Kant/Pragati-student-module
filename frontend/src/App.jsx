@@ -1,20 +1,20 @@
 import { Toaster } from "react-hot-toast";
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import PrivateRoute from "./routes/PrivateRoute";
 import RoleRoute from "./routes/RoleRoute";
 
-// ── Auth Pages  ──
+// Auth Pages
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
 
-
-// ── Student Module ───────────────────────────────────────────────────────────
-import { AuthProvider } from './context/AuthContext';
-import VerificationPage from './features/student/pages/public/VerificationPage';
+// Student Module
+import { AuthProvider } from "./context/AuthContext";
+import VerificationPage from "./features/student/pages/public/VerificationPage";
 import StudentRoutes from "./features/student/routes/StudentRoutes";
+
+// Admin / Mentor / College / Company Routes
 import AdminRoute from "./features/admin/routes/AdminRoutes";
-// import mentorRoute from "./features/mentor/routes/MentorRoutes";
 import MentorLayout from "./features/mentor/MentorLayout";
 import Activities from "./features/mentor/pages/Activities";
 import CreateActivity from "./features/mentor/pages/CreateActivity";
@@ -23,22 +23,33 @@ import ManageDeadlines from "./features/mentor/pages/ManageDeadlines";
 import BulkAssignActivity from "./features/mentor/pages/BulkAssignActivity";
 import ActivityCalendar from "./features/mentor/pages/ActivityCalendar";
 import collegeRoute from "./features/college/routes/AppRoutes";
-import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
+
+import NotFoundPage from "./routes/NotFoundPage";
 
 function App() {
   return (
     <AuthProvider>
       <Toaster />
-      <Routes>
-        
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        
-        {/* ── Auth Routes ────────────────────────────────────────── */}
-        <Route path='/login' element={<LoginPage />} />
-        <Route path='/register' element={<RegisterPage />} />
 
-        {/* ── Mentor (protected) ─────────────────────────────────────────── */}
+      <Routes>
+        <Route
+          path="/"
+          element={<Navigate to="/login" replace />}
+        />
+
+        {/* Auth Routes */}
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+
+        {/* Mentor (protected) */}
         <Route element={<PrivateRoute />}>
           <Route element={<RoleRoute allowedRoles={['mentor']} />}>
             <Route path="/mentor" element={<MentorLayout />}>
@@ -49,32 +60,32 @@ function App() {
               <Route path="activities/deadlines" element={<ManageDeadlines />} />
               <Route path="activities/bulk-assign" element={<BulkAssignActivity />} />
               <Route path="activities/calendar" element={<ActivityCalendar />} />
-              {/* Add other mentor routes here as needed */}
             </Route>
           </Route>
         </Route>
 
-        {/* ── Admin ─────────────────────────────────────────────────── */}
-       
+        {/* Admin */}
         {AdminRoute}
 
-        {/* ── Student ───────────────────────────────────────────────── */}
+        {/* Student */}
         {StudentRoutes}
 
-      {/* Collge */}
+        {/* College */}
+        {collegeRoute}
 
-      {collegeRoute}
+        {/* Company */}
+        {CompanyRoute}
 
+        {/* Public Certificate Verification */}
+        <Route
+          path="/verify/:code"
+          element={<VerificationPage />}
+        />
 
-  {/* Company */}
-
-      {CompanyRoute}
-
-      
-        {/* Public certificate verification */}
-        <Route path='/verify/:code' element={<VerificationPage />} />
-
-        <Route path="*" element={<NotFoundPage />} />
+        <Route
+          path="*"
+          element={<NotFoundPage />}
+        />
       </Routes>
     </AuthProvider>
   );
