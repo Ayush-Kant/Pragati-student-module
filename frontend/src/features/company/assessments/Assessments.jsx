@@ -360,7 +360,8 @@ const [selectedType, setSelectedType] =
 
                 <tbody>
 
-                  {assessmentData.map((item) => (
+                  {filteredAssessments.length > 0 ? (
+  filteredAssessments.map((item) => (
 
                     <tr key={item.id}>
 
@@ -396,7 +397,8 @@ const [selectedType, setSelectedType] =
 
                     </tr>
 
-                  ))  (
+                  )) 
+                ) : (
                     <tr>
                       <td colSpan="6">
                         <div className="assessments-empty-state">
