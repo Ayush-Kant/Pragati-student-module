@@ -1,79 +1,49 @@
-
-
 import { Toaster } from "react-hot-toast";
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-
-// ── Auth Pages  ──
-import LoginPage from "./features/auth/LoginPage";
-import RegisterPage from "./features/auth/RegisterPage";
-
-
-
-
-// ── Student Module ───────────────────────────────────────────────────────────
-import { AuthProvider} from './context/AuthContext';
-import VerificationPage from './features/student/pages/public/VerificationPage';
-import StudentRoutes from "./features/student/routes/StudentRoutes";
-import AdminRoute from "./features/admin/routes/AdminRoutes";
-import mentorRoute from "./features/mentor/routes/MentorRoutes";
-import collegeRoute from "./features/college/routes/AppRoutes";
-import NotFoundPage from "./routes/NotFoundPage";
-import CompanyRoute from "./features/company/routes/CompanyRoute";
-
+// ── College Module ─────────────────────────────────────────────────────────
+import { CollegeLayout } from './features/college/layouts/CollegeLayout';
+import DashboardPage     from './features/college/dashboard/pages/DashboardPage';
+import CollegeProfilePage from './features/college/profile/pages/CollegeProfilePage';
+import PlaceholderPage   from './features/college/pages/PlaceholderPage';
 
 function App() {
   return (
-    <AuthProvider>
+    <>
       <Toaster />
       <Routes>
-       
-        <Route path="/" element={<Navigate to="/login" replace />} />
-       
-        {/* ── Auth Routes ────────────────────────────────────────── */}
-        <Route path='/login' element={<LoginPage />} />
-        <Route path='/register' element={<RegisterPage />} />
 
+        {/* Default → college dashboard */}
+        <Route path="/" element={<Navigate to="/college/dashboard" replace />} />
 
-        {/* ── Mentor ────────────────────────────────────────────────── */}
-        {mentorRoute}
+        {/* ── College (no auth) ─────────────────────────────────────── */}
+        <Route path="college" element={<CollegeLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
 
+          {/* Implemented pages */}
+          <Route path="dashboard"   element={<DashboardPage />} />
+          <Route path="profile"     element={<CollegeProfilePage />} />
 
-        {/* ── Admin ─────────────────────────────────────────────────── */}
-       
-        {AdminRoute}
+          {/* Sidebar nav pages — placeholder until implemented */}
+          <Route path="students"    element={<PlaceholderPage />} />
+          <Route path="placements"  element={<PlaceholderPage />} />
+          <Route path="drives"      element={<PlaceholderPage />} />
+          <Route path="assessments" element={<PlaceholderPage />} />
+          <Route path="analytics"   element={<PlaceholderPage />} />
+          <Route path="reports"     element={<PlaceholderPage />} />
+          <Route path="faculty"     element={<PlaceholderPage />} />
+          <Route path="companies"   element={<PlaceholderPage />} />
+          <Route path="internships" element={<PlaceholderPage />} />
+          <Route path="settings"    element={<PlaceholderPage />} />
+          <Route path="help"        element={<PlaceholderPage />} />
+        </Route>
 
+        {/* Catch-all → college dashboard */}
+        <Route path="*" element={<Navigate to="/college/dashboard" replace />} />
 
-        {/* ── Student ───────────────────────────────────────────────── */}
-        {StudentRoutes}
-
-
-      {/* Collge */}
-
-
-      {collegeRoute}
-
-
-
-
-  {/* Company */}
-
-
-      {CompanyRoute}
-
-
-     
-        {/* Public certificate verification */}
-        <Route path='/verify/:code' element={<VerificationPage />} />
-
-
-        <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </AuthProvider>
+    </>
   );
-
-
-
-
 }
+
 export default App;

@@ -1,18 +1,45 @@
 // src/features/college/dashboard/pages/DashboardPage.jsx
 import React from 'react';
 import { useDashboardData } from '../hooks/useDashboardData';
+import {
+  GraduationCap, Briefcase, Building2, Users,
+  TrendingUp, CalendarDays,
+} from 'lucide-react';
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
+} from 'recharts';
 
 export default function DashboardPage() {
   const {
     dashboardStats,
     activities,
     placementData,
-    revenueData,
-    admissionsData,
     isLoading,
     error,
-    refetch
   } = useDashboardData();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#ff7a00] mx-auto mb-3" />
+          <p className="text-gray-500 text-sm">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-5 bg-red-50 text-red-600 rounded-xl border border-red-200 text-sm font-medium">
+        {error}
+      </div>
+    );
+  }
+
+  // chart data from hook (placementData from dummy)
+  const chartData = placementData.map(d => ({ month: d.month, placements: d.placements }));
 
   return (
     <div style={{ padding: '24px', fontFamily: 'system-ui, sans-serif', maxWidth: '600px', margin: '0 auto' }}>
