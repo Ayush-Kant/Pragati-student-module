@@ -411,6 +411,196 @@ const EditOfferModal = ({ offer, onClose, onSave }) => {
   );
 };
 
+// ─── Create Offer Modal ─────────────────────────────────────────────────────────
+
+const CreateOfferModal = ({ offer, onClose, onSave }) => {
+  const [form, setForm] = useState({
+    name: "",
+    role: "",
+    package: "",
+    status: "Pending",
+    joining: "",
+  });
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!form.name.trim()) newErrors.name = "Candidate name is required";
+    if (!form.role.trim()) newErrors.role = "Role is required";
+    if (!form.package.trim()) newErrors.package = "Package is required";
+    if (!form.status) newErrors.status = "Status is required";
+    if (!form.joining.trim()) newErrors.joining = "Joining date is required";
+    return newErrors;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newErrors = validate();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    onSave({
+      ...offer,
+      name: form.name.trim(),
+      role: form.role.trim(),
+      package: form.package.trim(),
+      status: form.status,
+      joining: form.joining.trim(),
+      initials: form.name.trim().slice(0, 2).toUpperCase(),
+    });
+  };
+
+  return (
+    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
+        {/* Header */}
+        <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900">Generate Offer</h3>
+            <p className="text-sm text-gray-500 mt-1">Create a new offer</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition mt-1"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Fields */}
+        <div className="p-8 space-y-5">
+          {/* Candidate Name */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Candidate <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${
+                errors.name ? "border-red-400 bg-red-50" : "border-gray-200"
+              }`}
+              placeholder="e.g. Rahul Patil"
+            />
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            )}
+          </div>
+
+          {/* Role */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Role <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.role}
+              onChange={(e) => handleChange("role", e.target.value)}
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${
+                errors.role ? "border-red-400 bg-red-50" : "border-gray-200"
+              }`}
+              placeholder="e.g. Software Engineer"
+            />
+            {errors.role && (
+              <p className="text-red-500 text-xs mt-1">{errors.role}</p>
+            )}
+          </div>
+
+          {/* Package */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Package <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.package}
+              onChange={(e) => handleChange("package", e.target.value)}
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${
+                errors.package ? "border-red-400 bg-red-50" : "border-gray-200"
+              }`}
+              placeholder="e.g. ₹18 LPA"
+            />
+            {errors.package && (
+              <p className="text-red-500 text-xs mt-1">{errors.package}</p>
+            )}
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Status <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={form.status}
+              onChange={(e) => handleChange("status", e.target.value)}
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm bg-white ${
+                errors.status ? "border-red-400 bg-red-50" : "border-gray-200"
+              }`}
+            >
+              <option value="">Select status</option>
+              {OFFER_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            {errors.status && (
+              <p className="text-red-500 text-xs mt-1">{errors.status}</p>
+            )}
+          </div>
+
+          {/* Joining Date */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Joining Date <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.joining}
+              onChange={(e) => handleChange("joining", e.target.value)}
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${
+                errors.joining ? "border-red-400 bg-red-50" : "border-gray-200"
+              }`}
+              placeholder="e.g. Jul 1, 2026"
+            />
+            {errors.joining && (
+              <p className="text-red-500 text-xs mt-1">{errors.joining}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition"
+          >
+            Generate Offer
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 
 const DeleteOfferModal = ({ offer, onClose, onDelete }) => (
@@ -461,7 +651,7 @@ const Offers = () => {
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
 
-  // Modal state: null | 'view' | 'edit' | 'delete'
+  // Modal state: null | 'view' | 'edit' | 'delete' | 'create'
   const [activeModal, setActiveModal] = useState(null);
   const [selectedOffer, setSelectedOffer] = useState(null);
 
@@ -528,6 +718,25 @@ const Offers = () => {
     setSelectedOffer(null);
   };
 
+  const handleCreateOffer = (newOffer) => {
+    const offer = {
+      ...newOffer,
+      id: Date.now(),
+      initials: newOffer.name
+          .split(" ")
+          .map((word) => word[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase(),
+    }
+
+    setOffers((prev) => [offer, ...prev])
+
+    toast.success("Offer generated successfully");
+
+    setActiveModal(null)
+  }
+
   const handleCloseModal = () => {
     setActiveModal(null);
     setSelectedOffer(null);
@@ -541,7 +750,7 @@ const Offers = () => {
           <h1>Offer Management</h1>
           <p>Track and manage candidate offers</p>
         </div>
-        <button className="generate-btn">
+        <button onClick={() => setActiveModal("create")} className="generate-btn">
           <FiFileText />
           Generate Offer
         </button>
@@ -732,6 +941,13 @@ const Offers = () => {
           offer={selectedOffer}
           onClose={handleCloseModal}
           onDelete={handleConfirmDelete}
+        />
+      )}
+
+      {activeModal === 'create' && (
+        <CreateOfferModal
+          onClose={handleCloseModal}
+          onSave={handleCreateOffer}
         />
       )}
 
