@@ -10,13 +10,14 @@ const ActiveDriveCard = () => {
       style={{
         background: "rgba(255,255,255,0.9)",
         backdropFilter: "blur(10px)",
+        cursor: "pointer",
         padding: "22px",
         borderRadius: "24px",
-        boxShadow: "0 10px 25px rgba(37,99,235,0.08)",
+        boxShadow: "0 10px 25px rgba(59,130,246,0.05)",
         width: "100%",
         maxWidth: "360px",
         border: "1px solid #e5e7eb",
-        borderTop: "5px solid #2563eb",
+        borderTop: "4px solid #3b82f6",
         transition: "all 0.25s ease",
         transform: "translateY(0px)",
       }}
@@ -66,7 +67,7 @@ const ActiveDriveCard = () => {
           e.currentTarget.style.opacity = "1";
         }}
         style={{
-          background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+          background: "linear-gradient(135deg, #3b82f6, #60a5fa)",
           color: "white",
           border: "none",
           padding: "12px 18px",

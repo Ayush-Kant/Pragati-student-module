@@ -12,14 +12,14 @@ const StatCard = ({ title, value }) => {
         backdropFilter: "blur(10px)",
         padding: "24px",
         borderRadius: "20px",
-        boxShadow: "0 10px 25px rgba(37,99,235,0.08)",
+        boxShadow: "0 10px 25px rgba(59,130,246,0.05)",
         minHeight: "140px",
         textAlign: "center",
         transform: "translateY(0px)",
         transition: "all 0.25s ease",
         cursor: "pointer",
         border: "1px solid #e5e7eb",
-        borderTop: "5px solid #2563eb",
+        borderTop: "4px solid #3b82f6",
       }}
     >
       <h3
@@ -37,7 +37,7 @@ const StatCard = ({ title, value }) => {
         style={{
           fontSize: "40px",
           fontWeight: "700",
-          color: "#2563eb",
+          color: "#3b82f6",
           margin: 0,
         }}
       >

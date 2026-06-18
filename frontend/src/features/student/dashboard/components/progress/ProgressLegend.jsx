@@ -19,10 +19,10 @@ const ProgressLegend = () => {
         backdropFilter: "blur(10px)",
         padding: "24px",
         borderRadius: "20px",
-        boxShadow: "0 10px 25px rgba(37,99,235,0.08)",
+        boxShadow: "0 10px 25px rgba(59,130,246,0.05)",
         width: "260px",
         border: "1px solid #e5e7eb",
-        borderTop: "5px solid #2563eb",
+        borderTop: "4px solid #3b82f6",
         transition: "all 0.25s ease",
         transform: "translateY(0px)",
         cursor: "pointer",
@@ -71,7 +71,7 @@ const ProgressLegend = () => {
               style={{
                 width: item.value,
                 height: "100%",
-                background: "#2563eb",
+                background: "#3b82f6",
                 borderRadius: "999px",
               }}
             />
