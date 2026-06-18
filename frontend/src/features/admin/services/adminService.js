@@ -50,87 +50,7 @@ export const getAdminProfile = async () => {
 };
 
 export const updateAdminProfile = async (profileData) => {
-  const response = await API.put(
-    "/profile",
-    profileData,
-    getConfig()
-  );
-  return response.data;
-};
-
-/* =========================
-   MENTOR MANAGEMENT
-========================= */
-
-// Get all mentors
-export const getMentors = async () => {
-  const response = await API.get(
-    "/mentors",
-    getConfig()
-  );
-  return response.data;
-};
-
-// Get mentor details
-export const getMentorById = async (mentorId) => {
-  const response = await API.get(
-    `/mentors/${mentorId}`,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Get mentor performance
-export const getMentorPerformance = async (mentorId) => {
-  const response = await API.get(
-    `/mentors/${mentorId}/performance`,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Register mentor
-export const registerMentor = async (mentorData) => {
-  const response = await API.post(
-    "/mentors",
-    mentorData,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Assign mentor to batch
-export const assignMentor = async (
-  mentorId,
-  assignData
-) => {
-  const response = await API.patch(
-    `/mentors/${mentorId}/assign`,
-    assignData,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Replace mentor
-export const replaceMentor = async (
-  mentorId,
-  replaceData
-) => {
-  const response = await API.patch(
-    `/mentors/${mentorId}/replace`,
-    replaceData,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Delete mentor
-export const removeMentor = async (mentorId) => {
-  const response = await API.delete(
-    `/mentors/${mentorId}`,
-    getConfig()
-  );
+  const response = await API.put("/profile", profileData, getConfig());
   return response.data;
 };
 
@@ -161,6 +81,7 @@ export const approveCollege = async (id) => {
     const response = await API.put(`/api/v1/admin/colleges/${id}/approve`);
     return response.data;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -172,6 +93,7 @@ export const rejectCollege = async (id, reason) => {
     });
     return response.data;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -183,6 +105,7 @@ export const suspendCollege = async (id, reason) => {
     });
     return response.data;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -210,8 +133,6 @@ export const fetchActivityFeed = async () => {
   const response = await API.get("/api/admin/dashboard/activity-feed");
   return response.data;
 };
-
-
 
 // Mock Mentor Data - Fallback when backend is unavailable
 const mockMentors = [
@@ -296,6 +217,7 @@ export const getMentors = async () => {
     const response = await API.get("/api/v1/admin/mentors");
     return response.data;
   } catch (error) {
+    console.log(error);
     return mockMentors;
   }
 };
@@ -310,6 +232,7 @@ export const getMentorById = async (mentorId) => {
     const response = await API.get(`/api/v1/admin/mentors/${mentorId}`);
     return response.data;
   } catch (error) {
+    console.log(error);
     const mentor = mockMentors.find((m) => m.id === mentorId);
     return mentor || mockMentors[0];
   }
@@ -327,9 +250,12 @@ export const getMentorPerformance = async (mentorId) => {
   }
 
   try {
-    const response = await API.get(`/api/v1/admin/mentors/${mentorId}/performance`);
+    const response = await API.get(
+      `/api/v1/admin/mentors/${mentorId}/performance`,
+    );
     return response.data;
   } catch (error) {
+    console.log(error);
     return {
       ...mockMentorPerformance,
       mentor: {
@@ -349,6 +275,7 @@ export const createMentor = async (mentorData) => {
     const response = await API.post("/api/v1/admin/mentors", mentorData);
     return response.data;
   } catch (error) {
+    console.log(error);
     return { success: true, data: mentorData };
   }
 };
@@ -361,10 +288,11 @@ export const assignMentor = async (mentorId, batchId) => {
   try {
     const response = await API.patch(
       `/api/v1/admin/mentors/${mentorId}/assign`,
-      { batchId }
+      { batchId },
     );
     return response.data;
   } catch (error) {
+    console.log(error);
     return { success: true, mentorId, batchId };
   }
 };
@@ -377,10 +305,11 @@ export const replaceMentor = async (mentorId, newMentorId) => {
   try {
     const response = await API.patch(
       `/api/v1/admin/mentors/${mentorId}/replace`,
-      { newMentorId }
+      { newMentorId },
     );
     return response.data;
   } catch (error) {
+    console.log(error);
     return { success: true, mentorId, newMentorId };
   }
 };
@@ -394,6 +323,7 @@ export const deleteMentor = async (mentorId) => {
     const response = await API.delete(`/api/v1/admin/mentors/${mentorId}`);
     return response.data;
   } catch (error) {
+    console.log(error);
     return { success: true, mentorId };
   }
 };
