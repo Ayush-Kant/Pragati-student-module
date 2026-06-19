@@ -1,5 +1,6 @@
-import { Toaster } from "react-hot-toast";
+import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 // Auth Pages
 import LoginPage from "./features/auth/LoginPage";

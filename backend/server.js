@@ -11,8 +11,6 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRouter from "./routes/auth.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 
-
-
 import dotenv from "dotenv";
 
 dotenv.config();
