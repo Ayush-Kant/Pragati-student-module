@@ -2,8 +2,7 @@
 -- Drops the existing empty/incompatible tables first, then creates the correct ones.
 -- Safe because both tables currently have 0 rows (confirmed before running this).
 
-DROP TABLE IF EXISTS recruitment_drives CASCADE;
-DROP TABLE IF EXISTS student_drive_progress CASCADE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_uid VARCHAR(128) UNIQUE;
 
 -- TABLE: recruitment_drives
 CREATE TABLE recruitment_drives (
@@ -21,7 +20,7 @@ CREATE TABLE recruitment_drives (
   required_skills      TEXT[],
   max_openings         INTEGER NOT NULL,
   application_deadline TIMESTAMPTZ,
-  assigned_test_id     INTEGER,
+  assigned_test_id INTEGER REFERENCES assessments(id),
   assigned_course_id   INTEGER REFERENCES courses(id),
   frozen               BOOLEAN NOT NULL DEFAULT FALSE,
   frozen_at            TIMESTAMPTZ,
