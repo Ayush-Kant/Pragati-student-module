@@ -21,7 +21,7 @@ CREATE TABLE recruitment_drives (
   required_skills      TEXT[],
   max_openings         INTEGER NOT NULL,
   application_deadline TIMESTAMPTZ,
-  assigned_test_id     INTEGER REFERENCES assessments(id),
+  assigned_test_id     INTEGER,
   assigned_course_id   INTEGER REFERENCES courses(id),
   frozen               BOOLEAN NOT NULL DEFAULT FALSE,
   frozen_at            TIMESTAMPTZ,
