@@ -374,28 +374,30 @@ export const getCandidates = async (driveId, { stage, page = 1, limit = 20 }) =>
   );
 
   const dataResult = await pool.query(
-    `SELECT
-        sdp.student_id, u.full_name, col.name AS college_name,
-        sdp.current_stage, sdp.assessment_score, sdp.training_completion
-     FROM student_drive_progress sdp
-     JOIN students s ON s.id = sdp.student_id
-     JOIN users u ON u.id = s.user_id
-     LEFT JOIN colleges col ON col.id = s.college_id
-     ${whereClause}
-     ORDER BY sdp.stage_updated_at DESC
-     LIMIT $${i++} OFFSET $${i++}`,
-    [...values, limit, offset]
-  );
+  `SELECT
+      sdp.student_id,
+      s.full_name,
+      s.college,
+      sdp.current_stage,
+      sdp.assessment_score,
+      sdp.training_completion
+   FROM student_drive_progress sdp
+   JOIN students s ON s.id = sdp.student_id
+   ${whereClause}
+   ORDER BY sdp.stage_updated_at DESC
+   LIMIT $${i++} OFFSET $${i++}`,
+  [...values, limit, offset]
+);
 
   return {
-    candidates: dataResult.rows.map((row) => ({
-      studentId: `stu_${row.student_id}`,
-      name: row.full_name,
-      college: row.college_name,
-      currentStage: row.current_stage,
-      assessmentScore: row.assessment_score !== null ? Number(row.assessment_score) : null,
-      trainingCompletion: `${row.training_completion ?? 0}%`,
-    })),
+   candidates: dataResult.rows.map((row) => ({
+  studentId: `stu_${row.student_id}`,
+  name: row.full_name,
+  college: row.college,
+  currentStage: row.current_stage,
+  assessmentScore: row.assessment_score !== null ? Number(row.assessment_score) : null,
+  trainingCompletion: `${row.training_completion ?? 0}%`,
+})),
     total: parseInt(countResult.rows[0].count, 10),
   };
 };
