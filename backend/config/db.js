@@ -1,4 +1,4 @@
-In db.js just add the data 
+
 import pg from "pg";
 import dotenv from "dotenv";
 import dns from "dns";
