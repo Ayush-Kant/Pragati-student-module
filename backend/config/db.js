@@ -1,3 +1,4 @@
+
 import pg from "pg";
 import dotenv from "dotenv";
 import dns from "dns";
@@ -31,4 +32,4 @@ export const connectDB = async () => {
   }
 };
 
-export default connectDB;
+export default pool;
