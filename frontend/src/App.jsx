@@ -37,7 +37,7 @@ function App() {
 
         {/* ── Student ───────────────────────────────────────────────── */}
         {StudentRoutes}
-
+         
       {/* Collge */}
 
       {collegeRoute}
