@@ -10,6 +10,8 @@ import cors from "cors";
 import companyRoutes from "./routes/company.routes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRouter from "./routes/auth.routes.js";
+import adminDriveRoutes from './routes/admin.drive.routes.js';
+const PORT = process.env.PORT || 5000;
 import interviewRoutes from "./routes/interview.routes.js";
 
 import dotenv from "dotenv";
