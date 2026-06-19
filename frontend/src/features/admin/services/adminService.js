@@ -63,76 +63,76 @@ export const updateAdminProfile = async (profileData) => {
 ========================= */
 
 // Get all mentors
-export const getMentors = async () => {
-  const response = await API.get(
-    "/mentors",
-    getConfig()
-  );
-  return response.data;
-};
+// export const getMentors = async () => {
+//   const response = await API.get(
+//     "/mentors",
+//     getConfig()
+//   );
+//   return response.data;
+// };
 
-// Get mentor details
-export const getMentorById = async (mentorId) => {
-  const response = await API.get(
-    `/mentors/${mentorId}`,
-    getConfig()
-  );
-  return response.data;
-};
+// // Get mentor details
+// export const getMentorById = async (mentorId) => {
+//   const response = await API.get(
+//     `/mentors/${mentorId}`,
+//     getConfig()
+//   );
+//   return response.data;
+// };
 
-// Get mentor performance
-export const getMentorPerformance = async (mentorId) => {
-  const response = await API.get(
-    `/mentors/${mentorId}/performance`,
-    getConfig()
-  );
-  return response.data;
-};
+// // Get mentor performance
+// export const getMentorPerformance = async (mentorId) => {
+//   const response = await API.get(
+//     `/mentors/${mentorId}/performance`,
+//     getConfig()
+//   );
+//   return response.data;
+// };
 
-// Register mentor
-export const registerMentor = async (mentorData) => {
-  const response = await API.post(
-    "/mentors",
-    mentorData,
-    getConfig()
-  );
-  return response.data;
-};
+// // Register mentor
+// export const registerMentor = async (mentorData) => {
+//   const response = await API.post(
+//     "/mentors",
+//     mentorData,
+//     getConfig()
+//   );
+//   return response.data;
+// };
 
-// Assign mentor to batch
-export const assignMentor = async (
-  mentorId,
-  assignData
-) => {
-  const response = await API.patch(
-    `/mentors/${mentorId}/assign`,
-    assignData,
-    getConfig()
-  );
-  return response.data;
-};
+// // Assign mentor to batch
+// export const assignMentor = async (
+//   mentorId,
+//   assignData
+// ) => {
+//   const response = await API.patch(
+//     `/mentors/${mentorId}/assign`,
+//     assignData,
+//     getConfig()
+//   );
+//   return response.data;
+// };
 
-// Replace mentor
-export const replaceMentor = async (
-  mentorId,
-  replaceData
-) => {
-  const response = await API.patch(
-    `/mentors/${mentorId}/replace`,
-    replaceData,
-    getConfig()
-  );
-  return response.data;
-};
+// // Replace mentor
+// export const replaceMentor = async (
+//   mentorId,
+//   replaceData
+// ) => {
+//   const response = await API.patch(
+//     `/mentors/${mentorId}/replace`,
+//     replaceData,
+//     getConfig()
+//   );
+//   return response.data;
+// };
 
-// Delete mentor
-export const removeMentor = async (mentorId) => {
-  const response = await API.delete(
-    `/mentors/${mentorId}`,
-    getConfig()
-  );
-  return response.data;
-};
+// // Delete mentor
+// export const removeMentor = async (mentorId) => {
+//   const response = await API.delete(
+//     `/mentors/${mentorId}`,
+//     getConfig()
+//   );
+//   return response.data;
+// };
 
 //For college needing recruitment
 export const getNeedsRecruitment = async () => {
@@ -396,4 +396,42 @@ export const deleteMentor = async (mentorId) => {
   } catch (error) {
     return { success: true, mentorId };
   }
+};
+
+
+export const getDrives = async () => {
+    if (USE_MOCK_DATA) return mockDrives;
+
+    try {
+        const response = await API.get("/api/v1/admin/drives");
+        return response.data;
+    }
+    catch (error) {
+        return mockDrives;
+    }
+};
+
+
+export const createDrive = async (driveData) => {
+    if (USE_MOCK_DATA) {
+        return {
+            success: true,
+            data: driveData
+        };
+    }
+
+    try {
+        const response = await API.post(
+            "/api/v1/admin/drives",
+            driveData
+        );
+
+        return response.data;
+    }
+    catch (error) {
+        return {
+            success: true,
+            data: driveData
+        };
+    }
 };
