@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS assessment_assignments (
 );
 
 -- INDEXES
-CREATE INDEX idx_assessments_type ON assessments(type);
-CREATE INDEX idx_assessments_status ON assessments(status);
-CREATE INDEX idx_assessments_difficulty ON assessments(difficulty);
-CREATE INDEX idx_questions_assessment ON assessment_questions(assessment_id);
-CREATE INDEX idx_assignment_drive ON assessment_assignments(drive_id);
+CREATE INDEX IF NOT EXISTS idx_assessments_type ON assessments(type);
+CREATE INDEX IF NOT EXISTS idx_assessments_status ON assessments(status);
+CREATE INDEX IF NOT EXISTS idx_assessments_difficulty ON assessments(difficulty);
+CREATE INDEX IF NOT EXISTS idx_questions_assessment ON assessment_questions(assessment_id);
+CREATE INDEX IF NOT EXISTS idx_assignment_drive ON assessment_assignments(drive_id);
