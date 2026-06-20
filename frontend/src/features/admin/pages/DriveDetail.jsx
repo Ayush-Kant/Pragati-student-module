@@ -14,19 +14,12 @@ import ShortlistModal from "../components/ShortlistModal";
 import DriveStatusBadge from "../components/DriveStatusBadge";
 import DriveStageBadge from "../components/DriveStageBadge";
 
-
 const DriveDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const {
-    drive,
-    candidates,
-    loading,
-    error,
-    refreshDrive,
-    refreshCandidates,
-  } = useDriveDetail(id);
+  const { drive, candidates, loading, error, refreshDrive, refreshCandidates } =
+    useDriveDetail(id);
 
   const [showAssignTest, setShowAssignTest] = useState(false);
   const [showAssignCourse, setShowAssignCourse] = useState(false);
@@ -55,17 +48,14 @@ const DriveDetail = () => {
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="text-sm text-blue-600 hover:underline"
+        className="mb-4 rounded border border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-50"
       >
-        ← Back
+        ← Back to Drives
       </button>
-
       {/* Header */}
       <div className="rounded-lg border bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold">
-            {drive?.title}
-          </h1>
+          <h1 className="text-2xl font-bold">{drive?.title}</h1>
 
           <DriveStatusBadge status={drive?.status} />
 
@@ -79,9 +69,7 @@ const DriveDetail = () => {
         {/* Assigned Test */}
         {drive?.assignedTest && (
           <div className="mt-4">
-            <span className="mr-2 text-sm font-medium">
-              Assigned Test:
-            </span>
+            <span className="mr-2 text-sm font-medium">Assigned Test:</span>
 
             <span className="rounded-full bg-blue-100 px-3 py-1 text-sm">
               {drive.assignedTest.title}
@@ -92,9 +80,7 @@ const DriveDetail = () => {
         {/* Assigned Course */}
         {drive?.assignedCourse && (
           <div className="mt-3">
-            <span className="mr-2 text-sm font-medium">
-              Assigned Course:
-            </span>
+            <span className="mr-2 text-sm font-medium">Assigned Course:</span>
 
             <span className="rounded-full bg-green-100 px-3 py-1 text-sm">
               {drive.assignedCourse.title}
