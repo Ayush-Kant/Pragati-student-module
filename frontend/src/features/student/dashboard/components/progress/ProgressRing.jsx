@@ -1,68 +1,79 @@
-const ProgressRing = () => {
+import { progressRingData } from "../../types/dashboardDummyData";
+
+const ProgressRing = ({ loading = false, error = false }) => {
+  if (loading) {
+    return <div className="text-gray-500">Loading progress...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Failed to load progress.</div>;
+  }
+
+  const { percentage } = progressRingData;
+
   return (
     <div
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-6px)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0px)";
-      }}
-      style={{
-        background: "rgba(255,255,255,0.9)",
-        backdropFilter: "blur(10px)",
-        padding: "30px",
-        borderRadius: "24px",
-        boxShadow: "0 10px 25px rgba(59,130,246,0.05)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        width: "260px",
-        border: "1px solid #e5e7eb",
-        borderTop: "4px solid #2b82f6",
-        transition: "all 0.25s ease",
-        transform: "translateY(0px)",
-        cursor: "pointer",
-      }}
+      className="
+        bg-white/90
+        backdrop-blur-md
+        p-8
+        rounded-3xl
+        shadow-md
+        flex
+        flex-col
+        items-center
+        w-full
+        max-w-[260px]
+        border
+        border-gray-200
+        border-t-4
+        border-t-blue-500
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-xl
+        cursor-pointer
+      "
     >
       <h2
-        style={{
-          marginBottom: "24px",
-          color: "#111827",
-          fontSize: "20px",
-          fontWeight: "600",
-          letterSpacing: "-0.5px",
-          fontFamily: "Inter, sans-serif",
-        }}
+        className="
+          mb-6
+          text-gray-900
+          text-2xl
+          font-semibold
+        "
       >
         Profile Completion
       </h2>
 
       <div
+        className="
+          w-[140px]
+          h-[140px]
+          rounded-full
+          flex
+          items-center
+          justify-center
+        "
         style={{
-          width: "140px",
-          height: "140px",
-          borderRadius: "50%",
-          background: "conic-gradient(#3b82f6 0% 75%, #bfdbfe 75% 100%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          background: `conic-gradient(#3b82f6 0% ${percentage}%, #bfdbfe ${percentage}% 100%)`,
         }}
       >
         <div
-          style={{
-            width: "96px",
-            height: "96px",
-            borderRadius: "50%",
-            background: "#ffffff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "22px",
-            fontWeight: "700",
-            color: "#111827",
-          }}
+          className="
+            w-[96px]
+            h-[96px]
+            rounded-full
+            bg-white
+            flex
+            items-center
+            justify-center
+            text-2xl
+            font-bold
+            text-gray-900
+          "
         >
-          75%
+          {percentage}%
         </div>
       </div>
     </div>

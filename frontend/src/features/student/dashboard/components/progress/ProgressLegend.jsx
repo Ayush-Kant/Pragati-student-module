@@ -1,78 +1,58 @@
-const ProgressLegend = () => {
-  const items = [
-    { label: "DSA", value: "40%" },
-    { label: "Projects", value: "30%" },
-    { label: "Resume", value: "20%" },
-    { label: "Aptitude", value: "10%" },
-  ];
+import { skillsBreakdownData } from "../../types/dashboardDummyData";
+
+const ProgressLegend = ({ loading = false, error = false }) => {
+  if (loading) {
+    return <div className="text-gray-500">Loading skills...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Failed to load skills.</div>;
+  }
 
   return (
     <div
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-6px)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0px)";
-      }}
-      style={{
-        background: "rgba(255,255,255,0.9)",
-        backdropFilter: "blur(10px)",
-        padding: "24px",
-        borderRadius: "20px",
-        boxShadow: "0 10px 25px rgba(59,130,246,0.05)",
-        width: "260px",
-        border: "1px solid #e5e7eb",
-        borderTop: "4px solid #3b82f6",
-        transition: "all 0.25s ease",
-        transform: "translateY(0px)",
-        cursor: "pointer",
-      }}
+      className="
+        bg-white/90
+        backdrop-blur-md
+        p-6
+        rounded-3xl
+        shadow-md
+        w-full
+        max-w-[260px]
+        border
+        border-gray-200
+        border-t-4
+        border-t-blue-500
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-xl
+        cursor-pointer
+      "
     >
       <h3
-        style={{
-          marginBottom: "22px",
-          color: "#111827",
-          fontSize: "20px",
-          fontWeight: "600",
-          letterSpacing: "-0.5px",
-          fontFamily: "Inter, sans-serif",
-        }}
+        className="
+          mb-6
+          text-gray-900
+          text-2xl
+          font-semibold
+        "
       >
         Skills Breakdown
       </h3>
 
-      {items.map((item, index) => (
-        <div
-          key={index}
-          style={{
-            marginBottom: "18px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "8px",
-            }}
-          >
+      {skillsBreakdownData.map((item, index) => (
+        <div key={index} className="mb-5">
+          <div className="flex justify-between mb-2">
             <span>{item.label}</span>
             <span>{item.value}</span>
           </div>
 
-          <div
-            style={{
-              width: "100%",
-              height: "10px",
-              background: "#e5e7eb",
-              borderRadius: "999px",
-            }}
-          >
+          <div className="w-full h-2 bg-gray-200 rounded-full">
             <div
+              className="h-full bg-blue-500 rounded-full"
               style={{
                 width: item.value,
-                height: "100%",
-                background: "#3b82f6",
-                borderRadius: "999px",
               }}
             />
           </div>

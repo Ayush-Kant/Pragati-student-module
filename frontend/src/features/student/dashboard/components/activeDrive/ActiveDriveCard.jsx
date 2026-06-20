@@ -1,84 +1,82 @@
-const ActiveDriveCard = () => {
+import { activeDriveData } from "../../types/dashboardDummyData";
+
+const ActiveDriveCard = ({ loading = false, error = false }) => {
+  if (loading) {
+    return <div className="text-gray-500">Loading drive...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Failed to load drive.</div>;
+  }
+
+  const { company, role, package: pkg, deadline, status } = activeDriveData;
+
   return (
     <div
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-6px)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0px)";
-      }}
-      style={{
-        background: "rgba(255,255,255,0.9)",
-        backdropFilter: "blur(10px)",
-        cursor: "pointer",
-        padding: "22px",
-        borderRadius: "24px",
-        boxShadow: "0 10px 25px rgba(59,130,246,0.05)",
-        width: "100%",
-        maxWidth: "360px",
-        border: "1px solid #e5e7eb",
-        borderTop: "4px solid #3b82f6",
-        transition: "all 0.25s ease",
-        transform: "translateY(0px)",
-      }}
+      className="
+        bg-white/90
+        backdrop-blur-md
+        p-6
+        rounded-3xl
+        shadow-md
+        w-full
+        max-w-[360px]
+        border
+        border-gray-200
+        border-t-4
+        border-t-blue-500
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-xl
+        cursor-pointer
+      "
     >
       <div
-        style={{
-          display: "inline-block",
-          padding: "6px 14px",
-          borderRadius: "999px",
-          background: "#dcfce7",
-          color: "#16a34a",
-          fontSize: "14px",
-          fontWeight: "600",
-          marginBottom: "18px",
-        }}
+        className="
+          inline-block
+          px-4
+          py-2
+          rounded-full
+          bg-green-100
+          text-green-600
+          text-sm
+          font-semibold
+          mb-5
+        "
       >
-        Active Drive
+        {status}
       </div>
 
-      <h2
-        style={{
-          margin: "0 0 10px 0",
-          fontSize: "24px",
-          color: "#111827",
-        }}
-      >
-        Google
-      </h2>
+      <h2 className="text-3xl font-semibold text-gray-900 mb-3">{company}</h2>
 
-      <p style={{ color: "#4b5563", marginBottom: "10px" }}>
-        Role: <strong>SDE Intern</strong>
+      <p className="text-gray-600 mb-3">
+        Role: <strong>{role}</strong>
       </p>
 
-      <p style={{ color: "#4b5563", marginBottom: "10px" }}>
-        Package: <strong>12 LPA</strong>
+      <p className="text-gray-600 mb-3">
+        Package: <strong>{pkg}</strong>
       </p>
 
-      <p style={{ color: "#4b5563", marginBottom: "20px" }}>
-        Deadline: <strong>20 June</strong>
+      <p className="text-gray-600 mb-6">
+        Deadline: <strong>{deadline}</strong>
       </p>
 
       <button
-        onMouseEnter={(e) => {
-          e.currentTarget.style.opacity = "0.9";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.opacity = "1";
-        }}
-        style={{
-          background: "linear-gradient(135deg, #3b82f6, #60a5fa)",
-          color: "white",
-          border: "none",
-          padding: "12px 18px",
-          borderRadius: "12px",
-          fontSize: "15px",
-          fontWeight: "600",
-          cursor: "pointer",
-          width: "100%",
-          boxShadow: "0 6px 14px rgba(37,99,235,0.3)",
-          transition: "0.3s",
-        }}
+        className="
+          w-full
+          bg-gradient-to-r
+          from-blue-500
+          to-blue-400
+          text-white
+          py-3
+          rounded-xl
+          font-semibold
+          shadow-md
+          transition-all
+          duration-300
+          hover:opacity-90
+        "
       >
         Apply Now
       </button>

@@ -1,48 +1,28 @@
 const StatCard = ({ title, value }) => {
   return (
     <div
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-6px)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0px)";
-      }}
-      style={{
-        background: "rgba(255,255,255,0.9)",
-        backdropFilter: "blur(10px)",
-        padding: "24px",
-        borderRadius: "20px",
-        boxShadow: "0 10px 25px rgba(59,130,246,0.05)",
-        minHeight: "140px",
-        textAlign: "center",
-        transform: "translateY(0px)",
-        transition: "all 0.25s ease",
-        cursor: "pointer",
-        border: "1px solid #e5e7eb",
-        borderTop: "4px solid #3b82f6",
-      }}
+      className="
+        bg-white/90
+        backdrop-blur-md
+        p-6
+        rounded-2xl
+        shadow-md
+        min-h-[140px]
+        text-center
+        border
+        border-gray-200
+        border-t-4
+        border-t-blue-500
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-xl
+        cursor-pointer
+      "
     >
-      <h3
-        style={{
-          color: "#6b7280",
-          fontSize: "16px",
-          marginBottom: "14px",
-          fontWeight: "500",
-        }}
-      >
-        {title}
-      </h3>
+      <h3 className="text-gray-500 text-base mb-4 font-medium">{title}</h3>
 
-      <p
-        style={{
-          fontSize: "40px",
-          fontWeight: "700",
-          color: "#3b82f6",
-          margin: 0,
-        }}
-      >
-        {value}
-      </p>
+      <p className="text-4xl font-bold text-blue-500">{value}</p>
     </div>
   );
 };
