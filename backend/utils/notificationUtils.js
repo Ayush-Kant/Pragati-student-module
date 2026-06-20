@@ -12,39 +12,44 @@ const processNotifications = (notifications = []) => {
   }));
 };
 
-const handleExpiredToken = (error) => {
-  if (
-    error &&
-    (error.name === "TokenExpiredError" ||
-      error.message?.includes("jwt expired"))
-  ) {
-    return {
-      success: false,
-      status: 401,
-      message: "JWT token expired",
-    };
-  }
-
-  return null;
-};
-
 const handleZeroTasks = (tasks = []) => {
   if (!tasks || tasks.length === 0) {
     return {
-      count: 0,
-      tasks: [],
+      totalTasks: 0,
+      pendingTasks: [],
       message: "No pending tasks",
     };
   }
 
   return {
-    count: tasks.length,
-    tasks,
+    totalTasks: tasks.length,
+    pendingTasks: tasks,
+  };
+};
+
+const sanitizeReadinessScore = (student = {}) => {
+  const { overall_score, ...safeStudent } = student;
+  return safeStudent;
+};
+
+const injectIsSelf = (leaderboard = [], studentId) => {
+  return leaderboard.map((student) => ({
+    ...student,
+    isSelf: student.id === studentId,
+  }));
+};
+
+const aggregateDashboardPayload = (payload = {}) => {
+  return {
+    success: true,
+    data: payload,
   };
 };
 
 module.exports = {
   processNotifications,
-  handleExpiredToken,
   handleZeroTasks,
+  sanitizeReadinessScore,
+  injectIsSelf,
+  aggregateDashboardPayload,
 };

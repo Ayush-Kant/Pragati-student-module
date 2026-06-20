@@ -1,58 +1,75 @@
 const { validate: isUUID } = require("uuid");
 
+const createResponse = (success, status, message, data = null) => ({
+  success,
+  status,
+  message,
+  data,
+});
+
 const verifyDashboardAccess = (user) => {
   if (!user) {
-    return {
-      success: false,
-      status: 401,
-      message: "Unauthorized access",
-    };
+    return createResponse(false, 401, "Unauthorized access");
   }
 
-  if (user.role !== "student") {
-    return {
-      success: false,
-      status: 403,
-      message: "Forbidden access",
-    };
+  if (!user.role || user.role.toUpperCase() !== "STUDENT") {
+    return createResponse(false, 403, "Forbidden access");
   }
 
-  return {
-    success: true,
-  };
+  return createResponse(true, 200, "Access granted");
 };
 
-const validateOwnership = (userId, ownerId) => {
-  if (!userId || !ownerId) {
-    return {
-      success: false,
-      status: 400,
-      message: "Missing user information",
-    };
+const validateDriveId = (driveId) => {
+  if (!driveId || !isUUID(driveId)) {
+    return createResponse(false, 400, "Invalid drive ID");
   }
 
-  if (!isUUID(userId) || !isUUID(ownerId)) {
-    return {
-      success: false,
-      status: 400,
-      message: "Invalid UUID",
-    };
+  return createResponse(true, 200, "Valid drive ID");
+};
+
+const validateOwnership = (userId, driveOwnerId, driveId) => {
+  const driveValidation = validateDriveId(driveId);
+
+  if (!driveValidation.success) {
+    return driveValidation;
   }
 
-  if (userId !== ownerId) {
-    return {
-      success: false,
-      status: 403,
-      message: "You are not authorized to access this resource",
-    };
+  if (!userId || !driveOwnerId) {
+    return createResponse(false, 400, "Missing user information");
   }
 
-  return {
-    success: true,
-  };
+  if (!isUUID(userId) || !isUUID(driveOwnerId)) {
+    return createResponse(false, 400, "Invalid UUID");
+  }
+
+  if (userId !== driveOwnerId) {
+    return createResponse(
+      false,
+      403,
+      "You are not authorized to access this drive"
+    );
+  }
+
+  return createResponse(true, 200, "Ownership verified");
+};
+
+const handleExpiredToken = (error) => {
+  if (!error) return null;
+
+  if (error.name === "TokenExpiredError") {
+    return createResponse(false, 401, "Token expired");
+  }
+
+  if (error.name === "JsonWebTokenError") {
+    return createResponse(false, 401, "Invalid token");
+  }
+
+  return null;
 };
 
 module.exports = {
   verifyDashboardAccess,
   validateOwnership,
+  validateDriveId,
+  handleExpiredToken,
 };
