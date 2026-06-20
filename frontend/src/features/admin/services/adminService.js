@@ -1,15 +1,28 @@
 import axios from "axios";
 
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:5000";
+
 const API = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: API_URL,
+});
+
+const getConfig = () => ({
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
 });
 
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error),
@@ -22,17 +35,102 @@ API.interceptors.response.use(
       localStorage.removeItem("token");
       window.location.href = "/login";
     }
+
     return Promise.reject(error);
   },
 );
 
+/* =========================
+   ADMIN PROFILE
+========================= */
+
 export const getAdminProfile = async () => {
-  const response = await API.get("/profile");
+  const response = await API.get("/profile", getConfig());
   return response.data;
 };
 
 export const updateAdminProfile = async (profileData) => {
-  const response = await API.put("/profile", profileData);
+  const response = await API.put(
+    "/profile",
+    profileData,
+    getConfig()
+  );
+  return response.data;
+};
+
+/* =========================
+   MENTOR MANAGEMENT
+========================= */
+
+// Get all mentors
+export const getMentors = async () => {
+  const response = await API.get(
+    "/mentors",
+    getConfig()
+  );
+  return response.data;
+};
+
+// Get mentor details
+export const getMentorById = async (mentorId) => {
+  const response = await API.get(
+    `/mentors/${mentorId}`,
+    getConfig()
+  );
+  return response.data;
+};
+
+// Get mentor performance
+export const getMentorPerformance = async (mentorId) => {
+  const response = await API.get(
+    `/mentors/${mentorId}/performance`,
+    getConfig()
+  );
+  return response.data;
+};
+
+// Register mentor
+export const registerMentor = async (mentorData) => {
+  const response = await API.post(
+    "/mentors",
+    mentorData,
+    getConfig()
+  );
+  return response.data;
+};
+
+// Assign mentor to batch
+export const assignMentor = async (
+  mentorId,
+  assignData
+) => {
+  const response = await API.patch(
+    `/mentors/${mentorId}/assign`,
+    assignData,
+    getConfig()
+  );
+  return response.data;
+};
+
+// Replace mentor
+export const replaceMentor = async (
+  mentorId,
+  replaceData
+) => {
+  const response = await API.patch(
+    `/mentors/${mentorId}/replace`,
+    replaceData,
+    getConfig()
+  );
+  return response.data;
+};
+
+// Delete mentor
+export const removeMentor = async (mentorId) => {
+  const response = await API.delete(
+    `/mentors/${mentorId}`,
+    getConfig()
+  );
   return response.data;
 };
 
@@ -87,28 +185,4 @@ export const suspendCollege = async (id, reason) => {
   } catch (error) {
     throw error;
   }
-};
-export const fetchDashboardStats = async () => {
-  const response = await API.get("/api/admin/dashboard/stats");
-  return response.data;
-};
-
-export const fetchDashboardFunnel = async () => {
-  const response = await API.get("/api/admin/dashboard/funnel");
-  return response.data;
-};
-
-export const fetchCompanyStats = async () => {
-  const response = await API.get("/api/admin/dashboard/company-stats");
-  return response.data;
-};
-
-export const fetchCollegePerformance = async () => {
-  const response = await API.get("/api/admin/dashboard/college-performance");
-  return response.data;
-};
-
-export const fetchActivityFeed = async () => {
-  const response = await API.get("/api/admin/dashboard/activity-feed");
-  return response.data;
 };
