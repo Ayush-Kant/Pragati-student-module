@@ -18,6 +18,7 @@ import CompanyDetail from "../pages/CompanyDetail";
 import ActiveDrives from "../pages/ActiveDrives";
 import CompanyRankings from "../pages/CompanyRankings";
 import MentorDetail from "../pages/MentorDetail";
+import DriveDetail from "../pages/DriveDetail";
 
 const adminRoutes = (
   <Route path="admin" element={<AdminLayout />}>
@@ -32,6 +33,7 @@ const adminRoutes = (
     <Route path="assesments" element={<AdminAssesment />} />
     <Route path="training" element={<AdminTraining />} />
     <Route path="drives" element={<AdminDrives />} />
+    <Route path="drives/:id" element={<DriveDetail />} />
     <Route path="notification" element={<AdminNotifications />} />
     <Route path="disputes" element={<AdminDisputes />} />
   </Route>
