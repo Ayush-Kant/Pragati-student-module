@@ -1,5 +1,6 @@
 import DriveStatusBadge from "./DriveStatusBadge";
 import DriveStageBadge from "./DriveStageBadge";
+import { useNavigate } from "react-router-dom";
 
 export default function DriveTable({
   drives,
@@ -8,6 +9,7 @@ export default function DriveTable({
   onUnfreeze,
 }) {
 
+  const navigate = useNavigate();
   return (
     <div className="bg-white shadow rounded overflow-hidden">
 
@@ -53,10 +55,11 @@ export default function DriveTable({
               <td className="p-3 flex gap-2">
 
                 <button
-                  className="bg-blue-500 text-white px-3 py-1 rounded"
-                >
-                  View
-                </button>
+  className="bg-blue-500 text-white px-3 py-1 rounded"
+  onClick={() => navigate(`/admin/drives/${drive.id}`)}
+>
+  View
+</button>
 
                 {
                   drive.status === "frozen"
