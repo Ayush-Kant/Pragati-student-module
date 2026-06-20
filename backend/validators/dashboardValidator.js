@@ -1,8 +1,49 @@
 export const validateDashboard = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized access",
+        });
+    }
+
     next();
 };
 
 export const validateDriveId = (req, res, next) => {
+    const { driveId } = req.params;
+
+    const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+    if (!driveId) {
+        return res.status(400).json({
+            success: false,
+            message: "Drive ID is required",
+        });
+    }
+
+    if (!uuidRegex.test(driveId)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid Drive ID format",
+        });
+    }
+
+    next();
+};
+
+export const validateStudent = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            message: "Student authentication required",
+        });
+    }
+
+    next();
+};
+
+export const validateLeaderboard = (req, res, next) => {
     const { driveId } = req.params;
 
     if (!driveId) {
@@ -12,23 +53,6 @@ export const validateDriveId = (req, res, next) => {
         });
     }
 
-    next();
-};
-
-export const validateStudent = (req, res, next) => {
-    const { studentId } = req.body;
-
-    if (!studentId) {
-        return res.status(400).json({
-            success: false,
-            message: "Student ID is required",
-        });
-    }
-
-    next();
-};
-
-export const validateLeaderboard = (req, res, next) => {
     next();
 };
 
