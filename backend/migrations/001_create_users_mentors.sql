@@ -1,23 +1,25 @@
 -- TABLE 1: auth_users (login credentials)
 CREATE TABLE IF NOT EXISTS auth_users (
   id                  SERIAL PRIMARY KEY,
+  uuid_id             UUID DEFAULT gen_random_uuid() UNIQUE,
   email               VARCHAR(255) UNIQUE NOT NULL,
   password_hash       VARCHAR(255) NOT NULL,
   role                VARCHAR(20) NOT NULL
-                      CHECK (role IN ('mentor','student','company','admin')),
+                      CHECK (role IN ('mentor','student','company','admin','college')),
   created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- TABLE 2: users
 CREATE TABLE IF NOT EXISTS users (
   id            SERIAL PRIMARY KEY,
-  full_name     VARCHAR(50) NOT NULL,
+  full_name     VARCHAR(255),
   auth_user_id  BIGINT UNIQUE NOT NULL
                 REFERENCES auth_users(id)
                 ON DELETE CASCADE,
   email         VARCHAR(255) UNIQUE NOT NULL,
-  role          VARCHAR(20) NOT NULL
-                CHECK (role IN ('mentor','student','company','admin')),
+  role          VARCHAR(50) NOT NULL,
+  username      VARCHAR(255),
+  phone         VARCHAR(20),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

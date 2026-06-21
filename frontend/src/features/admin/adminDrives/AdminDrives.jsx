@@ -1,11 +1,8 @@
 import React from 'react'
+import DriveManagement from '../pages/DriveManagement';
 
 const AdminDrives = () => {
-  return (
-    <div>
-      Admin Drives
-    </div>
-  )
+  return <DriveManagement/>;
 }
 
-export default AdminDrives
+export default AdminDrives;
