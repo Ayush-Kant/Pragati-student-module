@@ -1,10 +1,10 @@
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
-<<<<<<< HEAD
+
 import { Toaster } from "react-hot-toast";
-=======
+
 import ProfileManagementPage from "./features/student/profile/pages/ProfileManagementPage";
->>>>>>> parent of 9a0f98c (Revert "Feature/mentor export report fe")
+
 
 // Auth Pages
 import LoginPage from "./features/auth/LoginPage";
