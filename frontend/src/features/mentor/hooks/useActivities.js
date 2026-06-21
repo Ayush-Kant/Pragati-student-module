@@ -8,7 +8,8 @@ export const mockActivities = [
     dueAt: "2025-05-25T23:59:00Z",
     status: "pending",
     assignedCount: 24,
-    submissionCount: 10
+    submissionCount: 10,
+    mentee: "John Doe"
   },
   {
     id: 2,
@@ -17,7 +18,8 @@ export const mockActivities = [
     dueAt: "2025-05-18T23:59:00Z",
     status: "completed",
     assignedCount: 32,
-    submissionCount: 32
+    submissionCount: 32,
+    mentee: "Jane Smith"
   },
   {
     id: 3,
@@ -26,7 +28,8 @@ export const mockActivities = [
     dueAt: null,
     status: "completed",
     assignedCount: 28,
-    submissionCount: 28
+    submissionCount: 28,
+    mentee: "John Doe"
   }
 ];
 

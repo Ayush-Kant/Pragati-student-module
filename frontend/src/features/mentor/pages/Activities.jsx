@@ -1,7 +1,7 @@
-import React from 'react';
-import ActivityFeed from '../components/activities/ActivityFeed';
+import React from "react";
+import ActivityFeed from "../components/activities/ActivityFeed";
 
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const Activities = () => {
   const handleExportReport = () => {
@@ -10,7 +10,7 @@ const Activities = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
+    <div className="p-2 sm:p-4 lg:p-8 bg-gray-50 min-h-screen">
       <style>{`
         @media print {
           body * {
@@ -51,10 +51,16 @@ const Activities = () => {
           </p>
         </div>
         <div className="flex items-center gap-2 sm:gap-4 no-print activity-actions">
-          <button onClick={handleExportReport} className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
+          <button
+            onClick={handleExportReport}
+            className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+          >
             Export Report (.pdf)
           </button>
-          <Link to="/mentor/activities/create" className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700">
+          <Link
+            to="/mentor/activities/create"
+            className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700"
+          >
             + Create Activity
           </Link>
         </div>

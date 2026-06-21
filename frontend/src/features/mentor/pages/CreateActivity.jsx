@@ -62,6 +62,10 @@ const CreateActivity = () => {
       toast.error('Due date cannot be in the past.');
       return;
     }
+    if (formData.maxScore < 1 || formData.maxScore > 100) {
+        toast.error('Max score must be between 1 and 100.');
+        return;
+    }
     if (formData.assignDate) {
       const assign = new Date(formData.assignDate);
       if (assign.setHours(0,0,0,0) < new Date(todayStr).setHours(0,0,0,0)) {
@@ -137,6 +141,10 @@ const CreateActivity = () => {
                   placeholder="Enter a detailed description of the activity..."
                 />
               </div>
+            </div>
+            <div className="mt-6">
+              <label htmlFor="maxScore" className="block text-sm font-medium text-gray-700">Max Score</label>
+              <input type="number" name="maxScore" id="maxScore" value={formData.maxScore} onChange={handleInputChange} className="block w-full mt-1 border border-gray-300 px-3 py-2 rounded-md shadow-sm" min="1" max="100" />
             </div>
             <div className="mt-6">
               <label htmlFor="tags" className="block text-sm font-medium text-gray-700">Tags</label>

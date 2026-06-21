@@ -36,12 +36,9 @@
     "react-router-dom": "^7.17.0",
     "recharts": "^3.8.1",
     "tailwindcss": "^4.3.0",
-<<<<<<< HEAD
     "react-hook-form": "^7.75.0",
     "react-hot-toast": "^2.6.0",
-=======
     "xlsx": "^0.18.5",
->>>>>>> parent of 9a0f98c (Revert "Feature/mentor export report fe")
     "zod": "^4.4.3"
   },
   "devDependencies": {

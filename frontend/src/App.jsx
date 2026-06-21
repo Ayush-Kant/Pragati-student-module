@@ -1,13 +1,9 @@
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
-<<<<<<< HEAD
-import { Toaster } from "react-hot-toast";
-=======
-import ProfileManagementPage from "./features/student/profile/pages/ProfileManagementPage";
->>>>>>> parent of 9a0f98c (Revert "Feature/mentor export report fe")
 
-import PrivateRoute from "./routes/PrivateRoute";
-import RoleRoute from "./routes/RoleRoute";
+import { Toaster } from "react-hot-toast";
+
+// import ProfileManagementPage from "./features/student/profile/pages/ProfileManagementPage";
 
 // Auth Pages
 import LoginPage from "./features/auth/LoginPage";
@@ -20,13 +16,7 @@ import StudentRoutes from "./features/student/routes/StudentRoutes";
 
 // Admin / Mentor / College / Company Routes
 import AdminRoute from "./features/admin/routes/AdminRoutes";
-import MentorLayout from "./features/mentor/MentorLayout";
-import Activities from "./features/mentor/pages/Activities";
-import CreateActivity from "./features/mentor/pages/CreateActivity";
-import ActivityTemplates from "./features/mentor/pages/ActivityTemplates";
-import ManageDeadlines from "./features/mentor/pages/ManageDeadlines";
-import BulkAssignActivity from "./features/mentor/pages/BulkAssignActivity";
-import ActivityCalendar from "./features/mentor/pages/ActivityCalendar";
+import mentorRoute from "./features/mentor/routes/MentorRoutes";
 import collegeRoute from "./features/college/routes/AppRoutes";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
 
@@ -44,20 +34,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Mentor (protected) */}
-        <Route element={<PrivateRoute />}>
-          <Route element={<RoleRoute allowedRoles={['mentor']} />}>
-            <Route path="/mentor" element={<MentorLayout />}>
-              <Route index element={<Activities />} />
-              <Route path="activities" element={<Activities />} />
-              <Route path="activities/create" element={<CreateActivity />} />
-              <Route path="activities/templates" element={<ActivityTemplates />} />
-              <Route path="activities/deadlines" element={<ManageDeadlines />} />
-              <Route path="activities/bulk-assign" element={<BulkAssignActivity />} />
-              <Route path="activities/calendar" element={<ActivityCalendar />} />
-            </Route>
-          </Route>
-        </Route>
+        {/* Mentor */}
+        {mentorRoute}
 
         {/* Admin */}
         {AdminRoute}
