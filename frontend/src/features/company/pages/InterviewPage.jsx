@@ -739,7 +739,7 @@ const InterviewsTable = ({ interviews, onEdit, onDelete, onFeedback }) => (
 /* ─────────────────────────────────────────────
    Main Interviews Page
 ───────────────────────────────────────────── */
-const InterviewsPage = () => {
+const InterviewPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const shouldOpenScheduleInterview = Boolean(location.state?.openScheduleInterview);
@@ -1015,4 +1015,4 @@ const InterviewsPage = () => {
   );
 };
 
-export default InterviewsPage;
+export default InterviewPage;
