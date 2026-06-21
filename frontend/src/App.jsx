@@ -3,8 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import { Toaster } from "react-hot-toast";
 
-import ProfileManagementPage from "./features/student/profile/pages/ProfileManagementPage";
-
+// import ProfileManagementPage from "./features/student/profile/pages/ProfileManagementPage";
 
 // Auth Pages
 import LoginPage from "./features/auth/LoginPage";
