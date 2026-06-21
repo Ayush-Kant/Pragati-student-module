@@ -17,9 +17,9 @@ import {
 } from "react-icons/fi";
 import "./../styles/interviews.css";
 
-/* ─────────────────────────────────────────────
+/* 
    Static mock data
-───────────────────────────────────────────── */
+*/
 const MOCK_INTERVIEWS = [
   {
     id: 1,
@@ -106,6 +106,7 @@ const ROUND_TYPES = [
 ];
 
 const STATUS_FILTERS = ["Scheduled", "Completed"];
+const RESULT_OPTIONS = ["Pass", "Fail"];
 
 /* ─────────────────────────────────────────────
    Schedule Interview Modal
@@ -472,10 +473,151 @@ const EditInterviewModal = ({ interview, onClose, onSave }) => {
   );
 };
 
-/* ─────────────────────────────────────────────
+/* 
+   Feedback Modal
+ */
+const FeedbackModal = ({ interview, onClose, onSave }) => {
+  const [form, setForm] = useState({
+    result: interview.result || RESULT_OPTIONS[0],
+    rating: interview.rating || 4,
+    strengths: interview.feedback?.strengths || "",
+    improvements: interview.feedback?.improvements || "",
+    comments: interview.feedback?.comments || "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(form);
+    onClose();
+  };
+
+  useEffect(() => {
+    const handler = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-box" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
+        <div className="modal-header">
+          <h2 id="feedback-modal-title">Interview Feedback</h2>
+          <button className="modal-close" onClick={onClose} aria-label="Close modal">
+            <FiX size={20} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body">
+            <div className="form-group">
+              <label>Candidate</label>
+              <input className="form-control" value={interview.candidate} disabled />
+            </div>
+            <div className="form-group">
+              <label>Interviewer</label>
+              <input className="form-control" value={interview.interviewer} disabled />
+            </div>
+            <div className="form-group">
+              <label>Round</label>
+              <input className="form-control" value={interview.round} disabled />
+            </div>
+
+            <div className="form-group">
+              <label>Result</label>
+              <div className="feedback-chips">
+                {RESULT_OPTIONS.map((option) => (
+                  <label key={option} className={`feedback-chip ${form.result === option ? "active" : ""}`}>
+                    <input
+                      type="radio"
+                      name="result"
+                      value={option}
+                      checked={form.result === option}
+                      onChange={handleChange}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="rating">Rating</label>
+              <div className="select-wrap">
+                <select
+                  id="rating"
+                  name="rating"
+                  className="form-control"
+                  style={{ paddingLeft: "14px" }}
+                  value={form.rating}
+                  onChange={handleChange}
+                >
+                  {[5, 4, 3, 2, 1].map((value) => (
+                    <option key={value} value={value}>{value} / 5</option>
+                  ))}
+                </select>
+                <FiChevronDown size={16} className="chevron-icon" />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="strengths">Strengths</label>
+              <textarea
+                id="strengths"
+                name="strengths"
+                className="form-control textarea"
+                rows={3}
+                placeholder="Key strengths observed during the interview"
+                value={form.strengths}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="improvements">Areas for Improvement</label>
+              <textarea
+                id="improvements"
+                name="improvements"
+                className="form-control textarea"
+                rows={3}
+                placeholder="Areas the candidate should improve"
+                value={form.improvements}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="comments">Comments</label>
+              <textarea
+                id="comments"
+                name="comments"
+                className="form-control textarea"
+                rows={4}
+                placeholder="Additional feedback or candidate recommendation"
+                value={form.comments}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn-submit">Save Feedback</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+/* 
    Actions dropdown cell
-───────────────────────────────────────────── */
-const ActionsCell = ({ onEdit, onDelete }) => {
+ */
+const ActionsCell = ({ onEdit, onDelete, onFeedback }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -497,6 +639,9 @@ const ActionsCell = ({ onEdit, onDelete }) => {
           <button onClick={() => { onEdit(); setOpen(false); }}>
             <FiEdit2 size={14} /> Edit
           </button>
+          <button onClick={() => { onFeedback(); setOpen(false); }}>
+            <FiUser size={14} /> Feedback
+          </button>
           <button
             className="danger"
             onClick={() => { onDelete(); setOpen(false); }}
@@ -509,10 +654,10 @@ const ActionsCell = ({ onEdit, onDelete }) => {
   );
 };
 
-/* ─────────────────────────────────────────────
+/* 
    Interviews Table
-───────────────────────────────────────────── */
-const InterviewsTable = ({ interviews, onEdit, onDelete }) => (
+ */
+const InterviewsTable = ({ interviews, onEdit, onDelete, onFeedback }) => (
   <div className="interviews-table-wrap">
     <table className="interviews-table">
       <thead>
@@ -523,6 +668,7 @@ const InterviewsTable = ({ interviews, onEdit, onDelete }) => (
           <th>Time</th>
           <th>Round</th>
           <th>Status</th>
+          <th>Result</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -568,10 +714,18 @@ const InterviewsTable = ({ interviews, onEdit, onDelete }) => (
               </span>
             </td>
 
+            {/* Result */}
+            <td>
+              <span className={`result-badge ${row.result ? row.result.toLowerCase() : "pending"}`}>
+                {row.result || "Pending"}
+              </span>
+            </td>
+
             {/* Actions */}
             <td>
               <ActionsCell
                 onEdit={() => onEdit(row)}
+                onFeedback={() => onFeedback(row)}
                 onDelete={() => onDelete(row.id)}
               />
             </td>
@@ -596,6 +750,33 @@ const InterviewsPage = () => {
   const [openFilter, setOpenFilter] = useState(null);
   const [showModal, setShowModal] = useState(shouldOpenScheduleInterview);
   const [editingInterview, setEditingInterview] = useState(null);
+  const [feedbackInterview, setFeedbackInterview] = useState(null);
+
+  const handleOpenFeedback = (interview) => {
+    setFeedbackInterview(interview);
+  };
+
+  const handleSaveFeedback = (feedback) => {
+    setInterviews((prev) =>
+      prev.map((i) =>
+        i.id === feedbackInterview.id
+          ? {
+              ...i,
+              result: feedback.result,
+              rating: feedback.rating,
+              feedback: {
+                strengths: feedback.strengths,
+                improvements: feedback.improvements,
+                comments: feedback.comments,
+              },
+              status: i.status === "Scheduled" ? "Completed" : i.status,
+            }
+          : i
+      )
+    );
+    toast.success("Interview feedback saved");
+    setFeedbackInterview(null);
+  };
 
   useEffect(() => {
     if (shouldOpenScheduleInterview) {
@@ -796,7 +977,7 @@ const InterviewsPage = () => {
 
         {/* Table */}
         {filtered.length > 0 ? (
-          <InterviewsTable interviews={filtered} onEdit={handleEdit} onDelete={handleDelete} />
+          <InterviewsTable interviews={filtered} onEdit={handleEdit} onDelete={handleDelete} onFeedback={handleOpenFeedback} />
         ) : (
           <div style={{ padding: "48px 24px", textAlign: "center", color: "#9ca3af" }}>
             <FiCalendar size={36} style={{ marginBottom: 12, opacity: 0.4 }} />
@@ -819,6 +1000,15 @@ const InterviewsPage = () => {
           interview={editingInterview}
           onClose={() => setEditingInterview(null)}
           onSave={handleSaveEdit}
+        />
+      )}
+
+      {/* Feedback Modal */}
+      {feedbackInterview && (
+        <FeedbackModal
+          interview={feedbackInterview}
+          onClose={() => setFeedbackInterview(null)}
+          onSave={handleSaveFeedback}
         />
       )}
     </div>
