@@ -6,6 +6,7 @@ import adminCollegeRoutes from "./routes/admin.college.routes.js";
 import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import collegeProfileRoutes from "./routes/collage.profile.routes.js";
 import cors from "cors";
 import companyRoutes from "./routes/company.routes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
@@ -44,6 +45,8 @@ app.use("/api/v1/company", companyRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
+
+app.use("/api/college/profile", collegeProfileRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.get("/", (req, res) => {
