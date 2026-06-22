@@ -6,7 +6,7 @@ import LoginPage from "../../auth/LoginPage";
 import RegisterPage from "../../auth/RegisterPage";
 
 import OnboardingWizard from "../pages/onboarding/OnboardingWizard";
-import DashboardPage from "../pages/dashboard/DashboardPage";
+import DashboardPage from "../dashboard/pages/DashboardPage";
 import ProfilePage from "../pages/profile/ProfilePage";
 import CoursesPage from "../pages/training/CoursesPage";
 import CourseDetailPage from "../pages/training/CourseDetailPage";

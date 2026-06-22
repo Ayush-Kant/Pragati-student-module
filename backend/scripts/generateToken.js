@@ -1,17 +1,17 @@
-// scripts/generateToken.js
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
-// Use the mentor user's actual ID from your seed data
-const payload = {
-  uid: 1,          // maps to auth_users.id in this feature branch
-  role: "mentor",
-  email: "mentor@example.com"
-};
+const token = jwt.sign(
+  {
+    companyId: "11111111-1111-1111-1111-111111111111",
+  },
+  process.env.JWT_SECRET,
+  {
+    expiresIn: "7d",
+  },
+);
 
-const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
-
-console.log("Your test JWT token:");
+console.log("\nTOKEN:\n");
 console.log(token);
