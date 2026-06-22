@@ -6,6 +6,7 @@ import adminCollegeRoutes from './routes/admin.college.routes.js';
 import companyRoutes from './routes/company.routes.js';
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import collegeProfileRoutes from "./routes/collage.profile.routes.js";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
 
@@ -39,6 +40,8 @@ app.use('/api/companies', companyRoutes);
 app.use("/api/mentor", contentRoutes);
 
 app.use("/api/student/notifications", notificationRoutes);
+
+app.use("/api/college/profile", collegeProfileRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.listen(PORT, () => {
