@@ -6,7 +6,7 @@ export const getProfile = async (id) => {
         `SELECT
             *
         FROM colleges
-        WHERE id = $1
+        WHERE user_id = $1
         `,[id]
     );
     return result.rows[0];
@@ -24,7 +24,7 @@ export const updateProfile = async (id, data) => {
     const query = `
     UPDATE colleges
     SET ${setClause}
-    WHERE id = $${fields.length + 1}
+    WHERE user_id = $${fields.length + 1}
     RETURNING *;
   `;
     const result = await pool.query(query, [...values, id]);
