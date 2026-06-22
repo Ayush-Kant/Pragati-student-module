@@ -4,9 +4,20 @@
 -- TABLE: colleges
 CREATE TABLE IF NOT EXISTS colleges (
   id               SERIAL PRIMARY KEY,
-  user_id          INTEGER REFERENCES users(id),
+  user_id          UUID NOT NULL REFERENCES auth_users(uuid_id),
   name             VARCHAR(255) NOT NULL,
   email            VARCHAR(255) UNIQUE NOT NULL,
+  phone             VARCHAR(20),
+  profile_code      VARCHAR(100),
+  established       INTEGER,
+  category          VARCHAR(255),
+  contact_person    VARCHAR(255),
+  designation       VARCHAR(255),
+  contact_lead      VARCHAR(255),
+  address           TEXT,
+  website           VARCHAR(255),
+  learners_guided   INTEGER DEFAULT 0,
+  about             TEXT,
   location         VARCHAR(255),
   departments      TEXT[],             -- e.g. ['CSE','ECE','MBA']
   student_strength INTEGER DEFAULT 0,

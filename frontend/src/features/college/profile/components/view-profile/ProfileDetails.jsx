@@ -21,12 +21,12 @@ export default function ProfileDetails({ profile }) {
     website = "",
     email = "",
     phone = "",
-    principalName = "N/A",
+    contact_lead = "N/A",
     collegeType = "N/A",
     accreditation = "N/A",
-    totalStudents = "N/A",
+    learners_guided = "N/A",
     aboutCollege = "",
-    contactPerson = {},
+    contact_person = "N/A",
     socialLinks = {}
   } = profile;
 
@@ -122,7 +122,7 @@ export default function ProfileDetails({ profile }) {
                 <div className="flex items-center gap-2.5">
                   <User className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
-                    {principalName}
+                    {contact_lead}
                   </span>
                 </div>
               </div>
@@ -158,7 +158,7 @@ export default function ProfileDetails({ profile }) {
                 <div className="flex items-center gap-2.5">
                   <Users className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
-                    {totalStudents}
+                    {learners_guided}
                   </span>
                 </div>
               </div>
@@ -188,15 +188,15 @@ export default function ProfileDetails({ profile }) {
           <div className="flex flex-col items-center text-center p-2">
 
             <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl border-2 border-emerald-100 shadow-sm mb-3 shrink-0 select-none">
-              {contactPerson.name ? contactPerson.name.split(' ').map(n => n[0]).join('') : 'CP'}
+              {contact_person ? contact_person.split(' ').map(n => n[0]).join('') : 'CP'}
             </div>
 
             <h4 className="text-base font-bold text-gray-800">
-              {contactPerson.name || "N/A"}
+              {contact_person || "N/A"}
             </h4>
 
             <p className="text-xs font-semibold text-gray-400 mt-0.5 mb-5 block">
-              {contactPerson.title || "N/A"}
+              {"N/A"}
             </p>
 
             <div className="w-full h-px bg-gray-100 mb-5"></div>
@@ -204,12 +204,12 @@ export default function ProfileDetails({ profile }) {
             <div className="w-full text-left space-y-4">
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-gray-400 shrink-0" />
-                {contactPerson.email ? (
+                {email ? (
                   <a
-                    href={`mailto:${contactPerson.email}`}
+                    href={`mailto:${email}`}
                     className="text-sm font-semibold text-[#f26a1b] hover:underline break-all transition-colors"
                   >
-                    {contactPerson.email}
+                    {email}
                   </a>
                 ) : (
                   <span className="text-sm font-semibold text-gray-700">N/A</span>
@@ -218,12 +218,12 @@ export default function ProfileDetails({ profile }) {
 
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-gray-400 shrink-0" />
-                {contactPerson.phone ? (
+                {phone ? (
                   <a
-                    href={`tel:${contactPerson.phone}`}
+                    href={`tel:${phone}`}
                     className="text-sm font-semibold text-gray-700 hover:text-[#f26a1b] transition-colors"
                   >
-                    {contactPerson.phone}
+                    {phone}
                   </a>
                 ) : (
                   <span className="text-sm font-semibold text-gray-700">N/A</span>
