@@ -1,6 +1,18 @@
+import AdmissionsChart from "../components/charts/AdmissionsChart";
+import PlacementChart from "../components/charts/PlacementChart";
+import RevenueChart from "../components/charts/RevenueChart";
+import DashboardLayout from "../components/layout/DashboardLayout";
+
 const DashboardPage = () => {
   return (
-    <div>Dashboard</div>
+   <DashboardLayout>
+    <div>
+      <AdmissionsChart/>
+      <PlacementChart/>
+      <RevenueChart/>
+      
+    </div>
+   </DashboardLayout>
   );
 };
 
