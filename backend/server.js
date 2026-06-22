@@ -12,6 +12,7 @@ import notificationRoutes from "./routes/notification.routes.js";
 import cors from "cors";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRouter from "./routes/auth.routes.js";
+import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 
 import dotenv from "dotenv";
@@ -23,7 +24,6 @@ const app = express();
 app.use(errorMiddleware);
 
 app.use(express.json());
-
 
 app.use(
   cors({
@@ -53,12 +53,12 @@ app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
-app.get("/", (req, res) => {
+  app.get("/", (req, res) => {
     res.json({
-        message: "Backend is running",
+      message: "Backend is running",
     });
-});
-app.listen(PORT, () => {
+  });
+  app.listen(PORT, () => {
     console.log(`✅ Server running on PORT : ${PORT}`);
   });
 });
