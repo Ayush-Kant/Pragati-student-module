@@ -1,14 +1,14 @@
 -- base tables
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    firebase_uid VARCHAR(128) UNIQUE,        -- ← ADD THIS for Firebase Auth link
+    firebase_uid VARCHAR(128) UNIQUE,
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     role VARCHAR(50) DEFAULT 'student',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- If users table already exists, just add the column safely
+-- If users table already exists, just add missing columns safely
 ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_uid VARCHAR(128) UNIQUE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
 
@@ -50,11 +50,13 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- dashboard related tables
 CREATE TABLE IF NOT EXISTS recruitment_drives (
     id SERIAL PRIMARY KEY,
     mentor_id INT REFERENCES mentors(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
-    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'completed', 'upcoming')),
+    status VARCHAR(50) DEFAULT 'active'
+        CHECK (status IN ('active', 'completed', 'upcoming')),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -71,8 +73,10 @@ CREATE TABLE IF NOT EXISTS student_progress (
     id SERIAL PRIMARY KEY,
     student_id INT REFERENCES users(id) ON DELETE CASCADE,
     drive_id INT REFERENCES recruitment_drives(id) ON DELETE CASCADE,
-    readiness_score INT DEFAULT 0 CHECK (readiness_score >= 0 AND readiness_score <= 100),
-    completion_pct INT DEFAULT 0 CHECK (completion_pct >= 0 AND completion_pct <= 100),
+    readiness_score INT DEFAULT 0
+        CHECK (readiness_score >= 0 AND readiness_score <= 100),
+    completion_pct INT DEFAULT 0
+        CHECK (completion_pct >= 0 AND completion_pct <= 100),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
