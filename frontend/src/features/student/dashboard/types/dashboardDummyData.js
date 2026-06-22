@@ -23,3 +23,53 @@ export const skillsBreakdownData = [
   { label: "Resume", value: "20%" },
   { label: "Aptitude", value: "10%" },
 ];
+
+export const upcomingSessionsData = [
+  {
+    id: 1,
+    title: "Mock Interview - HR Round",
+    date: "2026-06-20",
+    time: "10:00 AM",
+    mentor: "Mr. Sharma",
+  },
+];
+
+export const pendingTasksData = [
+  {
+    id: 1,
+    title: "Complete profile details",
+    dueDate: "2026-06-18",
+    done: false,
+  },
+];
+
+export const recentNotificationsData = [
+  {
+    id: 1,
+    message: "New job posting from Infosys",
+    time: "2 hours ago",
+    read: false,
+  },
+];
+
+export const leaderboardData = [
+  {
+    rank: 1,
+    name: "Aditi Rao",
+    score: 980,
+    department: "Computer Engineering",
+  },
+];
+
+export const dashboardApiResponse = {
+  success: true,
+  data: {
+    activeDrive: activeDriveData,
+    quickStats: quickStatsData,
+    progressRing: progressRingData,
+    upcomingSessions: upcomingSessionsData,
+    pendingTasks: pendingTasksData,
+    leaderboard: leaderboardData,
+    recentNotifications: recentNotificationsData,
+  },
+};

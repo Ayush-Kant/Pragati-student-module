@@ -18,26 +18,35 @@ import CompanyDetail from "../pages/CompanyDetail";
 import ActiveDrives from "../pages/ActiveDrives";
 import CompanyRankings from "../pages/CompanyRankings";
 import MentorDetail from "../pages/MentorDetail";
+import DriveDetail from "../pages/DriveDetail";
 
-const AdminRoute = (
-      <Route path="admin" element={<AdminLayout />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path='profile' element={<AdminProfile />} />
-        <Route path='companies' element={<AdminCompanies />} />
-        <Route path="companies/rankings" element={<CompanyRankings />} />
-        <Route path="companies/:id" element={<CompanyDetail />} />
-        <Route path="companies/active-drives" element={<ActiveDrives />} />
-        <Route path='colleges' element={<AdminCollege />} />
-        <Route path='colleges/:id' element={<CollegeDetail />} />
-        <Route path='students' element={<AdminStudent />} />
-        <Route path='mentors' element={<AdminMentors />} />
-        <Route path='assesments' element={<AdminAssesment />} />
-        <Route path='training' element={<AdminTraining />} />
-        <Route path='drives' element={<AdminDrives />} />
-        <Route path='notification' element={<AdminNotifications />} />
-        <Route path='disputes' element={<AdminDisputes />} />
-        <Route path="/admin/mentors/:id" element={<MentorDetail />} />
-      </Route>
-)
+const adminRoutes = (
+  <Route path="admin" element={<AdminLayout />}>
+    <Route index element={<AdminDashboard />} />
+    <Route path="dashboard" element={<AdminDashboard />} />
+    <Route path="profile" element={<AdminProfile />} />
+    <Route path="companies" element={<AdminCompanies />} />
+    <Route path="colleges" element={<AdminCollege />} />
+    <Route path="colleges/:id" element={<CollegeDetail />} />
+    <Route path="students" element={<AdminStudent />} />
+    <Route path="mentors" element={<AdminMentors />} />
+    <Route path="assesments" element={<AdminAssesment />} />
+    <Route path="training" element={<AdminTraining />} />
+    <Route path="drives" element={<AdminDrives />} />
+    <Route path="drives/:id" element={<DriveDetail />} />
+    <Route path="notification" element={<AdminNotifications />} />
+    <Route path="disputes" element={<AdminDisputes />} />
+  </Route>
+);
+
+const AdminRoute = import.meta.env.DEV ? (
+  adminRoutes
+) : (
+  <Route element={<PrivateRoute />}>
+    <Route element={<RoleRoute allowedRoles={["admin"]} />}>
+      {adminRoutes}
+    </Route>
+  </Route>
+);
 
 export default AdminRoute;
