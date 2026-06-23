@@ -11,6 +11,7 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRouter from "./routes/auth.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
+import questionBankRouter from "./routes/questionBank.routes.js";
 
 import dotenv from "dotenv";
 
@@ -42,6 +43,7 @@ app.use("/api/mentor", contentRoutes);
 app.use("/api/v1/company", companyRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
+app.use("/api/v1", questionBankRouter);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.get("/", (req, res) => {
