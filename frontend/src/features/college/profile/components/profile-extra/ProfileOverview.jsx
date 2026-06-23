@@ -5,7 +5,7 @@ import { FaLinkedin, FaInstagram, FaFacebook, FaYoutube } from "react-icons/fa";
 import {
   profileData,
   overviewCardsData,
-} from "../../types/ProfileExtraDummyData";
+} from "../../types/profileExtraDummyData";
 
 const socialIcons = {
   LinkedIn: FaLinkedin,
