@@ -28,8 +28,9 @@ function App() {
       <Toaster />
 
       <Routes>
+        
         <Route path="/" element={<Navigate to="/login" replace />} />
-
+        
         {/* ── Auth Routes ────────────────────────────────────────── */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
