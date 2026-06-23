@@ -12,6 +12,7 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRouter from "./routes/auth.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
+import departmentRoutes from "./src/routes/department.routes.js";
 
 import dotenv from "dotenv";
 
@@ -19,7 +20,6 @@ dotenv.config();
 const PORT = process.env.PORT || 5001;
 
 const app = express();
-app.use(errorMiddleware);
 
 app.use(express.json());
 
@@ -44,6 +44,9 @@ app.use("/api/v1/company", companyRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
+app.use("/api/departments", departmentRoutes);
+
+app.use(errorMiddleware);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.get("/", (req, res) => {
@@ -52,6 +55,7 @@ connectDB(process.env.POSTGRESQL_URI).then(() => {
     });
   });
   app.listen(PORT, () => {
-    console.log(`✅ Server running on PORT : ${PORT}`);
+     console.log(`✅ Server running on PORT : ${PORT}`);
+    console.log(`🌐 URL : http://localhost:${PORT}`);
   });
 });

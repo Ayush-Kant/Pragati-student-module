@@ -89,3 +89,21 @@ CREATE INDEX IF NOT EXISTS idx_student_progress_drive_id ON student_progress(dri
 CREATE INDEX IF NOT EXISTS idx_submissions_assessment_id ON submissions(assessment_id);
 CREATE INDEX IF NOT EXISTS idx_assessments_course_id ON assessments(course_id);
 CREATE INDEX IF NOT EXISTS idx_courses_mentor_id ON courses(mentor_id);
+
+-- Departments Management Schema
+CREATE TABLE IF NOT EXISTS departments (
+    dept_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    courses TEXT[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create index on department name for query optimization
+CREATE INDEX IF NOT EXISTS idx_departments_name ON departments(name);
+
+-- Insert dummy department records
+INSERT INTO departments (name, courses) VALUES 
+('Computer Science', '{"DSA", "DBMS", "OS"}'),
+('Information Technology', '{"CN", "Web Dev", "Software Engineering"}'),
+('Electronics and Communication', '{"Signals", "Microprocessors", "Communication Systems"}'),
+('Mechanical Engineering', '{"Thermodynamics", "Fluid Mechanics", "Machine Design"}');
