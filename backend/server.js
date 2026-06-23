@@ -1,64 +1,50 @@
 import express from "express";
-import { connectDB } from "./config/db.js";
-import mentorRoutes from "./routes/mentor.routes.js";
+import dotenv from "dotenv";
+import connectDB from "./config/db.js";
+import cors from "cors";
+
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
-import adminCourseRoutes from "./routes/admin.course.routes.js";
-import companyRoutes from "./routes/company.routes.js";
-import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
-
 import contentRoutes from "./routes/content.routes.js";
-import notificationRoutes from "./routes/notification.routes.js";
-import cors from "cors";
-import errorMiddleware from "./middleware/errorMiddleware.js";
-import authRouter from "./routes/auth.routes.js";
-import adminDriveRoutes from "./routes/admin.drive.routes.js";
-import interviewRoutes from "./routes/interview.routes.js";
-
-import dotenv from "dotenv";
+import companyRoutes from "./routes/company.routes.js";
+import studentProfileRoutes from "./routes/studentProfile.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 
 dotenv.config();
-const PORT = process.env.PORT || 5001;
 
 const app = express();
-app.use(errorMiddleware);
+const PORT = process.env.PORT || 5000;
 
+// middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost"))
-        return callback(null, true);
-      const clientUrl = process.env.CLIENT_URL;
-      if (clientUrl && origin === clientUrl) return callback(null, true);
-      return callback(new Error(`CORS policy: origin ${origin} not allowed`));
-    },
-    credentials: true,
-  }),
-);
-app.use("/api/auth", authRouter);
+// routes
+app.use("/api/student/dashboard", dashboardRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/student", studentProfileRoutes);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
-app.use("/api/v1/admin/courses", adminCourseRoutes);
-
-app.use("/api/companies", companyRoutes);
-
+app.use("/api/v1/admin/companies", companyRoutes);
 app.use("/api/mentor", contentRoutes);
 
-app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
-app.use("/api/v1/company", companyRoutes);
-app.use("/api/mentor", mentorRoutes);
-app.use("/api/v1/company/interviews", interviewRoutes);
-app.use("/api/student/notifications", notificationRoutes);
-
-connectDB(process.env.POSTGRESQL_URI).then(() => {
-  app.get("/", (req, res) => {
-    res.json({
-      message: "Backend is running",
-    });
-  });
-  app.listen(PORT, () => {
-    console.log(`✅ Server running on PORT : ${PORT}`);
+// root route
+app.get("/", (req, res) => {
+  res.json({
+    message: "Backend is running",
   });
 });
+
+// connect DB and start server
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on PORT: ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Server failed to start:", err);
+  });
+

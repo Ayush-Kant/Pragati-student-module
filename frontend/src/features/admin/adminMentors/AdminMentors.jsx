@@ -1,7 +1,6 @@
-import MentorManagement from "../pages/MentorManagement";
+import React from 'react';
 
-const AdminMentors = () => {
-  return <MentorManagement />;
-};
+export default function () {
+  return <div> Component</div>;
+}
 
-export default AdminMentors;

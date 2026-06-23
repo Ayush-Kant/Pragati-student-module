@@ -23,16 +23,11 @@ export function validateProfile(data = {}) {
   };
 }
 
-
 export function validateSocialLinks(data = {}) {
-
   const linkedin = data?.linkedin || "";
   const github = data?.github || "";
 
-
-  const urlRegex =
-    /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/.*)?$/;
-
+  const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/.*)?$/;
 
   if (linkedin && !urlRegex.test(linkedin)) {
     return {
@@ -41,7 +36,6 @@ export function validateSocialLinks(data = {}) {
     };
   }
 
-
   if (github && !urlRegex.test(github)) {
     return {
       isValid: false,
@@ -49,9 +43,9 @@ export function validateSocialLinks(data = {}) {
     };
   }
 
-
   return {
     isValid: true,
     message: "",
   };
 }
+
