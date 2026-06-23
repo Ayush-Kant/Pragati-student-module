@@ -26,20 +26,11 @@ function App() {
   return (
     <AuthProvider>
       <Toaster />
-<<<<<<< HEAD
-      <Routes>
-        
-<Route path="/" element={<Navigate to="/login" replace />} />
-        
-        {/* ── Auth Routes ────────────────────────────────────────── */}
-        <Route path='/login' element={<LoginPage />} />
-        <Route path='/register' element={<RegisterPage />} />
-=======
->>>>>>> origin/develop
 
       <Routes>
+        
         <Route path="/" element={<Navigate to="/login" replace />} />
-
+        
         {/* ── Auth Routes ────────────────────────────────────────── */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
