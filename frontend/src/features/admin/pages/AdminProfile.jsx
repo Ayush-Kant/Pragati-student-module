@@ -1,12 +1,5 @@
-import AdminProfile from "../adminProfile/AdminProfile";
-
 const AdminProfilePage = () => {
-  return <AdminProfile />;
+  return <div>Fix this </div>;
 };
 
 export default AdminProfilePage;
-
-
-
-
- 
