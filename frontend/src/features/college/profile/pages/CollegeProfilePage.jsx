@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import ProfileBanner from '../components/view-profile/ProfileBanner';
 import ProfileDetails from '../components/view-profile/ProfileDetails';
 import { profileDummyData } from '../types/profileDummyData';
+import { getProfile } from '../../services/collegeService';
 
 export default function CollegeProfilePage() {
   const [profile, setProfile] = useState(null);
@@ -9,17 +10,21 @@ export default function CollegeProfilePage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!profileDummyData) {
-        setError('No profile data available');
-        setLoading(false);
-        return;
-      }
-      setProfile(profileDummyData);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    fetchProfile();
   }, []);
+
+
+  const fetchProfile = async () => {
+   try {
+      const result = await getProfile();
+      setProfile(result.data);
+    } catch (err) {
+      console.error('Login error:', err);
+    }
+    setLoading(false);
+   };
+
+   console.log('Profile data:', profile);
 
   if (loading) {
     return (
