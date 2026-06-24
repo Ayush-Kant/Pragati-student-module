@@ -1,35 +1,28 @@
+import React from 'react';
 import { Edit2, BadgeCheck } from 'lucide-react';
 
 export default function ProfileBanner({ profile }) {
   if (!profile) return null;
 
-  const initials = profile.collegeName
-    ?.split(' ')
-    .filter(Boolean)
-    .map((word) => word[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase() || 'NA';
-
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
       <div className="flex flex-col md:flex-row gap-8 items-start">
-
+        
         {/* Left: Logo */}
-        <div className="shrink-0 flex justify-center w-full md:w-auto">
+        <div className="flex-shrink-0 flex justify-center w-full md:w-auto">
           <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden bg-gray-50 border-4 border-white shadow-lg">
             {profile.logoUrl ? (
               <img src={profile.logoUrl} alt={profile.collegeName} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-orange-50 text-orange-600 font-extrabold text-4xl">
-                {initials}
+                US
               </div>
             )}
           </div>
         </div>
 
         {/* Right: Info */}
-        <div className="grow flex flex-col justify-between w-full">
+        <div className="flex-grow flex flex-col justify-between w-full">
           <div>
             <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
               <div>
@@ -46,7 +39,7 @@ export default function ProfileBanner({ profile }) {
                 <p className="text-sm text-gray-500 max-w-3xl leading-relaxed">{profile.description}</p>
               </div>
 
-              <button className="shrink-0 inline-flex items-center justify-center gap-2 bg-[#ff7a00] hover:bg-[#e66e00] text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-sm">
+              <button className="flex-shrink-0 inline-flex items-center justify-center gap-2 bg-[#ff7a00] hover:bg-[#e66e00] text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-sm">
                 <Edit2 className="w-4 h-4" />
                 Edit Profile
               </button>
