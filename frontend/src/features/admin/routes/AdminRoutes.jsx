@@ -19,6 +19,11 @@ import ActiveDrives from "../pages/ActiveDrives";
 import CompanyRankings from "../pages/CompanyRankings";
 import MentorDetail from "../pages/MentorDetail";
 import DriveDetail from "../pages/DriveDetail";
+import AssessmentDetail from "../pages/AssessmentDetail";
+import PublishAssessmentModal from "../components/PublishAssessmentModal";
+import QuestionFormPage from "../components/QuestionFormPage";
+import AssignAssessmentModal from "../components/AssignAssessmentModal";
+import AssessmentQuestionList from "../components/AssessmentQuestionList";
 
 const adminRoutes = (
   <Route path="admin" element={<AdminLayout />}>
@@ -31,6 +36,11 @@ const adminRoutes = (
     <Route path="students" element={<AdminStudent />} />
     <Route path="mentors" element={<AdminMentors />} />
     <Route path="assesments" element={<AdminAssesment />} />
+    <Route path="assessments/:id" element={<AssessmentDetail />} />
+    <Route path="assessments/:id/questions" element={<QuestionFormPage />} />
+    <Route path="assessments/:id/publish" element={<PublishAssessmentModal />} />
+    <Route path="assessments/:id/assign" element={<AssignAssessmentModal />} />
+    <Route path="assessments/:id/questions/:qid" element={<AssessmentQuestionList />} />
     <Route path="training" element={<AdminTraining />} />
     <Route path="drives" element={<AdminDrives />} />
     <Route path="drives/:id" element={<DriveDetail />} />

@@ -516,3 +516,115 @@ export const updateDrive = async (driveId, payload) => {
     return { success: true, mentorId };
   }
 };
+
+const getToken = () => localStorage.getItem("token");
+
+export const getAssessmentById = async (assessmentId) => {
+  const response = await API.get(
+    `/api/v1/admin/assessments/${assessmentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const addQuestion = async (
+  assessmentId,
+  payload
+) => {
+  const response = await API.post(
+    `/api/v1/admin/assessments/${assessmentId}/questions`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const updateQuestion = async (
+  assessmentId,
+  questionId,
+  payload
+) => {
+  const response = await API.put(
+    `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const deleteQuestion = async (
+  assessmentId,
+  questionId
+) => {
+  const response = await API.delete(
+    `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const publishAssessment = async (
+  assessmentId
+) => {
+  const response = await API.patch(
+    `/api/v1/admin/assessments/${assessmentId}/publish`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const getDrives = async () => {
+  const response = await API.get(
+    "/api/v1/admin/drives",
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const assignAssessment = async (
+  assessmentId,
+  payload
+) => {
+  const response = await API.post(
+    `/api/v1/admin/assessments/${assessmentId}/assign`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  );
+
+  return response.data;
+};
