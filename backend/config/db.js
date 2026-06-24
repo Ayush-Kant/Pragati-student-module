@@ -1,3 +1,4 @@
+
 import pg from "pg";
 import dotenv from "dotenv";
 import dns from "dns";
@@ -7,7 +8,11 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const connectionString = process.env.POSTGRESQL_URI ?? "";
+const connectionString = process.env.POSTGRESQL_URI;
+
+if (!connectionString) {
+  throw new Error("POSTGRESQL_URI is missing in .env file");
+}
 
 const pgConfig = {
   connectionString,

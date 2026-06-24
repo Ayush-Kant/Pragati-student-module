@@ -1,87 +1,102 @@
--- base tables
-CREATE TABLE IF NOT EXISTS users (
+-- Student profile schema for PostgreSQL
+-- Assumes the existing students table already exists.
+CREATE TABLE IF NOT EXISTS student_resumes (
     id SERIAL PRIMARY KEY,
-    firebase_uid VARCHAR(128) UNIQUE,        -- ← ADD THIS for Firebase Auth link
-    full_name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    role VARCHAR(50) DEFAULT 'student',
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    student_id INT NOT NULL UNIQUE,
+    resume_url TEXT NOT NULL,
+    file_name VARCHAR(255),
+    file_size BIGINT,
+    mime_type VARCHAR(100),
+    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_resumes_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
 );
 
--- If users table already exists, just add the column safely
-ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_uid VARCHAR(128) UNIQUE;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
+CREATE INDEX IF NOT EXISTS idx_student_resumes_student_id
+    ON student_resumes(student_id);
 
-CREATE TABLE IF NOT EXISTS mentors (
+CREATE TABLE IF NOT EXISTS student_portfolios (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    specialization VARCHAR(255),
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    student_id INT NOT NULL UNIQUE,
+    headline VARCHAR(150),
+    bio TEXT,
+    website_url TEXT,
+    github_url TEXT,
+    linkedin_url TEXT,
+    portfolio_url TEXT,
+    is_public BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_portfolios_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS courses (
+CREATE INDEX IF NOT EXISTS idx_student_portfolios_student_id
+    ON student_portfolios(student_id);
+
+CREATE TABLE IF NOT EXISTS student_projects (
     id SERIAL PRIMARY KEY,
-    mentor_id INT REFERENCES mentors(id) ON DELETE CASCADE,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    student_id INT NOT NULL,
+    project_title VARCHAR(150) NOT NULL,
+    project_description TEXT,
+    project_url TEXT,
+    github_url TEXT,
+    technologies TEXT[] DEFAULT '{}',
+    start_date DATE,
+    end_date DATE,
+    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_projects_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS assessments (
+CREATE INDEX IF NOT EXISTS idx_student_projects_student_id
+    ON student_projects(student_id);
+
+CREATE INDEX IF NOT EXISTS idx_student_projects_featured
+    ON student_projects(student_id, is_featured);
+
+CREATE TABLE IF NOT EXISTS student_skills (
     id SERIAL PRIMARY KEY,
-    course_id INT REFERENCES courses(id) ON DELETE CASCADE,
-    title VARCHAR(255) NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    student_id INT NOT NULL,
+    skill_name VARCHAR(120) NOT NULL,
+    skill_level VARCHAR(50),
+    category VARCHAR(100),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_skills_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE,
+    CONSTRAINT uq_student_skill UNIQUE (student_id, skill_name)
 );
 
-CREATE TABLE IF NOT EXISTS submissions (
+CREATE INDEX IF NOT EXISTS idx_student_skills_student_id
+    ON student_skills(student_id);
+
+CREATE TABLE IF NOT EXISTS student_social_links (
     id SERIAL PRIMARY KEY,
-    assessment_id INT REFERENCES assessments(id) ON DELETE CASCADE,
-    student_id INT REFERENCES users(id) ON DELETE CASCADE,
-    status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    student_id INT NOT NULL UNIQUE,
+    linkedin_url TEXT,
+    github_url TEXT,
+    portfolio_url TEXT,
+    twitter_url TEXT,
+    website_url TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_social_links_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS notifications (
-    id SERIAL PRIMARY KEY,
-    mentor_id INT REFERENCES mentors(id) ON DELETE CASCADE,
-    type VARCHAR(100),
-    message TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS recruitment_drives (
-    id SERIAL PRIMARY KEY,
-    mentor_id INT REFERENCES mentors(id) ON DELETE CASCADE,
-    title VARCHAR(255) NOT NULL,
-    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'completed', 'upcoming')),
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS live_sessions (
-    id SERIAL PRIMARY KEY,
-    mentor_id INT REFERENCES mentors(id) ON DELETE CASCADE,
-    title VARCHAR(255) NOT NULL,
-    session_type VARCHAR(50) DEFAULT 'webinar',
-    scheduled_at TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS student_progress (
-    id SERIAL PRIMARY KEY,
-    student_id INT REFERENCES users(id) ON DELETE CASCADE,
-    drive_id INT REFERENCES recruitment_drives(id) ON DELETE CASCADE,
-    readiness_score INT DEFAULT 0 CHECK (readiness_score >= 0 AND readiness_score <= 100),
-    completion_pct INT DEFAULT 0 CHECK (completion_pct >= 0 AND completion_pct <= 100),
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_users_firebase_uid ON users(firebase_uid);
-CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives(mentor_id);
-CREATE INDEX IF NOT EXISTS idx_live_sessions_mentor_id_scheduled_at ON live_sessions(mentor_id, scheduled_at);
-CREATE INDEX IF NOT EXISTS idx_student_progress_student_id ON student_progress(student_id);
-CREATE INDEX IF NOT EXISTS idx_student_progress_drive_id ON student_progress(drive_id);
-CREATE INDEX IF NOT EXISTS idx_submissions_assessment_id ON submissions(assessment_id);
-CREATE INDEX IF NOT EXISTS idx_assessments_course_id ON assessments(course_id);
-CREATE INDEX IF NOT EXISTS idx_courses_mentor_id ON courses(mentor_id);
+CREATE INDEX IF NOT EXISTS idx_student_social_links_student_id
+    ON student_social_links(student_id);

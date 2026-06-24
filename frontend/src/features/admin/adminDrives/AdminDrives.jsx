@@ -1,11 +1,6 @@
-import React from 'react'
+import React from 'react';
 
-const AdminDrives = () => {
-  return (
-    <div>
-      Admin Drives
-    </div>
-  )
+export default function () {
+  return <div> Component</div>;
 }
 
-export default AdminDrives
