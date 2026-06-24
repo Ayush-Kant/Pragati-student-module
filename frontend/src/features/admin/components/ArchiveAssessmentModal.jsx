@@ -1,20 +1,20 @@
-const PublishAssessmentModal = ({
+const ArchiveAssessmentModal = ({
   isOpen,
   onClose,
   assessment,
-  onPublish,
+  onArchive,
 }) => {
   if (!isOpen || !assessment) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md">
         <h2 className="text-xl font-bold mb-4">
-          Publish Assessment
+          Archive Assessment
         </h2>
 
         <p className="mb-6 text-gray-600">
-          Are you sure you want to publish
+          Are you sure you want to archive
           <span className="font-semibold">
             {" "}
             {assessment.title}
@@ -25,19 +25,19 @@ const PublishAssessmentModal = ({
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+            className="px-4 py-2 border rounded-lg"
           >
             Cancel
           </button>
 
           <button
             onClick={() => {
-              onPublish(assessment.id);
+              onArchive(assessment.id);
               onClose();
             }}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg"
           >
-            Publish
+            Archive
           </button>
         </div>
       </div>
@@ -45,4 +45,4 @@ const PublishAssessmentModal = ({
   );
 };
 
-export default PublishAssessmentModal;
+export default ArchiveAssessmentModal;
