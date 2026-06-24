@@ -9,21 +9,27 @@
  * calculatePercentile
  * -------------------
  * Returns the percentile rank (0–100) of `score` within the
- * given `scores` array using the "percentage of values below"
- * definition, which matches common HR / academic usage.
+ * given `scores` array.  Uses the standard "percentage of values
+ * below *or equal*" formula:
+ *
+ *     percentile = ((below + 0.5 × equal) / total) × 100
+ *
+ * This matches common HR / academic usage where tied scores
+ * share the midpoint of the ranks they would span.
  *
  * @param {number}   score  - The individual's score to rank.
  * @param {number[]} scores - All scores in the cohort (unsorted).
  * @returns {number} Percentile rounded to one decimal place.
  *
  * @example
- *   calculatePercentile(75, [50, 60, 75, 80, 90])  // → 40.0
+ *   calculatePercentile(75, [50, 60, 75, 80, 90])  // → 50.0
  */
 const calculatePercentile = (score, scores) => {
     if (!Array.isArray(scores) || scores.length === 0) return 0;
 
     const below = scores.filter((s) => s < score).length;
-    const raw   = (below / scores.length) * 100;
+    const equal = scores.filter((s) => s === score).length;
+    const raw   = ((below + 0.5 * equal) / scores.length) * 100;
 
     return Number(raw.toFixed(1));
 };
@@ -31,26 +37,29 @@ const calculatePercentile = (score, scores) => {
 /**
  * calculateBatchRank
  * ------------------
- * Assigns a 1-based rank to every entry in `entries` based on
- * `scoreKey` (descending). Ties receive the same rank and the
- * next rank is skipped (standard competition ranking: 1, 1, 3…).
+ * Returns a **new** array of shallow-cloned entries, each augmented
+ * with a 1-based `batchRank` computed from `scoreKey` (descending).
+ * Ties receive the same rank and the next rank is skipped
+ * (standard competition ranking: 1, 1, 3…).
  *
- * Mutates each entry in-place by adding a `batchRank` field and
- * returns the same array for convenience.
+ * The original `entries` array is **not** mutated.
  *
  * @param {Object[]} entries   - Array of student/entry objects.
  * @param {string}   scoreKey  - Property name to rank by.
- * @returns {Object[]} The same array, now with `batchRank` set.
+ * @returns {Object[]} A new array with `batchRank` set on each entry.
  *
  * @example
  *   calculateBatchRank([{ score: 90 }, { score: 70 }, { score: 90 }], 'score')
  *   // → [{ score: 90, batchRank: 1 }, { score: 70, batchRank: 3 }, { score: 90, batchRank: 1 }]
  */
 const calculateBatchRank = (entries, scoreKey = 'readinessScore') => {
-    if (!Array.isArray(entries) || entries.length === 0) return entries;
+    if (!Array.isArray(entries) || entries.length === 0) return [];
 
-    // Sort descending by scoreKey (non-destructive copy for ordering)
-    const sorted = [...entries].sort((a, b) => (b[scoreKey] ?? 0) - (a[scoreKey] ?? 0));
+    // Clone entries to avoid mutating the originals
+    const cloned = entries.map((e) => ({ ...e }));
+
+    // Sort descending by scoreKey
+    const sorted = [...cloned].sort((a, b) => (b[scoreKey] ?? 0) - (a[scoreKey] ?? 0));
 
     // Assign competition ranks
     let rank = 1;
@@ -61,13 +70,15 @@ const calculateBatchRank = (entries, scoreKey = 'readinessScore') => {
         sorted[i].batchRank = rank;
     }
 
-    // Write ranks back onto original entries by reference identity
-    const rankMap = new Map(sorted.map((e) => [e, e.batchRank]));
-    entries.forEach((e) => {
-        e.batchRank = rankMap.get(e) ?? null;
+    // Map ranks back onto the cloned array (preserving original order)
+    const rankMap = new Map(sorted.map((e, idx) => [idx, e.batchRank]));
+    const sortedIndexMap = new Map(sorted.map((e, idx) => [e, idx]));
+    cloned.forEach((e) => {
+        const sortedIdx = sortedIndexMap.get(e);
+        e.batchRank = sortedIdx !== undefined ? rankMap.get(sortedIdx) : null;
     });
 
-    return entries;
+    return cloned;
 };
 
 /**

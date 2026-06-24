@@ -28,104 +28,123 @@ import {
  * intentionally exposed only internally (stripped before response).
  */
 const _fetchSelfProfile = async (userId) => {
-    const result = await pool.query(
-        `
-        SELECT
-            u.id                            AS "userId",
-            u.full_name                     AS "fullName",
-            u.email,
-            s.branch,
-            s.graduation_year               AS "graduationYear",
-            s.college,
-            s.profile_completeness          AS "profileCompleteness",
-            s.readiness_score               AS "rawReadinessScore",
-            ROUND(s.readiness_score, 1)     AS "readinessScore"
-        FROM users u
-        JOIN students s ON s.id = u.id
-        WHERE u.uuid_id = $1
-        `,
-        [userId]
-    );
+    try {
+        const result = await pool.query(
+            `
+            SELECT
+                u.id                            AS "userId",
+                u.full_name                     AS "fullName",
+                s.branch,
+                s.graduation_year               AS "graduationYear",
+                s.college,
+                s.profile_completeness          AS "profileCompleteness",
+                s.readiness_score               AS "rawReadinessScore",
+                ROUND(s.readiness_score, 1)     AS "readinessScore"
+            FROM users u
+            -- NOTE: students table lacks a user_id FK; this join relies on
+            -- matching auto-increment PKs. Consider adding an explicit FK
+            -- (e.g. students.user_id → users.id) in a future migration.
+            JOIN students s ON s.id = u.id
+            WHERE u.uuid_id = $1
+            `,
+            [userId]
+        );
 
-    return result.rows[0] ?? null;
+        return result.rows[0] ?? null;
+    } catch (err) {
+        console.error('[leaderboardService] _fetchSelfProfile failed:', err);
+        throw err;
+    }
 };
 
 /**
  * Fetch leaderboard entries scoped to the same batch
  * (same college + graduation_year) as the requesting user.
+ *
+ * Uses a LATERAL JOIN to fetch each student's latest drive stage
+ * in a single pass, avoiding a correlated subquery per row.
  */
 const _fetchBatchLeaderboard = async ({ college, graduationYear }) => {
-    const result = await pool.query(
-        `
-        SELECT
-            u.id                            AS "userId",
-            u.uuid_id                       AS "userUuid",
-            u.full_name                     AS "fullName",
-            s.branch,
-            s.profile_completeness          AS "profileCompleteness",
-            s.readiness_score               AS "rawReadinessScore",
-            ROUND(s.readiness_score, 1)     AS "readinessScore",
-
-            -- Placement stage for the most recent drive the student joined
-            (
+    try {
+        const result = await pool.query(
+            `
+            SELECT
+                u.id                            AS "userId",
+                u.full_name                     AS "fullName",
+                s.branch,
+                s.profile_completeness          AS "profileCompleteness",
+                s.readiness_score               AS "rawReadinessScore",
+                ROUND(s.readiness_score, 1)     AS "readinessScore",
+                latest_drive.stage              AS "latestStage"
+            FROM users u
+            -- NOTE: see _fetchSelfProfile for join-condition caveat.
+            JOIN students s ON s.id = u.id
+            LEFT JOIN LATERAL (
                 SELECT sdp.stage
                 FROM student_drive_progress sdp
                 WHERE sdp.student_id = s.id
                 ORDER BY sdp.updated_at DESC
                 LIMIT 1
-            ) AS "latestStage"
+            ) latest_drive ON true
+            WHERE
+                u.role = 'student'
+                AND s.college = $1
+                AND s.graduation_year = $2
+            ORDER BY s.readiness_score DESC
+            `,
+            [college, graduationYear]
+        );
 
-        FROM users u
-        JOIN students s ON s.id = u.id
-        WHERE
-            u.role = 'student'
-            AND s.college = $1
-            AND s.graduation_year = $2
-        ORDER BY s.readiness_score DESC
-        `,
-        [college, graduationYear]
-    );
-
-    return result.rows;
+        return result.rows;
+    } catch (err) {
+        console.error('[leaderboardService] _fetchBatchLeaderboard failed:', err);
+        throw err;
+    }
 };
 
 /**
  * Fetch aggregate placement statistics for the batch.
  */
 const _fetchBatchStats = async ({ college, graduationYear }) => {
-    const result = await pool.query(
-        `
-        SELECT
-            COUNT(DISTINCT u.id)                                            AS "totalStudents",
-            COUNT(DISTINCT sdp.student_id)
-                FILTER (WHERE sdp.stage = 'selected')                      AS "totalSelected",
-            COUNT(DISTINCT sdp.drive_id)                                    AS "totalDrives",
-            ROUND(AVG(s.readiness_score), 1)                               AS "avgReadinessScore",
-            ROUND(
-                100.0 *
-                COUNT(DISTINCT sdp.student_id) FILTER (WHERE sdp.stage = 'selected')
-                / NULLIF(COUNT(DISTINCT u.id), 0),
-                1
-            )                                                               AS "selectionRate"
-        FROM users u
-        JOIN students s ON s.id = u.id
-        LEFT JOIN student_drive_progress sdp ON sdp.student_id = s.id
-        WHERE
-            u.role = 'student'
-            AND s.college = $1
-            AND s.graduation_year = $2
-        `,
-        [college, graduationYear]
-    );
+    try {
+        const result = await pool.query(
+            `
+            SELECT
+                COUNT(DISTINCT u.id)                                            AS "totalStudents",
+                COUNT(DISTINCT sdp.student_id)
+                    FILTER (WHERE sdp.stage = 'selected')                      AS "totalSelected",
+                COUNT(DISTINCT sdp.drive_id)                                    AS "totalDrives",
+                ROUND(AVG(s.readiness_score), 1)                               AS "avgReadinessScore",
+                ROUND(
+                    100.0 *
+                    COUNT(DISTINCT sdp.student_id) FILTER (WHERE sdp.stage = 'selected')
+                    / NULLIF(COUNT(DISTINCT u.id), 0),
+                    1
+                )                                                               AS "selectionRate"
+            FROM users u
+            -- NOTE: see _fetchSelfProfile for join-condition caveat.
+            JOIN students s ON s.id = u.id
+            LEFT JOIN student_drive_progress sdp ON sdp.student_id = s.id
+            WHERE
+                u.role = 'student'
+                AND s.college = $1
+                AND s.graduation_year = $2
+            `,
+            [college, graduationYear]
+        );
 
-    const row = result.rows[0];
-    return {
-        totalStudents   : parseInt(row.totalStudents)    || 0,
-        totalSelected   : parseInt(row.totalSelected)    || 0,
-        totalDrives     : parseInt(row.totalDrives)      || 0,
-        avgReadinessScore: Number(row.avgReadinessScore) || 0,
-        selectionRate   : Number(row.selectionRate)      || 0,
-    };
+        const row = result.rows[0];
+        return {
+            totalStudents   : parseInt(row.totalStudents, 10)    || 0,
+            totalSelected   : parseInt(row.totalSelected, 10)    || 0,
+            totalDrives     : parseInt(row.totalDrives, 10)      || 0,
+            avgReadinessScore: Number(row.avgReadinessScore)     || 0,
+            selectionRate   : Number(row.selectionRate)          || 0,
+        };
+    } catch (err) {
+        console.error('[leaderboardService] _fetchBatchStats failed:', err);
+        throw err;
+    }
 };
 
 /**
@@ -133,33 +152,38 @@ const _fetchBatchStats = async ({ college, graduationYear }) => {
  * has participated in (for the "My Drives" widget).
  */
 const _fetchStudentDrives = async (studentId) => {
-    const result = await pool.query(
-        `
-        SELECT
-            rd.id       AS "driveId",
-            rd.title,
-            rd.status,
-            c.name      AS "companyName",
-            sdp.stage,
-            sdp.updated_at AS "updatedAt"
-        FROM student_drive_progress sdp
-        JOIN recruitment_drives rd ON rd.id = sdp.drive_id
-        JOIN companies c           ON c.id  = rd.company_id
-        WHERE sdp.student_id = $1
-        ORDER BY sdp.updated_at DESC
-        LIMIT 5
-        `,
-        [studentId]
-    );
+    try {
+        const result = await pool.query(
+            `
+            SELECT
+                rd.id       AS "driveId",
+                rd.title,
+                rd.status,
+                c.name      AS "companyName",
+                sdp.stage,
+                sdp.updated_at AS "updatedAt"
+            FROM student_drive_progress sdp
+            JOIN recruitment_drives rd ON rd.id = sdp.drive_id
+            JOIN companies c           ON c.id  = rd.company_id
+            WHERE sdp.student_id = $1
+            ORDER BY sdp.updated_at DESC
+            LIMIT 5
+            `,
+            [studentId]
+        );
 
-    return result.rows.map((row) => ({
-        driveId    : row.driveId,
-        title      : row.title,
-        status     : row.status,
-        companyName: row.companyName,
-        stage      : row.stage,
-        updatedAt  : row.updatedAt,
-    }));
+        return result.rows.map((row) => ({
+            driveId    : row.driveId,
+            title      : row.title,
+            status     : row.status,
+            companyName: row.companyName,
+            stage      : row.stage,
+            updatedAt  : row.updatedAt,
+        }));
+    } catch (err) {
+        console.error('[leaderboardService] _fetchStudentDrives failed:', err);
+        throw err;
+    }
 };
 
 // ─── Public API ──────────────────────────────────────────────
@@ -177,6 +201,11 @@ const _fetchStudentDrives = async (studentId) => {
  * @throws {Error} If the requesting user does not exist.
  */
 const aggregateDashboard = async (requestingUserId) => {
+
+    // ── 0. Input validation ───────────────────────────────────
+    if (!requestingUserId || typeof requestingUserId !== 'string') {
+        throw new Error('aggregateDashboard requires a valid requestingUserId (non-empty string).');
+    }
 
     // ── 1. Fetch self-profile first (needed for batch scope) ──
     const self = await _fetchSelfProfile(requestingUserId);
@@ -197,12 +226,12 @@ const aggregateDashboard = async (requestingUserId) => {
         _fetchStudentDrives(self.userId),
     ]);
 
-    // ── 3. Batch rank (mutates entries in-place) ─────────────
-    calculateBatchRank(leaderboard, 'readinessScore');
+    // ── 3. Batch rank (returns a new ranked array) ───────────
+    const rankedLeaderboard = calculateBatchRank(leaderboard, 'readinessScore');
 
     // ── 4. Percentile for the requesting user ────────────────
-    const allScores = leaderboard.map((e) => Number(e.rawReadinessScore) || 0);
-    const selfEntry = leaderboard.find((e) => e.userId === self.userId);
+    const allScores = rankedLeaderboard.map((e) => Number(e.rawReadinessScore) || 0);
+    const selfEntry = rankedLeaderboard.find((e) => e.userId === self.userId);
 
     const percentile = calculatePercentile(
         Number(self.rawReadinessScore) || 0,
@@ -210,7 +239,7 @@ const aggregateDashboard = async (requestingUserId) => {
     );
 
     // ── 5. isSelf injection ───────────────────────────────────
-    injectIsSelf(leaderboard, self.userId, 'userId');
+    injectIsSelf(rankedLeaderboard, self.userId, 'userId');
 
     // ── 6. Assemble raw dashboard ─────────────────────────────
     const raw = {
@@ -220,7 +249,7 @@ const aggregateDashboard = async (requestingUserId) => {
             batchRank: selfEntry?.batchRank ?? null,
         },
         batchStats,
-        leaderboard,
+        leaderboard: rankedLeaderboard,
         drives: studentDrives,
         generatedAt: new Date().toISOString(),
     };
