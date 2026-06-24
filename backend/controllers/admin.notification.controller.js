@@ -52,15 +52,21 @@ export const listTemplatesController = async (req, res) => {
   }
 };
 
+
 export const createTemplateController = async (req, res) => {
   try {
-    const data = await createTemplate(req.body);
+    const { name, subject, body } = req.body;
+    if (!name || !subject || !body) {
+      return res.status(400).json({ error: 'All fields (name, subject, body) are required.' });
+    }
+    const data = await createTemplate({ name, subject, body });
     return res.status(201).json(data);
   } catch (err) {
     console.error('createTemplate error:', err.message);
     return res.status(500).json({ error: 'Failed to create template.' });
   }
 };
+
 
 export const getNotificationByIdController = async (req, res) => {
   try {

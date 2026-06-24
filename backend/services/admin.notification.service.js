@@ -107,8 +107,40 @@ export const scheduleNotification = async ({ to, channel, subject, message, sche
 };
 
 // junior's part below
-export const listTemplates = async () => {};
+export const listTemplates = async () => {
+  const res = await pool.query(`SELECT id, name, subject, body FROM notification_templates ORDER BY created_at DESC`);
+  return res.rows;
+};
 
-export const createTemplate = async (payload) => {};
+export const createTemplate = async (payload) => {
+  const { name, subject, body } = payload;
+  const res = await pool.query(
+    `INSERT INTO notification_templates (name, subject, body) VALUES ($1, $2, $3) RETURNING id`,
+    [name, subject, body]
+  );
+  return { id: res.rows[0].id, name, subject, body };
+};
 
-export const getNotificationById = async (id) => {};
+export const getNotificationById = async (id) => {
+  
+  const realId = id.replace('notif_', '');
+  const res = await pool.query(
+    `SELECT id, recipient_group, channels, subject, message, status, sent_at, created_at 
+     FROM admin_notifications WHERE id = $1`,
+    [realId]
+  );
+  
+  if (res.rows.length === 0) return null;
+  
+  const n = res.rows[0];
+  return {
+    id: `notif_${n.id}`,
+    to: { group: n.recipient_group },
+    channel: n.channels,
+    subject: n.subject,
+    message: n.message,
+    status: n.status,
+    sentAt: n.sent_at,
+    createdAt: n.created_at
+  };
+};
