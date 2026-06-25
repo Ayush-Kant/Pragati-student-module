@@ -1,9 +1,9 @@
 import express from "express";
 import { connectDB } from "./config/db.js";
-import mentorRoutes from "./routes/mentor.routes.js";
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
 import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
+import adminNotificationRoutes from "./routes/admin.notification.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import cors from "cors";
@@ -41,9 +41,9 @@ app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/v1/company", companyRoutes);
-app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
+app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.get("/", (req, res) => {

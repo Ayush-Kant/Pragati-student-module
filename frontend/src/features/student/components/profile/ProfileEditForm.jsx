@@ -1,8 +1,3 @@
-// ProfileEditForm.jsx
-// Purpose: Controlled form for editing all student profile fields including bio, phone, and social links
-// Controlled form with validation — name, phone, city, department, CGPA
-
-
 import { useState, useEffect } from "react";
 import SkillTagSelector from "./SkillTagSelector";
 import ResumeUploader from "./ResumeUploader";

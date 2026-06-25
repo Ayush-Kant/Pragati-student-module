@@ -1,31 +1,44 @@
 export const profileDummyData = {
-  collegeName: "Uptoskills",
-  verified: true,
-  tagline: "Skill Development and Career Enablement",
-  description: "Uptoskills helps students and early career professionals build practical skills through mentor-led programs, assessments, projects, and placement-focused training.",
-  logoUrl: "",
-  code: "UTS2021",
-  established: "2021",
-  collegeType: "EdTech Organization",
-  affiliatedTo: "Industry and Campus Partners",
-  address: "Pune, Maharashtra, India",
-  website: "www.uptoskills.com",
-  email: "contact@uptoskills.com",
-  phone: "+91 98765 43210",
-  principalName: "Uptoskills Team",
-  accreditation: "Certified Training Partner",
-  totalStudents: "12,500+",
-  aboutCollege: "Uptoskills partners with colleges, mentors, and companies to deliver career-ready learning paths, hands-on projects, and placement readiness support.",
-  contactPerson: {
-    name: "Uptoskills Support",
-    title: "Partnership Coordinator",
-    email: "contact@uptoskills.com",
-    phone: "+91 98765 43210"
-  },
-  socialLinks: {
-    facebook: "facebook.com/uptoskills",
-    linkedin: "linkedin.com/company/uptoskills",
-    twitter: "twitter.com/uptoskills",
-    instagram: "instagram.com/uptoskills"
-  }
+  name: "Vaishnavi Chaudhari",
+  phone: "9876543210",
+  city: "Pune",
+  department: "Computer Engineering",
+  cgpa: 8.7,
+
+  email: "vaishnavi@college.edu",
+  rollNo: "2021CE047",
+  batch: "2021-2025",
+
+  status: "eligible",
+
+  skills: [
+    "React",
+    "Node.js",
+    "Python",
+    "SQL",
+    "Git",
+  ],
+
+  resumeUrl: null,
+
+  projects: [
+    {
+      id: 1,
+      title: "Student Portal",
+      description: "A college management portal project",
+      technologies: [
+        "React",
+        "Node.js",
+      ],
+    },
+    {
+      id: 2,
+      title: "Portfolio Website",
+      description: "Personal developer portfolio",
+      technologies: [
+        "React",
+        "Tailwind",
+      ],
+    },
+  ],
 };

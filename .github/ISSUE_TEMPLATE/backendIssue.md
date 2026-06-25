@@ -1,3 +1,13 @@
+---
+name: Backend Task
+about: Backend implementation task for interns
+title: "[BE] "
+labels: 
+     - backend 
+assignees: ''
+---
+
+
 ## 📋 Task Overview
 <!-- Brief description of what this backend task involves -->
 
