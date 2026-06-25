@@ -6,19 +6,17 @@ const AssessmentEditModal = ({
   assessment,
   onSave,
 }) => {
-  const [formData, setFormData] =
-    useState({
-      title: "",
-      difficulty: "",
-      timeLimitMinutes: "",
-    });
+  const [formData, setFormData] = useState({
+    title: "",
+    difficulty: "",
+    timeLimitMinutes: "",
+  });
 
   useEffect(() => {
     if (assessment) {
       setFormData({
         title: assessment.title,
-        difficulty:
-          assessment.difficulty,
+        difficulty: assessment.difficulty,
         timeLimitMinutes:
           assessment.timeLimitMinutes,
       });
@@ -39,80 +37,102 @@ const AssessmentEditModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-xl w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-xl border border-gray-200 bg-white p-6 shadow-2xl transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900">
+        {/* Header */}
+        <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">
           Edit Assessment
         </h2>
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-4"
+          className="space-y-5"
         >
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                title:
-                  e.target.value,
-              })
-            }
-            className="w-full border rounded p-3"
-          />
+          {/* Assessment Title */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+              Assessment Title
+            </label>
 
-          <select
-            value={
-              formData.difficulty
-            }
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                difficulty:
-                  e.target.value,
-              })
-            }
-            className="w-full border rounded p-3"
-          >
-            <option>
-              Easy
-            </option>
-            <option>
-              Medium
-            </option>
-            <option>
-              Hard
-            </option>
-          </select>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  title: e.target.value,
+                })
+              }
+              className="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 placeholder:text-gray-400 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+            />
+          </div>
 
-          <input
-            type="number"
-            value={
-              formData.timeLimitMinutes
-            }
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                timeLimitMinutes:
-                  e.target.value,
-              })
-            }
-            className="w-full border rounded p-3"
-          />
+          {/* Difficulty */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+              Difficulty
+            </label>
 
-          <div className="flex justify-end gap-3">
+            <select
+              value={formData.difficulty}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  difficulty:
+                    e.target.value,
+                })
+              }
+              className="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+            >
+              <option value="Easy">
+                Easy
+              </option>
+
+              <option value="Medium">
+                Medium
+              </option>
+
+              <option value="Hard">
+                Hard
+              </option>
+            </select>
+          </div>
+
+          {/* Time Limit */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+              Time Limit (Minutes)
+            </label>
+
+            <input
+              type="number"
+              value={
+                formData.timeLimitMinutes
+              }
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  timeLimitMinutes:
+                    e.target.value,
+                })
+              }
+              className="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border rounded"
+              className="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded"
+              className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
             >
               Save Changes
             </button>
