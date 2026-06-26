@@ -23,6 +23,84 @@ CREATE TABLE IF NOT EXISTS courses (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS course_modules (
+    id SERIAL PRIMARY KEY,
+    course_id INT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    order_index INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (course_id, order_index)
+);
+
+CREATE TABLE IF NOT EXISTS lessons (
+    id SERIAL PRIMARY KEY,
+    module_id INT NOT NULL REFERENCES course_modules(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    content TEXT,
+    duration_minutes INT DEFAULT 0 CHECK (duration_minutes >= 0),
+    order_index INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (module_id, order_index)
+);
+
+CREATE TABLE IF NOT EXISTS lesson_resources (
+    id SERIAL PRIMARY KEY,
+    lesson_id INT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    resource_type VARCHAR(50) NOT NULL DEFAULT 'video' CHECK (resource_type IN ('video', 'article', 'document', 'quiz', 'link', 'file', 'other')),
+    url TEXT,
+    file_path TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    CHECK (url IS NOT NULL OR file_path IS NOT NULL)
+);
+
+CREATE TABLE IF NOT EXISTS lesson_progress (
+    id SERIAL PRIMARY KEY,
+    student_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_id INT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+    progress_pct INT NOT NULL DEFAULT 0 CHECK (progress_pct >= 0 AND progress_pct <= 100),
+    completed BOOLEAN NOT NULL DEFAULT false,
+    last_viewed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (student_id, lesson_id)
+);
+
+CREATE TABLE IF NOT EXISTS student_notes (
+    id SERIAL PRIMARY KEY,
+    student_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_id INT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS lesson_bookmarks (
+    id SERIAL PRIMARY KEY,
+    student_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_id INT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+    bookmark_time_seconds INT DEFAULT 0 CHECK (bookmark_time_seconds >= 0),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (student_id, lesson_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_course_modules_course_id ON course_modules(course_id);
+CREATE INDEX IF NOT EXISTS idx_course_modules_order_index ON course_modules(course_id, order_index);
+CREATE INDEX IF NOT EXISTS idx_lessons_module_id ON lessons(module_id);
+CREATE INDEX IF NOT EXISTS idx_lessons_order_index ON lessons(module_id, order_index);
+CREATE INDEX IF NOT EXISTS idx_lesson_resources_lesson_id ON lesson_resources(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_progress_student_id ON lesson_progress(student_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_progress_lesson_id ON lesson_progress(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_student_notes_student_id ON student_notes(student_id);
+CREATE INDEX IF NOT EXISTS idx_student_notes_lesson_id ON student_notes(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_bookmarks_student_id ON lesson_bookmarks(student_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_bookmarks_lesson_id ON lesson_bookmarks(lesson_id);
+
 CREATE TABLE IF NOT EXISTS assessments (
     id SERIAL PRIMARY KEY,
     course_id INT REFERENCES courses(id) ON DELETE CASCADE,
