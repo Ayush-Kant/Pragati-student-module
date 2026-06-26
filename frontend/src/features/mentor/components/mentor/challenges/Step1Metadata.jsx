@@ -21,7 +21,7 @@ const Step1Metadata = ({ onNext }) => {
 
   const [errors, setErrors] = useState({});
 
-  // Handle text and number inputs
+  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -36,16 +36,18 @@ const Step1Metadata = ({ onNext }) => {
     }));
   };
 
-  // Handle language selection
+  // Handle checkbox selection
   const handleLanguageChange = (language) => {
-    const updatedLanguages = formData.allowedLanguages.includes(language)
-      ? formData.allowedLanguages.filter((lang) => lang !== language)
-      : [...formData.allowedLanguages, language];
+    setFormData((prev) => {
+      const exists = prev.allowedLanguages.includes(language);
 
-    setFormData((prev) => ({
-      ...prev,
-      allowedLanguages: updatedLanguages,
-    }));
+      return {
+        ...prev,
+        allowedLanguages: exists
+          ? prev.allowedLanguages.filter((l) => l !== language)
+          : [...prev.allowedLanguages, language],
+      };
+    });
 
     setErrors((prev) => ({
       ...prev,
@@ -53,7 +55,7 @@ const Step1Metadata = ({ onNext }) => {
     }));
   };
 
-  // Validate form
+  // Validation
   const validate = () => {
     const newErrors = {};
 
@@ -65,16 +67,12 @@ const Step1Metadata = ({ onNext }) => {
       newErrors.description = "Description is required.";
     }
 
-    if (
-      formData.maxScore === "" ||
-      Number(formData.maxScore) <= 0
-    ) {
-      newErrors.maxScore = "Please enter a valid max score.";
+    if (!formData.maxScore || Number(formData.maxScore) <= 0) {
+      newErrors.maxScore = "Enter a valid max score.";
     }
 
     if (formData.allowedLanguages.length === 0) {
-      newErrors.allowedLanguages =
-        "Select at least one language.";
+      newErrors.allowedLanguages = "Select at least one language.";
     }
 
     setErrors(newErrors);
@@ -82,151 +80,176 @@ const Step1Metadata = ({ onNext }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Next button
   const handleNext = () => {
-    if (validate()) {
-      if (onNext) {
-        onNext(formData);
-      }
+    if (!validate()) return;
+
+    if (typeof onNext === "function") {
+      onNext(formData);
+    } else {
+      console.error("onNext prop is missing in Step1Metadata");
     }
   };
 
   return (
+  <div
+    style={{
+      background: "#fff",
+      border: "1px solid #E5E7EB",
+      borderRadius: "12px",
+      padding: "30px",
+    }}
+  >
     <div
       style={{
-        maxWidth: "700px",
-        margin: "0 auto",
-        padding: "20px",
+        display: "grid",
+        gridTemplateColumns: "2fr 1fr",
+        gap: "30px",
       }}
     >
-      <h2>Challenge Metadata</h2>
+      {/* LEFT SIDE */}
+      <div>
+        {/* Title */}
+        <div style={{ marginBottom: "20px" }}>
+          <label style={{ fontWeight: 600 }}>Challenge Title *</label>
 
-      {/* Challenge Title */}
-      <div style={{ marginBottom: "20px" }}>
-        <label>
-          <strong>Challenge Title *</strong>
-        </label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="e.g. Reverse Linked List"
+            style={{
+              width: "100%",
+              marginTop: "8px",
+              padding: "12px",
+              border: "1px solid #D1D5DB",
+              borderRadius: "8px",
+              fontSize: "15px",
+            }}
+          />
 
-        <input
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          placeholder="Enter challenge title"
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "8px",
-          }}
-        />
-
-        {errors.title && (
-          <p style={{ color: "red" }}>{errors.title}</p>
-        )}
-      </div>
-
-      {/* Description */}
-      <div style={{ marginBottom: "20px" }}>
-        <label>
-          <strong>Description *</strong>
-        </label>
-
-        <textarea
-          name="description"
-          rows={6}
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Enter challenge description..."
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "8px",
-          }}
-        />
-
-        {errors.description && (
-          <p style={{ color: "red" }}>
-            {errors.description}
-          </p>
-        )}
-      </div>
-
-      {/* Max Score */}
-      <div style={{ marginBottom: "20px" }}>
-        <label>
-          <strong>Max Score *</strong>
-        </label>
-
-        <input
-          type="number"
-          name="maxScore"
-          min="1"
-          value={formData.maxScore}
-          onChange={handleChange}
-          placeholder="100"
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "8px",
-          }}
-        />
-
-        {errors.maxScore && (
-          <p style={{ color: "red" }}>
-            {errors.maxScore}
-          </p>
-        )}
-      </div>
-
-      {/* Allowed Languages */}
-      <div style={{ marginBottom: "20px" }}>
-        <label>
-          <strong>Allowed Languages *</strong>
-        </label>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "10px",
-            marginTop: "10px",
-          }}
-        >
-          {LANGUAGE_OPTIONS.map((language) => (
-            <label key={language}>
-              <input
-                type="checkbox"
-                checked={formData.allowedLanguages.includes(language)}
-                onChange={() =>
-                  handleLanguageChange(language)
-                }
-              />{" "}
-              {language}
-            </label>
-          ))}
+          {errors.title && (
+            <p style={{ color: "red" }}>{errors.title}</p>
+          )}
         </div>
 
-        {errors.allowedLanguages && (
-          <p style={{ color: "red" }}>
-            {errors.allowedLanguages}
-          </p>
-        )}
+        {/* Description */}
+        <div>
+          <label style={{ fontWeight: 600 }}>
+            Description *
+          </label>
+
+          <textarea
+            rows={12}
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Write challenge description..."
+            style={{
+              width: "100%",
+              marginTop: "8px",
+              padding: "12px",
+              border: "1px solid #D1D5DB",
+              borderRadius: "8px",
+              resize: "vertical",
+            }}
+          />
+
+          {errors.description && (
+            <p style={{ color: "red" }}>
+              {errors.description}
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* Next Button */}
-      <div style={{ textAlign: "right" }}>
-        <button
-          onClick={handleNext}
-          style={{
-            padding: "10px 20px",
-            cursor: "pointer",
-          }}
-        >
-          Next: Test Cases →
-        </button>
+      {/* RIGHT SIDE */}
+      <div>
+        <div style={{ marginBottom: "25px" }}>
+          <label style={{ fontWeight: 600 }}>
+            Max Score *
+          </label>
+
+          <input
+            type="number"
+            name="maxScore"
+            value={formData.maxScore}
+            onChange={handleChange}
+            placeholder="100"
+            style={{
+              width: "100%",
+              marginTop: "8px",
+              padding: "12px",
+              border: "1px solid #D1D5DB",
+              borderRadius: "8px",
+            }}
+          />
+
+          {errors.maxScore && (
+            <p style={{ color: "red" }}>
+              {errors.maxScore}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label style={{ fontWeight: 600 }}>
+            Allowed Languages
+          </label>
+
+          <div style={{ marginTop: "12px" }}>
+            {LANGUAGE_OPTIONS.map((language) => (
+              <div
+                key={language}
+                style={{ marginBottom: "10px" }}
+              >
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={formData.allowedLanguages.includes(language)}
+                    onChange={() =>
+                      handleLanguageChange(language)
+                    }
+                  />{" "}
+                  {language}
+                </label>
+              </div>
+            ))}
+          </div>
+
+          {errors.allowedLanguages && (
+            <p style={{ color: "red" }}>
+              {errors.allowedLanguages}
+            </p>
+          )}
+        </div>
       </div>
     </div>
-  );
+
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        marginTop: "35px",
+      }}
+    >
+      <button
+        onClick={handleNext}
+        style={{
+          background: "#2563EB",
+          color: "#fff",
+          border: "none",
+          padding: "12px 28px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontWeight: "600",
+        }}
+      >
+        Next →
+      </button>
+    </div>
+  </div>
+);
 };
 
 export default Step1Metadata;

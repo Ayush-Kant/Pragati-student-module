@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Step1Metadata from "../components/challenges/Step1Metadata";
-import Step2TestCases from "../components/challenges/Step2TestCases";
+import Step1Metadata from "../../components/mentor/challenges/Step1Metadata";
+import Step2TestCases from "../../components/mentor/challenges/Step2TestCases";
 
 const ChallengeCreatorPage = () => {
   const [step, setStep] = useState(1);
@@ -12,100 +12,143 @@ const ChallengeCreatorPage = () => {
     allowedLanguages: [],
   });
 
-  const nextStep = (data) => {
-    setChallengeData(data);
+  const handleNext = (updatedData) => {
+    setChallengeData(updatedData);
     setStep(2);
   };
 
-  const previousStep = () => {
+  const handleBack = () => {
     setStep(1);
   };
 
   return (
+  <div
+    style={{
+      minHeight: "100vh",
+      background: "#F3F4F6",
+      padding: "40px 20px",
+    }}
+  >
     <div
       style={{
-        background: "#F8FAFC",
-        minHeight: "100vh",
-        padding: "30px",
+        maxWidth: "1100px",
+        margin: "0 auto",
+        background: "#fff",
+        borderRadius: "16px",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+        padding: "40px",
       }}
     >
-      <div
+      {/* Heading */}
+      <h1
         style={{
-          maxWidth: "1000px",
-          margin: "0 auto",
-          background: "#FFFFFF",
-          borderRadius: "12px",
-          padding: "30px",
-          border: "1px solid #E5E7EB",
+          fontSize: "32px",
+          fontWeight: "700",
+          color: "#111827",
+          marginBottom: "10px",
         }}
       >
-        {/* Heading */}
-        <h2
-          style={{
-            marginBottom: "25px",
-            color: "#111827",
-          }}
-        >
-          Coding Challenge Creator
-        </h2>
+        Create New Challenge
+      </h1>
 
-        {/* Stepper */}
+      <p
+        style={{
+          color: "#6B7280",
+          marginBottom: "35px",
+        }}
+      >
+        Create a coding challenge in two simple steps.
+      </p>
+
+      {/* Stepper */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          marginBottom: "40px",
+        }}
+      >
+        {/* Step 1 */}
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            marginBottom: "30px",
+            alignItems: "center",
+            color: step === 1 ? "#2563EB" : "#9CA3AF",
+            fontWeight: "600",
           }}
         >
           <div
             style={{
-              flex: 1,
-              textAlign: "center",
-              padding: "12px",
-              borderBottom:
-                step === 1
-                  ? "3px solid #2563EB"
-                  : "3px solid #E5E7EB",
-              color: step === 1 ? "#2563EB" : "#6B7280",
-              fontWeight: 600,
+              width: "34px",
+              height: "34px",
+              borderRadius: "50%",
+              background: step === 1 ? "#2563EB" : "#E5E7EB",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: "10px",
             }}
           >
-            1. Challenge Metadata
+            1
           </div>
 
-          <div
-            style={{
-              flex: 1,
-              textAlign: "center",
-              padding: "12px",
-              borderBottom:
-                step === 2
-                  ? "3px solid #2563EB"
-                  : "3px solid #E5E7EB",
-              color: step === 2 ? "#2563EB" : "#6B7280",
-              fontWeight: 600,
-            }}
-          >
-            2. Test Cases
-          </div>
+          Metadata
         </div>
 
-        {/* Step Content */}
-        {step === 1 ? (
-          <Step1Metadata
-            formData={challengeData}
-            setFormData={setChallengeData}
-            onNext={nextStep}
-          />
-        ) : (
-          <Step2TestCases
-            challengeData={challengeData}
-            onBack={previousStep}
-          />
-        )}
+        <div
+          style={{
+            flex: 1,
+            height: "2px",
+            background: "#E5E7EB",
+            margin: "0 20px",
+          }}
+        />
+
+        {/* Step 2 */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            color: step === 2 ? "#2563EB" : "#9CA3AF",
+            fontWeight: "600",
+          }}
+        >
+          <div
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "50%",
+              background: step === 2 ? "#2563EB" : "#E5E7EB",
+              color: step === 2 ? "#fff" : "#6B7280",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: "10px",
+            }}
+          >
+            2
+          </div>
+
+          Test Cases
+        </div>
       </div>
+
+      {step === 1 ? (
+        <Step1Metadata
+          formData={challengeData}
+          setFormData={setChallengeData}
+          onNext={handleNext}
+        />
+      ) : (
+        <Step2TestCases
+          challengeData={challengeData}
+          onBack={handleBack}
+        />
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default ChallengeCreatorPage;

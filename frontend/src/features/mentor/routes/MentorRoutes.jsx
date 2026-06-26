@@ -7,6 +7,8 @@ import ExportReport from "../pages/ExportReport";
 import { ActivityProvider } from "../context/ActivityContext";
 import Activities from "../pages/Activities";
 import CreateActivity from "../pages/CreateActivity";
+import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
+
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
@@ -15,9 +17,11 @@ const mentorRoute = (
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="export-report" element={<ExportReport />} />
+          <Route path="challenge-creator" element={<ChallengeCreatorPage/>}/>
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
           <Route path="activities/create" element={<CreateActivity />} />
+        
         </Route>
       </Route>
     </Route>
