@@ -12,7 +12,7 @@ API.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 API.interceptors.response.use(
@@ -23,7 +23,7 @@ API.interceptors.response.use(
       window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 const getConfig = () => ({
@@ -45,77 +45,57 @@ export const updateAdminProfile = async (profileData) => {
 //For college needing recruitment
 export const getNeedsRecruitment = async () => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/colleges/needs-recruitment"
-    );
+    const response = await API.get("/api/v1/admin/colleges/needs-recruitment");
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 //To fetch rankings of college
 export const getCollegeRankings = async () => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/colleges/rankings"
-    );
+    const response = await API.get("/api/v1/admin/colleges/rankings");
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 export const approveCollege = async (id) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/approve`
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/approve`);
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 };
 
-
-export const rejectCollege = async (
-  id,
-  reason
-) => {
+export const rejectCollege = async (id, reason) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/reject`,
-      {
-        reason
-      }
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/reject`, {
+      reason,
+    });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
 
-
-export const suspendCollege = async (
-  id,
-  reason
-) => {
+export const suspendCollege = async (id, reason) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/suspend`,
-      {
-        reason
-      }
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/suspend`, {
+      reason,
+    });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -247,6 +227,8 @@ export const getDriveById = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     return mockDriveDetail;
   }
 };
@@ -264,6 +246,8 @@ export const getCandidates = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     return mockCandidates;
   }
 };
@@ -285,6 +269,8 @@ export const advanceDrive = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -306,6 +292,8 @@ export const freezeDrive = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -327,6 +315,8 @@ export const unfreezeDrive = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -348,6 +338,8 @@ export const moveCandidate = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -369,6 +361,8 @@ export const shortlistCandidates = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -390,6 +384,8 @@ export const assignTest = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -411,6 +407,8 @@ export const assignCourse = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -432,29 +430,25 @@ export const updateDrive = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
-  throw error;
-}
+    console.log(error);
+
+    throw error;
+  }
 };
 
 const getToken = () => localStorage.getItem("token");
 
 export const getAssessmentById = async (assessmentId) => {
-  const response = await API.get(
-    `/api/v1/admin/assessments/${assessmentId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
-  );
+  const response = await API.get(`/api/v1/admin/assessments/${assessmentId}`, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
 
   return response.data;
 };
 
-export const addQuestion = async (
-  assessmentId,
-  payload
-) => {
+export const addQuestion = async (assessmentId, payload) => {
   const response = await API.post(
     `/api/v1/admin/assessments/${assessmentId}/questions`,
     payload,
@@ -462,17 +456,13 @@ export const addQuestion = async (
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
-    }
+    },
   );
 
   return response.data;
 };
 
-export const updateQuestion = async (
-  assessmentId,
-  questionId,
-  payload
-) => {
+export const updateQuestion = async (assessmentId, questionId, payload) => {
   const response = await API.put(
     `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
     payload,
@@ -480,31 +470,26 @@ export const updateQuestion = async (
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
-    }
+    },
   );
 
   return response.data;
 };
 
-export const deleteQuestion = async (
-  assessmentId,
-  questionId
-) => {
+export const deleteQuestion = async (assessmentId, questionId) => {
   const response = await API.delete(
     `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
     {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
-    }
+    },
   );
 
   return response.data;
 };
 
-export const publishAssessment = async (
-  assessmentId
-) => {
+export const publishAssessment = async (assessmentId) => {
   const response = await API.patch(
     `/api/v1/admin/assessments/${assessmentId}/publish`,
     {},
@@ -512,29 +497,23 @@ export const publishAssessment = async (
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
-    }
+    },
   );
 
   return response.data;
 };
 
 export const getDrives = async () => {
-  const response = await API.get(
-    "/api/v1/admin/drives",
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
-  );
+  const response = await API.get("/api/v1/admin/drives", {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
 
   return response.data;
 };
 
-export const assignAssessment = async (
-  assessmentId,
-  payload
-) => {
+export const assignAssessment = async (assessmentId, payload) => {
   const response = await API.post(
     `/api/v1/admin/assessments/${assessmentId}/assign`,
     payload,
@@ -542,7 +521,7 @@ export const assignAssessment = async (
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
-    }
+    },
   );
 
   return response.data;
