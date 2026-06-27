@@ -1,10 +1,4 @@
-const isUUID = (value) => {
-  if (typeof value !== "string") {
-    return false;
-  }
-
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
-};
+const { validate: isUUID } = require("uuid");
 
 const createResponse = (success, status, message, data = null) => ({
   success,
@@ -52,27 +46,11 @@ const validateEnrollment = (studentId, courseId) => {
   return createResponse(true, 200, "Enrollment validated");
 };
 
-const verifyCourseAccess = (studentId, courseId, accessChecker = null) => {
+const verifyCourseAccess = (studentId, courseId) => {
   const validation = validateEnrollment(studentId, courseId);
 
   if (!validation.success) {
     return validation;
-  }
-
-  if (typeof accessChecker === "function") {
-    const accessResult = accessChecker(studentId, courseId);
-
-    if (accessResult === false) {
-      return createResponse(false, 403, "Student is not authorized to access this course");
-    }
-
-    if (accessResult && accessResult.success === false) {
-      return accessResult;
-    }
-  }
-
-  if (typeof accessChecker === "boolean" && !accessChecker) {
-    return createResponse(false, 403, "Student is not authorized to access this course");
   }
 
   return createResponse(true, 200, "Course access granted");
