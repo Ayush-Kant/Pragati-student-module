@@ -10,13 +10,13 @@ import {
 } from "../controllers/college.profile.controller.js";
 
 router.get(
-  "/:id",
+  "/",
   authMiddleware,
   getCollegeProfile
 );
 
 router.put(
-  "/:id",
+  "/",
   authMiddleware,
   updateCollegeProfile
 );
