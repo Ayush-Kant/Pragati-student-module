@@ -1,10 +1,25 @@
 const crypto = require("crypto");
+const { validate: isUUID } = require("uuid");
 
 const getResourceTokenSecret = (secret = null) => {
-  return secret || process.env.RESOURCE_TOKEN_SECRET || "pragati-development-secret";
+  const resolvedSecret = secret ?? process.env.RESOURCE_TOKEN_SECRET;
+
+  if (!resolvedSecret) {
+    throw new Error("RESOURCE_TOKEN_SECRET is required");
+  }
+
+  return resolvedSecret;
+};
+
+const isValidResourceId = (resourceId) => {
+  return typeof resourceId === "string" && isUUID(resourceId);
 };
 
 const generateSecureResourceToken = (resourceId, expiresAt, secret = null) => {
+  if (!isValidResourceId(resourceId)) {
+    throw new Error("Invalid Resource ID");
+  }
+
   const tokenSecret = getResourceTokenSecret(secret);
 
   return crypto
@@ -14,7 +29,7 @@ const generateSecureResourceToken = (resourceId, expiresAt, secret = null) => {
 };
 
 const generateSecureResourceUrl = (resourceId, expiresIn = 3600, secret = null) => {
-  if (!resourceId) {
+  if (!isValidResourceId(resourceId)) {
     return null;
   }
 
@@ -30,7 +45,7 @@ const generateSecureResourceUrl = (resourceId, expiresIn = 3600, secret = null) 
 };
 
 const verifySecureResourceToken = (resourceId, token, expiresAt, secret = null) => {
-  if (!resourceId || !token || !expiresAt) {
+  if (!resourceId || !token || !expiresAt || !isValidResourceId(resourceId)) {
     return false;
   }
 
@@ -38,9 +53,9 @@ const verifySecureResourceToken = (resourceId, token, expiresAt, secret = null) 
     return false;
   }
 
-  const expectedToken = generateSecureResourceToken(resourceId, expiresAt, secret);
-
   try {
+    const expectedToken = generateSecureResourceToken(resourceId, expiresAt, secret);
+
     return crypto.timingSafeEqual(
       Buffer.from(token, "hex"),
       Buffer.from(expectedToken, "hex")

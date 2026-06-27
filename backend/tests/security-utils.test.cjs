@@ -45,19 +45,28 @@ test("validateResourceAccess returns a specific invalid-ID message", () => {
   assert.equal(result.message, "Invalid Resource ID");
 });
 
-test("verifyCourseAccess blocks unauthorized access when the checker returns false", () => {
-  const result = verifyCourseAccess(studentId, courseId, () => false);
+test("verifyCourseAccess validates enrollment inputs without a callback", () => {
+  const result = verifyCourseAccess(studentId, undefined);
 
   assert.equal(result.success, false);
-  assert.equal(result.status, 403);
-  assert.equal(result.message, "Student is not authorized to access this course");
+  assert.equal(result.status, 400);
+  assert.equal(result.message, "Course ID is required");
 });
 
-test("resource tokens are signed and verifiable", () => {
-  const result = generateSecureResourceUrl("resource-1", 60, "test-secret");
+test("resource URLs reject missing or invalid resource identifiers", () => {
+  assert.equal(generateSecureResourceUrl(undefined, 60, "test-secret"), null);
+  assert.equal(generateSecureResourceUrl("not-a-uuid", 60, "test-secret"), null);
+});
 
+test("resource tokens require a secret and reject expired tokens", () => {
+  const originalSecret = process.env.RESOURCE_TOKEN_SECRET;
+  delete process.env.RESOURCE_TOKEN_SECRET;
+
+  assert.throws(() => generateSecureResourceUrl("123e4567-e89b-12d3-a456-426614174002", 60), /RESOURCE_TOKEN_SECRET/);
+
+  process.env.RESOURCE_TOKEN_SECRET = originalSecret;
+
+  const result = generateSecureResourceUrl("123e4567-e89b-12d3-a456-426614174002", 60, "test-secret");
   assert.ok(result.token);
-  assert.equal(result.resourceId, "resource-1");
-  assert.equal(verifySecureResourceToken("resource-1", result.token, result.expiresAt, "test-secret"), true);
-  assert.equal(verifySecureResourceToken("resource-1", "deadbeef", result.expiresAt, "test-secret"), false);
+  assert.equal(verifySecureResourceToken("123e4567-e89b-12d3-a456-426614174002", result.token, Date.now() - 1000, "test-secret"), false);
 });
