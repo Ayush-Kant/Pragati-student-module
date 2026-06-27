@@ -60,13 +60,20 @@ test("resource URLs reject missing or invalid resource identifiers", () => {
 
 test("resource tokens require a secret and reject expired tokens", () => {
   const originalSecret = process.env.RESOURCE_TOKEN_SECRET;
-  delete process.env.RESOURCE_TOKEN_SECRET;
 
-  assert.throws(() => generateSecureResourceUrl("123e4567-e89b-12d3-a456-426614174002", 60), /RESOURCE_TOKEN_SECRET/);
+  try {
+    delete process.env.RESOURCE_TOKEN_SECRET;
 
-  process.env.RESOURCE_TOKEN_SECRET = originalSecret;
+    assert.throws(() => generateSecureResourceUrl("123e4567-e89b-12d3-a456-426614174002", 60), /RESOURCE_TOKEN_SECRET/);
 
-  const result = generateSecureResourceUrl("123e4567-e89b-12d3-a456-426614174002", 60, "test-secret");
-  assert.ok(result.token);
-  assert.equal(verifySecureResourceToken("123e4567-e89b-12d3-a456-426614174002", result.token, Date.now() - 1000, "test-secret"), false);
+    const result = generateSecureResourceUrl("123e4567-e89b-12d3-a456-426614174002", 60, "test-secret");
+    assert.ok(result.token);
+    assert.equal(verifySecureResourceToken("123e4567-e89b-12d3-a456-426614174002", result.token, Date.now() - 1000, "test-secret"), false);
+  } finally {
+    if (originalSecret === undefined) {
+      delete process.env.RESOURCE_TOKEN_SECRET;
+    } else {
+      process.env.RESOURCE_TOKEN_SECRET = originalSecret;
+    }
+  }
 });
