@@ -181,7 +181,7 @@ export default function MentorLayout() {
           {menuItems.map((item, idx) => (
             <div
               key={idx}
-              onClick={() => navigate(item.path)}
+              onClick={() => {console.log("Clicked:", item);navigate(item.path)}}
               style={{
                 display: "flex",
                 alignItems: "center",
