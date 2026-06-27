@@ -49,7 +49,3 @@ CREATE INDEX idx_colleges_status     ON colleges(status);
 CREATE INDEX idx_colleges_name       ON colleges(name);
 CREATE INDEX idx_college_stats_rank  ON college_stats(performance_rank ASC NULLS LAST);
 CREATE INDEX idx_colleges_dept       ON colleges USING GIN(departments);
-
-
-
-
