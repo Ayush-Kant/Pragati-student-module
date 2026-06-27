@@ -14,7 +14,13 @@ const AuthPage = () => {
   const [errors, setErrors] = useState({});
   const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, userRole } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && userRole) {
+      navigate(`/${userRole}/dashboard`);
+    }
+  }, [isAuthenticated, userRole, navigate]);
 
   const slidesData = [
     {

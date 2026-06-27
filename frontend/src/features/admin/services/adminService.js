@@ -547,3 +547,17 @@ export const assignAssessment = async (
 
   return response.data;
 };
+
+export const getMentorById = async (id) => {
+  return { id, name: "Rohit Sharma" };
+};
+
+export const getMentorPerformance = async (id) => {
+  return {
+    mentor: { id, name: "Rohit Sharma" },
+    rating: 4.8,
+    totalReviews: 32,
+    completionRate: "87%",
+    avgAssignmentScore: 74,
+  };
+};
