@@ -62,16 +62,13 @@ const getCourses = async (req, res) => {
     }
 
     // Explicitly enforce student identity in request parameters
-    if (req.query) {
-      req.query.studentId = studentId;
-      req.query.userId = studentId;
-    }
-    if (req.body) {
-      req.body.studentId = studentId;
-      req.body.userId = studentId;
-    }
+    const queryPayload = {
+      ...req.query,
+      studentId,
+      userId: studentId,
+    };
 
-    const data = await service.getCourses(studentId, req.query);
+    const data = await service.getCourses(studentId, queryPayload);
 
     return res.status(200).json({
       success: true,
@@ -147,19 +144,16 @@ const updateLessonProgress = async (req, res) => {
     }
 
     // Explicitly enforce student identity in request parameters to prevent bypass
-    if (req.body) {
-      req.body.studentId = studentId;
-      req.body.userId = studentId;
-    }
-    if (req.query) {
-      req.query.studentId = studentId;
-      req.query.userId = studentId;
-    }
+    const payload = {
+      ...req.body,
+      studentId,
+      userId: studentId,
+    };
 
     const progress = await service.updateProgress(
       req.params.lessonId,
       studentId,
-      req.body,
+      payload,
     );
 
     return res.status(200).json({
@@ -196,16 +190,13 @@ const saveNotes = async (req, res) => {
     }
 
     // Explicitly enforce student identity in request parameters to prevent bypass
-    if (req.body) {
-      req.body.studentId = studentId;
-      req.body.userId = studentId;
-    }
-    if (req.query) {
-      req.query.studentId = studentId;
-      req.query.userId = studentId;
-    }
+    const payload = {
+      ...req.body,
+      studentId,
+      userId: studentId,
+    };
 
-    const note = await service.saveNotes(studentId, req.body);
+    const note = await service.saveNotes(studentId, payload);
 
     return res.status(201).json({
       success: true,
@@ -251,16 +242,6 @@ const getContinueLearning = async (req, res) => {
         message:
           "Forbidden: You cannot modify or access another student's data",
       });
-    }
-
-    // Explicitly enforce student identity in request parameters
-    if (req.query) {
-      req.query.studentId = studentId;
-      req.query.userId = studentId;
-    }
-    if (req.body) {
-      req.body.studentId = studentId;
-      req.body.userId = studentId;
     }
 
     const data = await service.getContinueLearning(studentId);
