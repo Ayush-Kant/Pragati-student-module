@@ -18,9 +18,6 @@ import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
 import CollegeProfilePage from "./features/college/profile/pages/CollegeProfilePage";
 
-// 🚀 NEW IMPORT: Your Student Workspace
-import ChallengeWorkspacePage from "./features/mentor/pages/student/ChallengeWorkspacePage";
-
 function App() {
   return (
     <AuthProvider>
@@ -35,9 +32,6 @@ function App() {
         {/* ── Public Test Route (Preview) ── */}
         <Route path='/preview/college-profile' element={<CollegeProfilePage />} />
         <Route path='/uptoskills-profile' element={<CollegeProfilePage />} />
-        
-        {/* 🚀 NEW ROUTE: Navigate here to see your layout */}
-        <Route path='/preview/challenge-workspace' element={<ChallengeWorkspacePage />} />
 
         {/* ── Mentor ── */}
         {mentorRoute}
