@@ -1,6 +1,7 @@
 // learningController.js
 
 import * as service from "../services/learningService.js";
+import { handleControllerError } from "../utils/errorHandler.js";
 
 const getCourses = async (req, res) => {
   try {
@@ -26,46 +27,24 @@ const getCourses = async (req, res) => {
       });
     }
 
+    // Explicitly enforce student identity in request parameters
+    if (req.query) {
+      req.query.studentId = studentId;
+      req.query.userId = studentId;
+    }
+    if (req.body) {
+      req.body.studentId = studentId;
+      req.body.userId = studentId;
+    }
+
     const data = await service.getCourses(studentId, req.query);
 
     return res.status(200).json({
       success: true,
       data: data,
-      total: data.length,
     });
   } catch (err) {
-    let status = err.status || 500;
-    if (!err.status) {
-      const message = err.message?.toLowerCase() || "";
-      const name = err.name || "";
-
-      if (
-        name === "ValidationError" ||
-        message.includes("validation") ||
-        message.includes("invalid")
-      ) {
-        status = 400;
-      } else if (
-        name === "UnauthorizedError" ||
-        message.includes("unauthorized") ||
-        message.includes("auth")
-      ) {
-        status = 401;
-      } else if (
-        name === "ForbiddenError" ||
-        message.includes("forbidden") ||
-        message.includes("denied")
-      ) {
-        status = 403;
-      } else if (name === "NotFoundError" || message.includes("not found")) {
-        status = 404;
-      }
-    }
-
-    return res.status(status).json({
-      success: false,
-      message: err.message,
-    });
+    return handleControllerError(res, err);
   }
 };
 
@@ -85,38 +64,7 @@ const getCourseDetail = async (req, res) => {
       data: course,
     });
   } catch (err) {
-    let status = err.status || 500;
-    if (!err.status) {
-      const message = err.message?.toLowerCase() || "";
-      const name = err.name || "";
-
-      if (
-        name === "ValidationError" ||
-        message.includes("validation") ||
-        message.includes("invalid")
-      ) {
-        status = 400;
-      } else if (
-        name === "UnauthorizedError" ||
-        message.includes("unauthorized") ||
-        message.includes("auth")
-      ) {
-        status = 401;
-      } else if (
-        name === "ForbiddenError" ||
-        message.includes("forbidden") ||
-        message.includes("denied")
-      ) {
-        status = 403;
-      } else if (name === "NotFoundError" || message.includes("not found")) {
-        status = 404;
-      }
-    }
-
-    return res.status(status).json({
-      success: false,
-      message: err.message,
-    });
+    return handleControllerError(res, err);
   }
 };
 
@@ -136,38 +84,7 @@ const getLesson = async (req, res) => {
       data: lesson,
     });
   } catch (err) {
-    let status = err.status || 500;
-    if (!err.status) {
-      const message = err.message?.toLowerCase() || "";
-      const name = err.name || "";
-
-      if (
-        name === "ValidationError" ||
-        message.includes("validation") ||
-        message.includes("invalid")
-      ) {
-        status = 400;
-      } else if (
-        name === "UnauthorizedError" ||
-        message.includes("unauthorized") ||
-        message.includes("auth")
-      ) {
-        status = 401;
-      } else if (
-        name === "ForbiddenError" ||
-        message.includes("forbidden") ||
-        message.includes("denied")
-      ) {
-        status = 403;
-      } else if (name === "NotFoundError" || message.includes("not found")) {
-        status = 404;
-      }
-    }
-
-    return res.status(status).json({
-      success: false,
-      message: err.message,
-    });
+    return handleControllerError(res, err);
   }
 };
 
@@ -195,6 +112,16 @@ const updateLessonProgress = async (req, res) => {
       });
     }
 
+    // Explicitly enforce student identity in request parameters to prevent bypass
+    if (req.body) {
+      req.body.studentId = studentId;
+      req.body.userId = studentId;
+    }
+    if (req.query) {
+      req.query.studentId = studentId;
+      req.query.userId = studentId;
+    }
+
     const progress = await service.updateProgress(
       req.params.lessonId,
       studentId,
@@ -203,42 +130,10 @@ const updateLessonProgress = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Lesson progress updated successfully.",
       data: progress,
     });
   } catch (err) {
-    let status = err.status || 500;
-    if (!err.status) {
-      const message = err.message?.toLowerCase() || "";
-      const name = err.name || "";
-
-      if (
-        name === "ValidationError" ||
-        message.includes("validation") ||
-        message.includes("invalid")
-      ) {
-        status = 400;
-      } else if (
-        name === "UnauthorizedError" ||
-        message.includes("unauthorized") ||
-        message.includes("auth")
-      ) {
-        status = 401;
-      } else if (
-        name === "ForbiddenError" ||
-        message.includes("forbidden") ||
-        message.includes("denied")
-      ) {
-        status = 403;
-      } else if (name === "NotFoundError" || message.includes("not found")) {
-        status = 404;
-      }
-    }
-
-    return res.status(status).json({
-      success: false,
-      message: err.message,
-    });
+    return handleControllerError(res, err);
   }
 };
 
@@ -266,46 +161,24 @@ const saveNotes = async (req, res) => {
       });
     }
 
+    // Explicitly enforce student identity in request parameters to prevent bypass
+    if (req.body) {
+      req.body.studentId = studentId;
+      req.body.userId = studentId;
+    }
+    if (req.query) {
+      req.query.studentId = studentId;
+      req.query.userId = studentId;
+    }
+
     const note = await service.saveNotes(studentId, req.body);
 
     return res.status(201).json({
       success: true,
-      message: "Notes saved successfully.",
       data: note,
     });
   } catch (err) {
-    let status = err.status || 500;
-    if (!err.status) {
-      const message = err.message?.toLowerCase() || "";
-      const name = err.name || "";
-
-      if (
-        name === "ValidationError" ||
-        message.includes("validation") ||
-        message.includes("invalid")
-      ) {
-        status = 400;
-      } else if (
-        name === "UnauthorizedError" ||
-        message.includes("unauthorized") ||
-        message.includes("auth")
-      ) {
-        status = 401;
-      } else if (
-        name === "ForbiddenError" ||
-        message.includes("forbidden") ||
-        message.includes("denied")
-      ) {
-        status = 403;
-      } else if (name === "NotFoundError" || message.includes("not found")) {
-        status = 404;
-      }
-    }
-
-    return res.status(status).json({
-      success: false,
-      message: err.message,
-    });
+    return handleControllerError(res, err);
   }
 };
 
@@ -318,38 +191,7 @@ const getResources = async (req, res) => {
       data: resources,
     });
   } catch (err) {
-    let status = err.status || 500;
-    if (!err.status) {
-      const message = err.message?.toLowerCase() || "";
-      const name = err.name || "";
-
-      if (
-        name === "ValidationError" ||
-        message.includes("validation") ||
-        message.includes("invalid")
-      ) {
-        status = 400;
-      } else if (
-        name === "UnauthorizedError" ||
-        message.includes("unauthorized") ||
-        message.includes("auth")
-      ) {
-        status = 401;
-      } else if (
-        name === "ForbiddenError" ||
-        message.includes("forbidden") ||
-        message.includes("denied")
-      ) {
-        status = 403;
-      } else if (name === "NotFoundError" || message.includes("not found")) {
-        status = 404;
-      }
-    }
-
-    return res.status(status).json({
-      success: false,
-      message: err.message,
-    });
+    return handleControllerError(res, err);
   }
 };
 
@@ -377,6 +219,16 @@ const getContinueLearning = async (req, res) => {
       });
     }
 
+    // Explicitly enforce student identity in request parameters
+    if (req.query) {
+      req.query.studentId = studentId;
+      req.query.userId = studentId;
+    }
+    if (req.body) {
+      req.body.studentId = studentId;
+      req.body.userId = studentId;
+    }
+
     const data = await service.getContinueLearning(studentId);
 
     return res.status(200).json({
@@ -384,38 +236,7 @@ const getContinueLearning = async (req, res) => {
       data: data,
     });
   } catch (err) {
-    let status = err.status || 500;
-    if (!err.status) {
-      const message = err.message?.toLowerCase() || "";
-      const name = err.name || "";
-
-      if (
-        name === "ValidationError" ||
-        message.includes("validation") ||
-        message.includes("invalid")
-      ) {
-        status = 400;
-      } else if (
-        name === "UnauthorizedError" ||
-        message.includes("unauthorized") ||
-        message.includes("auth")
-      ) {
-        status = 401;
-      } else if (
-        name === "ForbiddenError" ||
-        message.includes("forbidden") ||
-        message.includes("denied")
-      ) {
-        status = 403;
-      } else if (name === "NotFoundError" || message.includes("not found")) {
-        status = 404;
-      }
-    }
-
-    return res.status(status).json({
-      success: false,
-      message: err.message,
-    });
+    return handleControllerError(res, err);
   }
 };
 
