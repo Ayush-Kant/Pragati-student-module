@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getMentorById, getMentorPerformance } from "../services/adminService";
+//import { getMentorById, getMentorPerformance } from "../services/adminService";
 
 export default function useMentorDetail() {
   const { id } = useParams();
