@@ -10,6 +10,7 @@ import CreateActivity from "../pages/CreateActivity";
 import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
 
 
+
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
     <Route element={<RoleRoute allowedRoles={["mentor"]} />}>
@@ -21,7 +22,11 @@ const mentorRoute = (
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
           <Route path="activities/create" element={<CreateActivity />} />
+<<<<<<< HEAD
         
+=======
+          
+>>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
         </Route>
       </Route>
     </Route>

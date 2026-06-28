@@ -26,6 +26,7 @@ function App() {
         <Route path="/" element={<Navigate to="/mentor/challenge-creator" replace />} />
 
 
+
         {/* ── Auth Routes ────────────────────────────────────────── */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

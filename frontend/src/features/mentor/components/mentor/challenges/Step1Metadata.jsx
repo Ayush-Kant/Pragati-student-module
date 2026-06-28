@@ -91,6 +91,7 @@ const Step1Metadata = ({ onNext }) => {
   };
 
   return (
+<<<<<<< HEAD
   <div
     style={{
       background: "#fff",
@@ -223,6 +224,102 @@ const Step1Metadata = ({ onNext }) => {
             </p>
           )}
         </div>
+=======
+    <div style={{ maxWidth: "700px", margin: "0 auto", padding: "20px" }}>
+      <h2>Challenge Metadata</h2>
+
+      {/* Title */}
+      <div style={{ marginBottom: "20px" }}>
+        <label><strong>Challenge Title *</strong></label>
+        <input
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          placeholder="Enter challenge title"
+          style={{ width: "100%", padding: "10px", marginTop: "8px" }}
+        />
+        {errors.title && <p style={{ color: "red" }}>{errors.title}</p>}
+      </div>
+
+      {/* Description */}
+      <div style={{ marginBottom: "20px" }}>
+        <label><strong>Description *</strong></label>
+        <textarea
+          name="description"
+          rows={6}
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Enter challenge description..."
+          style={{ width: "100%", padding: "10px", marginTop: "8px" }}
+        />
+        {errors.description && (
+          <p style={{ color: "red" }}>{errors.description}</p>
+        )}
+      </div>
+
+      {/* Max Score */}
+      <div style={{ marginBottom: "20px" }}>
+        <label><strong>Max Score *</strong></label>
+        <input
+          type="number"
+          name="maxScore"
+          min="1"
+          value={formData.maxScore}
+          onChange={handleChange}
+          placeholder="100"
+          style={{ width: "100%", padding: "10px", marginTop: "8px" }}
+        />
+        {errors.maxScore && (
+          <p style={{ color: "red" }}>{errors.maxScore}</p>
+        )}
+      </div>
+
+      {/* Languages */}
+      <div style={{ marginBottom: "20px" }}>
+        <label><strong>Allowed Languages *</strong></label>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "10px",
+            marginTop: "10px",
+          }}
+        >
+          {LANGUAGE_OPTIONS.map((language) => (
+            <label key={language}>
+              <input
+                type="checkbox"
+                checked={formData.allowedLanguages.includes(language)}
+                onChange={() => handleLanguageChange(language)}
+              />{" "}
+              {language}
+            </label>
+          ))}
+        </div>
+
+        {errors.allowedLanguages && (
+          <p style={{ color: "red" }}>{errors.allowedLanguages}</p>
+        )}
+      </div>
+
+      {/* Next Button */}
+      <div style={{ textAlign: "right" }}>
+        <button
+          onClick={handleNext}
+          style={{
+            padding: "10px 20px",
+            cursor: "pointer",
+            background: "#2563EB",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+          }}
+        >
+          Next: Test Cases →
+        </button>
+>>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
       </div>
     </div>
 

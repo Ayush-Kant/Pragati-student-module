@@ -57,6 +57,7 @@ const Step2TestCases = ({ challengeData, onBack }) => {
   }, [testCases]);
 
   return (
+<<<<<<< HEAD
     <div
   style={{
     background: "#FFFFFF",
@@ -111,6 +112,23 @@ const Step2TestCases = ({ challengeData, onBack }) => {
     + Add Test Case
   </button>
 </div>
+=======
+    <div style={{ padding: "20px" }}>
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h2>Define Test Cases</h2>
+
+        <button onClick={addTestCase}>
+          + Add Test Case
+        </button>
+      </div>
+>>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
 
       {/* Challenge Info */}
       <p style={{ color: "#6B7280" }}>
@@ -131,6 +149,7 @@ const Step2TestCases = ({ challengeData, onBack }) => {
       ))}
 
       {/* Floating Validation Badge */}
+<<<<<<< HEAD
     <div
   style={{
     position: "fixed",
@@ -210,6 +229,47 @@ const Step2TestCases = ({ challengeData, onBack }) => {
     Publish Challenge
   </button>
 </div>
+=======
+      <div
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          padding: "10px 15px",
+          borderRadius: "8px",
+          color: "white",
+          backgroundColor: isValid ? "#10B981" : "#EF4444",
+          fontWeight: "bold",
+        }}
+      >
+        Total Weight: {totalWeight}%
+      </div>
+
+      {/* Bottom Bar */}
+      <div
+        style={{
+          marginTop: "30px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <button onClick={onBack}>← Back</button>
+
+        <button
+          disabled={!isValid}
+          style={{
+            padding: "10px 20px",
+            background: isValid ? "#2563EB" : "#9CA3AF",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: isValid ? "pointer" : "not-allowed",
+          }}
+        >
+          Publish Challenge
+        </button>
+      </div>
+>>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
     </div>
   );
 };

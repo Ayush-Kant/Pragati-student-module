@@ -1,5 +1,6 @@
 import React from "react";
 
+<<<<<<< HEAD
 const inputStyle = {
   width: "100%",
   padding: "10px 12px",
@@ -11,10 +12,13 @@ const inputStyle = {
   boxSizing: "border-box",
 };
 
+=======
+>>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
 const TestCaseRow = ({ data, onChange, onDelete, index }) => {
   return (
     <div
       style={{
+<<<<<<< HEAD
         background: "#FFFFFF",
         border: "1px solid #E5E7EB",
         borderRadius: "12px",
@@ -168,6 +172,87 @@ const TestCaseRow = ({ data, onChange, onDelete, index }) => {
           </label>
         </div>
       </div>
+=======
+        border: "1px solid #E5E7EB",
+        padding: "15px",
+        marginBottom: "15px",
+        borderRadius: "8px",
+      }}
+    >
+      <h4>Test Case {index}</h4>
+
+      {/* Input */}
+      <div>
+        <label>Input (stdin)</label>
+        <textarea
+          value={data.input}
+          onChange={(e) =>
+            onChange({ input: e.target.value })
+          }
+          style={{ width: "100%" }}
+        />
+      </div>
+
+      {/* Output */}
+      <div>
+        <label>Expected Output</label>
+        <textarea
+          value={data.output}
+          onChange={(e) =>
+            onChange({ output: e.target.value })
+          }
+          style={{ width: "100%" }}
+        />
+      </div>
+
+      {/* Time Limit */}
+      <div>
+        <label>Time Limit (ms)</label>
+        <input
+          type="number"
+          value={data.timeLimit}
+          onChange={(e) =>
+            onChange({ timeLimit: e.target.value })
+          }
+        />
+      </div>
+
+      {/* Weight */}
+      <div>
+        <label>Weight (%)</label>
+        <input
+          type="number"
+          value={data.weight}
+          onChange={(e) =>
+            onChange({ weight: e.target.value })}
+        />
+      </div>
+
+      {/* Hidden */}
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            checked={data.hidden}
+            onChange={(e) =>
+              onChange({ hidden: e.target.checked })
+            }
+          />
+          Hidden Case
+        </label>
+      </div>
+
+      {/* Delete */}
+      <button
+        onClick={onDelete}
+        style={{
+          marginTop: "10px",
+          color: "red",
+        }}
+      >
+        🗑 Delete
+      </button>
+>>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
     </div>
   );
 };

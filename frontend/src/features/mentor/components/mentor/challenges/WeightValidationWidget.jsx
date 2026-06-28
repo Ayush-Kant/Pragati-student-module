@@ -7,6 +7,7 @@ const WeightValidationWidget = ({ total }) => {
     <div
       style={{
         position: "fixed",
+<<<<<<< HEAD
         bottom: "25px",
         right: "25px",
         background: "#FFFFFF",
@@ -72,6 +73,17 @@ const WeightValidationWidget = ({ total }) => {
           }}
         />
       </div>
+=======
+        bottom: "20px",
+        right: "20px",
+        background: isValid ? "#10B981" : "#EF4444",
+        color: "white",
+        padding: "10px 15px",
+        borderRadius: "8px",
+      }}
+    >
+      Weight: {total}%
+>>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
     </div>
   );
 };
