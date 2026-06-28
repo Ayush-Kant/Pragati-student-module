@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 
-import { getMentorById, getMentorPerformance } from "../services/adminService";
+import {  getMentorPerformance } from "../services/adminService";
 
 
 

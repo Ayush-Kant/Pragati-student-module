@@ -16,7 +16,6 @@ const Step2TestCases = ({ challengeData, onBack }) => {
   const [totalWeight, setTotalWeight] = useState(0);
   const [isValid, setIsValid] = useState(false);
 
-  // Add new test case
   const addTestCase = () => {
     setTestCases((prev) => [
       ...prev,
@@ -31,7 +30,6 @@ const Step2TestCases = ({ challengeData, onBack }) => {
     ]);
   };
 
-  // Update test case
   const updateTestCase = (id, updatedData) => {
     setTestCases((prev) =>
       prev.map((tc) =>
@@ -40,12 +38,12 @@ const Step2TestCases = ({ challengeData, onBack }) => {
     );
   };
 
-  // Delete test case
   const deleteTestCase = (id) => {
-    setTestCases((prev) => prev.filter((tc) => tc.id !== id));
+    setTestCases((prev) =>
+      prev.filter((tc) => tc.id !== id)
+    );
   };
 
-  // Validate weight sum
   useEffect(() => {
     const total = testCases.reduce(
       (sum, tc) => sum + Number(tc.weight || 0),
@@ -57,290 +55,294 @@ const Step2TestCases = ({ challengeData, onBack }) => {
   }, [testCases]);
 
   return (
+    <div style={styles.page}>
 
-    <div
-  style={{
-    background: "#FFFFFF",
-    borderRadius: "12px",
-    border: "1px solid #E5E7EB",
-    padding: "30px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-  }}
->
+      <div style={styles.container}>
 
-      {/* Header */}
-      <div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "25px",
-  }}
->
-  <div>
-    <h2
-      style={{
-        margin: 0,
-        fontSize: "26px",
-        fontWeight: "700",
-      }}
-    >
-      Test Cases
-    </h2>
+        {/* Heading */}
 
-    <p
-      style={{
-        color: "#6B7280",
-        marginTop: "8px",
-      }}
-    >
-      {challengeData.title}
-    </p>
-  </div>
+        <h1 style={styles.heading}>
+          Create New Challenge
+        </h1>
 
-  <button
-    onClick={addTestCase}
-    style={{
-      background: "#2563EB",
-      color: "#fff",
-      border: "none",
-      padding: "10px 18px",
-      borderRadius: "8px",
-      cursor: "pointer",
-      fontWeight: "600",
-    }}
-  >
-    + Add Test Case
-  </button>
-</div>
+        {/* Stepper */}
 
-    <div style={{ padding: "20px" }}>
+        <div style={styles.stepper}>
 
-      {/* Header */}
-      <div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "25px",
-  }}
->
-  <div>
-    <h2
-      style={{
-        margin: 0,
-        fontSize: "26px",
-        fontWeight: "700",
-      }}
-    >
-      Test Cases
-    </h2>
+          <div style={styles.completedStep}>✓</div>
 
-        <button onClick={addTestCase}>
-          + Add Test Case
-        </button>
+          <span style={styles.completedText}>
+            Metadata
+          </span>
+
+          <div style={styles.line}></div>
+
+          <div style={styles.activeStep}>2</div>
+
+          <span style={styles.activeText}>
+            Test Cases
+          </span>
+
+        </div>
+
+        {/* Header */}
+
+        <div style={styles.header}>
+
+          <div>
+            <h2 style={styles.title}>
+              Test Cases
+            </h2>
+
+            <p style={styles.subtitle}>
+              Define inputs and expected outputs.
+            </p>
+          </div>
+
+          <button
+            onClick={addTestCase}
+            style={styles.addButton}
+          >
+            + Add Test Case
+          </button>
+
+        </div>
+
+        {/* Test Case Cards */}
+
+        {testCases.map((tc, index) => (
+          <TestCaseRow
+            key={tc.id}
+            index={index + 1}
+            data={tc}
+            onChange={(updated) =>
+              updateTestCase(tc.id, updated)
+            }
+            onDelete={() =>
+              deleteTestCase(tc.id)
+            }
+          />
+        ))}
+        {/* Weight Validation Card */}
+
+        <div style={styles.weightCard}>
+          <h3 style={styles.weightTitle}>
+            Weight Distribution
+          </h3>
+
+          <h1
+            style={{
+              ...styles.weightValue,
+              color: isValid ? "#10B981" : "#EF4444",
+            }}
+          >
+            {totalWeight}%
+          </h1>
+
+          <p
+            style={{
+              ...styles.weightStatus,
+              color: isValid ? "#10B981" : "#EF4444",
+            }}
+          >
+            {isValid
+              ? "Ready to Publish"
+              : "Total should equal 100%"}
+          </p>
+        </div>
+
+        {/* Bottom Buttons */}
+
+        <div style={styles.footer}>
+
+          <button
+            onClick={onBack}
+            style={styles.backBtn}
+          >
+            ← Back
+          </button>
+
+          <button
+            disabled={!isValid}
+            style={{
+              ...styles.publishBtn,
+              background: isValid
+                ? "#2563EB"
+                : "#9CA3AF",
+              cursor: isValid
+                ? "pointer"
+                : "not-allowed",
+            }}
+          >
+            Publish Challenge
+          </button>
+
+        </div>
+
       </div>
-
-    <p
-      style={{
-        color: "#6B7280",
-        marginTop: "8px",
-      }}
-    >
-      {challengeData.title}
-    </p>
-  </div>
-
-  <button
-    onClick={addTestCase}
-    style={{
-      background: "#2563EB",
-      color: "#fff",
-      border: "none",
-      padding: "10px 18px",
-      borderRadius: "8px",
-      cursor: "pointer",
-      fontWeight: "600",
-    }}
-  >
-    + Add Test Case
-  </button>
-</div>
-
-
-      {/* Challenge Info */}
-      <p style={{ color: "#6B7280" }}>
-        Challenge: {challengeData?.title}
-      </p>
-
-      {/* Test Case List */}
-      {testCases.map((tc, index) => (
-        <TestCaseRow
-          key={tc.id}
-          index={index + 1}
-          data={tc}
-          onChange={(updated) =>
-            updateTestCase(tc.id, updated)
-          }
-          onDelete={() => deleteTestCase(tc.id)}
-        />
-      ))}
-
-      {/* Floating Validation Badge */}
-
-    <div
-  style={{
-    position: "fixed",
-    right: "25px",
-    bottom: "25px",
-    background: "#fff",
-    padding: "16px",
-    borderRadius: "12px",
-    boxShadow: "0 6px 20px rgba(0,0,0,.15)",
-    minWidth: "180px",
-    textAlign: "center",
-  }}
->
-  <h4
-    style={{
-      margin: 0,
-      color: "#374151",
-    }}
-  >
-    Weight Distribution
-  </h4>
-
-  <h2
-    style={{
-      margin: "10px 0",
-      color: isValid ? "#16A34A" : "#DC2626",
-    }}
-  >
-    {totalWeight}%
-  </h2>
-
-  <small
-    style={{
-      color: isValid ? "#16A34A" : "#DC2626",
-    }}
-  >
-    {isValid
-      ? "Ready to Publish"
-      : "Total should be 100%"}
-  </small>
-</div>
-
-
-      {/* Bottom Bar */}
-      <div
-  style={{
-    marginTop: "35px",
-    display: "flex",
-    justifyContent: "space-between",
-  }}
->
-  <button
-    onClick={onBack}
-    style={{
-      padding: "12px 24px",
-      border: "1px solid #D1D5DB",
-      background: "#fff",
-      borderRadius: "8px",
-      cursor: "pointer",
-      fontWeight: "600",
-    }}
-  >
-    ← Back
-  </button>
-
-  <button
-    disabled={!isValid}
-    style={{
-      padding: "12px 28px",
-      border: "none",
-      borderRadius: "8px",
-      background: isValid ? "#2563EB" : "#9CA3AF",
-      color: "#fff",
-      cursor: isValid ? "pointer" : "not-allowed",
-      fontWeight: "600",
-    }}
-  >
-    Publish Challenge
-  </button>
-</div>
-
-      <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          padding: "10px 15px",
-          borderRadius: "8px",
-          color: "white",
-          backgroundColor: isValid ? "#10B981" : "#EF4444",
-          fontWeight: "bold",
-        }}
-      >
-        Total Weight: {totalWeight}%
-      </div>
-
-
-      {/* Bottom Bar */}
-      <div
-  style={{
-    marginTop: "35px",
-    display: "flex",
-    justifyContent: "space-between",
-  }}
->
-  <button
-    onClick={onBack}
-    style={{
-      padding: "12px 24px",
-      border: "1px solid #D1D5DB",
-      background: "#fff",
-      borderRadius: "8px",
-      cursor: "pointer",
-      fontWeight: "600",
-    }}
-  >
-    ← Back
-  </button>
-
-        <button
-          disabled={!isValid}
-          style={{
-            padding: "10px 20px",
-            background: isValid ? "#2563EB" : "#9CA3AF",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: isValid ? "pointer" : "not-allowed",
-          }}
-        >
-          Publish Challenge
-        </button>
-      </div>
-
-
-  <button
-    disabled={!isValid}
-    style={{
-      padding: "12px 28px",
-      border: "none",
-      borderRadius: "8px",
-      background: isValid ? "#2563EB" : "#9CA3AF",
-      color: "#fff",
-      cursor: isValid ? "pointer" : "not-allowed",
-      fontWeight: "600",
-    }}
-  >
-    Publish Challenge
-  </button>
-</div>
-
-  
+    </div>
   );
+};
+
+const styles = {
+  page: {
+    minHeight: "100vh",
+    background: "#F8FAFC",
+    padding: "32px",
+  },
+
+  container: {
+    maxWidth: "1100px",
+    margin: "0 auto",
+    background: "#FFFFFF",
+    border: "1px solid #E5E7EB",
+    borderRadius: "16px",
+    padding: "32px",
+    boxShadow: "0 2px 10px rgba(15,23,42,.05)",
+  },
+
+  heading: {
+    fontSize: "30px",
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: "28px",
+  },
+
+  stepper: {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "32px",
+  },
+
+  completedStep: {
+    width: "34px",
+    height: "34px",
+    borderRadius: "50%",
+    background: "#10B981",
+    color: "#fff",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontWeight: "700",
+  },
+
+  activeStep: {
+    width: "34px",
+    height: "34px",
+    borderRadius: "50%",
+    background: "#2563EB",
+    color: "#fff",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontWeight: "700",
+  },
+
+  completedText: {
+    marginLeft: "10px",
+    color: "#111827",
+    fontWeight: "600",
+  },
+
+  activeText: {
+    marginLeft: "10px",
+    color: "#111827",
+    fontWeight: "600",
+  },
+
+  line: {
+    flex: 1,
+    height: "2px",
+    background: "#E5E7EB",
+    margin: "0 18px",
+  },
+
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "28px",
+  },
+
+  title: {
+    fontSize: "24px",
+    fontWeight: "700",
+    color: "#111827",
+    margin: 0,
+  },
+
+  subtitle: {
+    marginTop: "6px",
+    color: "#6B7280",
+  },
+
+  addButton: {
+    background: "#2563EB",
+    color: "#FFFFFF",
+    border: "none",
+    padding: "12px 22px",
+    borderRadius: "10px",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+
+  weightCard: {
+    position: "fixed",
+    right: "30px",
+    bottom: "30px",
+    background: "#FFFFFF",
+    border: "1px solid #E5E7EB",
+    borderRadius: "14px",
+    padding: "18px",
+    width: "210px",
+    boxShadow: "0 8px 24px rgba(0,0,0,.08)",
+    textAlign: "center",
+  },
+
+  weightTitle: {
+    margin: 0,
+    color: "#111827",
+    fontSize: "16px",
+  },
+
+  weightValue: {
+    margin: "12px 0",
+    fontSize: "34px",
+    fontWeight: "700",
+  },
+
+  weightStatus: {
+    margin: 0,
+    fontSize: "14px",
+    fontWeight: "500",
+  },
+
+  footer: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginTop: "40px",
+    paddingTop: "24px",
+    borderTop: "1px solid #F1F5F9",
+  },
+
+  backBtn: {
+    padding: "12px 24px",
+    background: "#FFFFFF",
+    border: "1px solid #E5E7EB",
+    borderRadius: "10px",
+    color: "#6B7280",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+
+  publishBtn: {
+    padding: "12px 28px",
+    color: "#FFFFFF",
+    border: "none",
+    borderRadius: "10px",
+    fontWeight: "600",
+    fontSize: "15px",
+  },
 };
 
 export default Step2TestCases;

@@ -25,113 +25,139 @@ const ChallengeCreatorPage = () => {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#F8FAFC",
-        padding: "32px",
+        background: "#F8FAFC",
+        padding: "40px",
       }}
     >
       <div
         style={{
-          maxWidth: "1000px",
+          maxWidth: "1100px",
           margin: "0 auto",
-          background: "#FFFFFF",
-          border: "1px solid #E5E7EB",
-          borderRadius: "12px",
-          padding: "32px",
-          boxSizing: "border-box",
         }}
       >
         {/* Heading */}
-        <h2
+        <h1
           style={{
-            margin: "0 0 30px",
-            color: "#111827",
-            fontSize: "28px",
+            fontSize: "36px",
             fontWeight: "700",
+            color: "#111827",
+            marginBottom: "32px",
           }}
         >
-          Coding Challenge Creator
-        </h2>
+          Create New Challenge
+        </h1>
 
         {/* Stepper */}
         <div
           style={{
             display: "flex",
+            alignItems: "center",
             marginBottom: "32px",
-            gap: "20px",
           }}
         >
+          {/* Step 1 */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <div
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                background: step === 1 ? "#2563EB" : "#E5E7EB",
+                color: step === 1 ? "#fff" : "#6B7280",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                fontWeight: "600",
+              }}
+            >
+              1
+            </div>
+
+            <span
+              style={{
+                marginLeft: "12px",
+                color: "#111827",
+                fontWeight: "600",
+              }}
+            >
+              Metadata
+            </span>
+          </div>
+
+          {/* Line */}
           <div
             style={{
               flex: 1,
-              textAlign: "center",
-              paddingBottom: "12px",
-              borderBottom:
-                step === 1
-                  ? "3px solid #2563EB"
-                  : "3px solid #E5E7EB",
-              color: step === 1 ? "#2563EB" : "#6B7280",
-              fontWeight: "600",
+              height: "2px",
+              background: "#E5E7EB",
+              margin: "0 24px",
             }}
-          >
-            1. Challenge Metadata
-          </div>
+          />
 
-          Metadata
-        </div>
-
-        <div
-          style={{
-            flex: 1,
-            height: "2px",
-            background: "#E5E7EB",
-            margin: "0 20px",
-          }}
-        />
-
-        {/* Step 2 */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            color: step === 2 ? "#2563EB" : "#9CA3AF",
-            fontWeight: "600",
-          }}
-        >
+          {/* Step 2 */}
           <div
             style={{
-              width: "34px",
-              height: "34px",
-              borderRadius: "50%",
-              background: step === 2 ? "#2563EB" : "#E5E7EB",
-              color: step === 2 ? "#fff" : "#6B7280",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              marginRight: "10px",
             }}
           >
-            2
-          </div>
+            <div
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                background: step === 2 ? "#2563EB" : "#E5E7EB",
+                color: step === 2 ? "#fff" : "#6B7280",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                fontWeight: "600",
+              }}
+            >
+              2
+            </div>
 
-          Test Cases
+            <span
+              style={{
+                marginLeft: "12px",
+                color: "#111827",
+                fontWeight: "600",
+              }}
+            >
+              Test Cases
+            </span>
+          </div>
+        </div>
+
+        {/* Card */}
+        <div
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+            borderRadius: "12px",
+            padding: "32px",
+          }}
+        >
+          {step === 1 ? (
+            <Step1Metadata
+              formData={challengeData}
+              setFormData={setChallengeData}
+              onNext={handleNext}
+            />
+          ) : (
+            <Step2TestCases
+              challengeData={challengeData}
+              onBack={handleBack}
+            />
+          )}
         </div>
       </div>
-
-        {/* Page Content */}
-        {step === 1 ? (
-          <Step1Metadata
-            formData={challengeData}
-            setFormData={setChallengeData}
-            onNext={handleNext}
-          />
-        ) : (
-          <Step2TestCases
-            challengeData={challengeData}
-            onBack={handleBack}
-          />
-        )}
-      </div>
-    
+    </div>
   );
 };
 
