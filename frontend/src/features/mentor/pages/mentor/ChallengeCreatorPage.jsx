@@ -22,42 +22,15 @@ const ChallengeCreatorPage = () => {
   };
 
   return (
-  <div
-    style={{
-      minHeight: "100vh",
-      background: "#F3F4F6",
-      padding: "40px 20px",
-    }}
-  >
     <div
       style={{
-
-        maxWidth: "1100px",
-        margin: "0 auto",
-        background: "#fff",
-        borderRadius: "16px",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-        padding: "40px",
-
         minHeight: "100vh",
         backgroundColor: "#F8FAFC",
         padding: "32px",
-
       }}
     >
-      {/* Heading */}
-      <h1
+      <div
         style={{
-
-          fontSize: "32px",
-          fontWeight: "700",
-          color: "#111827",
-          marginBottom: "10px",
-        }}
-      >
-        Create New Challenge
-      </h1>
-
           maxWidth: "1000px",
           margin: "0 auto",
           background: "#FFFFFF",
@@ -65,7 +38,8 @@ const ChallengeCreatorPage = () => {
           borderRadius: "12px",
           padding: "32px",
           boxSizing: "border-box",
-        
+        }}
+      >
         {/* Heading */}
         <h2
           style={{
@@ -78,51 +52,16 @@ const ChallengeCreatorPage = () => {
           Coding Challenge Creator
         </h2>
 
-
-      <p
-        style={{
-          color: "#6B7280",
-          marginBottom: "35px",
-        }}
-      >
-        Create a coding challenge in two simple steps.
-      </p>
-
-      {/* Stepper */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          marginBottom: "40px",
-        }}
-      >
-        {/* Step 1 */}
+        {/* Stepper */}
         <div
           style={{
             display: "flex",
-
-            alignItems: "center",
-            color: step === 1 ? "#2563EB" : "#9CA3AF",
-            fontWeight: "600",
-
             marginBottom: "32px",
             gap: "20px",
-
           }}
         >
           <div
             style={{
-
-              width: "34px",
-              height: "34px",
-              borderRadius: "50%",
-              background: step === 1 ? "#2563EB" : "#E5E7EB",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginRight: "10px",
-
               flex: 1,
               textAlign: "center",
               paddingBottom: "12px",
@@ -132,12 +71,10 @@ const ChallengeCreatorPage = () => {
                   : "3px solid #E5E7EB",
               color: step === 1 ? "#2563EB" : "#6B7280",
               fontWeight: "600",
-
             }}
           >
-            1
+            1. Challenge Metadata
           </div>
-
 
           Metadata
         </div>
@@ -178,23 +115,7 @@ const ChallengeCreatorPage = () => {
 
           Test Cases
         </div>
-
-          <div
-            style={{
-              flex: 1,
-              textAlign: "center",
-              paddingBottom: "12px",
-              borderBottom:
-                step === 2
-                  ? "3px solid #2563EB"
-                  : "3px solid #E5E7EB",
-              color: step === 2 ? "#2563EB" : "#6B7280",
-              fontWeight: "600",
-            }}
-          >
-            2. Test Cases
-          </div>
-        </div>
+      </div>
 
         {/* Page Content */}
         {step === 1 ? (
@@ -210,22 +131,8 @@ const ChallengeCreatorPage = () => {
           />
         )}
       </div>
-
-      {step === 1 ? (
-        <Step1Metadata
-          formData={challengeData}
-          setFormData={setChallengeData}
-          onNext={handleNext}
-        />
-      ) : (
-        <Step2TestCases
-          challengeData={challengeData}
-          onBack={handleBack}
-        />
-      )}
-    </div>
-  
-);
+    
+  );
 };
 
 export default ChallengeCreatorPage;

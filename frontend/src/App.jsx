@@ -23,8 +23,7 @@ function App() {
     <AuthProvider>
       <Toaster />
       <Routes>
-        <Route path="/" element={<Navigate to="/mentor/challenge-creator" replace />} />
-
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
 
         {/* ── Auth Routes ────────────────────────────────────────── */}

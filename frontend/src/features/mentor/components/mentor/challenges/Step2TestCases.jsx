@@ -57,7 +57,7 @@ const Step2TestCases = ({ challengeData, onBack }) => {
   }, [testCases]);
 
   return (
-<<<<<<< HEAD
+
     <div
   style={{
     background: "#FFFFFF",
@@ -67,6 +67,7 @@ const Step2TestCases = ({ challengeData, onBack }) => {
     boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
   }}
 >
+
       {/* Header */}
       <div
   style={{
@@ -112,23 +113,60 @@ const Step2TestCases = ({ challengeData, onBack }) => {
     + Add Test Case
   </button>
 </div>
-=======
+
     <div style={{ padding: "20px" }}>
+
       {/* Header */}
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h2>Define Test Cases</h2>
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "25px",
+  }}
+>
+  <div>
+    <h2
+      style={{
+        margin: 0,
+        fontSize: "26px",
+        fontWeight: "700",
+      }}
+    >
+      Test Cases
+    </h2>
 
         <button onClick={addTestCase}>
           + Add Test Case
         </button>
       </div>
->>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
+
+    <p
+      style={{
+        color: "#6B7280",
+        marginTop: "8px",
+      }}
+    >
+      {challengeData.title}
+    </p>
+  </div>
+
+  <button
+    onClick={addTestCase}
+    style={{
+      background: "#2563EB",
+      color: "#fff",
+      border: "none",
+      padding: "10px 18px",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontWeight: "600",
+    }}
+  >
+    + Add Test Case
+  </button>
+</div>
+
 
       {/* Challenge Info */}
       <p style={{ color: "#6B7280" }}>
@@ -149,7 +187,7 @@ const Step2TestCases = ({ challengeData, onBack }) => {
       ))}
 
       {/* Floating Validation Badge */}
-<<<<<<< HEAD
+
     <div
   style={{
     position: "fixed",
@@ -192,6 +230,7 @@ const Step2TestCases = ({ challengeData, onBack }) => {
   </small>
 </div>
 
+
       {/* Bottom Bar */}
       <div
   style={{
@@ -229,7 +268,7 @@ const Step2TestCases = ({ challengeData, onBack }) => {
     Publish Challenge
   </button>
 </div>
-=======
+
       <div
         style={{
           position: "fixed",
@@ -245,15 +284,28 @@ const Step2TestCases = ({ challengeData, onBack }) => {
         Total Weight: {totalWeight}%
       </div>
 
+
       {/* Bottom Bar */}
       <div
-        style={{
-          marginTop: "30px",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <button onClick={onBack}>← Back</button>
+  style={{
+    marginTop: "35px",
+    display: "flex",
+    justifyContent: "space-between",
+  }}
+>
+  <button
+    onClick={onBack}
+    style={{
+      padding: "12px 24px",
+      border: "1px solid #D1D5DB",
+      background: "#fff",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontWeight: "600",
+    }}
+  >
+    ← Back
+  </button>
 
         <button
           disabled={!isValid}
@@ -269,8 +321,25 @@ const Step2TestCases = ({ challengeData, onBack }) => {
           Publish Challenge
         </button>
       </div>
->>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
-    </div>
+
+
+  <button
+    disabled={!isValid}
+    style={{
+      padding: "12px 28px",
+      border: "none",
+      borderRadius: "8px",
+      background: isValid ? "#2563EB" : "#9CA3AF",
+      color: "#fff",
+      cursor: isValid ? "pointer" : "not-allowed",
+      fontWeight: "600",
+    }}
+  >
+    Publish Challenge
+  </button>
+</div>
+
+  
   );
 };
 

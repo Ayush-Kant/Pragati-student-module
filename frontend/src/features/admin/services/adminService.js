@@ -512,6 +512,14 @@ export const getDrives = async () => {
 
   return response.data;
 };
+export const getMentorPerformance = async (mentorId) => {
+  const response = await API.get(
+    `/api/v1/admin/mentors/${mentorId}/performance`,
+    getConfig()
+  );
+
+  return response.data;
+};
 
 
 export const getMentorPerformance = async () => {

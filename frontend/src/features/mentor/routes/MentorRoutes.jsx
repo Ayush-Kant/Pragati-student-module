@@ -22,11 +22,7 @@ const mentorRoute = (
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
           <Route path="activities/create" element={<CreateActivity />} />
-<<<<<<< HEAD
-        
-=======
-          
->>>>>>> 586c829 (fetch: Complete reamaining frontend changes)
+
         </Route>
       </Route>
     </Route>
