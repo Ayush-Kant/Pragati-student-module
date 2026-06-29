@@ -4,6 +4,7 @@ import RoleRoute from "../../../routes/RoleRoute";
 import { CollegeLayout } from "../layouts/CollegeLayout";
 import Dashboard from "../pages/Dashboard";
 import CollegeProfilePage from "../profile/pages/CollegeProfilePage"; // Added Profile Page
+import Students from "../pages/Students";
 
 const collegeRoute = (
   <Route element={<PrivateRoute />}>
@@ -12,6 +13,7 @@ const collegeRoute = (
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="profile" element={<CollegeProfilePage />} />
+        <Route path="students" element={<Students />} />
       </Route>
     </Route>
   </Route>
