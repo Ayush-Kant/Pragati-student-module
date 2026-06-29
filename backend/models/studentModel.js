@@ -32,13 +32,13 @@ class StudentModel {
 
     const query = `
       INSERT INTO students (
-        enrollment_no, name, email, phone, department, 
+        enrollment_no, name, full_name, email, phone, department, 
         course, semester, cgpa, placement_status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *;
     `;
     const values = [
-      enrollment_no, name, email, phone, department,
+      enrollment_no, name, name, email, phone, department,
       course, semester, cgpa, placement_status,
     ];
     const result = await pool.query(query, values);
@@ -55,6 +55,12 @@ class StudentModel {
         fields.push(`${key} = $${queryIdx}`);
         values.push(value);
         queryIdx++;
+        // If updating name, also update full_name to keep in sync
+        if (key === 'name') {
+          fields.push(`full_name = $${queryIdx}`);
+          values.push(value);
+          queryIdx++;
+        }
       }
     }
 
