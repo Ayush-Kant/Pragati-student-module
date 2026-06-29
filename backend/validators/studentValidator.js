@@ -8,7 +8,6 @@ export const sanitizeInput = (input) => {
 };
 
 export const validateRequestBody = (req, res, next) => {
-  // Recursively sanitize strings
   const sanitizeObject = (obj) => {
     for (const key in obj) {
       if (typeof obj[key] === 'string') {
@@ -33,17 +32,14 @@ export const validateStudent = (req, res, next) => {
   if (!enrollment_no) errors.push("enrollment_no is required");
   if (!name) errors.push("name is required");
 
-  // Email Validation
   if (email && !/^\S+@\S+\.\S+$/.test(email)) {
     errors.push("Invalid email format");
   }
 
-  // Phone Validation
   if (phone && !/^\d{10}$/.test(phone)) {
     errors.push("Invalid phone format (must be 10 digits)");
   }
 
-  // CGPA Validation
   if (cgpa !== undefined) {
     const cgpaNum = parseFloat(cgpa);
     if (isNaN(cgpaNum) || cgpaNum < 0 || cgpaNum > 10) {
@@ -51,7 +47,6 @@ export const validateStudent = (req, res, next) => {
     }
   }
 
-  // Semester Validation
   if (semester !== undefined) {
     const semNum = parseInt(semester);
     if (isNaN(semNum) || semNum < 1 || semNum > 8) {

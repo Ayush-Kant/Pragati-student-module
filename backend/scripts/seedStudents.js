@@ -38,7 +38,7 @@ const studentSeedData = [
 
 const academicSeedData = [
   {
-    student_id: 1, // Will map properly later
+    student_id: 1, 
     tenth_board: "CBSE",
     tenth_percentage: 92.5,
     tenth_year: 2019,
@@ -85,7 +85,6 @@ const skillSeedData = [
 async function seedDatabase() {
   console.log("🌱 Starting seed process...");
   try {
-    // Insert Students
     for (const student of studentSeedData) {
       const { enrollment_no, name, email, phone, department, course, semester, cgpa, placement_status } = student;
       const res = await pool.query(`
@@ -95,12 +94,9 @@ async function seedDatabase() {
         RETURNING id;
       `, [enrollment_no, name, email, phone, department, course, semester, cgpa, placement_status]);
       
-      // Assume mapping ID logic here if we wanted to dynamically map it to skills/academic
-      // But for simplicity of seed script, we just run inserts that might fail on unique constraints gracefully
     }
     console.log("✅ Students seeded");
 
-    // We can fetch the real IDs based on enrollment_no to seed related data
     const getStudentId = async (enrollment) => {
         const res = await pool.query('SELECT id FROM students WHERE enrollment_no = $1', [enrollment]);
         return res.rows.length > 0 ? res.rows[0].id : null;

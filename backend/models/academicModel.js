@@ -8,12 +8,10 @@ class AcademicModel {
   }
 
   async updateAcademicDetails(studentId, academicData) {
-    // Check if exists
     const checkQuery = `SELECT id FROM student_academic_details WHERE student_id = $1;`;
     const checkResult = await pool.query(checkQuery, [studentId]);
 
     if (checkResult.rowCount === 0) {
-      // Insert if not exists
       const fields = ['student_id'];
       const values = [studentId];
       const placeholders = ['$1'];
@@ -36,7 +34,6 @@ class AcademicModel {
       const result = await pool.query(insertQuery, values);
       return result.rows[0];
     } else {
-      // Update
       const fields = [];
       const values = [];
       let queryIdx = 1;

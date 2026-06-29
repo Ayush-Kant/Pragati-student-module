@@ -23,7 +23,6 @@ class StudentService {
       throw new Error("Student not found");
     }
     
-    // Fetch related data
     const academic = await academicModel.getAcademicDetails(id);
     const skills = await skillsModel.getStudentSkills(id);
 
@@ -39,8 +38,6 @@ class StudentService {
   }
 
   async addStudent(studentData) {
-    // We could add business logic here (e.g., checking if email/enrollment exists)
-    // The DB will throw an error on unique constraint, but handling it is good
     try {
       const newStudent = await studentModel.createStudent(studentData);
       return {
@@ -49,7 +46,7 @@ class StudentService {
         data: newStudent
       };
     } catch (error) {
-      if (error.code === '23505') { // Postgres unique violation
+      if (error.code === '23505') { 
         throw new Error("Student with this enrollment number or email already exists");
       }
       throw error;
@@ -120,7 +117,6 @@ class StudentService {
     };
   }
 
-  // Academic specific services
   async getAcademicDetails(studentId) {
     const academic = await academicModel.getAcademicDetails(studentId);
     if (!academic) {
@@ -147,7 +143,6 @@ class StudentService {
     };
   }
 
-  // Skills specific services
   async getStudentSkills(studentId) {
     const skills = await skillsModel.getStudentSkills(studentId);
     return {

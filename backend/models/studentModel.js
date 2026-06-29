@@ -55,7 +55,6 @@ class StudentModel {
         fields.push(`${key} = $${queryIdx}`);
         values.push(value);
         queryIdx++;
-        // If updating name, also update full_name to keep in sync
         if (key === 'name') {
           fields.push(`full_name = $${queryIdx}`);
           values.push(value);
@@ -129,7 +128,6 @@ class StudentModel {
       FROM students
       GROUP BY department, placement_status;
     `;
-    // A simpler query might be better for general stats, we can do multiple queries
     const totalQuery = `SELECT COUNT(*) FROM students;`;
     const placementQuery = `SELECT placement_status, COUNT(*) FROM students GROUP BY placement_status;`;
     const deptQuery = `SELECT department, COUNT(*) FROM students GROUP BY department;`;

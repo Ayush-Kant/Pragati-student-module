@@ -35,7 +35,6 @@ class SkillsModel {
 
     fields.push(`updated_at = CURRENT_TIMESTAMP`);
     
-    // Add WHERE conditions
     values.push(studentId);
     values.push(skillId);
 

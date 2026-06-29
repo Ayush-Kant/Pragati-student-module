@@ -1,7 +1,6 @@
 import { pool } from "../config/db.js";
-import studentService from "../services/studentService.js";
+import studentService from "../services/student.service.js";
 
-// Existing code for student_profiles
 export const getStudentProfile = async (req, res) => {
   try {
     const userId = 1;
@@ -82,8 +81,6 @@ export const updateStudentProfile = async (req, res) => {
     });
   }
 };
-
-// --- New code for Student Database Management Module ---
 
 export const getStudents = async (req, res) => {
   try {
@@ -176,7 +173,6 @@ export const getStudentStatistics = async (req, res) => {
   }
 };
 
-// Academic Methods
 export const getAcademicDetails = async (req, res) => {
   try {
     const result = await studentService.getAcademicDetails(req.params.id);
@@ -201,7 +197,6 @@ export const updateAcademicDetails = async (req, res) => {
   }
 };
 
-// Skills Methods
 export const getStudentSkills = async (req, res) => {
   try {
     const result = await studentService.getStudentSkills(req.params.id);
