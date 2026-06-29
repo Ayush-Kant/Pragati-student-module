@@ -2,18 +2,20 @@
 
 CREATE TABLE IF NOT EXISTS students (
     id SERIAL PRIMARY KEY,
-    enrollment_no VARCHAR(50) UNIQUE NOT NULL,
-    name VARCHAR(150) NOT NULL,
-    email VARCHAR(150) UNIQUE,
-    phone VARCHAR(20),
-    department VARCHAR(100),
-    course VARCHAR(100),
-    semester INT,
-    cgpa NUMERIC(4,2),
-    placement_status VARCHAR(50),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE students
+    ADD COLUMN IF NOT EXISTS enrollment_no VARCHAR(50) UNIQUE,
+    ADD COLUMN IF NOT EXISTS name VARCHAR(150),
+    ADD COLUMN IF NOT EXISTS email VARCHAR(150) UNIQUE,
+    ADD COLUMN IF NOT EXISTS phone VARCHAR(20),
+    ADD COLUMN IF NOT EXISTS department VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS course VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS semester INT,
+    ADD COLUMN IF NOT EXISTS cgpa NUMERIC(4,2),
+    ADD COLUMN IF NOT EXISTS placement_status VARCHAR(50);
 
 CREATE INDEX IF NOT EXISTS idx_students_enrollment_no ON students(enrollment_no);
 CREATE INDEX IF NOT EXISTS idx_students_department ON students(department);
