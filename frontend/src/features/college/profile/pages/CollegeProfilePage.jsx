@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import ProfileBanner from './../components/view-profile/ProfileBanner';
-import ProfileDetails from './../components/view-profile/ProfileDetails';
-import { profileDummyData } from './../types/profileDummyData';
-import useProfileData from './../hooks/useProfileData';
+import { useEffect, useState } from "react";
+import ProfileBanner from "../components/view-profile/ProfileBanner";
+import ProfileDetails from "../components/view-profile/ProfileDetails";
+import { getProfile } from "../../services/collegeService";
 
 export default function CollegeProfilePage() {
   const [profile, setProfile] = useState(null);
@@ -10,27 +9,25 @@ export default function CollegeProfilePage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    try {
-      // Simulate an API call delay
-      const timer = setTimeout(() => {
-        if (!profileDummyData) {
-          setError("No profile data available");
-          setLoading(false);
-          return;
-        }
-        
-        console.log("Loading profile data:", profileDummyData);
-        setProfile(profileDummyData);
-        setLoading(false);
-      }, 500);
+    fetchProfile();
+  }, []);
 
-      return () => clearTimeout(timer);
+  const fetchProfile = async () => {
+    try {
+      const result = await getProfile();
+
+      if (result?.success) {
+        setProfile(result.data);
+      } else {
+        setError("No profile data available");
+      }
     } catch (err) {
-      console.error("Error loading profile:", err);
-      setError(err.message);
+      console.error("Profile Error:", err);
+      setError(err.message || "Failed to load profile");
+    } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   if (loading) {
     return (
@@ -64,19 +61,17 @@ export default function CollegeProfilePage() {
   return (
     <div className="bg-white min-h-screen p-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        
-        {/* Header / Breadcrumb */}
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Uptoskills Profile</h1>
-          <p className="text-sm text-gray-600 font-medium mt-2">Dashboard &gt; Uptoskills Profile</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            Uptoskills Profile
+          </h1>
+          <p className="text-sm text-gray-600 font-medium mt-2">
+            Dashboard &gt; Uptoskills Profile
+          </p>
         </div>
 
-        {/* Top Banner section */}
         <ProfileBanner profile={profile} />
-
-        {/* Bottom Details section */}
         <ProfileDetails profile={profile} />
-        
       </div>
     </div>
   );
