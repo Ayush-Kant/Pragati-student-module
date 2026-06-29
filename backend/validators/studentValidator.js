@@ -94,7 +94,7 @@ export const validateSkill = (req, res, next) => {
   const { skill_name, skill_level } = req.body;
   const errors = [];
 
-  if (!skill_name) {
+  if (req.method === 'POST' && !skill_name) {
     errors.push("skill_name is required");
   }
   
