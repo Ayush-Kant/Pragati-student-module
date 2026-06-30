@@ -22,15 +22,25 @@ const PORT = process.env.PORT || 5001;
 const app = express();
 app.use(express.json());
 
-app.use(errorMiddleware);
-
-app.use(
-  cors({
+app.use(cors({
     origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost"))
+      if (!origin) return callback(null, true);
+      
+      // Allow localhost and 127.0.0.1 (any port)
+      if (origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) {
         return callback(null, true);
+      }
+      
       const clientUrl = process.env.CLIENT_URL;
-      if (clientUrl && origin === clientUrl) return callback(null, true);
+      if (clientUrl) {
+        // Strip trailing slash for proper comparison
+        const normalizedClientUrl = clientUrl.replace(/\/$/, "");
+        const normalizedOrigin = origin.replace(/\/$/, "");
+        if (normalizedOrigin === normalizedClientUrl) {
+          return callback(null, true);
+        }
+      }
+      
       return callback(new Error(`CORS policy: origin ${origin} not allowed`));
     },
     credentials: true,
@@ -48,6 +58,7 @@ app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 
+app.use(errorMiddleware);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.get("/", (req, res) => {
