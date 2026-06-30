@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+// sequelize Op imported only if needed for future queries
 import sequelize from "../config/sequelize.js";
 import Training from "../src/models/Training.js";
 import TrainingProgress from "../src/models/TrainingProgress.js";
@@ -150,12 +150,10 @@ export class TrainingService {
       throw err;
     }
 
-    let numericMentorId = mentorId;
-    if (typeof mentorId === "string" && mentorId.startsWith("M")) {
-      numericMentorId = parseInt(mentorId.substring(1), 10);
-    } else {
-      numericMentorId = parseInt(mentorId, 10);
-    }
+    const numericMentorId =
+      typeof mentorId === "string" && mentorId.startsWith("M")
+        ? parseInt(mentorId.substring(1), 10)
+        : parseInt(mentorId, 10);
 
     const mentor = await Mentor.findByPk(numericMentorId);
     if (!mentor) {
