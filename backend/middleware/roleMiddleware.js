@@ -1,3 +1,4 @@
+
 const roleMiddleware = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
@@ -6,8 +7,21 @@ const roleMiddleware = (...roles) => {
       });
     }
 
+
+export const roleMiddleware = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: Access denied",
+      });
+    }
+
     next();
   };
 };
+
+
+export default roleMiddleware;
 
 export default roleMiddleware;

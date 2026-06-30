@@ -8,6 +8,9 @@ async function seedData() {
     console.log("Clearing existing data...");
     await client.query(`
       TRUNCATE TABLE 
+        mentor_feedback,
+        training_progress,
+        trainings,
         admin_audit_log,
         student_drive_progress, 
         recruitment_drives, 
@@ -46,51 +49,87 @@ async function seedData() {
     `);
 
     console.log("Inserting auth_users...");
-    const authUserResult = await client.query(`
-      INSERT INTO auth_users (id, email, password_hash, role) VALUES 
-      (1, 'mentor@example.com', '$2b$10$wEdbVskJ22j29f8f292jf2', 'mentor')
-      RETURNING id, email, role;
+    // 1. Mentor
+    await client.query(`
+      INSERT INTO auth_users (id, uuid_id, email, password_hash, role) VALUES 
+      (1, 'uuid-mentor-1', 'mentor@example.com', '$2b$10$wEdbVskJ22j29f8f292jf2', 'mentor')
     `);
-    const authUser = authUserResult.rows[0];
+    // 2. Company Representative User
+    await client.query(`
+      INSERT INTO auth_users (id, uuid_id, email, password_hash, role) VALUES 
+      (2, 'uuid-company-1', 'hr@google.com', '$2b$10$wEdbVskJ22j29f8f292jf2', 'company')
+    `);
+    // 3. Student User
+    await client.query(`
+      INSERT INTO auth_users (id, uuid_id, email, password_hash, role) VALUES 
+      (3, 'uuid-student-1', 'student@example.com', '$2b$10$wEdbVskJ22j29f8f292jf2', 'student')
+    `);
 
     console.log("Inserting users...");
-    const userResult = await client.query(`
+    await client.query(`
       INSERT INTO users (id, full_name, auth_user_id, email, role) VALUES 
       (1, 'John Doe', 1, 'mentor@example.com', 'mentor')
-      RETURNING id, full_name, role;
     `);
-    const user = userResult.rows[0];
+    await client.query(`
+      INSERT INTO users (id, full_name, auth_user_id, email, role) VALUES 
+      (2, 'Google HR Officer', 2, 'hr@google.com', 'company')
+    `);
+    await client.query(`
+      INSERT INTO users (id, full_name, auth_user_id, email, role) VALUES 
+      (3, 'Alice Smith', 3, 'student@example.com', 'student')
+    `);
 
     console.log("Inserting mentors...");
-    const mentorResult = await client.query(`
+    await client.query(`
       INSERT INTO mentors (id, user_id, bio, expertise_tags, verified, status) VALUES 
       (1, 1, 'Frontend Development Expert', ARRAY['MERN', 'React', 'Node.js'], true, 'approved')
-      RETURNING id;
     `);
-    const mentor = mentorResult.rows[0];
 
     console.log("Inserting companies...");
-    const companyResult = await client.query(`
-      INSERT INTO companies (id, name) VALUES 
-      (1, 'Google')
-      RETURNING id;
+    await client.query(`
+      INSERT INTO companies (id, user_id, name, email, status) VALUES 
+      (1, 2, 'Google', 'hr@google.com', 'approved')
     `);
-    const company = companyResult.rows[0];
+
+    console.log("Inserting students...");
+    await client.query(`
+      INSERT INTO students (id, full_name, email, phone) VALUES 
+      (1, 'Alice Smith', 'student@example.com', '1234567890')
+    `);
 
     console.log("Inserting recruitment drives...");
-    const driveResult = await client.query(`
+    await client.query(`
       INSERT INTO recruitment_drives (id, title, company_id, mentor_id, status) VALUES 
       (1, 'Summer Internship Drive 2026', 1, 1, 'active')
-      RETURNING id, title;
     `);
-    const drive = driveResult.rows[0];
+
+    console.log("Inserting trainings...");
+    await client.query(`
+      INSERT INTO trainings (training_id, company_id, title, description, duration, start_date, end_date, mentor_id, curriculum, status) VALUES 
+      ('T101', 1, 'React Bootcamp', 'Complete React training covering fundamentals, hooks, and context API', 30, '2026-05-15 00:00:00', '2026-06-15 00:00:00', 1, '["React Basics", "Components & Props", "State & Lifecycle", "Hooks", "Context API"]'::jsonb, 'ACTIVE'),
+      ('T102', 1, 'Node.js Advanced', 'Advanced backend course with Node.js and Express', 30, '2026-06-01 00:00:00', '2026-07-01 00:00:00', null, '["Event Loop", "Streams", "Express Routing", "Sequelize ORM"]'::jsonb, 'ACTIVE')
+    `);
+
+    console.log("Inserting training progress...");
+    await client.query(`
+      INSERT INTO training_progress (progress_id, training_id, candidate_id, attendance, assignment_score, engagement_score, performance_rating, readiness_score, completion_date, status) VALUES 
+      ('TP101', 'T101', 1, 90, 85, 4.5, 4, 87, null, 'IN_PROGRESS')
+    `);
+
+    console.log("Inserting mentor feedback...");
+    await client.query(`
+      INSERT INTO mentor_feedback (feedback_id, training_id, mentor_id, candidate_id, feedback, rating) VALUES 
+      ('MF101', 'T101', 1, 1, 'Good progress overall, candidate is grasping concepts well', 4)
+    `);
 
     await client.query("COMMIT");
     console.log("Seed completed successfully!");
-    console.log(`Test Mentor Auth User ID: ${authUser.id}`);
-    console.log(`Test Mentor User ID: ${user.id}`);
-    console.log(`Test Mentor ID: ${mentor.id}`);
-    console.log(`Test Drive ID: ${drive.id}`);
+    console.log(`Test Mentor Auth User ID: 1`);
+    console.log(`Test Mentor ID: 1`);
+    console.log(`Test Company Representative User ID: 2`);
+    console.log(`Test Company ID: 1`);
+    console.log(`Test Student Candidate ID: 1`);
+    console.log(`Test Training ID: T101, T102`);
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Error seeding data:", error);
