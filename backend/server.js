@@ -13,6 +13,7 @@ import authRouter from "./routes/auth.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
+import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
 
 import dotenv from "dotenv";
 
@@ -20,9 +21,8 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 const app = express();
-app.use(errorMiddleware);
-
 app.use(express.json());
+app.use(errorMiddleware);
 
 app.use(
   cors({
@@ -46,6 +46,7 @@ app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/admin/company", companyRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
+app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
