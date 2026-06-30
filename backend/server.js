@@ -12,16 +12,16 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRouter from "./routes/auth.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
+import mentorRoutes from "./routes/mentor.routes.js";
 import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
 
 import dotenv from "dotenv";
 
 dotenv.config();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 const app = express();
 app.use(express.json());
-
 app.use(errorMiddleware);
 
 app.use(
@@ -36,18 +36,18 @@ app.use(
     credentials: true,
   }),
 );
+
 app.use("/api/auth", authRouter);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
 app.use("/api/mentor", contentRoutes);
-app.use("/api/v1/company", companyRoutes);
-app.use("/api/v1/company/interviews", interviewRoutes);
+app.use("/api/mentor", mentorRoutes);
+app.use("/api/v1/admin/company", companyRoutes);
+app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
-
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
-
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.get("/", (req, res) => {
