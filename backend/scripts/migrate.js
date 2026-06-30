@@ -30,7 +30,10 @@ async function runMigrations() {
         auth_users, 
         college_stats,
         students,
-        admin_audit_log
+        admin_audit_log,
+        trainings,
+        training_progress,
+        mentor_feedback
       CASCADE;
     `);
     console.log("Existing tables dropped successfully.");
@@ -38,9 +41,12 @@ async function runMigrations() {
     const migrationsDir = path.join(__dirname, "../migrations");
     const migrationFiles = [
       "001_create_users_mentors.sql",
+      "Students.sql",
+      "004_create_college_management.sql",
+      "005_create_company_management.sql",
       "003_create_admin_dashboard.sql",
       "002_create_content_tables.sql",
-      "Students.sql",
+      "006_create_training_coordination.sql",
     ];
 
     for (const file of migrationFiles) {

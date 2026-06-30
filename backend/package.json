@@ -4,7 +4,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles --forceExit",
     "dev": "nodemon server.js"
   },
   "author": "",
@@ -15,9 +15,19 @@
     "dns": "^0.1.2",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "helmet": "^8.2.0",
+    "joi": "^18.2.3",
+    "jsonwebtoken": "^9.0.3",
     "node-pg": "^1.0.1",
     "nodemon": "^3.1.14",
     "pg": "^8.21.0",
-    "resend": "^6.12.3"
+    "resend": "^6.12.3",
+    "sequelize": "^6.37.8"
+  },
+  "devDependencies": {
+    "eslint": "^10.6.0",
+    "jest": "^30.4.2",
+    "prettier": "^3.9.4",
+    "supertest": "^7.2.2"
   }
 }

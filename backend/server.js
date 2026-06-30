@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import trainingRoutes from "./routes/trainingRoutes.js";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
 app.use("/api/student/dashboard", dashboardRoutes);
+app.use("/api/v1/company/training", trainingRoutes);
 
 app.get("/", (req, res) => {
   res.json({
@@ -20,10 +22,16 @@ app.get("/", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`✅ Server running on PORT : ${PORT}`);
-});
+let server;
+if (process.env.NODE_ENV !== "test") {
+  server = app.listen(PORT, () => {
+    console.log(`✅ Server running on PORT : ${PORT}`);
+  });
+}
 
 connectDB().catch((err) => {
   console.error("❌ PostgreSQL connection failed:", err.message);
 });
+
+export { app, server };
+export default app;
