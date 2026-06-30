@@ -3,10 +3,14 @@ import connectDB from "./config/db.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import studentRoutes from './routes/student.routes.js'
 import authRouter from './routes/auth.routes.js'
+import cors from 'cors'
 
 const PORT = process.env.PORT || 5000;
 
 const app = express();
+app.use(cors({
+    origin: "http://localhost:5173"
+}))
 app.use(express.json())
 app.use("/api/auth", authRouter);
 app.use("/api/mentor", mentorRoutes);

@@ -21,7 +21,7 @@ import {
   validateAcademicDetails,
   validateSkill,
   validateRequestBody
-} from "../validators/studentValidator.js";
+} from "../validators/student.validator.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
 import roleMiddleware from "../middleware/roleMiddleware.js";

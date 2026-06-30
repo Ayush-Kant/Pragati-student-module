@@ -29,8 +29,10 @@ export const validateStudent = (req, res, next) => {
   const { enrollment_no, name, email, phone, semester, cgpa } = req.body;
   const errors = [];
 
-  if (!enrollment_no) errors.push("enrollment_no is required");
-  if (!name) errors.push("name is required");
+  if (req.method === 'POST') {
+    if (!enrollment_no) errors.push("enrollment_no is required");
+    if (!name) errors.push("name is required");
+  }
 
   if (email && !/^\S+@\S+\.\S+$/.test(email)) {
     errors.push("Invalid email format");
