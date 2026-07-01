@@ -1,4 +1,3 @@
-import { useProfileData } from '../college/profile/hooks/useProfileData';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import studentImage from "./images/student.png";

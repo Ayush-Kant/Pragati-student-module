@@ -1,8 +1,6 @@
-import React from 'react'
-import DriveManagement from '../pages/DriveManagement';
+import React from 'react';
 
-const AdminDrives = () => {
-  return <DriveManagement/>;
+export default function () {
+  return <div> Component</div>;
 }
 
-export default AdminDrives;
