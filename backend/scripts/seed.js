@@ -51,7 +51,8 @@ async function seedData() {
     console.log("Inserting auth_users...");
     const authUserResult = await client.query(`
       INSERT INTO auth_users (id, email, password_hash, role) VALUES 
-      (1, 'mentor@example.com', '$2b$10$wEdbVskJ22j29f8f292jf2', 'mentor')
+      (1, 'mentor@example.com', '$2b$10$mSD6Bqp4SvDs5hXDMj4rPOBI.LnWQWYo5gZkFwcTfhdwC/JwEf.bC', 'mentor'),
+      (2, 'company@gmail.com', '$2b$10$mSD6Bqp4SvDs5hXDMj4rPOBI.LnWQWYo5gZkFwcTfhdwC/JwEf.bC', 'company')
       RETURNING id, email, role;
     `);
     const authUser = authUserResult.rows[0];
@@ -59,7 +60,8 @@ async function seedData() {
     console.log("Inserting users...");
     const userResult = await client.query(`
       INSERT INTO users (id, full_name, auth_user_id, email, role) VALUES 
-      (1, 'John Doe', 1, 'mentor@example.com', 'mentor')
+      (1, 'John Doe', 1, 'mentor@example.com', 'mentor'),
+      (2, 'Company Admin', 2, 'company@gmail.com', 'company')
       RETURNING id, full_name, role;
     `);
     const user = userResult.rows[0];
@@ -74,8 +76,9 @@ async function seedData() {
 
     console.log("Inserting companies...");
     const companyResult = await client.query(`
-      INSERT INTO companies (id, name, email) VALUES 
-      (1, 'Google', 'google@example.com')
+      INSERT INTO companies (id, user_id, name, email) VALUES 
+      (1, null, 'Google', 'google@example.com'),
+      (2, 2, 'Company Corporate', 'company@gmail.com')
       RETURNING id;
     `);
     const company = companyResult.rows[0];
@@ -83,7 +86,8 @@ async function seedData() {
     console.log("Inserting recruitment drives...");
     const driveResult = await client.query(`
       INSERT INTO recruitment_drives (id, title, company_id, mentor_id, status) VALUES 
-      (1, 'Summer Internship Drive 2026', 1, 1, 'active')
+      (1, 'Summer Internship Drive 2026', 1, 1, 'active'),
+      (2, 'Tech Trainee Hiring 2026', 2, 1, 'active')
       RETURNING id, title;
     `);
     const drive = driveResult.rows[0];
@@ -100,7 +104,9 @@ async function seedData() {
     await client.query(`
       INSERT INTO trainings (training_id, company_id, title, description, duration, start_date, end_date, mentor_id, status) VALUES 
       ('t1', 1, 'Full Stack Web Development', 'Deep dive into React, Node.js and PostgreSQL', 12, NOW() - INTERVAL '1 month', NOW() + INTERVAL '2 months', 1, 'ACTIVE'),
-      ('t2', 1, 'Cloud Architecture & DevOps', 'AWS, Docker, Kubernetes and CI/CD pipelines', 8, NOW() - INTERVAL '2 months', NOW() - INTERVAL '1 week', 1, 'COMPLETED');
+      ('t2', 1, 'Cloud Architecture & DevOps', 'AWS, Docker, Kubernetes and CI/CD pipelines', 8, NOW() - INTERVAL '2 months', NOW() - INTERVAL '1 week', 1, 'COMPLETED'),
+      ('t3', 2, 'Full Stack Web Development', 'Deep dive into React, Node.js and PostgreSQL', 12, NOW() - INTERVAL '1 month', NOW() + INTERVAL '2 months', 1, 'ACTIVE'),
+      ('t4', 2, 'Cloud Architecture & DevOps', 'AWS, Docker, Kubernetes and CI/CD pipelines', 8, NOW() - INTERVAL '2 months', NOW() - INTERVAL '1 week', 1, 'COMPLETED');
     `);
 
     console.log("Inserting training progress...");
@@ -108,7 +114,10 @@ async function seedData() {
       INSERT INTO training_progress (progress_id, training_id, candidate_id, attendance, assignment_score, engagement_score, performance_rating, status) VALUES 
       ('tp1', 't1', 1, 90, 85, 8.2, 4, 'IN_PROGRESS'),
       ('tp2', 't1', 2, 95, 92, 9.0, 5, 'IN_PROGRESS'),
-      ('tp3', 't2', 3, 100, 78, 7.5, 3, 'COMPLETED');
+      ('tp3', 't2', 3, 100, 78, 7.5, 3, 'COMPLETED'),
+      ('tp4', 't3', 1, 90, 85, 8.2, 4, 'IN_PROGRESS'),
+      ('tp5', 't3', 2, 95, 92, 9.0, 5, 'IN_PROGRESS'),
+      ('tp6', 't4', 3, 100, 78, 7.5, 3, 'COMPLETED');
     `);
 
     console.log("Resetting primary key sequences...");
