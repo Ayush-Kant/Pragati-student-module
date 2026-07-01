@@ -3,6 +3,9 @@
 //  Pure utility helpers for the Learning Engine.
 //  No DB access here — all functions are deterministic and
 //  operate only on the in-memory data passed to them.
+//
+//  Student identity resolution (uuid → students.id) and all
+//  JOIN logic live in progressService.js, not here.
 // ─────────────────────────────────────────────────────────────
 
 /** Threshold (0–1) at which watch-time auto-qualifies as complete. */

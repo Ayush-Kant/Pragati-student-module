@@ -3,25 +3,37 @@
 
 import { pool } from '../../config/db.js';
 import * as progressModel from "../models/progressModel.js";
-import {
-    calculateWatchPercentage,
-    calculateModuleProgress,
-    calculateCourseProgress,
-    calculateContinueLearning,
-    serializeLearningData,
 } from '../utils/learningUtils.js';
 
 // ---------------- Internal DB helpers (used by the dashboard engine) ----------------
+/**
+ * _resolveStudentId
+ * -----------------
+ * Resolve an `auth_users.uuid_id` (JWT identity) to the application's
+ * `students.id` and a display name. This joins `auth_users` → `users`
+ * and then links to `students` by email which is currently the most
+ * reliable cross-table unique key in the schema.
+ */
 const _resolveStudentId = async (uuidId) => {
     try {
         const result = await pool.query(
             `
             SELECT
                 s.id        AS "studentId",
+<<<<<<< HEAD
                 COALESCE(u.full_name, s.full_name) AS "fullName"
             FROM auth_users au
             JOIN users u ON u.auth_user_id = au.id
             LEFT JOIN students s ON s.email = au.email
+=======
+                s.full_name AS "fullName"
+            FROM auth_users au
+            -- Link auth identity to the profile record via auth_user_id
+            JOIN users u ON u.auth_user_id = au.id
+            -- Link profile to the students record via the shared UNIQUE email
+            -- (students has no user_id FK; email is the reliable common key)
+            JOIN students s ON s.email = au.email
+>>>>>>> c0602cc0 (fix progressService.js)
             WHERE au.uuid_id = $1
             `,
             [uuidId]
@@ -50,27 +62,27 @@ const _fetchEnrolledCourses = async (studentId) => {
               AND c.status = 'published'
             ORDER BY sce.enrolled_at DESC
             `,
-            [studentId]
-        );
+                const _resolveStudentId = async (uuidId) => {
+            try {
+                const result = await pool.query(
+                    `
+                            SELECT
+                                s.id        AS "studentId",
+                                COALESCE(u.full_name, s.full_name) AS "fullName"
+                            FROM auth_users au
+                            JOIN users u ON u.auth_user_id = au.id
+                            LEFT JOIN students s ON s.email = au.email
+                            WHERE au.uuid_id = $1
+                            `,
+                    [uuidId]
+                );
 
-        return result.rows;
-    } catch (err) {
-        console.error('[progressService] _fetchEnrolledCourses failed:', err);
-        throw err;
-    }
-};
-
-const _fetchLessonProgress = async (studentId) => {
-    try {
-        const result = await pool.query(
-            `
-            SELECT
-                slp.lesson_id       AS "lessonId",
-                slp.status,
-                slp.watch_seconds   AS "watchSeconds",
-                slp.completed_at    AS "completedAt",
-                slp.last_accessed_at AS "lastAccessedAt"
-            FROM student_lesson_progress slp
+                return result.rows[0] ?? null;
+            } catch (err) {
+                console.error('[progressService] _resolveStudentId failed:', err);
+                throw err;
+            }
+        };
             WHERE slp.student_id = $1
             `,
             [studentId]
@@ -89,16 +101,16 @@ const _fetchCourseStructure = async (courseIds) => {
     try {
         const result = await pool.query(
             `
-            SELECT
-                c.id                AS "courseId",
-                m.id                AS "moduleId",
+        SELECT
+        c.id                AS "courseId",
+            m.id                AS "moduleId",
                 m.title             AS "moduleTitle",
-                m.order_index       AS "moduleOrder",
-                l.id                AS "lessonId",
-                l.title             AS "lessonTitle",
-                l.content_type      AS "contentType",
-                l.duration_seconds  AS "durationSeconds",
-                l.order_index       AS "lessonOrder"
+                    m.order_index       AS "moduleOrder",
+                        l.id                AS "lessonId",
+                            l.title             AS "lessonTitle",
+                                l.content_type      AS "contentType",
+                                    l.duration_seconds  AS "durationSeconds",
+                                        l.order_index       AS "lessonOrder"
             FROM courses c
             JOIN modules m ON m.course_id = c.id
             LEFT JOIN lessons l ON l.module_id = m.id
@@ -161,13 +173,30 @@ const _buildCourseTree = (flatRows, enrolledCourses) => {
 
 // ---------------- Public APIs ----------------
 
+<<<<<<< HEAD
+=======
+/**
+ * aggregateLearningDashboard
+ * --------------------------
+ * Orchestrates all DB queries, computes per-module and per-course
+ * completion, builds the "continue learning" widget, then returns
+ * a fully assembled, serialized learning dashboard payload.
+ *
+ * @param {string} requestingUserId - UUID of the logged-in student
+ *        (`auth_users.uuid_id`).
+ * @returns {Promise<Object>} Serialized learning dashboard object.
+ *
+ * @throws {Error} If the requesting user does not exist or has no
+ *         student profile.
+ */
+>>>>>>> c0602cc0 (fix progressService.js)
 const aggregateLearningDashboard = async (requestingUserId) => {
     if (!requestingUserId || typeof requestingUserId !== 'string') {
         throw new Error('aggregateLearningDashboard requires a valid requestingUserId (non-empty string).');
     }
 
     const student = await _resolveStudentId(requestingUserId);
-    if (!student) throw new Error(`Student profile not found for userId: ${requestingUserId}`);
+    if (!student) throw new Error(`Student profile not found for userId: ${ requestingUserId } `);
     const { studentId } = student;
 
     const enrolledCourses = await _fetchEnrolledCourses(studentId);
