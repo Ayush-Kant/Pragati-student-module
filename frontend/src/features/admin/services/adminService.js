@@ -873,6 +873,7 @@ export const assignAssessment = async (assessmentId, payload) => {
   return response.data;
 };
 
+<<<<<<< HEAD
 // Mock Mentor Data - Fallback when backend is unavailable
 const mockMentors = [
   {
@@ -1053,3 +1054,93 @@ export const deleteMentor = async (mentorId) => {
     return { success: true, mentorId };
   }
 };
+=======
+
+
+
+/* ===========================================
+   Disputes
+=========================================== */
+
+// Get dispute list
+export const getDisputes = async (params = {}) => {
+  const response = await API.get(
+    "/api/v1/admin/disputes",
+    {
+      ...getHeaders(),
+      params,
+    }
+  );
+
+  return response.data;
+};
+
+// Get single dispute
+export const getDisputeById = async (id) => {
+  const response = await API.get(
+    `/api/v1/admin/disputes/${id}`,
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+// Mark dispute as In Review
+export const reviewDispute = async (id) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/review`,
+    {},
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+// Resolve dispute
+export const resolveDispute = async (
+  id,
+  resolution
+) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/resolve`,
+    {
+      resolution,
+    },
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+// Escalate dispute
+export const escalateDispute = async (
+  id,
+  reason
+) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/escalate`,
+    {
+      reason,
+    },
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+// Add Admin Note
+export const addDisputeNote = async (
+  id,
+  note
+) => {
+  const response = await API.post(
+    `/api/v1/admin/disputes/${id}/notes`,
+    {
+      note,
+    },
+    getHeaders()
+  );
+
+  return response.data;
+};
+>>>>>>> 3fb0e17 (feat: implement dispute resolution frontend)
