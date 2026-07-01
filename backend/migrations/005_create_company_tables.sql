@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS companies (
 
 CREATE TABLE IF NOT EXISTS company_team_members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    company_id UUID NOT NULL,
+    company_id INTEGER NOT NULL,
     user_id UUID,
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,

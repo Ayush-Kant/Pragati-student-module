@@ -21,7 +21,8 @@ ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS application_deadline TIM
 -- assessments module lands: ALTER TABLE recruitment_drives ADD CONSTRAINT
 -- recruitment_drives_assigned_test_fk FOREIGN KEY (assigned_test_id) REFERENCES assessments(id);
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS assigned_test_id INTEGER;
-ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS assigned_course_id INTEGER REFERENCES courses(id);
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS assigned_course_id INTEGER;
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS mentor_id INTEGER REFERENCES users(id);
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS frozen BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS frozen_at TIMESTAMPTZ;
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS frozen_by INTEGER REFERENCES users(id);
@@ -50,6 +51,9 @@ CREATE TABLE IF NOT EXISTS student_drive_progress (
 );
 
 ALTER TABLE student_drive_progress ADD COLUMN IF NOT EXISTS current_stage VARCHAR(50) NOT NULL DEFAULT 'application';
+ALTER TABLE student_drive_progress ADD COLUMN IF NOT EXISTS stage VARCHAR(50) NOT NULL DEFAULT 'applied';
+ALTER TABLE student_drive_progress ADD COLUMN IF NOT EXISTS college_id INTEGER REFERENCES colleges(id) ON DELETE SET NULL;
+ALTER TABLE student_drive_progress ADD COLUMN IF NOT EXISTS company_id INTEGER REFERENCES companies(id) ON DELETE SET NULL;
 ALTER TABLE student_drive_progress ADD COLUMN IF NOT EXISTS assessment_score NUMERIC(5,2);
 ALTER TABLE student_drive_progress ADD COLUMN IF NOT EXISTS training_completion NUMERIC(5,2) DEFAULT 0.00;
 ALTER TABLE student_drive_progress ADD COLUMN IF NOT EXISTS stage_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS recruitment_drives (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE student_drive_progress (
+CREATE TABLE IF NOT EXISTS student_drive_progress (
   id         SERIAL PRIMARY KEY,
   student_id INTEGER NOT NULL REFERENCES users(id),
   drive_id   INTEGER NOT NULL REFERENCES recruitment_drives(id),
@@ -43,22 +43,22 @@ CREATE TABLE admin_audit_log (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_sdp_stage
+CREATE INDEX IF NOT EXISTS idx_sdp_stage
 ON student_drive_progress(stage);
 
-CREATE INDEX idx_sdp_college_id
+CREATE INDEX IF NOT EXISTS idx_sdp_college_id
 ON student_drive_progress(college_id);
 
-CREATE INDEX idx_sdp_company_id
+CREATE INDEX IF NOT EXISTS idx_sdp_company_id
 ON student_drive_progress(company_id);
 
-CREATE INDEX idx_sdp_drive_id
+CREATE INDEX IF NOT EXISTS idx_sdp_drive_id
 ON student_drive_progress(drive_id);
 
-CREATE INDEX idx_audit_created
+CREATE INDEX IF NOT EXISTS idx_audit_created
 ON admin_audit_log(created_at DESC);
 
-CREATE INDEX idx_audit_admin_id
+CREATE INDEX IF NOT EXISTS idx_audit_admin_id
 ON admin_audit_log(admin_id);
 
 
