@@ -37,9 +37,9 @@ router.get("/statistics", roleMiddleware("admin", "staff", "company"), getStuden
 
 router.get("/", getStudents);
 router.get("/:id", getStudentById);
-router.post("/", roleMiddleware("admin", "staff"), validateStudent, createStudent);
-router.put("/:id", roleMiddleware("admin", "staff", "student"), validateStudent, updateStudent);
-router.delete("/:id", roleMiddleware("admin"), deleteStudent);
+router.post("/", roleMiddleware("admin", "staff", "college"), validateStudent, createStudent);
+router.put("/:id", roleMiddleware("admin", "staff", "student", "college"), validateStudent, updateStudent);
+router.delete("/:id", roleMiddleware("admin", "college"), deleteStudent);
 
 router.get("/:id/academic", getAcademicDetails);
 router.put("/:id/academic", roleMiddleware("admin", "staff", "student"), validateAcademicDetails, updateAcademicDetails);

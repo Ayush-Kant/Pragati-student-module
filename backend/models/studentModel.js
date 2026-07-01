@@ -28,18 +28,20 @@ class StudentModel {
       semester,
       cgpa,
       placement_status,
+      skills,
+      graduation_year,
     } = studentData;
 
     const query = `
       INSERT INTO students (
         enrollment_no, name, full_name, email, phone, department, 
-        course, semester, cgpa, placement_status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        course, semester, cgpa, placement_status, skills, graduation_year
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *;
     `;
     const values = [
       enrollment_no, name, name, email, phone, department,
-      course, semester, cgpa, placement_status,
+      course, semester, cgpa, placement_status, skills || [], graduation_year || null
     ];
     const result = await pool.query(query, values);
     return result.rows[0];

@@ -12,18 +12,16 @@ import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import collegeProfileRoutes from "./routes/collage.profile.routes.js";
 import companyRoutes from "./routes/company.routes.js";
-import authRouter from "./routes/auth.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
-
-import cors from "cors";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 
 const PORT = process.env.PORT || 5000;
 
 const app = express();
 app.use(cors({
-    origin: "http://localhost:5173"
+    origin: "http://localhost:5173",
+    credentials: true
 }))
 app.use(express.json())
 app.use("/api/auth", authRouter);

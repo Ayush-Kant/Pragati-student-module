@@ -1,42 +1,160 @@
-import { studentApiResponse } from "../types/studentDummyData"
-
-// Simulate API delay
-const delay = (ms = 300) => new Promise((res) => setTimeout(res, ms))
-
-let localStudents = [...studentApiResponse.data]
-let nextId = Math.max(...localStudents.map((s) => s.id)) + 1
+import api from "../../../../services/api";
 
 export const getStudents = async () => {
-  await delay()
-  return { success: true, data: [...localStudents] }
-}
+  try {
+    const response = await api.get('/students');
+    const mappedData = response.data.data.map(student => ({
+      id: student.id,
+      enrollmentNo: student.enrollment_no,
+      name: student.name,
+      email: student.email,
+      phone: student.phone,
+      department: student.department,
+      course: student.course,
+      semester: student.semester,
+      batch: student.graduation_year ? student.graduation_year.toString() : "Unknown",
+      cgpa: student.cgpa,
+      placementStatus: student.placement_status || "Eligible",
+      skills: student.skills ? student.skills.map(s => typeof s === 'string' ? s : s.skill_name) : [],
+      address: student.address || "",
+      resumeStatus: student.resume_url ? "Uploaded" : "Not Uploaded",
+      linkedin: student.linkedin_url || "",
+      github: student.github_url || "",
+      placedAt: student.placed_at || null,
+      package: student.package || null,
+    }));
+    return { success: true, data: mappedData };
+  } catch (error) {
+    return { success: false, message: error.response?.data?.message || "Failed to fetch students" };
+  }
+};
 
 export const getStudentById = async (id) => {
-  await delay()
-  const student = localStudents.find((s) => s.id === id)
-  if (!student) return { success: false, message: "Student not found" }
-  return { success: true, data: student }
-}
+  try {
+    const response = await api.get(`/students/${id}`);
+    const student = response.data.data;
+    
+    const mappedStudent = {
+      id: student.id,
+      enrollmentNo: student.enrollment_no,
+      name: student.name,
+      email: student.email,
+      phone: student.phone,
+      department: student.department,
+      course: student.course,
+      semester: student.semester,
+      batch: student.graduation_year ? student.graduation_year.toString() : "Unknown",
+      cgpa: student.cgpa,
+      placementStatus: student.placement_status || "Eligible",
+      skills: student.skills ? student.skills.map(s => typeof s === 'string' ? s : s.skill_name) : [],
+      address: student.address || "",
+      resumeStatus: student.resume_url ? "Uploaded" : "Not Uploaded",
+      linkedin: student.linkedin_url || "",
+      github: student.github_url || "",
+      placedAt: student.placed_at || null,
+      package: student.package || null,
+    };
+    return { success: true, data: mappedStudent };
+  } catch (error) {
+    return { success: false, message: error.response?.data?.message || "Student not found" };
+  }
+};
 
 export const createStudent = async (studentData) => {
-  await delay()
-  const newStudent = { ...studentData, id: nextId++, skills: studentData.skills || [] }
-  localStudents = [...localStudents, newStudent]
-  return { success: true, data: newStudent }
-}
+  try {
+    const payload = {
+      enrollment_no: studentData.enrollmentNo,
+      name: studentData.name,
+      email: studentData.email,
+      phone: studentData.phone,
+      department: studentData.department,
+      course: studentData.course,
+      semester: studentData.semester,
+      cgpa: studentData.cgpa,
+      placement_status: studentData.placementStatus,
+      graduation_year: studentData.batch && studentData.batch !== "All" ? parseInt(studentData.batch) : null,
+      skills: studentData.skills || []
+    };
+    
+    const response = await api.post('/students', payload);
+    const student = response.data.data;
+    const mappedStudent = {
+      id: student.id,
+      enrollmentNo: student.enrollment_no,
+      name: student.name,
+      email: student.email,
+      phone: student.phone,
+      department: student.department,
+      course: student.course,
+      semester: student.semester,
+      batch: student.graduation_year ? student.graduation_year.toString() : "Unknown",
+      cgpa: student.cgpa,
+      placementStatus: student.placement_status || "Eligible",
+      skills: student.skills ? student.skills.map(s => typeof s === 'string' ? s : s.skill_name) : [],
+      address: student.address || "",
+      resumeStatus: student.resume_url ? "Uploaded" : "Not Uploaded",
+      linkedin: student.linkedin_url || "",
+      github: student.github_url || "",
+      placedAt: student.placed_at || null,
+      package: student.package || null,
+    };
+    return { success: true, data: mappedStudent };
+  } catch (error) {
+    return { success: false, message: error.response?.data?.message || "Failed to create student" };
+  }
+};
 
 export const updateStudent = async (id, studentData) => {
-  await delay()
-  const index = localStudents.findIndex((s) => s.id === id)
-  if (index === -1) return { success: false, message: "Student not found" }
-  localStudents[index] = { ...localStudents[index], ...studentData }
-  return { success: true, data: localStudents[index] }
-}
+  try {
+    const payload = {
+      enrollment_no: studentData.enrollmentNo,
+      name: studentData.name,
+      email: studentData.email,
+      phone: studentData.phone,
+      department: studentData.department,
+      course: studentData.course,
+      semester: studentData.semester,
+      cgpa: studentData.cgpa,
+      placement_status: studentData.placementStatus,
+      graduation_year: studentData.batch && studentData.batch !== "All" ? parseInt(studentData.batch) : null,
+      skills: studentData.skills || []
+    };
+    
+    Object.keys(payload).forEach(key => payload[key] === undefined && delete payload[key]);
+
+    const response = await api.put(`/students/${id}`, payload);
+    const student = response.data.data;
+    const mappedStudent = {
+      id: student.id,
+      enrollmentNo: student.enrollment_no,
+      name: student.name,
+      email: student.email,
+      phone: student.phone,
+      department: student.department,
+      course: student.course,
+      semester: student.semester,
+      batch: student.graduation_year ? student.graduation_year.toString() : "Unknown",
+      cgpa: student.cgpa,
+      placementStatus: student.placement_status || "Eligible",
+      skills: student.skills ? student.skills.map(s => typeof s === 'string' ? s : s.skill_name) : [],
+      address: student.address || "",
+      resumeStatus: student.resume_url ? "Uploaded" : "Not Uploaded",
+      linkedin: student.linkedin_url || "",
+      github: student.github_url || "",
+      placedAt: student.placed_at || null,
+      package: student.package || null,
+    };
+    return { success: true, data: mappedStudent };
+  } catch (error) {
+    return { success: false, message: error.response?.data?.message || "Failed to update student" };
+  }
+};
 
 export const deleteStudent = async (id) => {
-  await delay()
-  const index = localStudents.findIndex((s) => s.id === id)
-  if (index === -1) return { success: false, message: "Student not found" }
-  localStudents = localStudents.filter((s) => s.id !== id)
-  return { success: true, message: "Student deleted successfully" }
-}
+  try {
+    const response = await api.delete(`/students/${id}`);
+    return { success: true, message: response.data.message || "Student deleted successfully" };
+  } catch (error) {
+    return { success: false, message: error.response?.data?.message || "Failed to delete student" };
+  }
+};
