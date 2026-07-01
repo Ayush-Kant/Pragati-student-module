@@ -13,7 +13,7 @@ import {
 // ==========================================
 export const createCourse = async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
     const { title, description, skillTags, driveId } = req.body;
 
     const result = await createCourseService({
@@ -51,7 +51,7 @@ export const createCourse = async (req, res) => {
 // ==========================================
 export const getCourses = async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
     const { status, driveId } = req.query;
 
     const result = await getCoursesService({ userId, status, driveId });
@@ -78,7 +78,7 @@ export const getCourses = async (req, res) => {
 // ==========================================
 export const getCourseById = async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
     const { courseId } = req.params;
 
     const result = await getCourseByIdService({ userId, courseId });
@@ -105,7 +105,7 @@ export const getCourseById = async (req, res) => {
 // ==========================================
 export const updateCourse = async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
     const { courseId } = req.params;
 
     const result = await updateCourseService({
@@ -140,7 +140,7 @@ export const updateCourse = async (req, res) => {
 // ==========================================
 export const deleteCourse = async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
     const { courseId } = req.params;
 
     const result = await deleteCourseService({
@@ -166,7 +166,7 @@ export const deleteCourse = async (req, res) => {
 // ==========================================
 export const addModule = async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
     const { courseId } = req.params;
     const { title, orderIndex } = req.body;
 
@@ -203,7 +203,7 @@ export const addModule = async (req, res) => {
 // ==========================================
 export const deleteModule = async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
     const { moduleId } = req.params;
 
     const result = await deleteModuleService({
