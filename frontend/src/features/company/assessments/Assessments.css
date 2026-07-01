@@ -1,4 +1,4 @@
-﻿.assessments-wrapper {
+.assessments-wrapper {
   padding: 0;
   background: transparent;
   overflow-x: hidden;
@@ -111,7 +111,7 @@
 .filter-btn {
   height: 42px;
 
-  padding: 0 16px;
+  padding: 0 36px 0 16px !important;
 
   border-radius: 10px;
   border: 1px solid #d0d5dd;

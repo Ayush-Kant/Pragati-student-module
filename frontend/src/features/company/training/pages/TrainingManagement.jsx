@@ -10,19 +10,21 @@ import api from '../../../../services/api';
 import "../../styles/companyDashboard.css";
 
 
-// PRD returns: { trainingId, title, mentor, status, completionPercentage, attendancePercentage, studentCount }
-const normalize = (p) => ({
-  id:             p.trainingId,
-  program:        p.title,
-  mentor:         p.mentor ?? '—',
-  mentorInitials: (p.mentor ?? '')
-                    .split(' ').slice(0, 2)
-                    .map(w => w[0]?.toUpperCase() ?? '').join(''),
-  students:       p.studentCount ?? 0,
-  completion:     p.completionPercentage != null ? `${p.completionPercentage}%` : '—',
-  attendance:     p.attendancePercentage  != null ? `${p.attendancePercentage}%`  : '—',
-  status:         p.status ?? 'Active',
-});
+const normalize = (p) => {
+  const mentorName = p.mentor && typeof p.mentor === 'object' ? p.mentor.name : (typeof p.mentor === 'string' ? p.mentor : '');
+  return {
+    id:             p.trainingId,
+    program:        p.title,
+    mentor:         mentorName || '—',
+    mentorInitials: mentorName
+                      ? mentorName.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('')
+                      : '—',
+    students:       p.candidatesEnrolled ?? p.studentCount ?? 0,
+    completion:     p.completionPercentage != null ? `${p.completionPercentage}%` : '—',
+    attendance:     p.attendancePercentage  != null ? `${p.attendancePercentage}%`  : '—',
+    status:         p.status ?? 'Active',
+  };
+};
 
 export const TrainingManagement = () => {
   const [trainingData, setTrainingData] = useState([]);

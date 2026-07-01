@@ -14,6 +14,8 @@ import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
+import companyProfileRoutes from "./modules/company/routes/companyProfile.routes.js";
+import trainingRoutes from "./routes/trainingRoutes.js";
 
 import dotenv from "dotenv";
 
@@ -45,6 +47,8 @@ app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/admin/company", companyRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
+app.use("/api/v1/company", companyProfileRoutes);
+app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
