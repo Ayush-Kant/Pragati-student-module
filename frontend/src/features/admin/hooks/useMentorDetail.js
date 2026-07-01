@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getMentorById, getMentorPerformance } from "../services/adminService";
+// import { getMentorPerformance } from "../services/adminService";
 
 export default function useMentorDetail() {
   const { id } = useParams();
@@ -53,9 +53,9 @@ export default function useMentorDetail() {
         setError(null);
 
         // Try to fetch from API
-        const performanceData = await getMentorPerformance(id);
+        // const performanceData = await getMentorPerformance(id);
 
-        setPerformance(performanceData);
+        // setPerformance(performanceData);
       } catch (err) {
         console.warn("Backend unavailable, using mock mentor performance");
         // Use mock data if backend is unavailable

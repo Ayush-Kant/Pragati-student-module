@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS recruitment_drives (
   id         SERIAL PRIMARY KEY,
   title      VARCHAR(255) NOT NULL,
   company_id INTEGER NOT NULL REFERENCES companies(id),
-  mentor_id  INTEGER REFERENCES users(id),
+  mentor_id  INTEGER REFERENCES mentors(id),
   status     VARCHAR(50) NOT NULL DEFAULT 'active'
              CHECK (status IN ('active','closed','draft')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

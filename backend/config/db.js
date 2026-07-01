@@ -1,4 +1,3 @@
-
 import pg from "pg";
 import dotenv from "dotenv";
 import dns from "dns";
@@ -15,9 +14,10 @@ const pgConfig = {
   max: 5,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 15000,
-  ssl: process.env.NODE_ENV === "production"
-    ? { rejectUnauthorized: true }
-    : false,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: true }
+      : false,
 };
 
 export const pool = new Pool(pgConfig);
@@ -32,4 +32,4 @@ export const connectDB = async () => {
   }
 };
 
-export default pool;
+export default connectDB;

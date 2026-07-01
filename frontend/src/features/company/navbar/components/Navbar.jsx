@@ -626,7 +626,7 @@ const Navbar = () => {
           {/* Settings icon (existing) */}
           <div
             className="nav-icon"
-            onClick={() => navigate("/settings")}
+            onClick={() => navigate("/company/settings")}
             style={{ cursor: "pointer" }}
           >
             <FiSettings size={18} />

@@ -1,28 +1,15 @@
 import axios from "axios";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:5000";
-
 const API = axios.create({
-  baseURL: API_URL,
-});
-
-const getConfig = () => ({
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
+  baseURL: "http://localhost:5000",
 });
 
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => Promise.reject(error),
@@ -35,112 +22,24 @@ API.interceptors.response.use(
       localStorage.removeItem("token");
       window.location.href = "/login";
     }
-
     return Promise.reject(error);
   },
 );
 
-/* =========================
-   ADMIN PROFILE
-========================= */
+const getConfig = () => ({
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+});
 
 export const getAdminProfile = async () => {
-  const response = await API.get("/profile", getConfig());
+  const response = await API.get("/profile");
   return response.data;
 };
 
 export const updateAdminProfile = async (profileData) => {
-  const response = await API.put("/profile", profileData, getConfig());
+  const response = await API.put("/profile", profileData);
   return response.data;
-};
-
-/* =========================
-   MENTOR MANAGEMENT
-========================= */
-
-// Get all mentors
-export const getMentors = async () => {
-  const response = await API.get(
-    "/mentors",
-    getConfig()
-  );
-  return response.data;
-};
-
-// Get mentor details
-export const getMentorById = async (mentorId) => {
-  const response = await API.get(
-    `/mentors/${mentorId}`,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Get mentor performance
-export const getMentorPerformance = async (mentorId) => {
-  const response = await API.get(
-    `/mentors/${mentorId}/performance`,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Register mentor
-export const registerMentor = async (mentorData) => {
-  const response = await API.post(
-    "/mentors",
-    mentorData,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Assign mentor to batch
-export const assignMentor = async (
-  mentorId,
-  assignData
-) => {
-  const response = await API.patch(
-    `/mentors/${mentorId}/assign`,
-    assignData,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Replace mentor
-export const replaceMentor = async (
-  mentorId,
-  replaceData
-) => {
-  const response = await API.patch(
-    `/mentors/${mentorId}/replace`,
-    replaceData,
-    getConfig()
-  );
-  return response.data;
-};
-
-// Delete mentor
-export const deleteMentor = async (mentorId) => {
-  const response = await API.delete(
-    `/mentors/${mentorId}`,
-    getConfig()
-  );
-  return response.data;
-};
-
-export const createMentor = async (mentorData) => {
-  try {
-    const response = await API.post(
-      "/api/v1/admin/mentors",
-      mentorData,
-      getConfig()
-    );
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
 };
 
 //For college needing recruitment
@@ -170,6 +69,7 @@ export const approveCollege = async (id) => {
     const response = await API.put(`/api/v1/admin/colleges/${id}/approve`);
     return response.data;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -181,6 +81,8 @@ export const rejectCollege = async (id, reason) => {
     });
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -192,36 +94,55 @@ export const suspendCollege = async (id, reason) => {
     });
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
-
+<<<<<<< HEAD
 export const fetchDashboardStats = async () => {
   const response = await API.get("/api/admin/dashboard/stats");
+=======
+
+export const createMentor = registerMentor;
+export const deleteMentor = removeMentor;
+
+export const fetchDashboardStats = async () => {
+  const response = await API.get("/api/v1/admin/dashboard/stats", getConfig());
+>>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
   return response.data;
 };
 
 export const fetchDashboardFunnel = async () => {
+<<<<<<< HEAD
   const response = await API.get("/api/admin/dashboard/funnel");
+=======
+  const response = await API.get("/api/v1/admin/dashboard/funnel", getConfig());
+>>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
   return response.data;
 };
 
 export const fetchCompanyStats = async () => {
+<<<<<<< HEAD
   const response = await API.get("/api/admin/dashboard/company-stats");
+=======
+  const response = await API.get("/api/v1/admin/dashboard/company-stats", getConfig());
+>>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
   return response.data;
 };
 
 export const fetchCollegePerformance = async () => {
-  const response = await API.get(
-    "/api/admin/dashboard/college-performance"
-  );
+<<<<<<< HEAD
+  const response = await API.get("/api/admin/dashboard/college-performance");
+=======
+  const response = await API.get("/api/v1/admin/dashboard/college-performance", getConfig());
+>>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
   return response.data;
 };
 
 export const fetchActivityFeed = async () => {
-  const response = await API.get(
-    "/api/admin/dashboard/activity-feed"
-  );
+<<<<<<< HEAD
+  const response = await API.get("/api/admin/dashboard/activity-feed");
   return response.data;
 };
 
@@ -328,6 +249,8 @@ export const getDriveById = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     return mockDriveDetail;
   }
 };
@@ -345,6 +268,8 @@ export const getCandidates = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     return mockCandidates;
   }
 };
@@ -366,6 +291,8 @@ export const advanceDrive = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -387,6 +314,8 @@ export const freezeDrive = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -408,6 +337,8 @@ export const unfreezeDrive = async (driveId) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -429,6 +360,8 @@ export const moveCandidate = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -450,6 +383,8 @@ export const shortlistCandidates = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -471,6 +406,8 @@ export const assignTest = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -492,6 +429,8 @@ export const assignCourse = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
@@ -513,6 +452,105 @@ export const updateDrive = async (driveId, payload) => {
 
     return response.data;
   } catch (error) {
-    return { success: true, mentorId };
+    console.log(error);
+
+    throw error;
   }
 };
+
+const getToken = () => localStorage.getItem("token");
+
+export const getAssessmentById = async (assessmentId) => {
+  const response = await API.get(`/api/v1/admin/assessments/${assessmentId}`, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+
+  return response.data;
+};
+
+export const addQuestion = async (assessmentId, payload) => {
+  const response = await API.post(
+    `/api/v1/admin/assessments/${assessmentId}/questions`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    },
+  );
+
+  return response.data;
+};
+
+export const updateQuestion = async (assessmentId, questionId, payload) => {
+  const response = await API.put(
+    `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    },
+  );
+
+  return response.data;
+};
+
+export const deleteQuestion = async (assessmentId, questionId) => {
+  const response = await API.delete(
+    `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    },
+  );
+
+  return response.data;
+};
+
+export const publishAssessment = async (assessmentId) => {
+  const response = await API.patch(
+    `/api/v1/admin/assessments/${assessmentId}/publish`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    },
+  );
+
+  return response.data;
+};
+
+export const getDrives = async () => {
+  const response = await API.get("/api/v1/admin/drives", {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+
+  return response.data;
+};
+
+export const assignAssessment = async (assessmentId, payload) => {
+  const response = await API.post(
+    `/api/v1/admin/assessments/${assessmentId}/assign`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    },
+  );
+
+  return response.data;
+};
+=======
+  const response = await API.get("/api/v1/admin/dashboard/activity-feed", getConfig());
+  return response.data;
+};
+
+>>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
