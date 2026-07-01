@@ -2,7 +2,7 @@ import { DriveRow } from './DriveRow';
 
 export const DrivesTable = ({ drives, onView, onEdit, onViewCandidates, onChangeStage, onDelete }) => {
   return (
-    <div className="responsive-table-wrap bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+    <div className="responsive-table-wrap overflow-x-auto bg-white border border-gray-100 rounded-2xl shadow-sm">
       <table className="w-full">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50">
