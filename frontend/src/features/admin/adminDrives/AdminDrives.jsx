@@ -1,6 +1,5 @@
-import DriveManagement from '../pages/DriveManagement';
+import React from 'react';
 
 export default function AdminDrives() {
   return <DriveManagement />;
 }
-
