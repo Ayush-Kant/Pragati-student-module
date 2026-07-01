@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Mail, Users, Send, CheckSquare, Square } from 'lucide-react';
-import "../../styles/companyDashboard.css";
+import "../styles/companyDashboard.css";
 
 const templates = {
   custom: {
