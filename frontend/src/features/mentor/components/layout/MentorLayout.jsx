@@ -44,10 +44,16 @@ export default function MentorLayout() {
     icon: <ListTodo className="w-5 h-5" />,
   },
   {
+  name: "Submission Monitoring",
+  path: "/mentor/submission-monitoring",
+  icon: <LineChart className="w-5 h-5" />,
+},
+  {
     name: "Reports & Analytics",
     path: "/mentor/export-report",
     icon: <LineChart className="w-5 h-5" />,
   },
+
   {
     name: "Settings",
     path: "/mentor/settings",
