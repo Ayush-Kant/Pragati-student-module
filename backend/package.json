@@ -11,17 +11,27 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
-    "dns": "^0.1.2",
+    "curl": "^0.1.4",
+    "dns": "^0.2.2",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+
+
     "helmet": "^8.2.0",
     "joi": "^18.2.3",
+
     "jsonwebtoken": "^9.0.3",
     "node-pg": "^1.0.1",
-    "nodemon": "^3.1.14",
     "pg": "^8.21.0",
     "resend": "^6.12.3",
+
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+
     "sequelize": "^6.37.8"
   },
   "devDependencies": {
@@ -30,5 +40,6 @@
     "jest": "^30.4.2",
     "prettier": "^3.9.4",
     "supertest": "^7.2.2"
+
   }
 }
