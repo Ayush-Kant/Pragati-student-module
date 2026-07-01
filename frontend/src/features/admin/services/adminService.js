@@ -31,6 +31,7 @@ const getConfig = () => ({
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 });
+const getHeaders = () => getConfig();
 
 export const getAdminProfile = async () => {
   const response = await API.get("/profile");
@@ -1054,9 +1055,77 @@ export const deleteMentor = async (mentorId) => {
     return { success: true, mentorId };
   }
 };
-=======
 
+/* ===========================================
+   Disputes
+=========================================== */
 
+export const getDisputes = async (params = {}) => {
+  const response = await API.get(
+    "/api/v1/admin/disputes",
+    {
+      ...getHeaders(),
+      params,
+    }
+  );
+
+  return response.data;
+};
+
+export const getDisputeById = async (id) => {
+  const response = await API.get(
+    `/api/v1/admin/disputes/${id}`,
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const reviewDispute = async (id) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/review`,
+    {},
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+export const resolveDispute = async (id, resolution) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/resolve`,
+    {
+      resolution,
+    },
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+export const escalateDispute = async (id, reason) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/escalate`,
+    {
+      reason,
+    },
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+export const addDisputeNote = async (id, note) => {
+  const response = await API.post(
+    `/api/v1/admin/disputes/${id}/notes`,
+    {
+      note,
+    },
+    getHeaders()
+  );
+
+  return response.data;
+};
 
 /* ===========================================
    Disputes
@@ -1143,4 +1212,215 @@ export const addDisputeNote = async (
 
   return response.data;
 };
+<<<<<<< HEAD
 >>>>>>> 3fb0e17 (feat: implement dispute resolution frontend)
+=======
+  const response = await API.get("/api/v1/admin/dashboard/activity-feed", getConfig());
+  return response.data;
+};
+
+<<<<<<< HEAD
+=======
+// Mentor Management APIs
+
+export const getMentors = async () => {
+  if (USE_MOCK_DATA) {
+    return mockMentors;
+  }
+
+  try {
+    const response = await API.get("/api/v1/admin/mentors");
+    return response.data;
+  } catch (error) {
+    return mockMentors;
+  }
+};
+
+export const getMentorById = async (mentorId) => {
+  if (USE_MOCK_DATA) {
+    const mentor = mockMentors.find((m) => m.id === mentorId);
+    return mentor || mockMentors[0];
+  }
+
+  try {
+    const response = await API.get(`/api/v1/admin/mentors/${mentorId}`);
+    return response.data;
+  } catch (error) {
+    const mentor = mockMentors.find((m) => m.id === mentorId);
+    return mentor || mockMentors[0];
+  }
+};
+
+export const getMentorPerformance = async (mentorId) => {
+  if (USE_MOCK_DATA) {
+    return {
+      ...mockMentorPerformance,
+      mentor: {
+        ...mockMentorPerformance.mentor,
+        id: mentorId,
+      },
+    };
+  }
+
+  try {
+    const response = await API.get(`/api/v1/admin/mentors/${mentorId}/performance`);
+    return response.data;
+  } catch (error) {
+    return {
+      ...mockMentorPerformance,
+      mentor: {
+        ...mockMentorPerformance.mentor,
+        id: mentorId,
+      },
+    };
+  }
+};
+
+export const createMentor = async (mentorData) => {
+  if (USE_MOCK_DATA) {
+    return { success: true, data: mentorData };
+  }
+
+  try {
+    const response = await API.post("/api/v1/admin/mentors", mentorData);
+    return response.data;
+  } catch (error) {
+    return { success: true, data: mentorData };
+  }
+};
+
+export const assignMentor = async (mentorId, batchId) => {
+  if (USE_MOCK_DATA) {
+    return { success: true, mentorId, batchId };
+  }
+
+  try {
+    const response = await API.patch(
+      `/api/v1/admin/mentors/${mentorId}/assign`,
+      { batchId }
+    );
+    return response.data;
+  } catch (error) {
+    return { success: true, mentorId, batchId };
+  }
+};
+
+export const replaceMentor = async (mentorId, newMentorId) => {
+  if (USE_MOCK_DATA) {
+    return { success: true, mentorId, newMentorId };
+  }
+
+  try {
+    const response = await API.patch(
+      `/api/v1/admin/mentors/${mentorId}/replace`,
+      { newMentorId }
+    );
+    return response.data;
+  } catch (error) {
+    return { success: true, mentorId, newMentorId };
+  }
+};
+
+export const deleteMentor = async (mentorId) => {
+  if (USE_MOCK_DATA) {
+    return { success: true, mentorId };
+  }
+
+  try {
+    const response = await API.delete(`/api/v1/admin/mentors/${mentorId}`);
+    return response.data;
+  } catch (error) {
+    return { success: true, mentorId };
+  }
+};
+
+
+
+
+/* ===========================================
+   Disputes
+=========================================== */
+
+// Get dispute list
+export const getDisputes = async (params = {}) => {
+  const response = await API.get(
+    "/api/v1/admin/disputes",
+    {
+      ...getHeaders(),
+      params,
+    }
+  );
+
+  return response.data;
+};
+
+// Get single dispute
+export const getDisputeById = async (id) => {
+  const response = await API.get(
+    `/api/v1/admin/disputes/${id}`,
+    getConfig()
+  );
+
+  return response.data;
+};
+
+// Mark dispute as In Review
+export const reviewDispute = async (id) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/review`,
+    {},
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+// Resolve dispute
+export const resolveDispute = async (
+  id,
+  resolution
+) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/resolve`,
+    {
+      resolution,
+    },
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+// Escalate dispute
+export const escalateDispute = async (
+  id,
+  reason
+) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/escalate`,
+    {
+      reason,
+    },
+    getHeaders()
+  );
+
+  return response.data;
+};
+
+// Add Admin Note
+export const addDisputeNote = async (
+  id,
+  note
+) => {
+  const response = await API.post(
+    `/api/v1/admin/disputes/${id}/notes`,
+    {
+      note,
+    },
+    getHeaders()
+  );
+
+  return response.data;
+};
+>>>>>>> 231f2d5 (feat: implement dispute resolution frontend)
+>>>>>>> ed209e1 (feat: implement dispute resolution frontend)
