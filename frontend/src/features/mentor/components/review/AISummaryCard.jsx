@@ -2,34 +2,37 @@ import { Sparkles } from "lucide-react";
 
 export default function AISummaryCard() {
   return (
-    <div className="mt-6 border rounded-xl p-5 bg-white">
+    <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6">
 
       <div className="flex items-start gap-4">
 
-        <div className="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center">
-          <Sparkles className="w-6 h-6 text-violet-600" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100">
+          <Sparkles
+            size={24}
+            className="text-violet-600"
+          />
         </div>
 
         <div className="flex-1">
 
-          <h3 className="font-semibold text-lg">
+          <h3 className="text-xl font-semibold text-gray-900">
             AI Analysis Summary
           </h3>
 
-          <p className="text-gray-500 mt-1 leading-6">
+          <p className="mt-2 text-gray-600 leading-7">
             Code structure is generally clean.
             Architecture aligns well with MVC.
-            Missing minor validation and
-            reusable utility extraction.
+            Missing minor validation and reusable
+            utility extraction.
           </p>
 
-          <div className="flex gap-3 mt-4">
+          <div className="mt-5 flex flex-wrap gap-3">
 
-            <span className="px-3 py-1 rounded-md bg-gray-100 text-sm">
+            <span className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700">
               Strength: Routing
             </span>
 
-            <span className="px-3 py-1 rounded-md bg-gray-100 text-sm">
+            <span className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700">
               Weakness: Error Handling
             </span>
 

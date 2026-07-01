@@ -112,7 +112,8 @@ export default function MentorLayout() {
     <div
       style={{
         display: "flex",
-        minHeight: "100vh",
+        height: "100vh",
+        overflow: "hidden",
         backgroundColor: "#f8fafc",
         fontFamily: '"Inter", sans-serif',
         margin: 0,
@@ -260,12 +261,14 @@ export default function MentorLayout() {
       {/* 2. RIGHT SIDE CONTENT CANVAS */}
       <div
         style={{
-          flex: 1,
-          marginLeft: "260px",
-          display: "flex",
-          flexDirection: "column",
-          minWidth: 0,
-        }}
+  flex: 1,
+  marginLeft: "260px",
+  display: "flex",
+  flexDirection: "column",
+  minWidth: 0,
+  height: "100vh",
+  overflow: "hidden",
+}}
       >
         {/* Top Header Navigation Bar */}
         <div
@@ -358,15 +361,18 @@ export default function MentorLayout() {
         </div>
 
         {/* Inner Content Injection Frame */}
-        <div
-          style={{
-            padding: "32px 40px",
-            boxSizing: "border-box",
-            width: "100%",
-          }}
-        >
-          <Outlet />
-        </div>
+<div
+  style={{
+    flex: 1,
+    overflowY: "auto",
+    padding: "32px 40px",
+    boxSizing: "border-box",
+    width: "100%",
+    minHeight: 0,
+  }}
+>
+  <Outlet />
+</div>
       </div>
     </div>
   );

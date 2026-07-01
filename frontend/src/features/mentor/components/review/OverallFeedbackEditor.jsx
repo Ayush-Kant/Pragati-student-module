@@ -31,26 +31,21 @@ export default function OverallFeedbackEditor() {
       </div>
 
       <textarea
-        rows={8}
-        placeholder="Write comprehensive feedback here..."
-        className="w-full p-5 resize-none outline-none"
-      />
+  rows={8}
+  placeholder="Write comprehensive feedback here..."
+  className="
+    w-full
+    p-5
+    resize-none
+    outline-none
+    border-0
+    focus:ring-0
+    text-gray-700
+    placeholder:text-gray-400
+  "
+/>
 
-      <div className="border-t flex justify-end gap-3 p-4 bg-gray-50">
-
-        <button className="px-6 py-2 rounded-lg border hover:bg-gray-100">
-          Save Draft
-        </button>
-
-        <button className="px-6 py-2 rounded-lg border hover:bg-gray-100">
-          Preview
-        </button>
-
-        <button className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-          Publish Grade
-        </button>
-
-      </div>
+      
 
     </div>
   );
