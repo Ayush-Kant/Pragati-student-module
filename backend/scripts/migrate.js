@@ -89,6 +89,7 @@ function splitSqlStatements(sql) {
   let doubleQuote = false;
   let lineComment = false;
   let blockComment = false;
+  let dollarQuote = false;
 
   for (let i = 0; i < sql.length; i += 1) {
     const char = sql[i];
@@ -112,6 +113,16 @@ function splitSqlStatements(sql) {
       continue;
     }
 
+    if (dollarQuote) {
+      current += char;
+      if (char === "$" && next === "$") {
+        current += next;
+        i += 1;
+        dollarQuote = false;
+      }
+      continue;
+    }
+
     if (singleQuote) {
       current += char;
       if (char === "'" && next === "'") {
@@ -131,6 +142,13 @@ function splitSqlStatements(sql) {
       } else if (char === '"') {
         doubleQuote = false;
       }
+      continue;
+    }
+
+    if (char === "$" && next === "$") {
+      dollarQuote = true;
+      current += char + next;
+      i += 1;
       continue;
     }
 
