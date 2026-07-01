@@ -1,47 +1,70 @@
+import AISummaryCard from "./AISummaryCard";
+import ScoreSummary from "./ScoreSummary";
+import RubricCriterionCard from "./RubricCriterionCard";
+import OverallFeedbackEditor from "./OverallFeedbackEditor";
+
 export default function RubricPanel() {
-  return (
 
-    <div
-      className="
-      bg-white
-      rounded-xl
-      border
-      border-gray-200
-      h-[720px]
-      "
-    >
+    return (
 
-      <div className="border-b px-5 py-4">
+        <div className="flex flex-col h-full">
 
-        <h2 className="font-bold text-xl">
+            <div className="flex justify-between items-start">
 
-          Grading Rubric
+                <div>
 
-        </h2>
+                    <h2 className="text-2xl font-bold">
+                        Grading Rubric
+                    </h2>
 
-        <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-gray-500 mt-1">
+                        Reviewing against Standard Enterprise Criteria
+                    </p>
 
-          Reviewing against Standard Enterprise Criteria
+                </div>
 
-        </p>
+                <ScoreSummary/>
 
-      </div>
+            </div>
 
-      <div
-        className="
-        flex
-        items-center
-        justify-center
-        h-full
-        text-gray-400
-        "
-      >
+            <AISummaryCard/>
 
-        Rubric Panel
+            <h3 className="font-semibold text-lg mt-6 mb-4">
+                Scoring Criteria
+            </h3>
 
-      </div>
+            <div className="space-y-4">
 
-    </div>
+                <RubricCriterionCard
+                    title="Architecture & Design"
+                    description="Appropriate separation of concerns."
+                    score={13}
+                />
 
-  );
+                <RubricCriterionCard
+                    title="Code Quality"
+                    description="Readable and maintainable code."
+                    score={14}
+                />
+
+                <RubricCriterionCard
+                    title="Performance"
+                    description="Efficient implementation."
+                    score={12}
+                />
+
+                <RubricCriterionCard
+                    title="Documentation"
+                    description="Comments and documentation."
+                    score={11}
+                />
+
+            </div>
+
+            <OverallFeedbackEditor />
+
+        </div>
+
+    );
+
 }

@@ -1,8 +1,13 @@
+import { useState } from "react";
+
 import FileExplorer from "../components/review/FileExplorer";
 import SubmissionViewer from "../components/review/SubmissionViewer";
 import RubricPanel from "../components/review/RubricPanel";
 
 export default function ReviewGradingPage() {
+
+  const [selectedFile, setSelectedFile] = useState("app.js");
+
   return (
     <div className="space-y-5">
 
@@ -31,12 +36,12 @@ export default function ReviewGradingPage() {
 
           <button
             className="
-            px-4
-            py-2
-            rounded-lg
-            border
-            text-blue-600
-            hover:bg-blue-50
+              px-4
+              py-2
+              rounded-lg
+              border
+              text-blue-600
+              hover:bg-blue-50
             "
           >
             Open Full
@@ -50,15 +55,20 @@ export default function ReviewGradingPage() {
 
       <div
         className="
-        grid
-        grid-cols-[280px_1fr_420px]
-        gap-5
+          grid
+          grid-cols-[280px_1fr_420px]
+          gap-5
         "
       >
 
-        <FileExplorer />
+        <FileExplorer
+          selectedFile={selectedFile}
+          onSelect={setSelectedFile}
+        />
 
-        <SubmissionViewer />
+        <SubmissionViewer
+          selectedFile={selectedFile}
+        />
 
         <RubricPanel />
 

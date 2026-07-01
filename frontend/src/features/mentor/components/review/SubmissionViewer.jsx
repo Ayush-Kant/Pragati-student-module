@@ -1,37 +1,58 @@
-export default function SubmissionViewer() {
+import PreviewTabs from "./PreviewTabs";
+import CodeViewer from "./CodeViewer";
+
+export default function SubmissionViewer({ selectedFile }) {
+
+  const fileContent = {
+    "app.js": `const express = require("express");
+
+const app = express();
+
+const port = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+
+// Routes
+app.get("/api/products", (req, res) => {
+    res.json({ message: "Products List" });
+});
+
+app.listen(port, () => {
+    console.log("Server running");
+});
+`,
+
+    "routes.js": `const router = require("express").Router();
+
+router.get("/users", (req, res) => {
+    res.json(["John", "Alex"]);
+});
+
+module.exports = router;
+`,
+
+    "package.json": `{
+  "name": "ecommerce-api",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^5.0.0"
+  }
+}`
+  };
+
   return (
 
-    <div
-      className="
-      bg-white
-      rounded-xl
-      border
-      border-gray-200
-      h-[720px]
-      "
-    >
+    <div className="bg-white border rounded-xl overflow-hidden">
 
-      <div className="border-b px-5 py-4 font-semibold">
+      <PreviewTabs />
 
-        Submission Viewer
-
-      </div>
-
-      <div
-        className="
-        h-full
-        flex
-        items-center
-        justify-center
-        text-gray-400
-        "
-      >
-
-        Code Viewer
-
-      </div>
+      <CodeViewer
+        code={fileContent[selectedFile]}
+      />
 
     </div>
 
   );
+
 }

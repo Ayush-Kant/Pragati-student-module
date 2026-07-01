@@ -8,6 +8,7 @@ import { ActivityProvider } from "../context/ActivityContext";
 import Activities from "../pages/Activities";
 import CreateActivity from "../pages/CreateActivity";
 import SubmissionMonitoringPage from "../pages/SubmissionMonitoringPage";
+import ReviewGradingPage from "../pages/ReviewGradingPage";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
