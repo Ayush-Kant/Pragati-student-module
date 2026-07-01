@@ -145,6 +145,249 @@ export const exportStudents = async (params = {}) => {
   }
 };
 
+const STORAGE_KEY = "trainingPrograms";
+
+export const adminService = {
+
+  async getTrainingProgramById(programId) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const program =
+      programs.find(
+        (item) => item.id === programId
+      );
+
+    return {
+      data:
+        program || null,
+    };
+
+  },
+
+  async updateTrainingProgram(updatedProgram) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) =>
+        program.id === updatedProgram.id
+          ? updatedProgram
+          : program
+      );
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+      data: updatedProgram,
+    };
+
+  },
+
+  async assignMentor(programId, mentor) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) =>
+
+        program.id === programId
+          ? {
+              ...program,
+              mentor,
+            }
+          : program
+
+      );
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },
+
+  async archiveTrainingProgram(programId) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) =>
+
+        program.id === programId
+          ? {
+              ...program,
+              status: "archived",
+            }
+          : program
+
+      );
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },
+
+  async addModule(programId, moduleData) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) => {
+
+        if (program.id !== programId)
+          return program;
+
+        const modules =
+          program.modules || [];
+
+        return {
+
+          ...program,
+
+          modules: [
+
+            ...modules,
+
+            {
+              id: `module_${Date.now()}`,
+              ...moduleData,
+            },
+
+          ],
+
+          modulesCount:
+            modules.length + 1,
+
+        };
+
+      });
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },
+
+  async updateModule(programId, updatedModule) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) => {
+
+        if (program.id !== programId)
+          return program;
+
+        return {
+
+          ...program,
+
+          modules:
+            (program.modules || []).map(
+              (module) =>
+
+                module.id === updatedModule.id
+                  ? updatedModule
+                  : module
+
+            ),
+
+        };
+
+      });
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },
+
+  async deleteModule(programId, moduleId) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) => {
+
+        if (program.id !== programId)
+          return program;
+
+        const modules =
+          (program.modules || []).filter(
+            (module) =>
+              module.id !== moduleId
+          );
+
+        return {
+
+          ...program,
+
+          modules,
+
+          modulesCount:
+            modules.length,
+
+        };
+
+      });
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },};
+
 //For college needing recruitment
 export const getNeedsRecruitment = async () => {
   try {
