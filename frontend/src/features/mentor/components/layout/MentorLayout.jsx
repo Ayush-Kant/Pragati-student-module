@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import {
   LayoutDashboard,
@@ -15,37 +15,46 @@ import {
 } from "lucide-react";
 
 export default function MentorLayout() {
+  const location = useLocation();
   const navigate = useNavigate();
 
   const menuItems = [
     {
       name: "Dashboard",
-      active: true,
+      path: "/mentor/dashboard",
       icon: <LayoutDashboard className="w-5 h-5" />,
     },
-    { name: "My Mentees", active: false, icon: <Users className="w-5 h-5" /> },
+    { name: "My Mentees", path: "#", icon: <Users className="w-5 h-5" /> },
     {
       name: "Sessions",
-      active: false,
+      path: "#",
       icon: <CalendarDays className="w-5 h-5" />,
     },
     {
       name: "Assessments",
-      active: false,
+      path: "/mentor/question-bank",
       icon: <ClipboardList className="w-5 h-5" />,
     },
     {
       name: "Tasks & Assignments",
-      active: false,
+      path: "/mentor/activities",
       icon: <ListTodo className="w-5 h-5" />,
     },
     {
       name: "Reports & Analytics",
-      active: false,
+      path: "/mentor/export-report",
       icon: <LineChart className="w-5 h-5" />,
     },
-    { name: "Settings", active: false, icon: <Settings className="w-5 h-5" /> },
+    { name: "Settings", path: "#", icon: <Settings className="w-5 h-5" /> },
   ];
+
+  const isItemActive = (item) => {
+    if (item.path === "#") return false;
+    if (item.path === "/mentor/dashboard") {
+      return location.pathname === "/mentor/dashboard" || location.pathname === "/mentor";
+    }
+    return location.pathname.startsWith(item.path);
+  };
 
   const [{ mentorName, initials }] = useState(() => {
     try {
@@ -172,7 +181,7 @@ export default function MentorLayout() {
           {menuItems.map((item, idx) => (
             <div
               key={idx}
-              onClick={() => navigate(item.path)}
+              onClick={() => {console.log("Clicked:", item);navigate(item.path)}}
               style={{
                 display: "flex",
                 alignItems: "center",

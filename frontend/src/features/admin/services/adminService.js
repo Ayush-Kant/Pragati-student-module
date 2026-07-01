@@ -12,7 +12,7 @@ API.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 API.interceptors.response.use(
@@ -23,8 +23,15 @@ API.interceptors.response.use(
       window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
+
+const getConfig = () => ({
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+});
+
 export const getAdminProfile = async () => {
   const response = await API.get("/profile");
   return response.data;
@@ -38,101 +45,85 @@ export const updateAdminProfile = async (profileData) => {
 //For college needing recruitment
 export const getNeedsRecruitment = async () => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/colleges/needs-recruitment"
-    );
+    const response = await API.get("/api/v1/admin/colleges/needs-recruitment");
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 //To fetch rankings of college
 export const getCollegeRankings = async () => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/colleges/rankings"
-    );
+    const response = await API.get("/api/v1/admin/colleges/rankings");
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 export const approveCollege = async (id) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/approve`
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/approve`);
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 };
 
-
-export const rejectCollege = async (
-  id,
-  reason
-) => {
+export const rejectCollege = async (id, reason) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/reject`,
-      {
-        reason
-      }
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/reject`, {
+      reason,
+    });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
 
-
-export const suspendCollege = async (
-  id,
-  reason
-) => {
+export const suspendCollege = async (id, reason) => {
   try {
-    const response = await API.put(
-      `/api/v1/admin/colleges/${id}/suspend`,
-      {
-        reason
-      }
-    );
+    const response = await API.put(`/api/v1/admin/colleges/${id}/suspend`, {
+      reason,
+    });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
+    console.log(error);
+
     throw error;
   }
 };
+
+export const createMentor = registerMentor;
+export const deleteMentor = removeMentor;
+
 export const fetchDashboardStats = async () => {
-  const response = await API.get("/api/admin/dashboard/stats");
+  const response = await API.get("/api/v1/admin/dashboard/stats", getConfig());
   return response.data;
 };
 
 export const fetchDashboardFunnel = async () => {
-  const response = await API.get("/api/admin/dashboard/funnel");
+  const response = await API.get("/api/v1/admin/dashboard/funnel", getConfig());
   return response.data;
 };
 
 export const fetchCompanyStats = async () => {
-  const response = await API.get("/api/admin/dashboard/company-stats");
+  const response = await API.get("/api/v1/admin/dashboard/company-stats", getConfig());
   return response.data;
 };
 
 export const fetchCollegePerformance = async () => {
-  const response = await API.get("/api/admin/dashboard/college-performance");
+  const response = await API.get("/api/v1/admin/dashboard/college-performance", getConfig());
   return response.data;
 };
 
 export const fetchActivityFeed = async () => {
-  const response = await API.get("/api/admin/dashboard/activity-feed");
+  const response = await API.get("/api/v1/admin/dashboard/activity-feed", getConfig());
   return response.data;
 };

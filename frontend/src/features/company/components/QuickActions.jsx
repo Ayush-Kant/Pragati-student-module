@@ -41,11 +41,11 @@ const QuickActions = () => {
   };
 
   const handleCreateDrive = () => {
-    navigate("/drives", { state: { openCreateDrive: true } });
+    navigate("/company/drives", { state: { openCreateDrive: true } });
   };
 
   const handleScheduleInterview = () => {
-    navigate("/interviews", { state: { openScheduleInterview: true } });
+    navigate("/company/interviews", { state: { openScheduleInterview: true } });
   };
 
   const handleSendNotification = (event) => {
