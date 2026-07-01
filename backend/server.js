@@ -29,10 +29,23 @@ app.use(express.json());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost"))
+      if (!origin) return callback(null, true);
+      
+      // Allow localhost and 127.0.0.1 (any port)
+      if (origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) {
         return callback(null, true);
+      }
+      
       const clientUrl = process.env.CLIENT_URL;
-      if (clientUrl && origin === clientUrl) return callback(null, true);
+      if (clientUrl) {
+        // Strip trailing slash for proper comparison
+        const normalizedClientUrl = clientUrl.replace(/\/$/, "");
+        const normalizedOrigin = origin.replace(/\/$/, "");
+        if (normalizedOrigin === normalizedClientUrl) {
+          return callback(null, true);
+        }
+      }
+      
       return callback(new Error(`CORS policy: origin ${origin} not allowed`));
     },
     credentials: true,
@@ -46,6 +59,11 @@ app.use("/api/mentor", contentRoutes);
 app.use("/api/v1/company", companyRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
+
+app.use("/api/v1/admin/disputes", adminDisputeRoutes);
+app.use("/api/v1/admin/notifications", adminNotificationRoutes);
+
+app.use(errorMiddleware);
 app.use("/api/v1", questionBankRouter);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {

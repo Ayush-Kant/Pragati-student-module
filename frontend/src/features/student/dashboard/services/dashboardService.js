@@ -1,7 +1,7 @@
 
 import { dashboardApiResponse, leaderboardData } from "../types/dashboardDummyData";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 const getHeaders = () => ({
   "Content-Type": "application/json",

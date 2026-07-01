@@ -12,11 +12,13 @@ import {
   Search,
   Bell,
   HelpCircle,
+  Briefcase,
 } from "lucide-react";
 
 export default function MentorLayout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const menuItems = [
     {
@@ -24,20 +26,29 @@ export default function MentorLayout() {
       path: "/mentor/dashboard",
       icon: <LayoutDashboard className="w-5 h-5" />,
     },
-    { name: "My Mentees", path: "#", icon: <Users className="w-5 h-5" /> },
+    {
+      name: "Projects",
+      path: "/mentor/projects/create",
+      icon: <Briefcase className="w-5 h-5" />,
+    },
+    {
+      name: "My Mentees",
+      path: "/mentor/mentees",
+      icon: <Users className="w-5 h-5" />,
+    },
     {
       name: "Sessions",
-      path: "#",
+      path: "/mentor/sessions",
       icon: <CalendarDays className="w-5 h-5" />,
     },
     {
       name: "Assessments",
-      path: "/mentor/question-bank",
+      path: "/mentor/assessments",
       icon: <ClipboardList className="w-5 h-5" />,
     },
     {
       name: "Tasks & Assignments",
-      path: "/mentor/activities",
+      path: "/mentor/tasks",
       icon: <ListTodo className="w-5 h-5" />,
     },
     {
