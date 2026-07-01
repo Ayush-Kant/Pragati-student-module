@@ -227,7 +227,7 @@ const ViewProgramModal = ({ program, onClose }) => {
   useEffect(() => {
     const fetchDetail = async () => {
       try {
-        const res = await api.get(`/api/v1/company/training/${program.id}`);
+        const res = await api.get(`/v1/company/training/${program.id}`);
         setDetail(res.data.data);
       } catch {
         toast.error('Failed to load program details');
