@@ -1,5 +1,5 @@
 import express from "express";
-import { connectDB } from "./config/db.js";
+import {connectDB} from "./config/db.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
@@ -13,7 +13,7 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRouter from "./routes/auth.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
-
+import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -45,8 +45,8 @@ app.use("/api/v1/company", companyRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
-
 app.use("/api/college/profile", collegeProfileRoutes);
+app.use("/api/college/dashboard", collegeDashboardRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.get("/", (req, res) => {
