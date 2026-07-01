@@ -938,3 +938,64 @@
   background:#fee2e2;
   color:#dc2626;
 }
+
+/* RESPONSIVE OVERRIDES */
+@media (max-width: 768px) {
+  .assessments-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .create-btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .filter-btn {
+    width: 100%;
+    justify-content: space-between !important;
+  }
+
+  .delete-modal {
+    width: 90% !important;
+    max-width: 480px;
+    padding: 24px 16px !important;
+  }
+
+  .delete-title {
+    font-size: 24px !important;
+  }
+
+  .delete-assessment-name {
+    font-size: 20px !important;
+  }
+
+  .delete-text {
+    font-size: 16px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .delete-btn-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .delete-confirm-btn,
+  .cancel-btn {
+    width: 100% !important;
+  }
+}
