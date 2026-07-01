@@ -26,14 +26,21 @@ import {
 /**
  * _resolveStudentId
  * -----------------
- * Resolves a user's auth UUID (`users.uuid_id`) to their integer
- * student PK (`students.id`).
+ * Resolves a user's auth UUID (`auth_users.uuid_id`) to their integer
+ * student PK (`students.id`) and display name.
  *
- * Uses the same join-condition caveat as the leaderboard service:
- * `students.id = users.id` (no explicit FK — relies on matching
- * auto-increment PKs).
+ * Join strategy
+ * ─────────────
+ * The `students` table has no `user_id` FK column (confirmed from schema).
+ * The safest available link between the two systems is the `email` field,
+ * which is declared UNIQUE NOT NULL in both `auth_users` and `students`.
  *
- * @param {string} uuidId - The `uuid_id` from the `users` table.
+ * Resolution chain:
+ *   auth_users  (uuid_id = $1)
+ *     → users        (users.auth_user_id = auth_users.id)
+ *     → students     (students.email    = auth_users.email)
+ *
+ * @param {string} uuidId - The `uuid_id` from the `auth_users` table.
  * @returns {Promise<{ studentId: number, fullName: string } | null>}
  */
 const _resolveStudentId = async (uuidId) => {
@@ -42,13 +49,14 @@ const _resolveStudentId = async (uuidId) => {
             `
             SELECT
                 s.id        AS "studentId",
-                u.full_name AS "fullName"
-            FROM users u
-            -- NOTE: students table lacks a user_id FK; this join relies on
-            -- matching auto-increment PKs. Consider adding an explicit FK
-            -- (e.g. students.user_id → users.id) in a future migration.
-            JOIN students s ON s.id = u.id
-            WHERE u.uuid_id = $1
+                s.full_name AS "fullName"
+            FROM auth_users au
+            -- Link auth identity to the profile record via auth_user_id
+            JOIN users u ON u.auth_user_id = au.id
+            -- Link profile to the students record via the shared UNIQUE email
+            -- (students has no user_id FK; email is the reliable common key)
+            JOIN students s ON s.email = au.email
+            WHERE au.uuid_id = $1
             `,
             [uuidId]
         );
@@ -249,7 +257,7 @@ const _buildCourseTree = (flatRows, enrolledCourses) => {
  * a fully assembled, serialized learning dashboard payload.
  *
  * @param {string} requestingUserId - UUID of the logged-in student
- *        (`users.uuid_id`).
+ *        (`auth_users.uuid_id`).
  * @returns {Promise<Object>} Serialized learning dashboard object.
  *
  * @throws {Error} If the requesting user does not exist or has no
