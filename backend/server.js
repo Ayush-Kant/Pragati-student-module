@@ -1,38 +1,31 @@
 import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+
 import { connectDB } from "./config/db.js";
+
+// Admin Routes
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
 import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
+import adminDriveRoutes from "./routes/admin.drive.routes.js";
+import adminNotificationRoutes from "./routes/admin.notification.routes.js";
+import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
+
+// Standard & Role-Specific Routes
+import authRouter from "./routes/auth.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
-import cors from "cors";
 import companyRoutes from "./routes/company.routes.js";
-import errorMiddleware from "./middleware/errorMiddleware.js";
-import authRouter from "./routes/auth.routes.js";
-import adminDriveRoutes from "./routes/admin.drive.routes.js";
+import companyProfileRoutes from "./modules/company/routes/companyProfile.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import questionBankRouter from "./routes/questionBank.routes.js";
-
-import dotenv from "dotenv";
-import cors from "cors";
-import { connectDB } from "./config/db.js";
-import authRouter from "./routes/auth.routes.js";
-import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
-import adminCollegeRoutes from "./routes/admin.college.routes.js";
-import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
-import adminNotificationRoutes from "./routes/admin.notification.routes.js";
-import contentRoutes from "./routes/content.routes.js";
-import notificationRoutes from "./routes/notification.routes.js";
-import companyRoutes from "./routes/company.routes.js";
-import adminDriveRoutes from "./routes/admin.drive.routes.js";
-import interviewRoutes from "./routes/interview.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
-import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
-import companyProfileRoutes from "./modules/company/routes/companyProfile.routes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
-import errorMiddleware from "./middleware/errorMiddleware.js";
 
+// Middleware
+import errorMiddleware from "./middleware/errorMiddleware.js";
 dotenv.config();
 
 console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
@@ -43,14 +36,18 @@ const PORT = process.env.PORT || 5000;
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) {
+      if (
+        !origin ||
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:")
+      ) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"), false);
       }
     },
     credentials: true,
-  })
+  }),
 );
 app.use(express.json());
 
@@ -78,11 +75,12 @@ app.get("/", (req, res) => {
 
 app.use(errorMiddleware);
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`✅ Server running on PORT : ${PORT}`);
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on PORT : ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ PostgreSQL connection failed:", err.message);
   });
-}).catch((err) => {
-  console.error("❌ PostgreSQL connection failed:", err.message);
-});
-
