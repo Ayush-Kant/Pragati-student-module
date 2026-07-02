@@ -5,17 +5,40 @@ import TeamComparisonTable from "../components/analytics/TeamComparisonTable";
 import PerformanceRadar from "../components/analytics/PerformanceRadar";
 import AnalyticsFilters from "../components/analytics/AnalyticsFilters";
 import useAnalytics from "../hooks/useAnalytics";
+import { useState } from "react";
 
 export default function AnalyticsDashboardPage() {
-    const analytics = useAnalytics();
+    
+    const [filters, setFilters] = useState({
+  project: "All Projects",
+  batch: "All Batches",
+  period: "This Week",
+});
 
-  if (!analytics) {
-    return (
-      <div className="flex justify-center items-center h-96 text-gray-500">
-        Loading analytics...
-      </div>
-    );
-  }
+const { analytics, loading, error } = useAnalytics(filters);
+
+function handleFilterChange(key, value) {
+  setFilters((prev) => ({
+    ...prev,
+    [key]: value,
+  }));
+}
+
+if (loading) {
+  return (
+    <div className="flex justify-center items-center h-96 text-gray-500">
+      Loading analytics...
+    </div>
+  );
+}
+
+if (error) {
+  return (
+    <div className="flex justify-center items-center h-96 text-red-500">
+      {error}
+    </div>
+  );
+}
   return (
     <div className="bg-slate-50">
 
@@ -30,7 +53,10 @@ export default function AnalyticsDashboardPage() {
           Understand project performance and assessment quality.
         </p>
 
-        <AnalyticsFilters />
+        <AnalyticsFilters
+  filters={filters}
+  onFilterChange={handleFilterChange}
+/>
 
       </div>
 

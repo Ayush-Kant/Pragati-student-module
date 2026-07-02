@@ -1,4 +1,9 @@
-export async function getAnalyticsData() {
+export async function getAnalyticsData(filters = {}) {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
+  console.log("Analytics Filters:", filters);
+
   return {
     kpis: {
       submissionRate: 92,

@@ -1,19 +1,49 @@
-export default function AnalyticsFilters() {
+export default function AnalyticsFilters({
+  filters,
+  onFilterChange,
+}) {
   return (
-    <div className="bg-white border rounded-xl p-4 mb-6 flex gap-4">
+    <div className="mt-8 mb-6 bg-white border rounded-xl p-4">
+      <div className="flex flex-wrap gap-4">
 
-      <select className="border rounded-lg px-4 py-2">
-        <option>All Projects</option>
-      </select>
+        <select
+          value={filters.project}
+          onChange={(e) =>
+            onFilterChange("project", e.target.value)
+          }
+          className="border rounded-lg px-4 py-2 bg-white"
+        >
+          <option>All Projects</option>
+          <option>Frontend</option>
+          <option>Backend</option>
+          <option>AI</option>
+        </select>
 
-      <select className="border rounded-lg px-4 py-2">
-        <option>All Batches</option>
-      </select>
+        <select
+          value={filters.batch}
+          onChange={(e) =>
+            onFilterChange("batch", e.target.value)
+          }
+          className="border rounded-lg px-4 py-2 bg-white"
+        >
+          <option>All Batches</option>
+          <option>Batch A</option>
+          <option>Batch B</option>
+          <option>Batch C</option>
+        </select>
 
-      <select className="border rounded-lg px-4 py-2">
-        <option>This Week</option>
-      </select>
+        <select
+          value={filters.period}
+          onChange={(e) =>
+            onFilterChange("period", e.target.value)
+          }
+          className="border rounded-lg px-4 py-2 bg-white"
+        >
+          <option>This Week</option>
+          <option>This Month</option>
+        </select>
 
+      </div>
     </div>
   );
 }

@@ -1,17 +1,32 @@
 import { useEffect, useState } from "react";
 import { getAnalyticsData } from "../services/analyticsService";
-
-export default function useAnalytics() {
+export default function useAnalytics(filters) {
   const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function loadAnalytics() {
-      const data = await getAnalyticsData();
-      setAnalytics(data);
+      try {
+        setLoading(true);
+
+       const data = await getAnalyticsData(filters);
+
+        setAnalytics(data);
+      } catch (err) {
+        console.error("Failed to load analytics:", err);
+        setError("Failed to load analytics.");
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadAnalytics();
-  }, []);
+  }, [filters]);
 
-  return analytics;
+  return {
+    analytics,
+    loading,
+    error,
+  };
 }
