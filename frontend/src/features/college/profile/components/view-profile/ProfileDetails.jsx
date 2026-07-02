@@ -46,7 +46,7 @@ export default function ProfileDetails({ profile }) {
                   Address
                 </label>
                 <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700 leading-relaxed">
                     {address}
                   </span>
@@ -58,7 +58,7 @@ export default function ProfileDetails({ profile }) {
                   Website
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Globe className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Globe className="w-4 h-4 text-gray-400 shrink-0" />
                   {website ? (
                     <a
                       href={`https://${website}`}
@@ -80,7 +80,7 @@ export default function ProfileDetails({ profile }) {
                   Email
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Mail className="w-4 h-4 text-gray-400 shrink-0" />
                   {email ? (
                     <a
                       href={`mailto:${email}`}
@@ -99,7 +99,7 @@ export default function ProfileDetails({ profile }) {
                   Phone
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Phone className="w-4 h-4 text-gray-400 shrink-0" />
                   {phone ? (
                     <a
                       href={`tel:${phone}`}
@@ -121,7 +121,7 @@ export default function ProfileDetails({ profile }) {
                   Contact Lead
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <User className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
                     {contact_lead}
                   </span>
@@ -133,7 +133,7 @@ export default function ProfileDetails({ profile }) {
                   Organization Type
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
                     {collegeType}
                   </span>
@@ -145,7 +145,7 @@ export default function ProfileDetails({ profile }) {
                   Recognition
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Award className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Award className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
                     {accreditation}
                   </span>
@@ -157,7 +157,7 @@ export default function ProfileDetails({ profile }) {
                   Learners Guided
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Users className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
                     {learners_guided}
                   </span>
@@ -169,7 +169,7 @@ export default function ProfileDetails({ profile }) {
                   About Uptoskills
                 </label>
                 <div className="flex items-start gap-2.5">
-                  <Info className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <Info className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700 leading-relaxed">
                     {aboutCollege}
                   </span>
@@ -208,7 +208,6 @@ export default function ProfileDetails({ profile }) {
 
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-gray-400 shrink-0" />
-
                 {email ? (
                   <a
                     href={`mailto:${email}`}
@@ -223,7 +222,6 @@ export default function ProfileDetails({ profile }) {
 
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-gray-400 shrink-0" />
-
                 {phone ? (
                   <a
                     href={`tel:${phone}`}

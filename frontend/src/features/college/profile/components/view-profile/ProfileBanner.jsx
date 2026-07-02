@@ -1,8 +1,8 @@
-import React from "react";
-import { Edit2, BadgeCheck } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Edit2, BadgeCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProfileBanner({ profile }) {
+
   const navigate = useNavigate();
 
   if (!profile) return null;
@@ -21,7 +21,7 @@ export default function ProfileBanner({ profile }) {
       <div className="flex flex-col md:flex-row gap-8 items-start">
 
         {/* Left: Logo */}
-        <div className="flex-shrink-0 flex justify-center w-full md:w-auto">
+        <div className="shrink-0 flex justify-center w-full md:w-auto">
           <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden bg-gray-50 border-4 border-white shadow-lg">
             {profile.logoUrl ? (
               <img
@@ -38,7 +38,7 @@ export default function ProfileBanner({ profile }) {
         </div>
 
         {/* Right: Info */}
-        <div className="flex-grow flex flex-col justify-between w-full">
+        <div className="grow flex flex-col justify-between w-full">
           <div>
             <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
               <div>
