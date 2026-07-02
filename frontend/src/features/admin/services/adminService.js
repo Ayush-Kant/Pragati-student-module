@@ -1346,7 +1346,7 @@ export const getDisputes = async (params = {}) => {
   const response = await API.get(
     "/api/v1/admin/disputes",
     {
-      ...getHeaders(),
+      ...getConfig(),
       params,
     }
   );
@@ -1369,7 +1369,7 @@ export const reviewDispute = async (id) => {
   const response = await API.patch(
     `/api/v1/admin/disputes/${id}/review`,
     {},
-    getHeaders()
+    getConfig()
   );
 
   return response.data;
@@ -1385,7 +1385,7 @@ export const resolveDispute = async (
     {
       resolution,
     },
-    getHeaders()
+    getConfig()
   );
 
   return response.data;
@@ -1401,7 +1401,7 @@ export const escalateDispute = async (
     {
       reason,
     },
-    getHeaders()
+    getConfig()
   );
 
   return response.data;
@@ -1417,7 +1417,7 @@ export const addDisputeNote = async (
     {
       note,
     },
-    getHeaders()
+    getConfig()
   );
 
   return response.data;
