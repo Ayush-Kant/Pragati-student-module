@@ -15,17 +15,10 @@ const collegeRoute = (
 
       <Route path="college" element={<CollegeLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
-
         <Route path="dashboard" element={<DashboardPage />} />
-
         <Route path="profile" element={<CollegeProfilePage />} />
-
         <Route path="students" element={<Students />} />
-
-        <Route
-          path="update-profile"
-          element={<OrganizationProfile />}
-        />
+        <Route path="update-profile" element={<OrganizationProfile />} />
       </Route>
     </Route>
   </Route>

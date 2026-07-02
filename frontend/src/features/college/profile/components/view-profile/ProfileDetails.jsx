@@ -1,4 +1,6 @@
+
 import React from 'react';
+
 import {
   MapPin,
   Globe,
@@ -46,7 +48,7 @@ export default function ProfileDetails({ profile }) {
                   Address
                 </label>
                 <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700 leading-relaxed">
                     {address}
                   </span>
@@ -58,7 +60,7 @@ export default function ProfileDetails({ profile }) {
                   Website
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Globe className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Globe className="w-4 h-4 text-gray-400 shrink-0" />
                   {website ? (
                     <a
                       href={`https://${website}`}
@@ -80,7 +82,7 @@ export default function ProfileDetails({ profile }) {
                   Email
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Mail className="w-4 h-4 text-gray-400 shrink-0" />
                   {email ? (
                     <a
                       href={`mailto:${email}`}
@@ -99,7 +101,7 @@ export default function ProfileDetails({ profile }) {
                   Phone
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Phone className="w-4 h-4 text-gray-400 shrink-0" />
                   {phone ? (
                     <a
                       href={`tel:${phone}`}
@@ -121,7 +123,7 @@ export default function ProfileDetails({ profile }) {
                   Contact Lead
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <User className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
                     {contact_lead}
                   </span>
@@ -133,7 +135,7 @@ export default function ProfileDetails({ profile }) {
                   Organization Type
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
                     {collegeType}
                   </span>
@@ -145,7 +147,7 @@ export default function ProfileDetails({ profile }) {
                   Recognition
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Award className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Award className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
                     {accreditation}
                   </span>
@@ -157,7 +159,7 @@ export default function ProfileDetails({ profile }) {
                   Learners Guided
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Users className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700">
                     {learners_guided}
                   </span>
@@ -169,7 +171,7 @@ export default function ProfileDetails({ profile }) {
                   About Uptoskills
                 </label>
                 <div className="flex items-start gap-2.5">
-                  <Info className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <Info className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <span className="text-sm font-semibold text-gray-700 leading-relaxed">
                     {aboutCollege}
                   </span>
@@ -189,9 +191,11 @@ export default function ProfileDetails({ profile }) {
           <div className="flex flex-col items-center text-center p-2">
 
             <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl border-2 border-emerald-100 shadow-sm mb-3 shrink-0 select-none">
+
               {contact_person
                 ? contact_person.split(" ").map((n) => n[0]).join("")
                 : "CP"}
+
             </div>
 
             <h4 className="text-base font-bold text-gray-800">
@@ -235,6 +239,93 @@ export default function ProfileDetails({ profile }) {
                   <span className="text-sm font-semibold text-gray-700">N/A</span>
                 )}
               </div>
+
+            </div>
+          </div>
+        </ProfileCard>
+
+        {/* Social Links Card */}
+        <ProfileCard title="Social Links">
+          <div className="space-y-4">
+
+            {/* Facebook */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FaFacebook className="w-4.5 h-4.5 text-[#1877F2]" />
+                <span className="text-sm font-bold text-gray-500">Facebook</span>
+              </div>
+              {socialLinks.facebook ? (
+                <a
+                  href={`https://${socialLinks.facebook}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-[#f26a1b] hover:underline"
+                >
+                  {socialLinks.facebook}
+                </a>
+              ) : (
+                <span className="text-sm font-semibold text-gray-700">N/A</span>
+              )}
+            </div>
+
+            {/* LinkedIn */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FaLinkedin className="w-4.5 h-4.5 text-[#0A66C2]" />
+                <span className="text-sm font-bold text-gray-500">LinkedIn</span>
+              </div>
+              {socialLinks.linkedin ? (
+                <a
+                  href={`https://${socialLinks.linkedin}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-[#f26a1b] hover:underline"
+                >
+                  {socialLinks.linkedin}
+                </a>
+              ) : (
+                <span className="text-sm font-semibold text-gray-700">N/A</span>
+              )}
+            </div>
+
+            {/* Twitter */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FaTwitter className="w-4.5 h-4.5 text-[#1DA1F2]" />
+                <span className="text-sm font-bold text-gray-500">Twitter</span>
+              </div>
+              {socialLinks.twitter ? (
+                <a
+                  href={`https://${socialLinks.twitter}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-[#f26a1b] hover:underline"
+                >
+                  {socialLinks.twitter}
+                </a>
+              ) : (
+                <span className="text-sm font-semibold text-gray-700">N/A</span>
+              )}
+            </div>
+
+            {/* Instagram */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FaInstagram className="w-4.5 h-4.5 text-[#E1306C]" />
+                <span className="text-sm font-bold text-gray-500">Instagram</span>
+              </div>
+              {socialLinks.instagram ? (
+                <a
+                  href={`https://${socialLinks.instagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-[#f26a1b] hover:underline"
+                >
+                  {socialLinks.instagram}
+                </a>
+              ) : (
+                <span className="text-sm font-semibold text-gray-700">N/A</span>
+              )}
 
             </div>
 
