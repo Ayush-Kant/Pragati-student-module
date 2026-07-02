@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import {
   LayoutDashboard,
@@ -7,7 +7,9 @@ import {
   CalendarDays,
   ClipboardList,
   ListTodo,
-  LineChart,
+  MonitorCheck,
+  BarChart3,
+  FileBarChart,
   Settings,
   Search,
   Bell,
@@ -16,6 +18,7 @@ import {
 
 export default function MentorLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
   {
@@ -46,13 +49,18 @@ export default function MentorLayout() {
   {
   name: "Submission Monitoring",
   path: "/mentor/submission-monitoring",
-  icon: <LineChart className="w-5 h-5" />,
+  icon: <MonitorCheck className="w-5 h-5" />,
+},
+{
+  name: "Project Analytics",
+  path: "/mentor/project-analytics",
+  icon: <BarChart3 className="w-5 h-5" />,
 },
   {
-    name: "Reports & Analytics",
-    path: "/mentor/export-report",
-    icon: <LineChart className="w-5 h-5" />,
-  },
+  name: "Reports & Analytics",
+  path: "/mentor/export-report",
+  icon: <FileBarChart className="w-5 h-5" />,
+},
 
   {
     name: "Settings",
@@ -195,11 +203,26 @@ export default function MentorLayout() {
                 padding: "12px 14px",
                 borderRadius: "10px",
                 cursor: "pointer",
-                backgroundColor: item.active ? "#f0f9ff" : "transparent",
-                color: item.active ? "#0284c7" : "#64748b",
-                fontWeight: item.active ? "600" : "500",
+                backgroundColor:
+  location.pathname === item.path
+    ? "#EAF2FF"
+    : "transparent",
+
+color:
+  location.pathname === item.path
+    ? "#2563EB"
+    : "#64748b",
+
+fontWeight:
+  location.pathname === item.path
+    ? "600"
+    : "500",
                 fontSize: "14px",
                 transition: "all 0.2s",
+                boxShadow:
+  location.pathname === item.path
+    ? "0 1px 3px rgba(37,99,235,0.12)"
+    : "none",
               }}
             >
               {item.icon}
