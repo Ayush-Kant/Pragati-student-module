@@ -8,15 +8,18 @@ export const createAssessment = async (req, res) => {
     try {
         const {
             title,
-            description,
-            due_date,
+            type,
+            difficulty,
+            time_limit_minutes,
+            total_marks,
+            status,
             created_by
         } = req.body;
 
-        if (!title || !created_by) {
+        if (!title || !type || !created_by) {
             return res.status(400).json({
                 success: false,
-                message: "title and created_by are required"
+                message: "title, type and created_by are required"
             });
         }
 
@@ -24,17 +27,23 @@ export const createAssessment = async (req, res) => {
             `
             INSERT INTO assessments (
                 title,
-                description,
-                due_date,
+                type,
+                difficulty,
+                time_limit_minutes,
+                total_marks,
+                status,
                 created_by
             )
-            VALUES ($1, $2, $3, $4)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *;
             `,
             [
                 title,
-                description || null,
-                due_date || null,
+                type,
+                difficulty || "Easy",
+                time_limit_minutes || 30,
+                total_marks || 100,
+                status || "draft",
                 created_by
             ]
         );
@@ -49,11 +58,10 @@ export const createAssessment = async (req, res) => {
 
         res.status(500).json({
             success: false,
-            message: "Failed to create assessment"
+            message: error.message
         });
     }
 };
-
 
 /*
 GET /api/activity/assessments
@@ -77,50 +85,52 @@ export const getAssessments = async (req, res) => {
 
         res.status(500).json({
             success: false,
-            message: "Failed to fetch assessments"
+            message: error.message
         });
     }
 };
 
-
 /*
 POST /api/activity/submissions
-Create a submission
 */
 export const createSubmission = async (req, res) => {
     try {
         const {
-            assessment_id,
             student_id,
-            submission_url
+            drive_id,
+            activity_title,
+            activity_type,
+            status,
+            score
         } = req.body;
 
-        if (
-            !assessment_id ||
-            !student_id ||
-            !submission_url
-        ) {
+        if (!student_id || !drive_id || !activity_title) {
             return res.status(400).json({
                 success: false,
-                message:
-                    "assessment_id, student_id and submission_url are required"
+                message: "student_id, drive_id, and activity_title are required"
             });
         }
 
         const result = await pool.query(
             `
-            INSERT INTO submissions (
-                assessment_id,
+            INSERT INTO activity_submissions (
                 student_id,
-                submission_url
+                drive_id,
+                activity_title,
+                activity_type,
+                status,
+                score
             )
-            VALUES ($1, $2, $3)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *;
             `,
             [
-                assessment_id,
                 student_id,
-                submission_url
+                drive_id,
+                activity_title,
+                activity_type || null,
+                status || "submitted",
+                score || null
             ]
         );
 
@@ -134,28 +144,33 @@ export const createSubmission = async (req, res) => {
 
         res.status(500).json({
             success: false,
-            message: "Failed to create submission"
+            message: error.message
         });
     }
 };
 
-
 /*
-GET /api/activity/submissions/:assessmentId
-Get submissions for an assessment
+GET /api/activity/submissions/:driveId
 */
 export const getSubmissions = async (req, res) => {
     try {
-        const { assessmentId } = req.params;
+        const { driveId } = req.params; // Using drive_id instead of assessment_id for activity_submissions
+
+        if (!driveId) {
+            return res.status(400).json({
+                success: false,
+                message: "driveId is required"
+            });
+        }
 
         const result = await pool.query(
             `
             SELECT *
-            FROM submissions
-            WHERE assessment_id = $1
-            ORDER BY submitted_at DESC;
+            FROM activity_submissions
+            WHERE drive_id = $1
+            ORDER BY created_at DESC;
             `,
-            [assessmentId]
+            [driveId]
         );
 
         res.status(200).json({
@@ -168,7 +183,7 @@ export const getSubmissions = async (req, res) => {
 
         res.status(500).json({
             success: false,
-            message: "Failed to fetch submissions"
+            message: error.message
         });
     }
 };

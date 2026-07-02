@@ -16,7 +16,7 @@ router.get("/assessments", getAssessments);
 router.post("/submissions", createSubmission);
 
 router.get(
-    "/submissions/:assessmentId",
+    "/submissions/:driveId",
     getSubmissions
 );
 
