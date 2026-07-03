@@ -13,22 +13,18 @@ export default function CollegeProfilePage() {
     fetchProfile();
   }, []);
 
-  const fetchProfile = async () => {
-    try {
-      const result = await getProfile();
 
-      if (result?.success) {
-        setProfile(result.data);
-      } else {
-        setError("No profile data available");
-      }
+  const fetchProfile = async () => {
+   try {
+      const result = await getProfile();
+      setProfile(result.data);
     } catch (err) {
-      console.error("Profile Error:", err);
-      setError(err.message || "Failed to load profile");
-    } finally {
-      setLoading(false);
+      console.error('Login error:', err);
     }
-  };
+    setLoading(false);
+   };
+
+   console.log('Profile data:', profile);
 
   if (loading) {
     return (
@@ -52,19 +48,13 @@ export default function CollegeProfilePage() {
   if (!profile) return null;
 
   return (
-    <div className="bg-white min-h-screen p-6 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            Uptoskills Profile
-          </h1>
-          <p className="text-sm text-gray-600 font-medium mt-2">
-            Dashboard &gt; Uptoskills Profile
-          </p>
-        </div>
-
-        <ProfileBanner profile={profile} />
-        <ProfileDetails profile={profile} />
+    <div>
+      {/* Breadcrumb */}
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-gray-900">College Profile</h1>
+        <p className="text-xs text-gray-500 mt-0.5">
+          Dashboard &rsaquo; Profile
+        </p>
       </div>
 
       <ProfileBanner profile={profile} />
