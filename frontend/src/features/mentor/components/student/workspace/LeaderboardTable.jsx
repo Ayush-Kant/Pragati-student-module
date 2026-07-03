@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+// 1. Import your hook
+import { useChallenge } from '../../../hooks/useChallenge';
 
-const MOCK_LEADERBOARD = [
-  { studentName: "Sarah Jenkins", score: 100, executionTimeMs: 41, date: "2 mins ago" },
-  { studentName: "Marcus Rossi", score: 100, executionTimeMs: 42, date: "5 mins ago" },
-  { studentName: "David Chen", score: 95, executionTimeMs: 45, date: "12 mins ago" },
-  { studentName: "Tom Baker", score: 80, executionTimeMs: 50, date: "1 hour ago" },
-];
+export default function LeaderboardTable({ challengeId }) {
+  const [submissions, setSubmissions] = useState([]);
+  
+  // 2. Destructure the loading state and fetch function
+  const { isLoading, fetchLeaderboard } = useChallenge();
 
-export default function LeaderboardTable() {
-  const [submissions] = useState(MOCK_LEADERBOARD);
+  // 3. Fetch the data when the component mounts
+  useEffect(() => {
+    const loadData = async () => {
+      // Pass the challengeId to your mock service
+      const data = await fetchLeaderboard(challengeId);
+      if (data) {
+        setSubmissions(data);
+      }
+    };
+    loadData();
+  }, [challengeId]); // Re-run if the challengeId changes
 
+  // Sorting Handler: Primary Score (DESC), Secondary Execution Time (ASC)
   const sortedSubmissions = [...submissions].sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
     return a.executionTimeMs - b.executionTimeMs;
@@ -22,9 +33,19 @@ export default function LeaderboardTable() {
     return { rankText: 'text-[#6B7280]', rowBg: 'hover:bg-[#F8FAFC]' };
   };
 
+  // 4. Show a loading state while fetching from the mock API
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 space-y-3 border border-[#E5E7EB] rounded-md bg-[#FFFFFF]">
+        <div className="w-6 h-6 border-2 border-[#EFF6FF] border-t-[#2563EB] rounded-full animate-spin"></div>
+        <p className="text-sm text-[#6B7280]">Loading leaderboard data...</p>
+      </div>
+    );
+  }
+
   if (sortedSubmissions.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 border border-[#E5E7EB] rounded-md bg-[#FFFFFF]">
         <p className="text-sm text-[#6B7280]">No submissions yet. Be the first to solve this!</p>
       </div>
     );
@@ -32,7 +53,6 @@ export default function LeaderboardTable() {
 
   return (
     <div className="w-full overflow-hidden rounded-md border border-[#E5E7EB] bg-[#FFFFFF]">
-      {/* Added overflow-x-auto to prevent breaking on narrow screens */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm border-collapse min-w-[400px]">
           <thead>
@@ -49,7 +69,7 @@ export default function LeaderboardTable() {
               return (
                 <tr key={index} className={`transition-colors ${rowBg}`}>
                   <td className={`py-3 px-4 text-center ${rankText}`}>
-                    {index + 1}
+                    {row.rank || index + 1}
                   </td>
                   <td className="py-3 px-4 font-medium text-[#111827] whitespace-nowrap">
                     {row.studentName}

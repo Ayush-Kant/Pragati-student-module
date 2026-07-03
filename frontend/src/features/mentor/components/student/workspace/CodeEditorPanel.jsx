@@ -1,10 +1,15 @@
 import React, { useState, useRef } from 'react';
+// Import the custom hook (Adjust the path if your folder structure differs slightly)
+import { useChallenge } from '../../../hooks/useChallenge';
 
 export default function CodeEditorPanel({ challenge, setIsDrawerOpen, isEvaluating, setIsEvaluating, setExecutionResult }) {
   const [selectedLang, setSelectedLang] = useState(challenge.allowedLanguages[0]?.id || '');
   const [code, setCode] = useState(`class DynamicArray {\n\n    private int[] arr;\n    private int capacity;\n    private int size;\n\n    public DynamicArray(int capacity) {\n        this.capacity = capacity;\n        this.size = 0;\n    }\n\n    // Implement remaining methods...\n}`);
   
   const lineNumbersRef = useRef(null);
+  
+  // Destructure only the submit function from the hook
+  const { submitStudentCode } = useChallenge();
 
   const handleScroll = (e) => {
     if (lineNumbersRef.current) {
@@ -21,21 +26,19 @@ export default function CodeEditorPanel({ challenge, setIsDrawerOpen, isEvaluati
   const handleSubmit = async () => {
     if (isEvaluating) return;
     
+    // 1. Trigger UI loading states
     setIsEvaluating(true);
     setIsDrawerOpen(true); 
+    setExecutionResult(null); // Clear previous results
 
-    setTimeout(() => {
-      setIsEvaluating(false);
-      setExecutionResult({
-        totalScore: 100,
-        maxScore: challenge.maxScore,
-        passedTestCases: 45,
-        totalTestCases: 45,
-        executionTimeMs: 42,
-        memoryMB: 41.2,
-        judge0Verdict: 'Accepted'
-      });
-    }, 2000);
+    // 2. Call the mock backend
+    const result = await submitStudentCode(challenge.id, selectedLang, code);
+    
+    // 3. Update UI with results and stop loading spinner
+    if (result) {
+      setExecutionResult(result);
+    }
+    setIsEvaluating(false);
   };
 
   return (
@@ -72,7 +75,7 @@ export default function CodeEditorPanel({ challenge, setIsDrawerOpen, isEvaluati
           ))}
         </div>
         
-        {/* Code Input (Added pb-24 so text isn't hidden under the sticky button) */}
+        {/* Code Input */}
         <textarea
           value={code}
           onChange={(e) => setCode(e.target.value)}
