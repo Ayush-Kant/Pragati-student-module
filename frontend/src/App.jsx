@@ -32,6 +32,7 @@ function App() {
         {/* ── Public Test Route (Preview) ── */}
         <Route path='/preview/college-profile' element={<CollegeProfilePage />} />
         <Route path='/uptoskills-profile' element={<CollegeProfilePage />} />
+        
 
         {/* ── Mentor ── */}
         {mentorRoute}
