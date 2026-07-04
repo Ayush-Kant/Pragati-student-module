@@ -1,6 +1,11 @@
-import React from 'react';
+import React from 'react'
 
-export default function () {
-  return <div> Component</div>;
+const AdminNotifications = () => {
+  return (
+    <div>
+      Admin Notifications
+    </div>
+  )
 }
 
+export default AdminNotifications

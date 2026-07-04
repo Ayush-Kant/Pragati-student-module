@@ -1,9 +1,46 @@
-import React from 'react';
+import React from "react";
 
-export default function AdminFooter({ darkMode }) {
+const AdminFooter = ({ darkMode }) => {
   return (
-    <footer className={`py-4 px-6 text-center text-sm border-t ${darkMode ? 'bg-gray-900 text-gray-400 border-gray-700' : 'bg-white text-gray-500 border-gray-200'}`}>
-      © {new Date().getFullYear()} Pragati Admin. All rights reserved.
+    <footer
+      className={`
+        border-t px-6 py-4 text-sm
+        flex flex-col md:flex-row
+        items-center justify-between
+        transition-all duration-300
+
+        ${
+          darkMode
+            ? "bg-gray-900 border-gray-700 text-gray-400"
+            : "bg-white border-gray-200 text-gray-500"
+        }
+      `}
+    >
+
+      {/* Left */}
+      <p>
+        © 2026 Pragati Admin Panel. All rights reserved.
+      </p>
+
+      {/* Right */}
+      <div className="flex items-center gap-4 mt-2 md:mt-0">
+
+        <button className="hover:text-sky-500 transition">
+          Privacy Policy
+        </button>
+
+        <button className="hover:text-sky-500 transition">
+          Terms
+        </button>
+
+        <button className="hover:text-sky-500 transition">
+          Support
+        </button>
+
+      </div>
+
     </footer>
   );
-}
+};
+
+export default AdminFooter;

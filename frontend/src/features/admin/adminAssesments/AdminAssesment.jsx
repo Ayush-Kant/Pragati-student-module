@@ -1,6 +1,11 @@
-import React from 'react';
+import React from 'react'
 
-export default function () {
-  return <div> Component</div>;
+const AdminAssesment = () => {
+  return (
+    <div>
+      Admin Assesments
+    </div>
+  )
 }
 
+export default AdminAssesment

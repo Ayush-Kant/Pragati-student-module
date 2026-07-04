@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import useDashboardData from "../hooks/useDashboardData";
 import LeaderboardPreview from "../components/leaderboard/LeaderboardPreview";
 
@@ -185,41 +184,6 @@ const DashboardPage = () => {
       </div>
     </div>
   );
-};
-ActiveDriveCard.propTypes = {
-  data: PropTypes.object,
-  loading: PropTypes.bool,
-};
-
-QuickStats.propTypes = {
-  data: PropTypes.object,
-  loading: PropTypes.bool,
-};
-
-ProgressRing.propTypes = {
-  data: PropTypes.object,
-  loading: PropTypes.bool,
-};
-
-UpcomingSessions.propTypes = {
-  data: PropTypes.array,
-  loading: PropTypes.bool,
-};
-
-PendingTasks.propTypes = {
-  data: PropTypes.array,
-  loading: PropTypes.bool,
-};
-
-NotificationsList.propTypes = {
-  data: PropTypes.array,
-  loading: PropTypes.bool,
-};
-
-LeaderboardPreview.propTypes = {
-  leaderboard: PropTypes.array,
-  loading: PropTypes.bool,
-  error: PropTypes.string,
 };
 
 export default DashboardPage;

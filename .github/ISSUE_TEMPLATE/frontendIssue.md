@@ -1,13 +1,3 @@
----
-name: Frontend Task
-about: Frontend implementation task for interns
-title: "[FE] "
-labels: 
-     - frontend 
-assignees: ''
----
-
-
 ## 📋 Task Overview
 <!-- Brief description of what this frontend task involves -->
 

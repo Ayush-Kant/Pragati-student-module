@@ -8,11 +8,7 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const connectionString = process.env.POSTGRESQL_URI;
-
-if (!connectionString) {
-  throw new Error("POSTGRESQL_URI is missing in .env file");
-}
+const connectionString = process.env.POSTGRESQL_URI ?? "";
 
 const pgConfig = {
   connectionString,
@@ -36,4 +32,4 @@ export const connectDB = async () => {
   }
 };
 
-export default connectDB;
+export default pool;
