@@ -4,11 +4,14 @@ import NotificationDetailDrawer from "../components/NotificationDetailDrawer";
 
 import useNotifications from "../hooks/useNotifications";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import NotificationCompose from "../components/NotificationCompose";
 
 
 
 export default function NotificationCenter() {
   const navigate = useNavigate();
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
   const {
     notifications,
 
@@ -69,7 +72,7 @@ export default function NotificationCenter() {
         </div>
 
         <button
-           onClick={() => navigate("/admin/notification/compose")}
+          onClick={() => setIsComposeOpen(true)}
           className="
             bg-teal-600
             hover:bg-teal-700
@@ -210,6 +213,11 @@ export default function NotificationCenter() {
         onClose={closeNotification}
       />
 
+     {isComposeOpen && (
+  <NotificationCompose
+    onClose={() => setIsComposeOpen(false)}
+  />
+)}
     </div>
   );
 }

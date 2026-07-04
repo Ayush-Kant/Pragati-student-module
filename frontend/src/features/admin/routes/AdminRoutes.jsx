@@ -17,7 +17,6 @@ import RoleRoute from "../../../routes/RoleRoute";
 import CompanyDetail from "../pages/CompanyDetail";
 import ActiveDrives from "../pages/ActiveDrives";
 import CompanyRankings from "../pages/CompanyRankings";
-import DisputeDetail from "../pages/DisputeDetail";
 
 const AdminRoute = (
       <Route path="admin" element={<AdminLayout />}>
@@ -36,14 +35,6 @@ const AdminRoute = (
         <Route path='drives' element={<AdminDrives />} />
         <Route path='notification' element={<AdminNotifications />} />
         <Route path='disputes' element={<AdminDisputes />} />
-        <Route
-        path="notification/compose"
-        element={
-          <NotificationCompose
-            onClose={() => navigate("/admin/notification")}
-          />
-        }
-      />
       </Route>
 )
 
