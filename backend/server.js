@@ -1,6 +1,11 @@
 import express from "express";
+<<<<<<< HEAD
 import {connectDB} from "./config/db.js";
+=======
+import { connectDB } from "./config/db.js";
+>>>>>>> 365efab62a553f45ffa7656776b0906acf10d6fc
 import mentorRoutes from "./routes/mentor.routes.js";
+
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
 import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
@@ -10,11 +15,14 @@ import collegeProfileRoutes from "./routes/collage.profile.routes.js";
 import cors from "cors";
 import companyRoutes from "./routes/company.routes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
+import companyRoutes from "./routes/company.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
 import dotenv from "dotenv";
+import cors from "cors";
+import errorMiddleware from "./middleware/errorMiddleware.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 5001;
