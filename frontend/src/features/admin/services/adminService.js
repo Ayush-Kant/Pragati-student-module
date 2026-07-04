@@ -1053,3 +1053,67 @@ export const deleteMentor = async (mentorId) => {
     return { success: true, mentorId };
   }
 };
+/* ===========================================
+   Disputes
+=========================================== */
+
+export const getDisputes = async (params = {}) => {
+  const response = await API.get(
+    "/api/v1/admin/disputes",
+    {
+      ...getConfig(),
+      params,
+    }
+  );
+
+  return response.data;
+};
+
+export const getDisputeById = async (id) => {
+  const response = await API.get(
+    `/api/v1/admin/disputes/${id}`,
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const reviewDispute = async (id) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/review`,
+    {},
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const resolveDispute = async (id, resolution) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/resolve`,
+    { resolution },
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const escalateDispute = async (id, reason) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/escalate`,
+    { reason },
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const addDisputeNote = async (id, note) => {
+  const response = await API.post(
+    `/api/v1/admin/disputes/${id}/notes`,
+    { note },
+    getConfig()
+  );
+
+  return response.data;
+};
