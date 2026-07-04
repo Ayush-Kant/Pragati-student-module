@@ -1,3 +1,6 @@
+
+import React from 'react';
+
 import {
   MapPin,
   Globe,
@@ -188,7 +191,11 @@ export default function ProfileDetails({ profile }) {
           <div className="flex flex-col items-center text-center p-2">
 
             <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl border-2 border-emerald-100 shadow-sm mb-3 shrink-0 select-none">
-              {contact_person ? contact_person.split(' ').map(n => n[0]).join('') : 'CP'}
+
+              {contact_person
+                ? contact_person.split(" ").map((n) => n[0]).join("")
+                : "CP"}
+
             </div>
 
             <h4 className="text-base font-bold text-gray-800">
@@ -202,8 +209,10 @@ export default function ProfileDetails({ profile }) {
             <div className="w-full h-px bg-gray-100 mb-5"></div>
 
             <div className="w-full text-left space-y-4">
+
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-gray-400 shrink-0" />
+
                 {email ? (
                   <a
                     href={`mailto:${email}`}
@@ -218,6 +227,7 @@ export default function ProfileDetails({ profile }) {
 
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-gray-400 shrink-0" />
+
                 {phone ? (
                   <a
                     href={`tel:${phone}`}
@@ -229,8 +239,8 @@ export default function ProfileDetails({ profile }) {
                   <span className="text-sm font-semibold text-gray-700">N/A</span>
                 )}
               </div>
-            </div>
 
+            </div>
           </div>
         </ProfileCard>
 
@@ -316,6 +326,7 @@ export default function ProfileDetails({ profile }) {
               ) : (
                 <span className="text-sm font-semibold text-gray-700">N/A</span>
               )}
+
             </div>
 
           </div>

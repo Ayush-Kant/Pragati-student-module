@@ -5,14 +5,13 @@ import DashboardLayout from "../components/layout/DashboardLayout";
 
 const DashboardPage = () => {
   return (
-   <DashboardLayout>
-    <div>
-      <AdmissionsChart/>
-      <PlacementChart/>
-      <RevenueChart/>
-      
-    </div>
-   </DashboardLayout>
+    <DashboardLayout>
+      <div>
+        <AdmissionsChart />
+        <PlacementChart />
+        <RevenueChart />
+      </div>
+    </DashboardLayout>
   );
 };
 
