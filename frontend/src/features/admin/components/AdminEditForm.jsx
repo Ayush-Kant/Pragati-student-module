@@ -1,271 +1,385 @@
-// AdminEditForm.jsx – 4-step onboarding wizard form content
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import AdminAvatarUpload from "./AdminAvatarUpload";
+import { useEffect } from "react";
 
-const inputStyle = {
-  width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 10,
-  padding: "11px 14px", fontSize: 14, color: "#1e293b", outline: "none",
-  background: "#fff", boxSizing: "border-box", fontFamily: "inherit",
-  transition: "border-color .15s",
+const isValidTimeZone = (value) => {
+  if (!value) return true;
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: value });
+    return true;
+  } catch {
+    return false;
+  }
 };
-const labelStyle = { display: "block", fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 6, textTransform: "uppercase", letterSpacing: .5 };
-const fieldWrap = { marginBottom: 18 };
 
-/* ─── STEP 1 ─────────────────────────────────────────────── */
-export const Step1 = ({ data, setData }) => (
-  <div>
-    <div style={{ marginBottom: 28 }}>
-      <div style={{ width: 40, height: 4, background: "linear-gradient(90deg,#6366f1,#a855f7)", borderRadius: 99, marginBottom: 16 }} />
-      <h2 style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", margin: "0 0 6px" }}>Basic Information</h2>
-      <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>Help us build your professional profile. These details will be visible to potential mentees.</p>
-    </div>
+const profileSchema = z.object({
+  fullName: z
+    .string()
+    .nonempty("Full name is required")
+    .min(2, "Full name must be at least 2 characters"),
+  email: z
+    .string()
+    .nonempty("Email is required")
+    .email("Invalid email"),
+  bio: z
+    .string()
+    .max(300, "Max 300 characters")
+    .optional(),
+  avatarUrl: z.string().optional(),
+  phone: z
+  .string()
+  .trim()
+  .transform((val) => val.replace(/\s|-/g, ""))
+  .refine((val) => /^\+?[1-9]\d{9,14}$/.test(val), {
+    message: "Invalid phone number",
+  })
+  .optional(),
+  timezone: z
+    .string()
+    .optional()
+    .refine(isValidTimeZone, {
+      message: "Invalid IANA timezone string",
+    }),
+  github: z.string().optional(),
+  linkedin: z.string().optional(),
+});
 
-    <AdminAvatarUpload
-      avatarUrl={data.avatar}
-      fullName={data.fullName}
-      setValue={(_, v) => setData({ ...data, avatar: v })}
-    />
+const AdminEditForm = ({
+  profile,
+  onSave,
+  onCancel,
+}) => {
 
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-      <div style={fieldWrap}>
-        <label style={labelStyle}>Full Name</label>
-        <input style={inputStyle} placeholder="e.g. Alex Rivera" value={data.fullName || ""} onChange={e => setData({ ...data, fullName: e.target.value })} />
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+  setValue,
+  watch,
+  reset,
+} = useForm({
+  resolver: zodResolver(profileSchema),
+  defaultValues: {
+    fullName: "",
+    email: "",
+    bio: "",
+    phone: "",
+    timezone: "",
+    avatarUrl: "",
+    github: "",
+    linkedin: "",
+  },
+});
+
+useEffect(() => {
+  if (profile) {
+    reset({
+      fullName: profile.fullName || "",
+      email: profile.email || "",
+      bio: profile.bio || "",
+      phone: profile.contactInfo?.phone || "",
+      timezone: profile.contactInfo?.timezone || "",
+      avatarUrl: profile.avatarUrl || "",
+      github: profile.socialLinks?.github || "",
+      linkedin: profile.socialLinks?.linkedin || "",
+    });
+  }
+}, [profile, reset]);
+
+  const avatarUrl = watch("avatarUrl");
+  const onSubmit = (data) => {
+    const finalData = {
+      ...profile,
+      fullName: data.fullName,
+      email: data.email,
+      bio: data.bio,
+      avatarUrl: data.avatarUrl,
+      contactInfo: {
+        phone: data.phone,
+        timezone: data.timezone,
+      },
+      socialLinks: {
+        github: data.github,
+        linkedin: data.linkedin,
+      },
+    };
+    onSave(finalData);
+  };
+
+  return (
+  <div className="min-h-screen bg-[#f4f7fb] p-6">
+    <div className="w-full bg-white rounded-[32px] overflow-hidden shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+
+      {/* Top Banner */}
+      <div className="h-32 bg-gradient-to-r from-[#050816] via-[#6d28d9] to-[#2563eb]" />
+
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 p-8 -mt-16 relative z-10">
+
+        {/* LEFT PROFILE PANEL */}
+        <div className="bg-white rounded-[28px] p-6 shadow-lg border border-slate-100">
+
+          <div className="flex flex-col items-center text-center">
+
+            <AdminAvatarUpload
+              avatarUrl={avatarUrl}
+              fullName={profile.fullName}
+              setValue={setValue}
+            />
+
+            <h2 className="mt-5 text-3xl font-bold text-slate-900">
+              {profile.fullName}
+            </h2>
+
+            <p className="mt-2 text-sm text-slate-500">
+              {profile.bio || "No bio added"}
+            </p>
+
+            <p className="mt-1 text-sm text-slate-400">
+              Member since 2026
+            </p>
+
+            <button
+              type="button"
+              className="mt-6 w-full rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 py-3 text-white font-semibold shadow-lg hover:scale-[1.02] transition-all"
+            >
+              Change Password
+            </button>
+          </div>
+
+          {/* Social Links */}
+          <div className="mt-8">
+
+            <h3 className="mb-5 text-xl font-bold text-slate-900">
+              Social Links
+            </h3>
+
+            <div className="space-y-4">
+
+              <input
+                type="text"
+                placeholder="GitHub Profile URL"
+                {...register("github")}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              <input
+                type="text"
+                placeholder="LinkedIn Profile URL"
+                {...register("linkedin")}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              <button
+                type="button"
+                className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 py-3 text-white font-semibold shadow-lg hover:scale-[1.02] transition-all"
+
+              >
+                Add Link
+              </button>
+
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT FORM */}
+        <div className="bg-white rounded-[28px] p-8 shadow-lg border border-slate-100">
+
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-slate-900">
+              Edit Profile
+            </h1>
+
+            <p className="mt-2 text-slate-500">
+              Update your personal information and account details
+            </p>
+          </div>
+
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-8"
+          >
+
+            <input
+              type="hidden"
+              value={avatarUrl}
+              {...register("avatarUrl")}
+            />
+
+            {/* Basic Information */}
+            <div>
+
+              <h3 className="mb-6 text-xl font-bold text-slate-900">
+                Basic Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Full Name
+                  </label>
+
+                  <input
+                    type="text"
+                    {...register("fullName")}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  {errors.fullName && (
+                    <p className="mt-1 text-red-500 text-sm">
+                      {errors.fullName.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Email
+                  </label>
+
+                  <input
+                    type="email"
+                    {...register("email")}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  {errors.email && (
+                    <p className="mt-1 text-red-500 text-sm">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Phone
+                  </label>
+
+                  <input
+                    type="text"
+                    {...register("phone")}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  {errors.phone && (
+                    <p className="mt-1 text-red-500 text-sm">
+                      {errors.phone.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Location
+                  </label>
+
+                  <input
+                    type="text"
+                    {...register("timezone")}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  {errors.timezone && (
+                    <p className="mt-1 text-red-500 text-sm">
+                      {errors.timezone.message}
+                    </p>
+                  )}
+                </div>
+
+              </div>
+            </div>
+
+            {/* Bio */}
+            <div>
+
+              <h3 className="mb-6 text-xl font-bold text-slate-900">
+                About You
+              </h3>
+
+              <textarea
+                rows="4"
+                {...register("bio")}
+                placeholder="Tell us something about yourself..."
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 resize-none outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              {errors.bio && (
+                <p className="mt-1 text-red-500 text-sm">
+                  {errors.bio.message}
+                </p>
+              )}
+            </div>
+
+            {/* Role & Permissions */}
+            <div>
+
+              <h3 className="mb-6 text-xl font-bold text-slate-900">
+                Role & Permissions
+              </h3>
+
+              <div>
+
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Role
+                </label>
+
+                <input
+                  type="text"
+                  value={profile.role}
+                  readOnly
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
+                />
+              </div>
+
+              <div className="mt-6">
+
+                <label className="mb-3 block text-sm font-medium text-slate-700">
+                  Permissions
+                </label>
+
+                <div className="flex flex-wrap gap-3">
+
+                  {profile.permissions?.map((permission) => (
+                    <span
+                      key={permission}
+                      className="rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700"
+                    >
+                      {permission}
+                    </span>
+                  ))}
+
+                </div>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-4 pt-6 border-t border-slate-200">
+
+              <button
+                type="button"
+                onClick={onCancel}
+                className="rounded-2xl border border-slate-300 px-6 py-3 font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-8 py-3 text-white font-semibold shadow-lg hover:scale-[1.02] transition-all"
+              >
+                Save Changes
+              </button>
+
+            </div>
+
+          </form>
+        </div>
       </div>
-      <div style={fieldWrap}>
-        <label style={labelStyle}>Display Title</label>
-        <input style={inputStyle} placeholder="e.g. Senior Software Architect" value={data.displayTitle || ""} onChange={e => setData({ ...data, displayTitle: e.target.value })} />
-      </div>
-    </div>
-
-    <div style={fieldWrap}>
-      <label style={labelStyle}>Email Address</label>
-      <div style={{ display: "flex", alignItems: "center", border: "1.5px solid #e2e8f0", borderRadius: 10, background: "#fff", padding: "0 14px", height: 48, gap: 8 }}>
-        <span style={{ color: "#94a3b8" }}>✉</span>
-        <input style={{ border: "none", outline: "none", fontSize: 14, color: "#1e293b", flex: 1, background: "transparent", fontFamily: "inherit" }}
-          placeholder="alex@company.com" value={data.email || ""} onChange={e => setData({ ...data, email: e.target.value })} />
-      </div>
-    </div>
-
-    <div style={fieldWrap}>
-      <label style={labelStyle}>Professional Bio</label>
-      <textarea style={{ ...inputStyle, resize: "vertical" }} rows={4}
-        placeholder="Briefly describe your mentorship style and professional background..."
-        value={data.bio || ""} onChange={e => setData({ ...data, bio: e.target.value })} />
     </div>
   </div>
 );
-
-/* ─── STEP 2 ─────────────────────────────────────────────── */
-export const Step2 = ({ data, setData }) => {
-  const bioLen = (data.bio2 || "").length;
-  return (
-    <div>
-      <div style={{ textAlign: "center", marginBottom: 28 }}>
-        <div style={{ fontSize: 11, fontWeight: 800, color: "#6366f1", letterSpacing: 2, marginBottom: 8 }}>STEP 02</div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", margin: "0 0 8px" }}>Complete your professional profile</h2>
-        <p style={{ fontSize: 14, color: "#64748b", maxWidth: 480, margin: "0 auto" }}>Your profile is the first thing mentees see. Make it stand out.</p>
-      </div>
-
-      <div style={{ border: "1.5px solid #e2e8f0", borderLeft: "4px solid #6366f1", borderRadius: 12, padding: 20, marginBottom: 18, background: "#fafafe" }}>
-        <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a", marginBottom: 10 }}>Professional Bio</div>
-        <textarea style={{ ...inputStyle, resize: "vertical" }} rows={5}
-          placeholder="Share your journey, key achievements, and what motivates you to mentor others..."
-          value={data.bio2 || ""} onChange={e => setData({ ...data, bio2: e.target.value.slice(0, 500) })} />
-        <div style={{ textAlign: "right", fontSize: 11, color: "#94a3b8", marginTop: 4 }}>{bioLen} / 500</div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 18 }}>
-        {[
-          { key: "linkedin", icon: "🔗", label: "LinkedIn URL", ph: "https://linkedin.com/in/username", accent: "#22c55e" },
-          { key: "github", icon: "🌐", label: "GitHub / Portfolio", ph: "https://github.com/username", accent: "#f97316" },
-        ].map(({ key, icon, label, ph, accent }) => (
-          <div key={key} style={{ border: "1.5px solid #e2e8f0", borderLeft: `4px solid ${accent}`, borderRadius: 12, padding: 16, background: "#fafafe" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <span>{icon}</span>
-              <span style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{label}</span>
-            </div>
-            <input style={inputStyle} placeholder={ph} value={data[key] || ""} onChange={e => setData({ ...data, [key]: e.target.value })} />
-          </div>
-        ))}
-      </div>
-
-      <div style={{ border: "1.5px solid #e2e8f0", borderLeft: "4px solid #6366f1", borderRadius: 12, padding: 20, background: "#fafafe" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>Industry Certifications</div>
-            <div style={{ fontSize: 12, color: "#64748b" }}>Upload AWS, PMP, or other credentials.</div>
-          </div>
-          <button style={{ background: "#ede9fe", color: "#6366f1", border: "none", borderRadius: 20, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>+ Add New</button>
-        </div>
-        <div style={{ border: "2px dashed #c4b5fd", borderRadius: 10, padding: "30px 20px", textAlign: "center", background: "#f5f3ff", cursor: "pointer" }}>
-          <div style={{ fontSize: 28, marginBottom: 6 }}>📄</div>
-          <div style={{ fontWeight: 600, fontSize: 13, color: "#0f172a", marginBottom: 2 }}>Click or drag to upload files</div>
-          <div style={{ fontSize: 11, color: "#94a3b8" }}>PDF, PNG, JPG (Max 5MB)</div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* ─── STEP 3 ─────────────────────────────────────────────── */
-const EXP_OPTS = ["Frontend Architecture", "UI/UX Systems", "Backend Scaling", "Product Strategy", "DevOps", "Machine Learning"];
-const LEVELS = ["BEGINNER", "INTERMEDIATE", "EXPERT"];
-const LV = { EXPERT: { bg: "#d1fae5", color: "#059669" }, INTERMEDIATE: { bg: "#ede9fe", color: "#6d28d9" }, BEGINNER: { bg: "#dbeafe", color: "#2563eb" } };
-
-export const Step3 = ({ data, setData }) => {
-  const [newName, setNewName] = useState("");
-  const [newLvl, setNewLvl] = useState("BEGINNER");
-  const expertise = data.expertise || [];
-  const skills = data.coreSkills || [];
-
-  const toggleTag = tag => {
-    const u = expertise.includes(tag) ? expertise.filter(t => t !== tag) : [...expertise, tag];
-    setData({ ...data, expertise: u });
-  };
-
-  return (
-    <div style={{ border: "1.5px solid #e2e8f0", borderLeft: "4px solid #22c55e", borderRadius: 14, padding: 28 }}>
-      <h2 style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", marginBottom: 6 }}>Experience & Expertise</h2>
-      <p style={{ fontSize: 14, color: "#64748b", marginBottom: 24 }}>Tell us about your professional background and specializations.</p>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
-        <div>
-          <label style={labelStyle}>Current Designation</label>
-          <input style={inputStyle} placeholder="e.g. Senior Staff Engineer" value={data.designation || ""} onChange={e => setData({ ...data, designation: e.target.value })} />
-        </div>
-        <div>
-          <label style={labelStyle}>Years of Experience</label>
-          <select style={{ ...inputStyle }} value={data.yearsExp || ""} onChange={e => setData({ ...data, yearsExp: e.target.value })}>
-            <option value="">Select experience</option>
-            {["0-1 years", "1-3 years", "3-5 years", "5-10 years", "10+ years"].map(o => <option key={o}>{o}</option>)}
-          </select>
-        </div>
-      </div>
-
-      <div style={{ marginBottom: 24 }}>
-        <label style={labelStyle}>Expertise Areas</label>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {EXP_OPTS.map(tag => {
-            const on = expertise.includes(tag);
-            return (
-              <button key={tag} onClick={() => toggleTag(tag)} style={{
-                borderRadius: 99, padding: "7px 16px", fontSize: 13, fontWeight: 500, cursor: "pointer",
-                border: `1.5px solid ${on ? "#6366f1" : "#e2e8f0"}`,
-                background: on ? "#eef2ff" : "#fff", color: on ? "#4f46e5" : "#475569",
-              }}>
-                {tag}{on && " ×"}
-              </button>
-            );
-          })}
-          <button style={{ borderRadius: 99, padding: "7px 16px", fontSize: 13, border: "1.5px dashed #c7d2fe", background: "transparent", color: "#6366f1", cursor: "pointer", fontWeight: 700 }}>+ Add Other</button>
-        </div>
-      </div>
-
-      <div>
-        <label style={labelStyle}>Top Core Skills</label>
-        <div style={{ border: "1.5px dashed #e2e8f0", borderRadius: 12, overflow: "hidden" }}>
-          {skills.map((sk, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", padding: "12px 16px", borderBottom: "1px solid #f1f5f9" }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center", marginRight: 12, fontSize: 14 }}>
-                {sk.name.includes("React") ? "⌨" : "✏"}
-              </div>
-              <span style={{ flex: 1, fontWeight: 600, fontSize: 14, color: "#1e293b" }}>{sk.name}</span>
-              <span style={{ fontSize: 10, fontWeight: 700, borderRadius: 6, padding: "3px 8px", marginRight: 12, background: (LV[sk.level] || LV.BEGINNER).bg, color: (LV[sk.level] || LV.BEGINNER).color }}>{sk.level}</span>
-              <button onClick={() => setData({ ...data, coreSkills: skills.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 15 }}>🗑</button>
-            </div>
-          ))}
-          <div style={{ display: "flex", gap: 8, padding: 12, background: "#fafafa" }}>
-            <input style={{ ...inputStyle, flex: 1 }} placeholder="Skill name" value={newName} onChange={e => setNewName(e.target.value)} />
-            <select style={{ ...inputStyle, width: 140 }} value={newLvl} onChange={e => setNewLvl(e.target.value)}>
-              {LEVELS.map(l => <option key={l}>{l}</option>)}
-            </select>
-            <button onClick={() => { if (!newName.trim()) return; setData({ ...data, coreSkills: [...skills, { name: newName, level: newLvl }] }); setNewName(""); setNewLvl("BEGINNER"); }}
-              style={{ background: "none", border: "1.5px dashed #cbd5e1", borderRadius: 8, padding: "0 16px", cursor: "pointer", fontSize: 13, color: "#475569", fontWeight: 600, whiteSpace: "nowrap" }}>
-              + Add
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* ─── STEP 4 ─────────────────────────────────────────────── */
-const DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-const SLOTS = ["09:00 AM", "02:00 PM", "07:00 PM"];
-
-export const Step4 = ({ data, setData }) => {
-  const sel = data.availability || {};
-  const toggle = (day, slot) => {
-    const k = `${day}_${slot}`;
-    const u = { ...sel };
-    if (u[k]) delete u[k]; else u[k] = true;
-    setData({ ...data, availability: u });
-  };
-
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
-        <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", margin: "0 0 6px" }}>Weekly Availability</h2>
-          <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>Select slots for 1:1 mentorship sessions. Adjustable later.</p>
-        </div>
-        <div style={{ width: 44, height: 44, borderRadius: "50%", border: "1.5px solid #22c55e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📅</div>
-      </div>
-
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "5px 5px", minWidth: 560 }}>
-          <thead>
-            <tr>
-              <th style={{ width: 90 }} />
-              {DAYS.map(d => <th key={d} style={{ fontSize: 11, fontWeight: 700, color: "#475569", textAlign: "center", paddingBottom: 6 }}>{d}</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {SLOTS.map(slot => (
-              <tr key={slot}>
-                <td style={{ fontSize: 12, color: "#64748b", fontWeight: 600, verticalAlign: "middle", paddingRight: 8, whiteSpace: "nowrap" }}>
-                  <div>{slot}</div>
-                  <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 400 }}>(45 mins)</div>
-                </td>
-                {DAYS.map(day => {
-                  const on = !!sel[`${day}_${slot}`];
-                  return (
-                    <td key={day}>
-                      <div onClick={() => toggle(day, slot)} style={{
-                        border: `1.5px solid ${on ? "#22c55e" : "#e2e8f0"}`,
-                        borderRadius: 10, background: on ? "#f0fdf4" : "#fafafa",
-                        color: on ? "#16a34a" : "#cbd5e1", fontSize: on ? 11 : 18,
-                        fontWeight: on ? 700 : 400, cursor: "pointer",
-                        padding: "11px 4px", textAlign: "center", userSelect: "none",
-                        transition: "all .15s",
-                      }}>
-                        {on ? <><div>{slot}</div><div style={{ fontSize: 10 }}>Selected</div></> : "+"}
-                      </div>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div style={{ display: "flex", gap: 12, background: "#eef2ff", borderRadius: 12, padding: "14px 16px", marginTop: 20 }}>
-        <span style={{ fontSize: 18, color: "#6366f1", flexShrink: 0 }}>ℹ</span>
-        <p style={{ margin: 0, fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
-          Standard sessions are 45 minutes long. Configure timezone and buffer times in settings after registration.
-        </p>
-      </div>
-    </div>
-  );
-};
-
-/* ─── Router ──────────────────────────────────────────────── */
-const AdminEditForm = ({ step, data, setData }) => {
-  const Map = { 1: Step1, 2: Step2, 3: Step3, 4: Step4 };
-  const F = Map[step] || Step1;
-  return <F data={data} setData={setData} />;
 };
 
 export default AdminEditForm;

@@ -5,7 +5,6 @@ import {createProfile, getProfile, updateProfile} from "../services/college.prof
 export const getCollegeProfile = async (req, res, next) => {
   try {
     const userId = req.user.userId;
-
     const profile = await getProfile(userId);
 
     if (!profile) {

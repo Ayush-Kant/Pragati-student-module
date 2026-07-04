@@ -1,44 +1,30 @@
-const ProfileTextarea = ({
+import React from 'react';
+
+export default function ProfileTextarea({
   label,
   name,
   value,
-  onChange,
   placeholder,
+  onChange,
   rows = 4,
   required = false,
-}) => {
+}) {
   return (
-    <div className="flex flex-col gap-1 w-full">
-      <label className="text-sm font-medium text-gray-700">
-        {label}
-        {required && (
-          <span className="text-red-500 ml-1">*</span>
-        )}
-      </label>
-
+    <label className="block">
+      {label && (
+        <span className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400">
+          {label}
+        </span>
+      )}
       <textarea
-        rows={rows}
         name={name}
         value={value}
+        rows={rows}
+        required={required}
         onChange={onChange}
         placeholder={placeholder}
-        className="
-          w-full
-          px-4
-          py-3
-          border
-          border-gray-300
-          rounded-lg
-          text-sm
-          resize-none
-          outline-none
-          focus:ring-2
-          focus:ring-orange-400
-          focus:border-orange-400
-        "
+        className="w-full resize-y rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold leading-6 text-gray-700 outline-none transition focus:border-[#ff7a00] focus:ring-2 focus:ring-orange-100"
       />
-    </div>
+    </label>
   );
-};
-
-export default ProfileTextarea;
+}
