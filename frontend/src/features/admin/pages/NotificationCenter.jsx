@@ -3,8 +3,12 @@ import NotificationLogTable from "../components/NotificationLogTable";
 import NotificationDetailDrawer from "../components/NotificationDetailDrawer";
 
 import useNotifications from "../hooks/useNotifications";
+import { useNavigate } from "react-router-dom";
+
+
 
 export default function NotificationCenter() {
+  const navigate = useNavigate();
   const {
     notifications,
 
@@ -65,6 +69,7 @@ export default function NotificationCenter() {
         </div>
 
         <button
+           onClick={() => navigate("/admin/notification/compose")}
           className="
             bg-teal-600
             hover:bg-teal-700

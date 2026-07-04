@@ -36,7 +36,14 @@ const AdminRoute = (
         <Route path='drives' element={<AdminDrives />} />
         <Route path='notification' element={<AdminNotifications />} />
         <Route path='disputes' element={<AdminDisputes />} />
-        <Route path="disputes/:id" element={<DisputeDetail />} />
+        <Route
+        path="notification/compose"
+        element={
+          <NotificationCompose
+            onClose={() => navigate("/admin/notification")}
+          />
+        }
+      />
       </Route>
 )
 
