@@ -42,6 +42,352 @@ export const updateAdminProfile = async (profileData) => {
   return response.data;
 };
 
+export const getStudentById = async (id) => {
+  try {
+    const response = await API.get(
+      `/api/v1/admin/students/${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getStudentProgress = async (id) => {
+  try {
+    const response = await API.get(
+      `/api/v1/admin/students/${id}/progress`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getStudents = async (params = {}) => {
+  try {
+    const response = await API.get(
+      "/api/v1/admin/students",
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    throw error;
+  }
+};
+
+export const verifyStudent = async (studentId) => {
+  try {
+    const response = await API.patch(
+      `/api/v1/admin/students/${studentId}/verify`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying student:", error);
+    throw error;
+  }
+};
+
+export const blockStudent = async (studentId, reason) => {
+  try {
+    const response = await API.patch(
+      `/api/v1/admin/students/${studentId}/block`,
+      { reason }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error blocking student:", error);
+    throw error;
+  }
+};
+
+export const unblockStudent = async (studentId) => {
+  try {
+    const response = await API.patch(
+      `/api/v1/admin/students/${studentId}/unblock`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error unblocking student:", error);
+    throw error;
+  }
+};
+
+export const resetStudentPassword = async (studentId) => {
+  try {
+    const response = await API.post(
+      `/api/v1/admin/students/${studentId}/reset-pw`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    throw error;
+  }
+};
+
+export const exportStudents = async (params = {}) => {
+  try {
+    const response = await API.get(
+      "/api/v1/admin/students/export",
+      {
+        params,
+        responseType: "blob",
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error exporting students:", error);
+    throw error;
+  }
+};
+
+const STORAGE_KEY = "trainingPrograms";
+
+export const adminService = {
+
+  async getTrainingProgramById(programId) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const program =
+      programs.find(
+        (item) => item.id === programId
+      );
+
+    return {
+      data:
+        program || null,
+    };
+
+  },
+
+  async updateTrainingProgram(updatedProgram) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) =>
+        program.id === updatedProgram.id
+          ? updatedProgram
+          : program
+      );
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+      data: updatedProgram,
+    };
+
+  },
+
+  async assignMentor(programId, mentor) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) =>
+
+        program.id === programId
+          ? {
+              ...program,
+              mentor,
+            }
+          : program
+
+      );
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },
+
+  async archiveTrainingProgram(programId) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) =>
+
+        program.id === programId
+          ? {
+              ...program,
+              status: "archived",
+            }
+          : program
+
+      );
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },
+
+  async addModule(programId, moduleData) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) => {
+
+        if (program.id !== programId)
+          return program;
+
+        const modules =
+          program.modules || [];
+
+        return {
+
+          ...program,
+
+          modules: [
+
+            ...modules,
+
+            {
+              id: `module_${Date.now()}`,
+              ...moduleData,
+            },
+
+          ],
+
+          modulesCount:
+            modules.length + 1,
+
+        };
+
+      });
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },
+
+  async updateModule(programId, updatedModule) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) => {
+
+        if (program.id !== programId)
+          return program;
+
+        return {
+
+          ...program,
+
+          modules:
+            (program.modules || []).map(
+              (module) =>
+
+                module.id === updatedModule.id
+                  ? updatedModule
+                  : module
+
+            ),
+
+        };
+
+      });
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },
+
+  async deleteModule(programId, moduleId) {
+
+    const programs =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      ) || [];
+
+    const updatedPrograms =
+      programs.map((program) => {
+
+        if (program.id !== programId)
+          return program;
+
+        const modules =
+          (program.modules || []).filter(
+            (module) =>
+              module.id !== moduleId
+          );
+
+        return {
+
+          ...program,
+
+          modules,
+
+          modulesCount:
+            modules.length,
+
+        };
+
+      });
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedPrograms)
+    );
+
+    return {
+      success: true,
+    };
+
+  },};
+
 //For college needing recruitment
 export const getNeedsRecruitment = async () => {
   try {
@@ -100,27 +446,27 @@ export const suspendCollege = async (id, reason) => {
   }
 };
 export const fetchDashboardStats = async () => {
-  const response = await API.get("/api/admin/dashboard/stats");
+  const response = await API.get("/api/v1/admin/dashboard/stats", getConfig());
   return response.data;
 };
 
 export const fetchDashboardFunnel = async () => {
-  const response = await API.get("/api/admin/dashboard/funnel");
+  const response = await API.get("/api/v1/admin/dashboard/funnel", getConfig());
   return response.data;
 };
 
 export const fetchCompanyStats = async () => {
-  const response = await API.get("/api/admin/dashboard/company-stats");
+  const response = await API.get("/api/v1/admin/dashboard/company-stats", getConfig());
   return response.data;
 };
 
 export const fetchCollegePerformance = async () => {
-  const response = await API.get("/api/admin/dashboard/college-performance");
+  const response = await API.get("/api/v1/admin/dashboard/college-performance", getConfig());
   return response.data;
 };
 
 export const fetchActivityFeed = async () => {
-  const response = await API.get("/api/admin/dashboard/activity-feed");
+  const response = await API.get("/api/v1/admin/dashboard/activity-feed", getConfig());
   return response.data;
 };
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import {
   LayoutDashboard,
@@ -12,10 +12,13 @@ import {
   Search,
   Bell,
   HelpCircle,
+  Briefcase,
 } from "lucide-react";
 
 export default function MentorLayout() {
+  const location = useLocation();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const menuItems = [
   {
@@ -54,6 +57,14 @@ export default function MentorLayout() {
     icon: <Settings className="w-5 h-5" />,
   },
 ];
+
+  const isItemActive = (item) => {
+    if (item.path === "#") return false;
+    if (item.path === "/mentor/dashboard") {
+      return location.pathname === "/mentor/dashboard" || location.pathname === "/mentor";
+    }
+    return location.pathname.startsWith(item.path);
+  };
 
   const [{ mentorName, initials }] = useState(() => {
     try {
