@@ -873,393 +873,250 @@ export const assignAssessment = async (assessmentId, payload) => {
   return response.data;
 };
 
-// Mock Drive Data - Fallback when backend is unavailable
-
-const mockDrives = [
+// Mock Mentor Data - Fallback when backend is unavailable
+const mockMentors = [
   {
-    id: "drive_101",
-    title: "MERN Batch 1",
-    company: { id: "comp_001", name: "TechCorp Ltd" },
-    status: "active",
-    currentStage: "training",
-    candidates: 120,
-    createdAt: "2024-04-01T00:00:00Z",
+    id: "mentor_001",
+    name: "Rohit Sharma",
+    email: "rohit@uptoskills.com",
+    expertise: ["MERN", "React", "Node.js"],
+    rating: 4.8,
+    activeBatches: 3,
+    isActive: true,
   },
   {
-    id: "drive_102",
-    title: "Java Dev Drive",
-    company: { id: "comp_003", name: "InfoSys" },
-    status: "active",
-    currentStage: "screening",
-    candidates: 80,
-    createdAt: "2024-04-15T00:00:00Z",
+    id: "mentor_002",
+    name: "Priya Singh",
+    email: "priya@uptoskills.com",
+    expertise: ["AI/ML", "Python"],
+    rating: 4.2,
+    activeBatches: 1,
+    isActive: true,
   },
   {
-    id: "drive_103",
-    title: "Data Science Drive",
-    company: { id: "comp_002", name: "Analytics Plus" },
-    status: "frozen",
-    currentStage: "shortlist",
-    candidates: 45,
-    createdAt: "2024-03-10T00:00:00Z",
+    id: "mentor_003",
+    name: "Arjun Das",
+    email: "arjun@uptoskills.com",
+    expertise: ["Java", "Spring Boot"],
+    rating: 3.8,
+    activeBatches: 0,
+    isActive: false,
   },
 ];
 
-const mockDriveDetail = {
-  id: "drive_101",
-  title: "MERN Stack Fresher Drive 2024",
-  company: { id: "comp_001", name: "TechCorp Ltd" },
-  status: "active",
-  currentStage: "training",
-  criteria: { minGpa: 7.0, maxOpenings: 30 },
-  pipeline: {
-    applied: 240,
-    screened: 180,
-    training: 120,
-    shortlisted: 48,
-    interviews: 0,
-    selected: 0,
+const mockMentorPerformance = {
+  mentor: {
+    id: "mentor_001",
+    name: "Rohit Sharma",
   },
-  assignedTest: { id: "assess_403", title: "MERN Stack Screening Test" },
-  assignedCourse: { id: "course_201", title: "MERN Full Stack Development" },
-};
-
-const mockCandidates = [
-  {
-    studentId: "stu_001",
-    name: "Vedant Bende",
-    college: "IIT Bombay",
-    currentStage: "training",
-    assessmentScore: 72,
-    trainingCompletion: "80%",
-  },
-  {
-    studentId: "stu_002",
-    name: "Ankit A.",
-    college: "BITS Pilani",
-    currentStage: "training",
-    assessmentScore: 68,
-    trainingCompletion: "65%",
-  },
-  {
-    studentId: "stu_003",
-    name: "Mukesh C.",
-    college: "Ranchi University",
-    currentStage: "screened",
-    assessmentScore: 55,
-    trainingCompletion: "0%",
-  },
-];
-
-export const PIPELINE_STAGES = [
-  "application",
-  "screening",
-  "training",
-  "shortlist",
-  "interviews",
-  "selection",
-];
-
-// Feature Flag: Use mock data instead of backend APIs
-// Set to false to use real backend APIs (when available)
-const USE_MOCK_DATA = true;
-export const getDriveById = async (driveId) => {
-  if (USE_MOCK_DATA) {
-    return mockDriveDetail;
-  }
-
-  try {
-    const response = await API.get(
-      `/api/v1/admin/drives/${driveId}`,
-      getConfig(),
-    );
-
-    return response.data;
-  } catch (error) {
-    return mockDriveDetail;
-  }
-};
-
-export const getCandidates = async (driveId) => {
-  if (USE_MOCK_DATA) {
-    return mockCandidates;
-  }
-
-  try {
-    const response = await API.get(
-      `/api/v1/admin/drives/${driveId}/candidates`,
-      getConfig(),
-    );
-
-    return response.data;
-  } catch (error) {
-    return mockCandidates;
-  }
-};
-
-export const advanceDrive = async (driveId) => {
-  if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      message: "Drive advanced successfully",
-    };
-  }
-
-  try {
-    const response = await API.patch(
-      `/api/v1/admin/drives/${driveId}/advance`,
-      {},
-      getConfig(),
-    );
-
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const freezeDrive = async (driveId) => {
-  if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      status: "frozen",
-    };
-  }
-
-  try {
-    const response = await API.patch(
-      `/api/v1/admin/drives/${driveId}/freeze`,
-      {},
-      getConfig(),
-    );
-
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const unfreezeDrive = async (driveId) => {
-  if (USE_MOCK_DATA) {
-    return {
-      success: true,
+  rating: 4.8,
+  totalReviews: 32,
+  completionRate: "87%",
+  avgAssignmentScore: 74,
+  recentFeedback: [
+    {
+      studentId: "stu_001",
+      rating: 5,
+      comment: "Very helpful and clear explanations.",
+    },
+    {
+      studentId: "stu_002",
+      rating: 4,
+      comment: "Good depth on backend topics.",
+    },
+  ],
+  batchHistory: [
+    {
+      driveId: "drive_101",
+      batchId: "batch_301",
+      title: "MERN Batch 1",
       status: "active",
+    },
+    {
+      driveId: "drive_099",
+      batchId: "batch_280",
+      title: "React Dev Batch",
+      status: "completed",
+    },
+  ],
+};
+
+// Mentor Management APIs
+
+export const getMentors = async () => {
+  if (USE_MOCK_DATA) {
+    return mockMentors;
+  }
+
+  try {
+    const response = await API.get("/api/v1/admin/mentors");
+    return response.data;
+  } catch (error) {
+    return mockMentors;
+  }
+};
+
+export const getMentorById = async (mentorId) => {
+  if (USE_MOCK_DATA) {
+    const mentor = mockMentors.find((m) => m.id === mentorId);
+    return mentor || mockMentors[0];
+  }
+
+  try {
+    const response = await API.get(`/api/v1/admin/mentors/${mentorId}`);
+    return response.data;
+  } catch (error) {
+    const mentor = mockMentors.find((m) => m.id === mentorId);
+    return mentor || mockMentors[0];
+  }
+};
+
+export const getMentorPerformance = async (mentorId) => {
+  if (USE_MOCK_DATA) {
+    return {
+      ...mockMentorPerformance,
+      mentor: {
+        ...mockMentorPerformance.mentor,
+        id: mentorId,
+      },
     };
+  }
+
+  try {
+    const response = await API.get(`/api/v1/admin/mentors/${mentorId}/performance`);
+    return response.data;
+  } catch (error) {
+    return {
+      ...mockMentorPerformance,
+      mentor: {
+        ...mockMentorPerformance.mentor,
+        id: mentorId,
+      },
+    };
+  }
+};
+
+export const createMentor = async (mentorData) => {
+  if (USE_MOCK_DATA) {
+    return { success: true, data: mentorData };
+  }
+
+  try {
+    const response = await API.post("/api/v1/admin/mentors", mentorData);
+    return response.data;
+  } catch (error) {
+    return { success: true, data: mentorData };
+  }
+};
+
+export const assignMentor = async (mentorId, batchId) => {
+  if (USE_MOCK_DATA) {
+    return { success: true, mentorId, batchId };
   }
 
   try {
     const response = await API.patch(
-      `/api/v1/admin/drives/${driveId}/unfreeze`,
-      {},
-      getConfig(),
+      `/api/v1/admin/mentors/${mentorId}/assign`,
+      { batchId }
     );
-
     return response.data;
   } catch (error) {
-    throw error;
+    return { success: true, mentorId, batchId };
   }
 };
 
-export const moveCandidate = async (driveId, payload) => {
+export const replaceMentor = async (mentorId, newMentorId) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      ...payload,
-    };
+    return { success: true, mentorId, newMentorId };
   }
 
   try {
     const response = await API.patch(
-      `/api/v1/admin/drives/${driveId}/move-candidate`,
-      payload,
-      getConfig(),
+      `/api/v1/admin/mentors/${mentorId}/replace`,
+      { newMentorId }
     );
-
     return response.data;
   } catch (error) {
-    throw error;
+    return { success: true, mentorId, newMentorId };
   }
 };
 
-export const shortlistCandidates = async (driveId, payload) => {
+export const deleteMentor = async (mentorId) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      shortlistedCount: payload.topN,
-    };
+    return { success: true, mentorId };
   }
 
   try {
-    const response = await API.patch(
-      `/api/v1/admin/drives/${driveId}/shortlist`,
-      payload,
-      getConfig(),
-    );
-
+    const response = await API.delete(`/api/v1/admin/mentors/${mentorId}`);
     return response.data;
   } catch (error) {
-    throw error;
+    return { success: true, mentorId };
   }
 };
+/* ===========================================
+   Disputes
+=========================================== */
 
-export const assignTest = async (driveId, payload) => {
-  if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      assignedTest: payload,
-    };
-  }
-
-  try {
-    const response = await API.post(
-      `/api/v1/admin/drives/${driveId}/assign-test`,
-      payload,
-      getConfig(),
-    );
-
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const assignCourse = async (driveId, payload) => {
-  if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      assignedCourse: payload,
-    };
-  }
-
-  try {
-    const response = await API.post(
-      `/api/v1/admin/drives/${driveId}/assign-course`,
-      payload,
-      getConfig(),
-    );
-
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const updateDrive = async (driveId, payload) => {
-  if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      updatedDrive: payload,
-    };
-  }
-
-  try {
-    const response = await API.put(
-      `/api/v1/admin/drives/${driveId}`,
-      payload,
-      getConfig(),
-    );
-
-    return response.data;
-  } catch (error) {
-  throw error;
-}
-};
-
-const getToken = () => localStorage.getItem("token");
-
-export const getAssessmentById = async (assessmentId) => {
+export const getDisputes = async (params = {}) => {
   const response = await API.get(
-    `/api/v1/admin/assessments/${assessmentId}`,
+    "/api/v1/admin/disputes",
     {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
+      ...getConfig(),
+      params,
     }
   );
 
   return response.data;
 };
 
-export const addQuestion = async (
-  assessmentId,
-  payload
-) => {
-  const response = await API.post(
-    `/api/v1/admin/assessments/${assessmentId}/questions`,
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
+export const getDisputeById = async (id) => {
+  const response = await API.get(
+    `/api/v1/admin/disputes/${id}`,
+    getConfig()
   );
 
   return response.data;
 };
 
-export const updateQuestion = async (
-  assessmentId,
-  questionId,
-  payload
-) => {
-  const response = await API.put(
-    `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
-  );
-
-  return response.data;
-};
-
-export const deleteQuestion = async (
-  assessmentId,
-  questionId
-) => {
-  const response = await API.delete(
-    `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
-  );
-
-  return response.data;
-};
-
-export const publishAssessment = async (
-  assessmentId
-) => {
+export const reviewDispute = async (id) => {
   const response = await API.patch(
-    `/api/v1/admin/assessments/${assessmentId}/publish`,
+    `/api/v1/admin/disputes/${id}/review`,
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
+    getConfig()
   );
 
   return response.data;
 };
 
-export const getDrives = async () => {
-  const response = await API.get(
-    "/api/v1/admin/drives",
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
+export const resolveDispute = async (id, resolution) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/resolve`,
+    { resolution },
+    getConfig()
   );
 
   return response.data;
 };
 
+export const escalateDispute = async (id, reason) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/escalate`,
+    { reason },
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const addDisputeNote = async (id, note) => {
+  const response = await API.post(
+    `/api/v1/admin/disputes/${id}/notes`,
+    { note },
+    getConfig()
+  );
+
+  return response.data;
+};
 
 // Mock Notification Data
 
