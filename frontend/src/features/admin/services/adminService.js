@@ -1117,3 +1117,128 @@ export const addDisputeNote = async (id, note) => {
 
   return response.data;
 };
+
+// Mock Notification Data
+
+const mockNotifications = [
+  {
+    id: "notif_501",
+    subject: "MERN Drive Now Open",
+    recipientCount: 1432,
+    status: "sent",
+  },
+];
+
+const mockTemplates = [
+  {
+    id: "tmpl_001",
+    name: "Drive Opening",
+    subject: "New Drive Now Open",
+  },
+];
+
+// =========================
+// Notification APIs
+// =========================
+
+export const sendNotification = async (payload) => {
+  if (USE_MOCK_DATA) {
+    return {
+      success: true,
+      message: "Notification sent successfully",
+      notification: {
+        id: "notif_501",
+        ...payload,
+        status: "sent",
+      },
+    };
+  }
+
+  try {
+    const response = await API.post(
+      "/api/v1/admin/notifications/send",
+      payload,
+      getConfig(),
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const scheduleNotification = async (payload) => {
+  if (USE_MOCK_DATA) {
+    return {
+      success: true,
+      message: "Notification scheduled successfully",
+      notification: {
+        id: "notif_502",
+        ...payload,
+        status: "scheduled",
+      },
+    };
+  }
+
+  try {
+    const response = await API.post(
+      "/api/v1/admin/notifications/schedule",
+      payload,
+      getConfig(),
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getNotificationTemplates = async () => {
+  if (USE_MOCK_DATA) {
+    return {
+      templates: mockTemplates,
+    };
+  }
+
+  try {
+    const response = await API.get(
+      "/api/v1/admin/notifications/templates",
+      getConfig(),
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+
+    return {
+      templates: mockTemplates,
+    };
+  }
+};
+
+export const createNotificationTemplate = async (payload) => {
+  if (USE_MOCK_DATA) {
+    return {
+      success: true,
+      template: {
+        id: `tmpl_${Date.now()}`,
+        ...payload,
+      },
+    };
+  }
+
+  try {
+    const response = await API.post(
+      "/api/v1/admin/notifications/templates",
+      payload,
+      getConfig(),
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
