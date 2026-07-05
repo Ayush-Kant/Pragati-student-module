@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
@@ -48,3 +49,10 @@ const StatsCard = ({ title, value, change, trend = "up", icon: Icon, iconBg }) =
 };
 
 export default StatsCard;
+=======
+import React from 'react';
+
+export default function StatsCard() {
+  return <div>StatsCard</div>;
+}
+>>>>>>> d67cfd6b201056c03d2d1d17ae4cb71e2e7e97fc

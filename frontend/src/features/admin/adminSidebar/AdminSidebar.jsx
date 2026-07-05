@@ -585,252 +585,264 @@
 
 // export default AdminSidebar;
 import {
-  RiDashboardFill,
-  RiBuilding2Fill,
-  RiGraduationCapFill,
-  RiTeamFill,
-  RiUserStarFill,
-  RiFileList3Fill,
-  RiBook2Fill,
-  RiRocket2Fill,
-  RiNotification3Fill,
-  RiAuctionFill,
-  RiCloseLine,
-} from "react-icons/ri";
+  FaBorderAll,
+  FaBuilding,
+  FaGraduationCap,
+  FaUsers,
+  FaUserTie,
+  FaClipboardCheck,
+  FaBook,
+  FaRocket,
+  FaBell,
+  FaGavel,
+  FaXmark,
+} from "react-icons/fa6";
 
 import { NavLink } from "react-router-dom";
+
 import logo from "../../../assets/logo.png";
 
 function AdminSidebar({
   openSidebar,
   setOpenSidebar,
+  darkMode,
 }) {
+
   const menuSections = [
-    {
-      heading: "Overview",
-      items: [
-        {
-          title: "Dashboard",
-          path: "/admin",
-          icon: <RiDashboardFill />,
-          color: "bg-[#19c79a]",
-        },
-      ],
-    },
+  {
+    heading: "Overview",
+    items: [
+      {
+        title: "Dashboard",
+        path: "/admin",
+        icon: <FaBorderAll />,
+      },
+    ],
+  },
 
-    {
-      heading: "Management",
-      items: [
-        {
-          title: "Companies",
-          path: "/admin/companies",
-          icon: <RiBuilding2Fill />,
-          color: "bg-[#ff6b35]",
-         
-        },
-        {
-          title: "Colleges",
-          path: "/admin/colleges",
-          icon: <RiGraduationCapFill />,
-          color: "bg-[#f4a300]",
-          
-        },
-        {
-          title: "Students",
-          path: "/admin/students",
-          icon: <RiTeamFill />,
-          color: "bg-[#8b5cf6]",
-        },
-        {
-          title: "Mentors",
-          path: "/admin/mentors",
-          icon: <RiUserStarFill />,
-          color: "bg-[#0284c7]",
-        },
-      ],
-    },
+  {
+    heading: "Management",
+    items: [
+      {
+        title: "Companies",
+        path: "/admin/companies",
+        icon: <FaBuilding />,
+      },
+      {
+        title: "Colleges",
+        path: "/admin/colleges",
+        icon: <FaGraduationCap />,
+      },
+      {
+        title: "Students",
+        path: "/admin/students",
+        icon: <FaUsers />,
+      },
+      {
+        title: "Mentors",
+        path: "/admin/mentors",
+        icon: <FaUserTie />,
+      },
+    ],
+  },
 
-    {
-      heading: "Academics",
-      items: [
-        {
-          title: "Assessments",
-          path: "/admin/assesments",
-          icon: <RiFileList3Fill />,
-          color: "bg-[#0f2857]",
-        },
-        {
-          title: "Training (LMS)",
-          path: "/admin/training",
-          icon: <RiBook2Fill />,
-          color: "bg-[#06b6d4]",
-        },
-      ],
-    },
+  {
+    heading: "Academics",
+    items: [
+      {
+        title: "Assessments",
+        path: "/admin/assesments",
+        icon: <FaClipboardCheck />,
+      },
+      {
+        title: "Training LMS",
+        path: "/admin/training",
+        icon: <FaBook />,
+      },
+    ],
+  },
 
-    {
-      heading: "Recruitment",
-      items: [
-        {
-          title: "Drives",
-          path: "/admin/drives",
-          icon: <RiRocket2Fill />,
-          color: "bg-[#ff4d4f]",
-        },
-      ],
-    },
+  {
+    heading: "Recruitment",
+    items: [
+      {
+        title: "Drives",
+        path: "/admin/drives",
+        icon: <FaRocket />,
+      },
+    ],
+  },
 
-    {
-      heading: "Communications",
-      items: [
-        {
-          title: "Notifications",
-          path: "/admin/notification",
-          icon: <RiNotification3Fill />,
-          color: "bg-[#ec4899]",
-        },
-        {
-          title: "Disputes",
-          path: "/admin/disputes",
-          icon: <RiAuctionFill />,
-          color: "bg-[#6366f1]",
-        },
-      ],
-    },
+  {
+    heading: "Communications",
+    items: [
+      {
+        title: "Notifications",
+        path: "/admin/notification",
+        icon: <FaBell />,
+      },
+      {
+        title: "Disputes",
+        path: "/admin/disputes",
+        icon: <FaGavel />,
+      },
+    ],
+  },
+
+
   ];
 
   return (
     <aside
+    
       className={`
-        fixed top-0 left-0 z-50
-        h-screen w-[270px]
-        overflow-y-auto
-        bg-[#f7f7f8]
-        border-r border-gray-200
+        fixed top-0 left-0 z-50 h-screen w-64
+        p-5 overflow-y-auto border-r
         transition-all duration-300
 
+        ${
+          darkMode
+            ? "bg-gray-900 border-gray-700"
+            : "bg-white border-gray-200"
+        }
+
         ${openSidebar ? "translate-x-0" : "-translate-x-full"}
+
         md:translate-x-0
       `}
     >
-      {/* Mobile Close */}
       <button
-        onClick={() => setOpenSidebar(false)}
-        className="
-          md:hidden absolute top-5 right-5
-          text-gray-500 text-2xl
-        "
-      >
-        <RiCloseLine />
-      </button>
+  onClick={() => setOpenSidebar(false)}
+  className="
+    md:hidden
+    absolute top-5 right-5
+    text-xl
+    text-gray-500
+  "
+>
+  <FaXmark />
+</button>
 
       {/* Logo */}
-      <div className="flex justify-start px-5 pt-4 pb-7">
+      <div className="flex justify-center mb-6 pt-1">
+
         <img
           src={logo}
           alt="logo"
-          className="h-12 object-contain"
+          className="h-12 w-auto"
         />
+
       </div>
 
-      {/* Menu */}
-      <div className="px-3 pb-10">
-        {menuSections.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="mb-7">
-            {/* Heading */}
-            <h2
-              className="
-                text-[13px]
-                uppercase
-                font-bold
-                tracking-wider
-                text-[#9ca3af]
-                mb-3
-                px-2
-              "
-            >
-              {section.heading}
-            </h2>
+      {/* Sections */}
+      {menuSections.map((section, sectionIndex) => (
 
-            {/* Items */}
-            <div className="flex flex-col gap-1">
-              {section.items.map((item, index) => (
-                <NavLink
-                  key={index}
-                  to={item.path}
-                  end={item.title === "Dashboard"}
-                  onClick={() => setOpenSidebar(false)}
-                  className={({ isActive }) => `
-                    flex items-center justify-between
-                    px-4 py-3
-                    rounded-none
-                    transition-all duration-300
+        <div key={sectionIndex} className="mb-6">
 
-                    ${
-                      isActive
-                        ? "bg-[#dff4fb]"
-                        : "hover:bg-white"
-                    }
-                  `}
-                >
-                  {({ isActive }) => (
-                    <>
-                      <div className="flex items-center gap-4">
-                        {/* Icon */}
-                        <div
-                          className={`
-                            h-9 w-9
-                            rounded-xl
-                            flex items-center justify-center
-                            text-white text-[18px]
-                            ${item.color}
-                          `}
-                        >
-                          {item.icon}
-                        </div>
+          {/* Heading */}
+          <h2
+            className={`
+              text-xs uppercase font-semibold
+              mb-3 px-2 tracking-wide
 
-                        {/* Title */}
-                        <span
-                          className={`
-                            text-[17px]
-                            font-medium
-                            ${
-                              isActive
-                                ? "text-[#4b5563]"
-                                : "text-[#4b5563]"
-                            }
-                          `}
-                        >
-                          {item.title}
-                        </span>
-                      </div>
+              ${
+                darkMode
+                  ? "text-gray-500"
+                  : "text-gray-400"
+              }
+            `}
+          >
+            {section.heading}
+          </h2>
 
-                      {/* Badge */}
-                      {item.badge && (
-                        <div
-                          className="
-                            min-w-[24px]
-                            h-6
-                            px-2
-                            rounded-full
-                            bg-[#ff6b35]
-                            text-white
-                            text-[12px]
-                            font-semibold
-                            flex items-center justify-center
-                          "
-                        >
-                          {item.badge}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </NavLink>
-              ))}
-            </div>
+          {/* Items */}
+          <div className="flex flex-col gap-2">
+
+            {section.items.map((item, index) => (
+
+              <NavLink
+                to={item.path}
+                end={item.title === "Dashboard"}
+                key={index}
+
+                onClick={() => setOpenSidebar(false)}
+
+                className={({ isActive }) => `
+                  flex items-center gap-4
+                  px-4 py-3 rounded-xl
+                  transition-all duration-300 text-left
+
+                  ${
+                    isActive
+                      ? darkMode
+                        ? "bg-gray-800 text-sky-400"
+                        : "bg-sky-100 text-sky-600"
+                      : darkMode
+                        ? "text-gray-300 hover:bg-gray-800"
+                        : "text-gray-600 hover:bg-gray-100"
+                  }
+                `}
+              >
+
+                
+                {/* Icon */}
+         <div
+            className={`
+            flex items-center justify-center
+            w-10 h-10 rounded-xl
+            text-lg shadow-sm
+
+          ${
+              item.title === "Dashboard"
+              ? "bg-[#22C55E] text-white"
+
+              : item.title === "Companies"
+              ? "bg-[#FF7A30] text-white"
+
+              : item.title === "Colleges"
+              ? "bg-[#D9A11A] text-white"
+
+              : item.title === "Students"
+              ? "bg-[#7C4DFF] text-white"
+
+              : item.title === "Mentors"
+              ? "bg-[#0E7AC4] text-white"
+
+              : item.title === "Assessments"
+              ? "bg-[#12234A] text-white"
+
+              : item.title === "Training LMS"
+              ? "bg-[#21C7E6] text-white"
+
+              : item.title === "Drives"
+              ? "bg-[#F35B57] text-white"
+
+              : item.title === "Notifications"
+              ? "bg-[#E85AA9] text-white"
+
+              : "bg-[#6C8CFF] text-white"
+            }
+         `}
+          >
+              {item.icon}
           </div>
-        ))}
-      </div>
+            {/* Icon */}
+
+                {/* Title */}
+                <span className="font-medium text-sm">
+                  {item.title}
+                </span>
+
+              </NavLink>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      ))}
+
     </aside>
   );
 }

@@ -1,5 +1,6 @@
-import React from "react";
+import React from 'react';
 
+<<<<<<< HEAD
 const StatsSkeleton = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -23,3 +24,8 @@ const StatsSkeleton = () => {
 };
 
 export default StatsSkeleton;
+=======
+export default function StatsSkeleton() {
+  return <div>StatsSkeleton</div>;
+}
+>>>>>>> d67cfd6b201056c03d2d1d17ae4cb71e2e7e97fc

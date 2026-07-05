@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import StatsCard from "./StatsCard";
 import {
@@ -129,3 +130,10 @@ const StatsGrid = () => {
 };
 
 export default StatsGrid;
+=======
+import React from 'react';
+
+export default function StatsGrid() {
+  return <div>StatsGrid</div>;
+}
+>>>>>>> d67cfd6b201056c03d2d1d17ae4cb71e2e7e97fc

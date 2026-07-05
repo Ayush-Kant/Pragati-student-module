@@ -10,6 +10,7 @@ const DashboardPage = () => {
   const { dashboardStats, isLoading } = useDashboardData();
 
   return (
+<<<<<<< HEAD
     <div className="flex flex-col gap-8 pb-10">
       
       {/* Header Block */}
@@ -44,6 +45,15 @@ const DashboardPage = () => {
       </div>
 
     </div>
+=======
+    <DashboardLayout>
+      <div>
+        <AdmissionsChart />
+        <PlacementChart />
+        <RevenueChart />
+      </div>
+    </DashboardLayout>
+>>>>>>> d67cfd6b201056c03d2d1d17ae4cb71e2e7e97fc
   );
 };
 
