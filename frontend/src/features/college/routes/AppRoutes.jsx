@@ -7,6 +7,7 @@ import OrganizationProfile from "../profile/pages/AddCollegeProfile";
 
 // 👇 Add this import
 import StudentDatabasePage from "../students/pages/StudentDatabasePage";
+import CompanyJobPostingsPage from "../company-job-postings/pages/CompanyJobPostingsPage";
 
 const collegeRoute = (
   <>
@@ -21,6 +22,7 @@ const collegeRoute = (
 
       {/* Student Database */}
       <Route path="student" element={<StudentDatabasePage />} />
+      <Route path="company-job-postings" element={<CompanyJobPostingsPage />} />
     </Route>
   </>
 );
