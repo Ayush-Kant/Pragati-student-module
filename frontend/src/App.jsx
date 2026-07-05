@@ -22,7 +22,12 @@ import CompanyRoute from "./features/company/routes/CompanyRoute";
 
 import NotFoundPage from "./routes/NotFoundPage";
 
+// Placement Drives
+import { CollegeLayout } from "./features/college/layouts/CollegeLayout";
+import PlacementDrivesPage from "./features/college/placement-drives/pages/PlacementDrivesPage";
+
 function App() {
+
   return (
     <AuthProvider>
       <Toaster />
@@ -45,6 +50,9 @@ function App() {
 
         {/* College */}
         {collegeRoute}
+        <Route path="/college" element={<CollegeLayout />}>
+          <Route path="drives" element={<PlacementDrivesPage />} />
+        </Route>
 
         {/* Company */}
         {CompanyRoute}
