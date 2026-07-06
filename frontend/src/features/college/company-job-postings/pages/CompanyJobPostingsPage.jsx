@@ -110,7 +110,7 @@ const CompanyJobPostingsPage = () => {
 
       <div className="mb-8">
 
-        <h1 className="text-4xl font-bold text-slate-800">
+        <h1 className="text-3xl font-bold text-slate-800">
           Company Job Postings
         </h1>
 
