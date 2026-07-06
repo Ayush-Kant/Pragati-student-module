@@ -22,7 +22,7 @@ const collegeRoute = (
 
       {/* Student Database */}
       <Route path="student" element={<StudentDatabasePage />} />
-      <Route path="company-job-postings" element={<CompanyJobPostingsPage />} />
+      <Route path="company" element={<CompanyJobPostingsPage />} />
     </Route>
   </>
 );
