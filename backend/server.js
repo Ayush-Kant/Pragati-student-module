@@ -14,12 +14,13 @@ import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
 import adminCourseRoutes from "./routes/admin.course.routes.js";
 import adminStudentRoutes from './routes/admin.student.routes.js';
 import adminMentorRoutes from './routes/admin.mentor.routes.js';
+import adminCompanyRoutes from "./routes/admin.company.routes.js";
 
 // Standard & Role-Specific Routes
 import authRouter from "./routes/auth.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
-import companyRoutes from "./routes/company.routes.js";
+import companyRoutes from "./routes/admin.company.routes.js";
 import companyProfileRoutes from "./modules/company/routes/companyProfile.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import questionBankRouter from "./routes/questionBank.routes.js";
@@ -65,7 +66,7 @@ app.use('/api/v1/admin/mentors', adminMentorRoutes);
 app.use("/api/v1/admin/courses", adminCourseRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
-app.use("/api/v1/admin/company", companyRoutes);
+app.use("/api/v1/admin/company", adminCompanyRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/company", companyProfileRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
