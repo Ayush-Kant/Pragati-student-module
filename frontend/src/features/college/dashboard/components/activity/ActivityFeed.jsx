@@ -1,6 +1,6 @@
 import ActivityCard from "./ActivityCard";
 
-const activities = [
+const defaultActivities = [
   {
     title: "TCS Placement Drive Published",
     time: "10 min ago",
@@ -23,7 +23,9 @@ const activities = [
   },
 ];
 
-const ActivityFeed = () => {
+const ActivityFeed = ({ activities = [] }) => {
+  const displayActivities = activities.length > 0 ? activities : defaultActivities;
+
   return (
     <div className="bg-white rounded-xl shadow border p-5">
       <h2 className="text-lg font-semibold mb-5">
@@ -31,7 +33,7 @@ const ActivityFeed = () => {
       </h2>
 
       <div className="space-y-4">
-        {activities.map((item, index) => (
+        {displayActivities.map((item, index) => (
           <ActivityCard key={index} {...item} />
         ))}
       </div>

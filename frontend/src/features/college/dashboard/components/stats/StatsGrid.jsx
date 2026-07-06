@@ -103,10 +103,12 @@ const iconMap = {
   }
 };
 
-const StatsGrid = () => {
+const StatsGrid = ({ stats }) => {
+  const displayStats = stats && stats.length > 0 ? stats : localStats;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {localStats.map((stat) => {
+      {displayStats.map((stat) => {
         const config = iconMap[stat.title] || {
           icon: Users,
           iconBg: "bg-gradient-to-br from-gray-50 to-slate-50 text-slate-600 border border-slate-100"

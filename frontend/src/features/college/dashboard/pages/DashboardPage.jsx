@@ -8,7 +8,14 @@ import ActivityFeed from "../components/activity/ActivityFeed";
 import RecentUpdates from "../components/activity/RecentUpdates";
 
 const DashboardPage = () => {
-  const { dashboardStats, isLoading } = useDashboardData();
+  const { 
+    dashboardStats, 
+    dashboardActivities,
+    placementAnalytics,
+    revenueAnalytics,
+    admissionsAnalytics,
+    isLoading 
+  } = useDashboardData();
 
   return (
     <div className="flex flex-col gap-8">
@@ -37,17 +44,17 @@ const DashboardPage = () => {
         </h2>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <AdmissionsChart />
-          <PlacementChart />
+          <AdmissionsChart data={admissionsAnalytics} />
+          <PlacementChart data={placementAnalytics} />
         </div>
 
         <div className="mt-6">
-          <RevenueChart />
+          <RevenueChart data={revenueAnalytics} />
         </div>
 
 {/* Recent Activity Section */}
 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-  <ActivityFeed />
+  <ActivityFeed activities={dashboardActivities} />
   <RecentUpdates />
 </div>
       </div>
