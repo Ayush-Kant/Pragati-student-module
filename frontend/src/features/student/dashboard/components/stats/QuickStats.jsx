@@ -1,28 +1,26 @@
-import StatCard from "./StatCard";
-import { quickStatsData } from "../../types/dashboardDummyData";
+// src/features/student/dashboard/components/stats/QuickStats.jsx
+import React from 'react';
+import StatCard from './StatCard';
 
-const QuickStats = ({ loading = false, error = false }) => {
-  if (loading) {
-    return (
-      <div className="text-center text-gray-500 py-10">Loading stats...</div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center text-red-500 py-10">
-        Failed to load stats.
-      </div>
-    );
-  }
+export default function QuickStats({ stats = [] }) {
+  // Fallback defaults matching the ticket requirements if data isn't loaded yet
+  const displayStats = stats.length > 0 ? stats : [
+    { title: "Completed Courses", value: "8", icon: "🎓" },
+    { title: "Active Courses", value: "3", icon: "📚" },
+    { title: "Attendance", value: "92%", icon: "📅" },
+    { title: "Total XP", value: "1450", icon: "✨" }
+  ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {quickStatsData.map((item, index) => (
-        <StatCard key={index} title={item.title} value={item.value} />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {displayStats.map((stat, idx) => (
+        <StatCard 
+          key={idx}
+          title={stat.title}
+          value={stat.value}
+          icon={stat.icon}
+        />
       ))}
     </div>
   );
-};
-
-export default QuickStats;
+}

@@ -1,83 +1,21 @@
-import { progressRingData } from "../../types/dashboardDummyData";
+// src/features/student/dashboard/components/progress/ProgressRing.jsx
+import React from 'react';
 
-const ProgressRing = ({ loading = false, error = false }) => {
-  if (loading) {
-    return <div className="text-gray-500">Loading progress...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500">Failed to load progress.</div>;
-  }
-
-  const { percentage } = progressRingData;
-
+export default function ProgressRing({ percentage = 75 }) {
   return (
-    <div
-      className="
-        bg-white/90
-        backdrop-blur-md
-        p-8
-        rounded-3xl
-        shadow-md
-        flex
-        flex-col
-        items-center
-        w-full
-        max-w-[260px]
-        border
-        border-gray-200
-        border-t-4
-        border-t-blue-500
-        transition-all
-        duration-300
-        hover:-translate-y-1
-        hover:shadow-xl
-        cursor-pointer
-      "
-    >
-      <h2
-        className="
-          mb-6
-          text-gray-900
-          text-2xl
-          font-semibold
-        "
-      >
-        Profile Completion
-      </h2>
-
-      <div
-        className="
-          w-[140px]
-          h-[140px]
-          rounded-full
-          flex
-          items-center
-          justify-center
-        "
-        style={{
-          background: `conic-gradient(#3b82f6 0% ${percentage}%, #bfdbfe ${percentage}% 100%)`,
-        }}
-      >
-        <div
-          className="
-            w-[96px]
-            h-[96px]
-            rounded-full
-            bg-white
-            flex
-            items-center
-            justify-center
-            text-2xl
-            font-bold
-            text-gray-900
-          "
-        >
-          {percentage}%
-        </div>
+    <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm flex flex-col items-center justify-center text-center">
+      <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4 w-full text-left">
+        Course Progression
+      </h3>
+      <div className="relative w-32 h-32 flex items-center justify-center mb-2">
+        {/* Simple visual fallback circle container using custom background track styles */}
+        <div className="absolute inset-0 rounded-full border-8 border-slate-800"></div>
+        <div className="absolute inset-0 rounded-full border-8 border-orange-500 border-t-transparent border-r-transparent animate-pulse opacity-40"></div>
+        <div className="absolute text-2xl font-bold text-white">{percentage}%</div>
       </div>
+      <p className="text-xs text-slate-400 max-w-[200px] mt-2">
+        Track overall completion benchmarks across modules.
+      </p>
     </div>
   );
-};
-
-export default ProgressRing;
+}

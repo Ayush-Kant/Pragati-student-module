@@ -1,30 +1,23 @@
-import React from "react";
-import { formatDate, formatStatus } from "../../utils/dashboardHelpers";
-
+// src/features/student/dashboard/components/tasks/TaskCard.jsx
+import React from 'react';
 
 export default function TaskCard({ task }) {
+  if (!task) return null;
 
   return (
-
-    <div className="bg-white rounded-2xl p-5 shadow-md border-l-4 border-purple-500 hover:shadow-xl transition">
-
-
-      <h3 className="text-lg font-bold text-gray-800">
-        {task.title}
-      </h3>
-
-
-      <p className="text-gray-600 mt-3">
-        📅 Due: {formatDate(task.dueDate)}
-      </p>
-
-
-      <span className="inline-block mt-4 px-4 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-medium">
-        {formatStatus(task.status)}
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-950/50 border border-slate-800 rounded-xl gap-2 hover:border-orange-500/30 transition-all duration-200">
+      <div className="flex items-start gap-3">
+        <span className="text-xs px-2 py-1 font-semibold rounded bg-slate-800 text-orange-400 border border-slate-700">
+          {task.type || 'Task'}
+        </span>
+        <div>
+          <h4 className="text-sm font-medium text-white">{task.title}</h4>
+          <p className="text-xs text-slate-400 mt-0.5">Due: {task.deadline}</p>
+        </div>
+      </div>
+      <span className="text-xs font-medium px-2.5 py-1 rounded-full self-start sm:self-center bg-orange-500/10 text-orange-400 border border-orange-500/20">
+        {task.status || 'Pending'}
       </span>
-
-
     </div>
-
   );
 }
