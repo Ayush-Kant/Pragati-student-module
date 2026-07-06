@@ -4,6 +4,8 @@ import RevenueChart from "../components/charts/RevenueChart";
 import StatsGrid from "../components/stats/StatsGrid";
 import StatsSkeleton from "../components/stats/StatsSkeleton";
 import useDashboardData from "../hooks/useDashboardData";
+import ActivityFeed from "../components/activity/ActivityFeed";
+import RecentUpdates from "../components/activity/RecentUpdates";
 
 const DashboardPage = () => {
   const { dashboardStats, isLoading } = useDashboardData();
@@ -42,6 +44,12 @@ const DashboardPage = () => {
         <div className="mt-6">
           <RevenueChart />
         </div>
+
+{/* Recent Activity Section */}
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+  <ActivityFeed />
+  <RecentUpdates />
+</div>
       </div>
     </div>
   );
