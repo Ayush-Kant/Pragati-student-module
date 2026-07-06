@@ -19,7 +19,7 @@ import CompanyRoute from "./features/company/routes/CompanyRoute";
 import CollegeProfilePage from "./features/college/profile/pages/CollegeProfilePage";
 
 // Placement Drives
-import { CollegeLayout } from "./features/college/layouts/CollegeLayout";
+import CollegeLayout from "./features/college/layouts/CollegeLayout";
 import PlacementDrivesPage from "./features/college/placement-drives/pages/PlacementDrivesPage";
 
 function App() {
