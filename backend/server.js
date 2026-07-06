@@ -12,6 +12,7 @@ import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import adminNotificationRoutes from "./routes/admin.notification.routes.js";
 import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
 import adminCourseRoutes from "./routes/admin.course.routes.js";
+import adminStudentRoutes from './routes/admin.student.routes.js';
 
 // Standard & Role-Specific Routes
 import authRouter from "./routes/auth.routes.js";
@@ -58,6 +59,7 @@ app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
+app.use('/api/v1/admin/students', adminStudentRoutes);
 app.use("/api/v1/admin/courses", adminCourseRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
