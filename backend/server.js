@@ -23,7 +23,8 @@ import questionBankRouter from "./routes/questionBank.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
-
+//company Assessment route
+import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
 dotenv.config();
@@ -65,13 +66,17 @@ app.use("/api/v1/company", companyProfileRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
-app.use("/api/v1/admin/notifications", adminNotificationRoutes);
+
 
 app.get("/", (req, res) => {
   res.json({
     message: "Backend is running",
   });
 });
+app.use(
+  "/api/v1/company/assessments",
+  companyAssessmentRoutes
+);
 
 app.use(errorMiddleware);
 
