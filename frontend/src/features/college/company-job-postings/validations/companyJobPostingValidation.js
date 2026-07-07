@@ -1,43 +1,43 @@
-export const validateCompany = (company) => {
-  if (!company.company.trim()) {
-    return "Company Name is required";
+export const validateCompany = (data) => {
+  const errors = {};
+
+  if (!data.company.trim()) {
+    errors.company = "Company name is required";
   }
 
-  if (!company.location.trim()) {
-    return "Location is required";
+  if (!data.location.trim()) {
+    errors.location = "Location is required";
   }
 
-  if (!company.package.trim()) {
-    return "Package is required";
+  if (!data.package.trim()) {
+    errors.package = "Package is required";
   }
 
-  return "";
+  return errors;
 };
 
-export const validateJobPosting = (job) => {
-  if (!job.role.trim()) {
-    return "Job Role is required";
+export const validateJobPosting = (data) => {
+  const errors = {};
+
+  if (!data.role.trim()) {
+    errors.role = "Job role is required";
   }
 
-  if (!job.company.trim()) {
-    return "Company Name is required";
+  if (!data.company.trim()) {
+    errors.company = "Company is required";
   }
 
-  if (!job.cgpa) {
-    return "CGPA is required";
+  if (!data.cgpa) {
+    errors.cgpa = "CGPA is required";
   }
 
-  if (!job.batch.trim()) {
-    return "Batch is required";
+  if (!data.batch.trim()) {
+    errors.batch = "Batch is required";
   }
 
-  if (!job.deadline) {
-    return "Deadline is required";
+  if (!data.deadline) {
+    errors.deadline = "Deadline is required";
   }
 
-  return "";
-};
-
-export const validateEligibility = () => {
-  return "";
+  return errors;
 };

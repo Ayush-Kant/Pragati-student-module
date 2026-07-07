@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import {
   getCompanies,
@@ -9,12 +9,15 @@ import {
 
 const useCompanyData = () => {
   const [companies, setCompanies] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
+
       const data = await getCompanies();
       setCompanies(data);
     } catch {
@@ -22,11 +25,16 @@ const useCompanyData = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchCompanies();
-  }, []);
+    // call async function inside effect to avoid setting state synchronously
+    const load = async () => {
+      await fetchCompanies(false);
+    };
+
+    load();
+  }, [fetchCompanies]);
 
   const addCompany = async (company) => {
     await createCompany(company);

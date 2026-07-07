@@ -9,15 +9,14 @@ import {
 
 const useJobPosting = () => {
   const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const fetchJobs = async () => {
     try {
-      setLoading(true);
       const data = await getJobPostings();
-      setJobs(data);
-    } catch (err) {
+      setJobs([...data]);
+    } catch {
       setError("Unable to fetch jobs.");
     } finally {
       setLoading(false);
@@ -25,22 +24,42 @@ const useJobPosting = () => {
   };
 
   useEffect(() => {
-    fetchJobs();
+    const loadJobs = async () => {
+      await fetchJobs();
+    };
+    loadJobs();
   }, []);
 
   const addJob = async (job) => {
-    await createJobPosting(job);
-    fetchJobs();
+    try {
+      const newJob = await createJobPosting(job);
+
+      setJobs((prev) => [...prev, newJob]);
+    } catch {
+      setError("Unable to add job.");
+    }
   };
 
-  const editJob = async (id, job) => {
-    await updateJobPosting(id, job);
-    fetchJobs();
+  const editJob = async (id, updatedJob) => {
+    try {
+      const job = await updateJobPosting(id, updatedJob);
+
+      setJobs((prev) =>
+        prev.map((item) => (item.id === id ? job : item))
+      );
+    } catch {
+      setError("Unable to update job.");
+    }
   };
 
   const removeJob = async (id) => {
-    await deleteJobPosting(id);
-    fetchJobs();
+    try {
+      await deleteJobPosting(id);
+
+      setJobs((prev) => prev.filter((job) => job.id !== id));
+    } catch {
+      setError("Unable to delete job.");
+    }
   };
 
   const toggleJobStatus = async (id) => {
@@ -51,11 +70,13 @@ const useJobPosting = () => {
     const updatedStatus =
       selectedJob.status === "Open" ? "Closed" : "Open";
 
-    await updateJobPosting(id, {
+    const updatedJob = await updateJobPosting(id, {
       status: updatedStatus,
     });
 
-    fetchJobs();
+    setJobs((prev) =>
+      prev.map((job) => (job.id === id ? updatedJob : job))
+    );
   };
 
   return {
