@@ -1,5 +1,8 @@
 import express from "express";
-import {connectDB} from "./config/db.js";
+import dotenv from "dotenv";
+import cors from "cors";
+
+import connectDB  from "./config/db.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
@@ -7,15 +10,18 @@ import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import collegeProfileRoutes from "./routes/collage.profile.routes.js";
-import cors from "cors";
 import companyRoutes from "./routes/company.routes.js";
-import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRouter from "./routes/auth.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
-import dotenv from "dotenv";
+
 import collegeJobsRoutes from "./routes/college.jobs.routes.js";
+
+import studentRoutes from "./routes/student.routes.js";
+
+import errorMiddleware from "./middleware/errorMiddleware.js";
+
 
 dotenv.config();
 const PORT = process.env.PORT || 5001;
@@ -49,6 +55,7 @@ app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
+app.use("/api/students", studentRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.get("/", (req, res) => {

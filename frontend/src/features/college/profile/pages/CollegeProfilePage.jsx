@@ -24,8 +24,6 @@ export default function CollegeProfilePage() {
     setLoading(false);
    };
 
-   console.log('Profile data:', profile);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
