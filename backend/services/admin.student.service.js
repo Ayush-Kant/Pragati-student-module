@@ -13,7 +13,7 @@ const listStudents         = async ({ search, college, skills, status, gpaMin, g
 
     if (college) {
         values.push(college);
-        conditions.push(`s.college_id = $${values.length}`);
+        conditions.push(`s.college = $${values.length}`);
     }
 
     if (status) {
@@ -23,12 +23,12 @@ const listStudents         = async ({ search, college, skills, status, gpaMin, g
 
     if (gpaMin) {
         values.push(gpaMin);
-        conditions.push(`s.gpa >= $${values.length}`);
+        conditions.push(`s.cgpa >= $${values.length}`);
     }
 
     if (gpaMax) {
         values.push(gpaMax);
-        conditions.push(`s.gpa <= $${values.length}`);
+        conditions.push(`s.cgpa <= $${values.length}`);
     }
 
     if (skills) {
@@ -49,10 +49,8 @@ const listStudents         = async ({ search, college, skills, status, gpaMin, g
     const query = `
         SELECT
             s.*,
-            c.name AS college_name
+            s.college AS college_name
         FROM students s
-        LEFT JOIN colleges c
-            ON c.id = s.college_id
         ${whereClause}
         ORDER BY s.created_at DESC
         LIMIT $${values.length - 1}
@@ -68,10 +66,8 @@ const getStudentById       = async (id) => {
         `
         SELECT
             s.*,
-            c.name AS college_name
+            s.college AS college_name
         FROM students s
-        LEFT JOIN colleges c
-            ON c.id = s.college_id
         WHERE s.id = $1
         `,
         [id]
@@ -205,7 +201,7 @@ const exportStudents       = async ({ college, skills, status, gpaMin, gpaMax })
 
     if (college) {
         values.push(college);
-        conditions.push(`s.college_id = $${values.length}`);
+        conditions.push(`s.college = $${values.length}`);
     }
 
     if (skills) {
@@ -220,12 +216,12 @@ const exportStudents       = async ({ college, skills, status, gpaMin, gpaMax })
 
     if (gpaMin) {
         values.push(gpaMin);
-        conditions.push(`s.gpa >= $${values.length}`);
+        conditions.push(`s.cgpa >= $${values.length}`);
     }
 
     if (gpaMax) {
         values.push(gpaMax);
-        conditions.push(`s.gpa <= $${values.length}`);
+        conditions.push(`s.cgpa <= $${values.length}`);
     }
 
     const whereClause =
@@ -239,13 +235,11 @@ const exportStudents       = async ({ college, skills, status, gpaMin, gpaMax })
             s.id,
             s.full_name,
             s.email,
-            c.name AS college,
+            s.college,
             s.skills,
-            s.gpa,
+            s.cgpa,
             s.status
         FROM students s
-        LEFT JOIN colleges c
-            ON c.id = s.college_id
         ${whereClause}
         ORDER BY s.created_at DESC
         `,
@@ -253,10 +247,10 @@ const exportStudents       = async ({ college, skills, status, gpaMin, gpaMax })
     );
 
     let csv =
-        'id,name,email,college,skills,gpa,status\n';
+        'id,name,email,college,skills,cgpa,status\n';
 
     rows.forEach((student) => {
-        csv += `${student.id},"${student.full_name}","${student.email}","${student.college}","${student.skills?.join(',') || ''}",${student.gpa},${student.status}\n`;
+        csv += `${student.id},"${student.full_name}","${student.email}","${student.college}","${student.skills?.join(',') || ''}",${student.cgpa},${student.status}\n`;
     });
 
     return csv;
