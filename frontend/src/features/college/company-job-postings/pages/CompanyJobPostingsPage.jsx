@@ -11,6 +11,7 @@ import useJobPosting from "../hooks/useJobPosting";
 import useJobFilters from "../hooks/useJobFilters";
 
 import CompanyTable from "../components/company/CompanyTable";
+import CompanyDetails from "../components/company/CompanyDetails";
 import JobPostingTable from "../components/jobs/JobPostingTable";
 
 import CompanyForm from "../components/forms/CompanyForm";
@@ -32,6 +33,7 @@ const CompanyJobPostingsPage = () => {
     loading: companyLoading,
     error: companyError,
     addCompany,
+    editCompany,
     removeCompany,
   } = useCompanyData();
 
@@ -40,6 +42,7 @@ const CompanyJobPostingsPage = () => {
     loading: jobLoading,
     error: jobError,
     addJob,
+    editJob,
     removeJob,
     toggleJobStatus,
   } = useJobPosting();
@@ -50,12 +53,15 @@ const CompanyJobPostingsPage = () => {
   const [batch, setBatch] = useState("");
   const [status, setStatus] = useState("");
 
-  // If your hook exists and works, use it.
-  // Otherwise this page still works because of the fallback filters below.
+  const [editingJob, setEditingJob] = useState(null);
+
+  const [editingCompany, setEditingCompany] = useState(null);
+  const [viewCompany, setViewCompany] = useState(null);
+
   try {
     useJobFilters(jobs);
-  } catch (error) {
-    console.error("useJobFilters hook is not implemented or has an error:", error);
+  } catch (e) {
+    console.warn("useJobFilters error:", e);
   }
 
   const filteredCompanies = companies.filter((company) =>
@@ -91,6 +97,40 @@ const CompanyJobPostingsPage = () => {
     (job) => job.status === "Closed"
   ).length;
 
+  // ---------------- Company ----------------
+
+  const handleEditCompany = (company) => {
+    setEditingCompany(company);
+  };
+
+  const handleViewCompany = (company) => {
+    setViewCompany(company);
+  };
+
+  const handleSubmitCompany = async (data) => {
+    if (editingCompany) {
+      await editCompany(editingCompany.id, data);
+      setEditingCompany(null);
+    } else {
+      await addCompany(data);
+    }
+  };
+
+  // ---------------- Job ----------------
+
+  const handleEditJob = (job) => {
+    setEditingJob(job);
+  };
+
+  const handleSubmitJob = async (data) => {
+    if (editingJob) {
+      await editJob(editingJob.id, data);
+      setEditingJob(null);
+    } else {
+      await addJob(data);
+    }
+  };
+
   if (companyLoading || jobLoading) {
     return <LoadingSpinner />;
   }
@@ -109,15 +149,13 @@ const CompanyJobPostingsPage = () => {
       {/* Header */}
 
       <div className="mb-8">
-
-        <h1 className="text-3xl font-bold text-slate-800">
+        <h1 className="text-3xl font-bold">
           Company Job Postings
         </h1>
 
-        <p className="text-slate-500 mt-2">
+        <p className="text-slate-500">
           Placement Management Dashboard
         </p>
-
       </div>
 
       {/* Statistics */}
@@ -125,87 +163,59 @@ const CompanyJobPostingsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
 
         <div className="bg-white rounded-xl shadow p-6 flex justify-between">
-
           <div>
-
-            <p className="text-slate-500">
-              Companies
-            </p>
-
+            <p className="text-slate-500">Companies</p>
             <h2 className="text-3xl font-bold">
               {companies.length}
             </h2>
-
           </div>
 
           <Building2
             size={42}
             className="text-blue-600"
           />
-
         </div>
 
         <div className="bg-white rounded-xl shadow p-6 flex justify-between">
-
           <div>
-
-            <p className="text-slate-500">
-              Job Postings
-            </p>
-
+            <p className="text-slate-500">Job Postings</p>
             <h2 className="text-3xl font-bold">
               {jobs.length}
             </h2>
-
           </div>
 
           <BriefcaseBusiness
             size={42}
             className="text-purple-600"
           />
-
         </div>
 
         <div className="bg-white rounded-xl shadow p-6 flex justify-between">
-
           <div>
-
-            <p className="text-slate-500">
-              Open Jobs
-            </p>
-
+            <p className="text-slate-500">Open Jobs</p>
             <h2 className="text-3xl font-bold">
               {openJobs}
             </h2>
-
           </div>
 
           <CircleCheckBig
             size={42}
             className="text-green-600"
           />
-
         </div>
 
         <div className="bg-white rounded-xl shadow p-6 flex justify-between">
-
           <div>
-
-            <p className="text-slate-500">
-              Closed Jobs
-            </p>
-
+            <p className="text-slate-500">Closed Jobs</p>
             <h2 className="text-3xl font-bold">
               {closedJobs}
             </h2>
-
           </div>
 
           <CircleX
             size={42}
             className="text-red-500"
           />
-
         </div>
 
       </div>
@@ -255,29 +265,28 @@ const CompanyJobPostingsPage = () => {
       <div className="grid lg:grid-cols-3 gap-8 mb-10">
 
         <div>
-
           <CompanyForm
-            onSubmit={addCompany}
+            editingCompany={editingCompany}
+            onSubmit={handleSubmitCompany}
           />
-
         </div>
 
         <div className="lg:col-span-2">
-
-          {filteredCompanies.length ? (
-            <CompanyTable
-              companies={filteredCompanies}
-              onView={() => {}}
-              onEdit={() => {}}
-              onDelete={removeCompany}
-            />
-          ) : (
-            <EmptyState message="No Companies Found" />
-          )}
-
+          <CompanyTable
+            companies={filteredCompanies}
+            onView={handleViewCompany}
+            onEdit={handleEditCompany}
+            onDelete={removeCompany}
+          />
         </div>
 
       </div>
+
+      {viewCompany && (
+        <div className="mb-10">
+          <CompanyDetails company={viewCompany} />
+        </div>
+      )}
 
       {/* Jobs */}
 
@@ -286,7 +295,8 @@ const CompanyJobPostingsPage = () => {
         <div>
 
           <JobPostingForm
-            onSubmit={addJob}
+            editingJob={editingJob}
+            onSubmit={handleSubmitJob}
           />
 
         </div>
@@ -296,7 +306,7 @@ const CompanyJobPostingsPage = () => {
           {filteredJobs.length ? (
             <JobPostingTable
               jobs={filteredJobs}
-              onEdit={() => {}}
+              onEdit={handleEditJob}
               onDelete={removeJob}
               onToggleStatus={toggleJobStatus}
             />

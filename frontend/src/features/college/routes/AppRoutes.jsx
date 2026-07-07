@@ -22,6 +22,10 @@ const collegeRoute = (
         path="company-job-postings"
         element={<CompanyJobPostingsPage />}
       />
+
+      {/* Student Database */}
+      <Route path="student" element={<StudentDatabasePage />} />
+      <Route path="companies" element={<CompanyJobPostingsPage />} />
     </Route>
   </>
 );

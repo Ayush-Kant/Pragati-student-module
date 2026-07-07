@@ -28,7 +28,7 @@ function App() {
     <AuthProvider>
       <Toaster />
       <Routes>
-        <Route path="/" element={<Navigate to="/uptoskills-profile" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
         {/* ── Auth Routes ── */}
         <Route path='/login' element={<LoginPage />} />
