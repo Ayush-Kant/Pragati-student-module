@@ -2,8 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
-import { connectDB } from "./config/db.js";
-
+import connectDB  from "./config/db.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";

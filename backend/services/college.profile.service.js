@@ -12,9 +12,14 @@ export const getProfile = async (id) => {
 };
 
 export const updateProfile = async (id, data) => {
+  // Sanitize empty strings to null for database inserts/updates
+  const sanitizedData = {};
+  for (const key in data) {
+    sanitizedData[key] = data[key] === "" ? null : data[key];
+  }
 
-  const fields = Object.keys(data);
-  const values = Object.values(data);
+  const fields = Object.keys(sanitizedData);
+  const values = Object.values(sanitizedData);
 
   const setClause = fields
     .map((field, index) => `${field} = $${index + 1}`)
@@ -31,9 +36,14 @@ export const updateProfile = async (id, data) => {
 };
 
 export const createProfile = async (data) => {
+  // Sanitize empty strings to null for database inserts/updates
+  const sanitizedData = {};
+  for (const key in data) {
+    sanitizedData[key] = data[key] === "" ? null : data[key];
+  }
 
-  const fields = Object.keys(data);
-  const values = Object.values(data);
+  const fields = Object.keys(sanitizedData);
+  const values = Object.values(sanitizedData);
 
   const placeholders = values.map((_, index) => `$${index + 1}`);
 
