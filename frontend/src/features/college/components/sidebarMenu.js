@@ -1,12 +1,15 @@
 import {
   LayoutDashboard,
   User,
-  Users,
   Building2,
+  GraduationCap,
+  Users,
+  TrendingUp,
   Briefcase,
-  ClipboardList,
+  UserCheck,
   BarChart3,
   FileText,
+  Megaphone,
   Settings,
   HelpCircle,
   LogOut,
@@ -22,21 +25,25 @@ const sidebarMenu = [
         icon: LayoutDashboard,
       },
       {
-        name: "Profile",
+        name: "College Profile",
         path: "/college/profile",
         icon: User,
       },
       {
-        name: "Students",
-        path: "/college/student",
-        icon: Users,
+        name: "Departments",
+        path: "/college/departments",
+        icon: Building2,
       },
-    ],
-  },
-
-  {
-    title: "PLACEMENTS",
-    items: [
+      {
+        name: "Student Database",
+        path: "/college/student",
+        icon: GraduationCap,
+      },
+      {
+        name: "Student Performance",
+        path: "/college/student-performance",
+        icon: TrendingUp,
+      },
       {
         name: "Companies",
         path: "/college/companies",
@@ -48,16 +55,10 @@ const sidebarMenu = [
         icon: Briefcase,
       },
       {
-        name: "Applications",
-        path: "/college/applications",
-        icon: ClipboardList,
+        name: "Student Nomination",
+        path: "/college/student-nomination",
+        icon: UserCheck,
       },
-    ],
-  },
-
-  {
-    title: "REPORTS",
-    items: [
       {
         name: "Analytics",
         path: "/college/analytics",
@@ -67,6 +68,11 @@ const sidebarMenu = [
         name: "Reports",
         path: "/college/reports",
         icon: FileText,
+      },
+      {
+        name: "Announcements",
+        path: "/college/announcements",
+        icon: Megaphone,
       },
     ],
   },
@@ -80,7 +86,7 @@ const sidebarMenu = [
         icon: Settings,
       },
       {
-        name: "Help",
+        name: "Help & Support",
         path: "/college/help",
         icon: HelpCircle,
       },
