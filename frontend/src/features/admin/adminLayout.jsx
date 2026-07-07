@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
 import AdminNavbar from "./adminNavbar/AdminNavbar";
@@ -7,25 +7,32 @@ import AdminFooter from "./adminFooter/AdminFooter";
 import { useAdminProfile } from "./hooks/useAdminProfile";
 
 const AdminLayout = () => {
-
   const {
     profile,
     loading,
     error,
-    saveProfile
+    saveProfile,
   } = useAdminProfile();
 
   // Sidebar Toggle
   const [openSidebar, setOpenSidebar] = useState(false);
 
   // Dark Mode
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("theme") === "dark"
+  );
+
+  useEffect(() => {
+    localStorage.setItem(
+      "theme",
+      darkMode ? "dark" : "light"
+    );
+  }, [darkMode]);
 
   return (
     <div
       className={`
         min-h-screen transition-all duration-300
-
         ${
           darkMode
             ? "bg-gray-900 text-white"
@@ -33,7 +40,6 @@ const AdminLayout = () => {
         }
       `}
     >
-
       {/* Navbar */}
       <AdminNavbar
         openSidebar={openSidebar}
@@ -44,7 +50,6 @@ const AdminLayout = () => {
       />
 
       <div className="flex">
-
         {/* Sidebar */}
         <AdminSidebar
           openSidebar={openSidebar}
@@ -54,10 +59,8 @@ const AdminLayout = () => {
 
         {/* Main Section */}
         <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
-
           {/* Page Content */}
           <main className="flex-1 pt-20 p-6">
-
             <Outlet
               context={{
                 profile,
@@ -66,17 +69,13 @@ const AdminLayout = () => {
                 saveProfile,
                 darkMode,
               }}
-          />
-
+            />
           </main>
 
           {/* Footer */}
           <AdminFooter darkMode={darkMode} />
-
         </div>
-
       </div>
-
     </div>
   );
 };

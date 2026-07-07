@@ -1,11 +1,7 @@
-import React from 'react'
+import TrainingManagement from "../pages/TrainingManagement";
 
 const AdminTraining = () => {
-  return (
-    <div>
-      Admin Training
-    </div>
-  )
+  return <TrainingManagement />;
 }
 
-export default AdminTraining
+export default AdminTraining;

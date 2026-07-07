@@ -1,11 +1,6 @@
-import React from 'react'
+import React from 'react';
 
-const AdminNotifications = () => {
-  return (
-    <div>
-      Admin Notifications
-    </div>
-  )
+export default function () {
+  return <div> Component</div>;
 }
 
-export default AdminNotifications
