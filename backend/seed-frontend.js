@@ -78,6 +78,17 @@ async function seedDatabase() {
       ON CONFLICT DO NOTHING
     `, [ids[0], ids[1], ids[2], ids[3]]);
 
+    console.log('Seeding Disputes...');
+    await client.query(`
+      INSERT INTO disputes 
+        (id, filed_by_id, filed_by_role, against_id, against_role, dispute_type, description, status, priority, created_at, updated_at)
+      VALUES 
+        (101, 301, 'student', 1, 'mentor', 'mentor', 'Mentor was not responding to queries for 2 weeks.', 'open', 'high', NOW(), NOW()),
+        (102, 302, 'student', 101, 'company', 'fraud', 'Company charged extra fee without notice.', 'open', 'medium', NOW(), NOW()),
+        (103, 1, 'admin', 1, 'mentor', 'drive', 'Mentor missed 3 scheduled sessions.', 'in_review', 'low', NOW(), NOW())
+      ON CONFLICT DO NOTHING
+    `);
+
     await client.query('COMMIT');
     console.log('✅ Successfully seeded database with rich dummy data for frontend testing!');
 
