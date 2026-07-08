@@ -34,6 +34,7 @@ const migrationFiles = [
   "008_create_notifications.sql", // 019
   "010_create_disputes.sql", // 020
   "Students.sql", // 021
+  "011_create_live_sessions_module.sql", // 022
 ];
 
 async function runMigrationsFresh() {
