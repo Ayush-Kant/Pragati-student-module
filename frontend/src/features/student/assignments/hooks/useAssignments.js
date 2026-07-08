@@ -29,10 +29,15 @@ const useAssignments = () => {
     fetchAssignments();
   }, []);
 
+  const getAssignmentById = (id) => {
+    return assignments.find((a) => a.id.toString() === id.toString()) || null;
+  };
+
   return {
     assignments,
     loading,
     error,
+    getAssignmentById,
   };
 };
 

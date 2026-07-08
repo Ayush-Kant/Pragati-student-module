@@ -1,18 +1,18 @@
 import { Navigate, Route } from "react-router-dom";
-import MainLayout from "../../../layout/MainLayout";
+import CompanyLayout from "../layouts/CompanyLayout";
 import CompanyDashboard from "../pages/CompanyDashboard";
-import Drives from "../../../pages/Drives";
-import Candidates from "../../../pages/Candidates";
+import { RecruitmentDrives as Drives } from "../drives/pages/RecruitmentDrives";
+import Candidates from "../candidates/pages/CandidateManagement";
 import Assessments from "../assessments/Assessments";
-import Interviews from "../../../pages/Interviews";
-import Training from "../../../pages/Training";
-import Messages from "../../../pages/Messages";
+import Interviews from "../pages/InterviewPage";
+import { TrainingManagement as Training } from "../training/pages/TrainingManagement";
+import Messages from "../../college/pages/PlaceholderPage";
 import Offers from "../offers/Offers";
-import Reports from "../../../pages/Reports";
+import Reports from "../../college/pages/PlaceholderPage";
 import CompanySettings from "../pages/CompanySettings";
 
 const CompanyRoute = (
-  <Route path="company" element={<MainLayout />}>
+  <Route path="company" element={<CompanyLayout />}>
     <Route index element={<Navigate to="dashboard" replace />} />
     <Route path="dashboard" element={<CompanyDashboard />} />
     <Route path="drives" element={<Drives />} />
