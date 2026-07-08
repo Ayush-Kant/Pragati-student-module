@@ -13,26 +13,27 @@ const migrationsDir = path.join(__dirname, "../migrations");
 
 // Hardcoded execution order based on your dependencies
 const migrationFiles = [
-  "001_create_users_mentors.sql", // 001
-  "005_create_company_management.sql", // 002
-  "004_create_college_management.sql", // 003
-  "005_create_student_management.sql", // 004
-  "005_create_recruitment_drives.sql", // 005
-  "005_create_company_tables.sql", // 006
-  "002_create_content_tables.sql", // 007
-  "003_create_admin_dashboard.sql", // 008
-  "004_create_notifications.sql", // 009
-  // "006_create_assessments_minimal.sql", // 010
-  "006_create_assessments.sql", // 011
-  "006_create_college_profiles.sql", // 012
-  "006_create_dashboard_support.sql", // 013
-  // "006_create_reports_analytics_tables.sql", // 014
-  "006_create_training_coordination.sql", // 015
-  // "006_update_interviews_table.sql", // 016
-  "007_create_dashboard_tables.sql", // 017
-  "007_offers_hiring_tables.sql", // 018
-  "008_create_notifications.sql", // 019
-  "010_create_disputes.sql", // 020
+  "001_create_users_mentors.sql",
+  "002_create_content_tables.sql",
+  "003_create_admin_dashboard.sql",
+  "004_create_college_management.sql",
+  "004_create_notifications.sql",
+  "005_create_company_management.sql",
+  "005_create_company_tables.sql",
+  "005_create_recruitment_drives.sql",
+  "005_create_student_management.sql",
+  "006_create_assessments.sql",
+  "006_create_college_profiles.sql",
+  "006_create_dashboard_support.sql",
+  "006_create_question_bank.sql",
+  "006_create_reports_analytics_tables.sql",
+  "006_create_training_coordination.sql",
+  "006_update_interviews_table.sql",
+  "007_create_dashboard_tables.sql",
+  "007_offers_hiring_tables.sql",
+  "008_create_coding_challenges.sql",
+  "008_create_notifications.sql",
+  "010_create_disputes.sql",
   "Students.sql", // 021
 ];
 
