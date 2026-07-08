@@ -15,6 +15,8 @@ import authRouter from "./routes/auth.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
+
+import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 
 import errorMiddleware from "./middleware/errorMiddleware.js";
@@ -43,8 +45,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
-app.use("/api/mentor", contentRoutes);
+app.use("/api/v1/company/jobs", collegeJobsRoutes);
 app.use("/api/v1/company", companyRoutes);
+app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
