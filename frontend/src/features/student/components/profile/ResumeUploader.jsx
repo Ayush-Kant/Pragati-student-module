@@ -1,3 +1,6 @@
+// ResumeUploader.jsx
+// Purpose: Drag-and-drop PDF upload component with file preview and replace functionality
+
 import { useState, useRef } from "react";
 
 const ResumeUploader = ({ resumeFile, onUpload }) => {
@@ -114,3 +117,4 @@ const ResumeUploader = ({ resumeFile, onUpload }) => {
 };
 
 export default ResumeUploader;
+

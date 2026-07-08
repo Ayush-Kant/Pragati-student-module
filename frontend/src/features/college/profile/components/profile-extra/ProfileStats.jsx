@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { statsData } from "../../types/ProfileExtraDummyData";
+import { statsData } from "../../types/profileExtraDummyData";
 
 const colorVariants = {
   blue: {
