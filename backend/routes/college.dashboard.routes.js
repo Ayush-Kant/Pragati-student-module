@@ -2,25 +2,8 @@ import express from "express";
 const router = express.Router();
 
 import authMiddleware from "../middleware/authMiddleware.js";
-import {
-  getDashboardOverview,
-  getDashboardStats,
-  getDashboardActivities,
-  getPlacementAnalytics,
-  getRevenueAnalytics,
-  getAdmissionsAnalytics
-} from "../controllers/colllege.dashboard.controller.js";
+import { getDashboardData } from "../controllers/college.dashboard.controller.js";
 
-
-router.get(
-  "/",
-  authMiddleware,
-  getDashboardOverview,
-  getDashboardStats,
-  getDashboardActivities,
-  getPlacementAnalytics,
-  getRevenueAnalytics,
-  getAdmissionsAnalytics
-);
+router.get("/", authMiddleware, getDashboardData);
 
 export default router;
