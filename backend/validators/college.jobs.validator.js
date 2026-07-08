@@ -127,7 +127,7 @@ const validateJobPosting = (req, res, next) => {
         });
     }
 
-    if (experience_required === undefined || isNaN(experience_required)) {
+    if (!experience_required || experience_required.toString().trim() === "") {
         return res.status(400).json({
             message: "Valid experience is required",
         });

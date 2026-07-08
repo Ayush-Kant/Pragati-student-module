@@ -2,28 +2,20 @@
 -- Run this in your PostgreSQL database
 
 -- Students Table
-CREATE TABLE IF NOT EXISTS students (
-    id                  SERIAL PRIMARY KEY,
-    enrollment_no       VARCHAR(50) UNIQUE NOT NULL,
-    name                VARCHAR(100) NOT NULL,
-    email               VARCHAR(255) UNIQUE NOT NULL,
-    phone               VARCHAR(20),
-    department          VARCHAR(100),
-    course              VARCHAR(100),
-    semester            INTEGER,
-    batch               VARCHAR(10),
-    cgpa                DECIMAL(4, 2),
-    placement_status    VARCHAR(50) DEFAULT 'Not Eligible',
-    address             TEXT,
-    resume_status       VARCHAR(50) DEFAULT 'Not Uploaded',
-    linkedin            VARCHAR(255),
-    github              VARCHAR(255),
-    placed_at           VARCHAR(100),
-    package             VARCHAR(50),
-    college             VARCHAR(255),
-    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS enrollment_no VARCHAR(50) UNIQUE;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS department VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS course VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS semester INTEGER;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS batch VARCHAR(10);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS cgpa DECIMAL(4, 2);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS placement_status VARCHAR(50) DEFAULT 'Not Eligible';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS resume_status VARCHAR(50) DEFAULT 'Not Uploaded';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS linkedin VARCHAR(255);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS github VARCHAR(255);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS placed_at VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS package VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS college VARCHAR(255);
 
 -- Student Skills Table
 CREATE TABLE IF NOT EXISTS student_skills (

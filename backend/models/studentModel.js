@@ -132,10 +132,10 @@ export const createStudent = async (data, skills = []) => {
 
     const insertResult = await client.query(
       `INSERT INTO students
-        (enrollment_no, name, full_name, email, phone, department, course, semester, batch,
+        (enrollment_no, name, email, phone, department, course, semester, batch,
          cgpa, placement_status, address, resume_status, linkedin, github,
          placed_at, package, college)
-       VALUES ($1,$2,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
        RETURNING *`,
       [
         data.enrollmentNo,
@@ -190,7 +190,6 @@ export const updateStudent = async (id, data, skills) => {
       `UPDATE students SET
         enrollment_no    = COALESCE($1, enrollment_no),
         name             = COALESCE($2, name),
-        full_name        = COALESCE($2, full_name),
         email            = COALESCE($3, email),
         phone            = COALESCE($4, phone),
         department       = COALESCE($5, department),

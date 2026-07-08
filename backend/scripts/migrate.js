@@ -10,38 +10,16 @@ async function runMigrations() {
   try {
     console.log("Dropping existing tables to start fresh...");
     await pool.query(`
-      DROP TABLE IF EXISTS 
-        student_progress, 
-        student_drive_progress, 
-        live_sessions, 
-        recruitment_drives, 
-        notifications, 
-        submissions, 
-        assessments, 
-        modules, 
-        courses, 
-        mentors, 
-        drives, 
-        "Company", 
-        "User", 
-        companies, 
-        colleges, 
-        users, 
-        auth_users, 
-        college_stats,
-        students,
-        admin_audit_log
-      CASCADE;
+      DROP SCHEMA public CASCADE;
+      CREATE SCHEMA public;
+      GRANT ALL ON SCHEMA public TO public;
     `);
     console.log("Existing tables dropped successfully.");
 
     const migrationsDir = path.join(__dirname, "../migrations");
-    const migrationFiles = [
-      "001_create_users_mentors.sql",
-      "003_create_admin_dashboard.sql",
-      "002_create_content_tables.sql",
-      "Students.sql",
-    ];
+    const migrationFiles = fs.readdirSync(migrationsDir)
+      .filter(file => file.endsWith(".sql"))
+      .sort();
 
     for (const file of migrationFiles) {
       const filePath = path.join(migrationsDir, file);
