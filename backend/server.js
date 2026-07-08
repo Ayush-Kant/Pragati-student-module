@@ -19,7 +19,6 @@ import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
 import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 
 import studentRoutes from "./routes/student.routes.js";
-
 import errorMiddleware from "./middleware/errorMiddleware.js";
 
 
