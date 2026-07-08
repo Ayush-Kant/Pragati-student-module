@@ -16,9 +16,11 @@ const AuthPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, isAuthenticated, userRole } = useAuth();
 
+  const getRedirectPath = (role) => (role === 'admin' ? '/admin' : `/${role}/dashboard`);
+
   useEffect(() => {
     if (isAuthenticated && userRole) {
-      navigate(`/${userRole}/dashboard`);
+      navigate(getRedirectPath(userRole));
     }
   }, [isAuthenticated, userRole, navigate]);
 
@@ -108,7 +110,7 @@ const AuthPage = () => {
       if (result.success) {
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
         login(result.role, result.token);
-        navigate(`/${result.role}/dashboard`);
+        navigate(getRedirectPath(result.role));
       } else {
         setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
       }
