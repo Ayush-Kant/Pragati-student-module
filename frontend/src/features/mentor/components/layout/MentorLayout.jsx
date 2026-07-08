@@ -282,7 +282,7 @@ export default function MentorLayout() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 40px",
+            padding: "0 16px",
             boxSizing: "border-box",
             position: "sticky",
             top: 0,
@@ -366,7 +366,7 @@ export default function MentorLayout() {
         {/* Inner Content Injection Frame */}
         <div
           style={{
-            padding: "32px 40px",
+            padding: "12px 16px",
             boxSizing: "border-box",
             width: "100%",
           }}
