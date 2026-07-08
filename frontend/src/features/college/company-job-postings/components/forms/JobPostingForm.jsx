@@ -5,6 +5,7 @@ import { validateJobPosting } from "../../validations/companyJobPostingValidatio
 const getInitialFormData = (job) => ({
   role: job?.role || "",
   company: job?.company || "",
+  location: job?.location || "",
   cgpa: job?.cgpa || "",
   batch: job?.batch || "",
   deadline: job?.deadline || "",
@@ -27,7 +28,7 @@ const formReducer = (state, action) => {
   }
 };
 
-const JobPostingForm = ({ onSubmit, editingJob }) => {
+const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
   const [formData, dispatch] = useReducer(
     formReducer,
     editingJob,
@@ -37,10 +38,13 @@ const JobPostingForm = ({ onSubmit, editingJob }) => {
   const [errors, setErrors] = useState({
     role: "",
     company: "",
+    location: "",
     cgpa: "",
     batch: "",
     deadline: "",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     // Update form data when editingJob changes
@@ -54,6 +58,7 @@ const JobPostingForm = ({ onSubmit, editingJob }) => {
       setErrors({
         role: "",
         company: "",
+        location: "",
         cgpa: "",
         batch: "",
         deadline: "",
@@ -76,8 +81,9 @@ const JobPostingForm = ({ onSubmit, editingJob }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
-    const validationErrors = validateJobPosting(formData);
+    const validationErrors = validateJobPosting(formData, jobs, editingJob?.id);
 
     setErrors(validationErrors);
 
@@ -85,20 +91,28 @@ const JobPostingForm = ({ onSubmit, editingJob }) => {
       return;
     }
 
-    await onSubmit(formData);
+    try {
+      setIsSubmitting(true);
+      await onSubmit(formData);
 
-    dispatch({
-      type: "reset",
-      payload: getInitialFormData(),
-    });
+      dispatch({
+        type: "reset",
+        payload: getInitialFormData(),
+      });
 
-    setErrors({
-      role: "",
-      company: "",
-      cgpa: "",
-      batch: "",
-      deadline: "",
-    });
+      setErrors({
+        role: "",
+        company: "",
+        location: "",
+        cgpa: "",
+        batch: "",
+        deadline: "",
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -143,6 +157,25 @@ const JobPostingForm = ({ onSubmit, editingJob }) => {
           {errors.company && (
             <p className="text-red-500 text-sm mt-1">
               {errors.company}
+            </p>
+          )}
+        </div>
+
+        {/* Location */}
+        <div>
+          <input
+            name="location"
+            placeholder="Location"
+            value={formData.location}
+            onChange={handleChange}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
+              errors.location ? "border border-red-500" : "border"
+            }`}
+          />
+
+          {errors.location && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.location}
             </p>
           )}
         </div>
@@ -207,10 +240,19 @@ const JobPostingForm = ({ onSubmit, editingJob }) => {
 
         <button
           type="submit"
-          className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg py-3 flex justify-center items-center gap-2"
+          disabled={isSubmitting}
+          className={`w-full bg-green-600 hover:bg-green-700 text-white rounded-lg py-3 flex justify-center items-center gap-2 ${
+            isSubmitting ? "opacity-75 cursor-not-allowed" : ""
+          }`}
         >
-          <Plus size={18} />
-          {editingJob ? "Update Job" : "Create Job"}
+          {isSubmitting ? (
+            editingJob ? "Updating..." : "Creating..."
+          ) : (
+            <>
+              <Plus size={18} />
+              {editingJob ? "Update Job" : "Create Job"}
+            </>
+          )}
         </button>
 
       </form>

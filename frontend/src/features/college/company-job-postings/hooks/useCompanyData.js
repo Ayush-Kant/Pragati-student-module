@@ -19,7 +19,7 @@ const useCompanyData = () => {
       }
 
       const data = await getCompanies();
-      setCompanies(data);
+      setCompanies([...data]);
     } catch {
       setError("Unable to fetch companies.");
     } finally {
@@ -37,18 +37,32 @@ const useCompanyData = () => {
   }, [fetchCompanies]);
 
   const addCompany = async (company) => {
-    await createCompany(company);
-    fetchCompanies();
+    try {
+      const newCompany = await createCompany(company);
+      setCompanies((prev) => [...prev, newCompany]);
+    } catch {
+      setError("Unable to add company.");
+    }
   };
 
   const editCompany = async (id, company) => {
-    await updateCompany(id, company);
-    fetchCompanies();
+    try {
+      const updated = await updateCompany(id, company);
+      setCompanies((prev) =>
+        prev.map((item) => (item.id === id ? updated : item))
+      );
+    } catch {
+      setError("Unable to update company.");
+    }
   };
 
   const removeCompany = async (id) => {
-    await deleteCompany(id);
-    fetchCompanies();
+    try {
+      await deleteCompany(id);
+      setCompanies((prev) => prev.filter((item) => item.id !== id));
+    } catch {
+      setError("Unable to delete company.");
+    }
   };
 
   return {

@@ -24,7 +24,7 @@ const formReducer = (state, action) => {
   }
 };
 
-const CompanyForm = ({ onSubmit, editingCompany }) => {
+const CompanyForm = ({ onSubmit, editingCompany, companies = [] }) => {
   const [formData, dispatch] = useReducer(
     formReducer,
     editingCompany,
@@ -36,6 +36,8 @@ const CompanyForm = ({ onSubmit, editingCompany }) => {
     location: "",
     package: "",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     dispatch({
@@ -71,8 +73,9 @@ const CompanyForm = ({ onSubmit, editingCompany }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
-    const validationErrors = validateCompany(formData);
+    const validationErrors = validateCompany(formData, companies, editingCompany?.id);
 
     setErrors(validationErrors);
 
@@ -80,18 +83,25 @@ const CompanyForm = ({ onSubmit, editingCompany }) => {
       return;
     }
 
-    await onSubmit(formData);
+    try {
+      setIsSubmitting(true);
+      await onSubmit(formData);
 
-    dispatch({
-      type: "reset",
-      payload: getInitialFormData(),
-    });
+      dispatch({
+        type: "reset",
+        payload: getInitialFormData(),
+      });
 
-    setErrors({
-      company: "",
-      location: "",
-      package: "",
-    });
+      setErrors({
+        company: "",
+        location: "",
+        package: "",
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -187,10 +197,19 @@ const CompanyForm = ({ onSubmit, editingCompany }) => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg flex justify-center items-center gap-2"
+          disabled={isSubmitting}
+          className={`w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg flex justify-center items-center gap-2 ${
+            isSubmitting ? "opacity-75 cursor-not-allowed" : ""
+          }`}
         >
-          <Plus size={18} />
-          {editingCompany ? "Update Company" : "Add Company"}
+          {isSubmitting ? (
+            editingCompany ? "Updating..." : "Adding..."
+          ) : (
+            <>
+              <Plus size={18} />
+              {editingCompany ? "Update Company" : "Add Company"}
+            </>
+          )}
         </button>
       </form>
     </div>

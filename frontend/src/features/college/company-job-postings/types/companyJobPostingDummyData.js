@@ -18,6 +18,7 @@ export const jobPostings=[
     id:1,
     role:"Software Engineer",
     company:"Google",
+    location:"Bangalore",
     cgpa:8,
     batch:"2027",
     deadline:"2026-10-10",

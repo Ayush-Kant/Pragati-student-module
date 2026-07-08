@@ -1,6 +1,7 @@
 import {
   BriefcaseBusiness,
   Building2,
+  MapPin,
   CalendarDays,
   GraduationCap,
   Pencil,
@@ -45,6 +46,16 @@ const JobPostingCard = ({
               {job.company}
 
             </div>
+
+            {job.location && (
+              <div className="flex items-center gap-2">
+
+                <MapPin size={18} className="text-red-500" />
+
+                {job.location}
+
+              </div>
+            )}
 
             <div className="flex items-center gap-2">
 

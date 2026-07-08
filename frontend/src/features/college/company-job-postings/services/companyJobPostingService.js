@@ -9,7 +9,7 @@ let jobData = [...jobPostings];
 // ---------------- Company ----------------
 
 export const getCompanies = async () => {
-  return companyData;
+  return [...companyData];
 };
 
 export const getCompanyById = async (id) => {
@@ -44,7 +44,7 @@ export const deleteCompany = async (id) => {
 // ---------------- Job ----------------
 
 export const getJobPostings = async () => {
-  return jobData;
+  return [...jobData];
 };
 
 export const createJobPosting = async (job) => {

@@ -26,6 +26,8 @@ import JobStatusFilter from "../components/filters/JobStatusFilter";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import EmptyState from "../components/common/EmptyState";
 import ErrorState from "../components/common/ErrorState";
+import ConfirmationModal from "../components/common/ConfirmationModal";
+import DeleteJobPostingModal from "../components/forms/DeleteJobPostingModal";
 
 const CompanyJobPostingsPage = () => {
   const {
@@ -54,39 +56,22 @@ const CompanyJobPostingsPage = () => {
   const [status, setStatus] = useState("");
 
   const [editingJob, setEditingJob] = useState(null);
-
   const [editingCompany, setEditingCompany] = useState(null);
   const [viewCompany, setViewCompany] = useState(null);
 
-  try {
-    useJobFilters(jobs);
-  } catch (e) {
-    console.warn("useJobFilters error:", e);
-  }
+  // States for confirmation modals
+  const [companyToDelete, setCompanyToDelete] = useState(null);
+  const [jobToDelete, setJobToDelete] = useState(null);
 
-  const filteredCompanies = companies.filter((company) =>
-    company.company.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const filteredJobs = jobs.filter((job) => {
-    const companyMatch =
-      !selectedCompany || job.company === selectedCompany;
-
-    const batchMatch =
-      !batch || job.batch === batch;
-
-    const statusMatch =
-      !status || job.status === status;
-
-    const departmentMatch =
-      !department || job.department === department;
-
-    return (
-      companyMatch &&
-      batchMatch &&
-      statusMatch &&
-      departmentMatch
-    );
+  // Filtering consumed from hook
+  const { filteredCompanies, filteredJobs } = useJobFilters({
+    companies,
+    jobs,
+    search,
+    company: selectedCompany,
+    department,
+    batch,
+    status,
   });
 
   const openJobs = jobs.filter(
@@ -111,8 +96,26 @@ const CompanyJobPostingsPage = () => {
     if (editingCompany) {
       await editCompany(editingCompany.id, data);
       setEditingCompany(null);
+      // Update viewCompany if it's currently selected for viewing
+      if (viewCompany?.id === editingCompany.id) {
+        setViewCompany({ ...viewCompany, ...data });
+      }
     } else {
       await addCompany(data);
+    }
+  };
+
+  const handleDeleteCompanyClick = (id) => {
+    setCompanyToDelete(id);
+  };
+
+  const handleConfirmDeleteCompany = async () => {
+    if (companyToDelete) {
+      await removeCompany(companyToDelete);
+      if (viewCompany?.id === companyToDelete) {
+        setViewCompany(null);
+      }
+      setCompanyToDelete(null);
     }
   };
 
@@ -128,6 +131,17 @@ const CompanyJobPostingsPage = () => {
       setEditingJob(null);
     } else {
       await addJob(data);
+    }
+  };
+
+  const handleDeleteJobClick = (id) => {
+    setJobToDelete(id);
+  };
+
+  const handleConfirmDeleteJob = async () => {
+    if (jobToDelete) {
+      await removeJob(jobToDelete);
+      setJobToDelete(null);
     }
   };
 
@@ -268,16 +282,21 @@ const CompanyJobPostingsPage = () => {
           <CompanyForm
             editingCompany={editingCompany}
             onSubmit={handleSubmitCompany}
+            companies={companies}
           />
         </div>
 
         <div className="lg:col-span-2">
-          <CompanyTable
-            companies={filteredCompanies}
-            onView={handleViewCompany}
-            onEdit={handleEditCompany}
-            onDelete={removeCompany}
-          />
+          {filteredCompanies.length ? (
+            <CompanyTable
+              companies={filteredCompanies}
+              onView={handleViewCompany}
+              onEdit={handleEditCompany}
+              onDelete={handleDeleteCompanyClick}
+            />
+          ) : (
+            <EmptyState message="No Companies Found" />
+          )}
         </div>
 
       </div>
@@ -297,6 +316,7 @@ const CompanyJobPostingsPage = () => {
           <JobPostingForm
             editingJob={editingJob}
             onSubmit={handleSubmitJob}
+            jobs={jobs}
           />
 
         </div>
@@ -307,7 +327,7 @@ const CompanyJobPostingsPage = () => {
             <JobPostingTable
               jobs={filteredJobs}
               onEdit={handleEditJob}
-              onDelete={removeJob}
+              onDelete={handleDeleteJobClick}
               onToggleStatus={toggleJobStatus}
             />
           ) : (
@@ -317,6 +337,21 @@ const CompanyJobPostingsPage = () => {
         </div>
 
       </div>
+
+      {/* Confirmation Modals */}
+      <ConfirmationModal
+        isOpen={!!companyToDelete}
+        title="Confirm Delete"
+        message="Are you sure you want to delete this company?"
+        onConfirm={handleConfirmDeleteCompany}
+        onCancel={() => setCompanyToDelete(null)}
+      />
+
+      <DeleteJobPostingModal
+        isOpen={!!jobToDelete}
+        onClose={() => setJobToDelete(null)}
+        onConfirm={handleConfirmDeleteJob}
+      />
 
     </div>
   );
