@@ -64,6 +64,7 @@ app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
 app.use('/api/v1/admin/students', adminStudentRoutes);
 app.use('/api/v1/admin/mentors', adminMentorRoutes);
 app.use("/api/v1/admin/courses", adminCourseRoutes);
+app.use("/api/v1/admin/drives",adminDriveRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/admin/company", adminCompanyRoutes);
