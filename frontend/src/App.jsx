@@ -8,6 +8,7 @@ import RegisterPage from "./features/auth/RegisterPage";
 import EditProfileForm from "./features/college/profile/components/edit-profile/EditProfileForm";
 import DashboardLayout from "./features/college/dashboard/components/layout/DashboardLayout";
 import StatsGrid from "./features/college/dashboard/components/stats/StatsGrid";
+import DepartmentsPage from "./features/college/departments/pages/DepartmentsPage";
 
 // ── Student Module ───────────────────────────────────────────────────────────
 import { AuthProvider} from './context/AuthContext';
@@ -24,6 +25,13 @@ function App() {
     <AuthProvider>
       <Toaster />
       <Routes>
+        <Route 
+        path="College/Departments"
+        element={
+            <DepartmentsPage/>
+          
+        }
+        />
         
         <Route
   path="/"
