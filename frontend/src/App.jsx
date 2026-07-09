@@ -1,17 +1,15 @@
-
-import { Toaster } from "react-hot-toast";
+[9:22 pm, 09/07/2026] Himanshu: Get well soon shiva
+[9:38 pm, 09/07/2026] Himanshu: import { Toaster } from "react-hot-toast";
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // ── Auth Pages  ──
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
-import EditProfileForm from "./features/college/profile/components/edit-profile/EditProfileForm";
-import DashboardLayout from "./features/college/dashboard/components/layout/DashboardLayout";
-import StatsGrid from "./features/college/dashboard/components/stats/StatsGrid";
-import DepartmentsPage from "./features/college/departments/pages/DepartmentsPage";
 
-// ── Student Module ───────────────────────────────────────────────────────────
+// ── Contexts ──
 import { AuthProvider} from './context/AuthContext';
+
+// ── Route Modules ──
 import VerificationPage from './features/student/pages/public/VerificationPage';
 import StudentRoutes from "./features/student/routes/StudentRoutes";
 import AdminRoute from "./features/admin/routes/AdminRoutes";
@@ -19,62 +17,53 @@ import mentorRoute from "./features/mentor/routes/MentorRoutes";
 import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
+import CollegeProfilePage from "./features/college/profile/pages/CollegeProfilePage";
+
+// Placement Drives
+import CollegeLayout from "./features/college/layouts/CollegeLayout";
+import PlacementDrivesPage from "./features/college/placement-drives/pages/PlacementDrivesPage";
 
 function App() {
+
   return (
     <AuthProvider>
       <Toaster />
       <Routes>
-        <Route 
-        path="College/Departments"
-        element={
-            <DepartmentsPage/>
-          
-        }
-        />
-        
-        <Route
-  path="/"
-  element={
-    <DashboardLayout>
-      <div className="p-6">
-        <StatsGrid/> </div>
-    </DashboardLayout>
-  }
-/>
-        
-        {/* ── Auth Routes ────────────────────────────────────────── */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* ── Auth Routes ── */}
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
 
-        {/* ── Mentor ────────────────────────────────────────────────── */}
+        {/* ── Public Test Route (Preview) ── */}
+        <Route path='/preview/college-profile' element={<CollegeProfilePage />} />
+        <Route path='/uptoskills-profile' element={<CollegeProfilePage />} />
+
+        {/* ── Mentor ── */}
         {mentorRoute}
 
-        {/* ── Admin ─────────────────────────────────────────────────── */}
-       
+        {/* ── Admin ── */}
         {AdminRoute}
 
-        {/* ── Student ───────────────────────────────────────────────── */}
+        {/* ── Student ── */}
         {StudentRoutes}
 
-      {/* Collge */}
+        {/* ── College ── */}
+        {collegeRoute}
+        <Route path="/college" element={<CollegeLayout />}>
+          <Route path="drives" element={<PlacementDrivesPage />} />
+        </Route>
 
-      {collegeRoute}
+        {/* ── Company ── */}
+        {CompanyRoute}
 
-
-  {/* Company */}
-
-      {CompanyRoute}
-
-      
-        {/* Public certificate verification */}
+        {/* ── Public ── */}
         <Route path='/verify/:code' element={<VerificationPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AuthProvider>
   );
-
-
 }
+
 export default App;
