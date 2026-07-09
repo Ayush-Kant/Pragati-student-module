@@ -1,5 +1,7 @@
 import express from "express";
 import connectDB from "./config/db.js";
+import studentProfileRouter from "./src/routes/index.js";
+import errorHandler from "./src/middleware/errorHandler.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -12,6 +14,12 @@ app.get("/", (req, res) => {
         message: "Backend is running",
     });
 });
+
+// ── Student Profile Module Routes ─────────────────────────────────────────────
+app.use(studentProfileRouter);
+
+// ── Global Error Handler (must be last) ──────────────────────────────────────
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`✅ Server running on PORT : ${PORT}`);
