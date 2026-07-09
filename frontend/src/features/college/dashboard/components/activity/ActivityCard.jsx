@@ -1,21 +1,27 @@
-import React from 'react';
-import { getStatusClass } from "../../utils/dashboardHelpers";
+import { Clock } from "lucide-react";
 
-export default function ActivityCard({ activity }) {
+const ActivityCard = ({ title, time, status }) => {
   return (
-    <div className="border rounded-lg p-4 shadow-sm mb-3">
-      <h3 className="font-semibold">{activity.title}</h3>
-
-      <p className="text-sm text-gray-600">
-        {activity.description}
-      </p>
-
-      <div className="flex justify-between mt-2 text-xs text-gray-500">
-        <span>{activity.time}</span>
-        <span className={getStatusClass(activity.status)}>
-          {activity.status}
-        </span>
+    <div className="flex items-center justify-between p-4 rounded-xl border bg-white shadow-sm">
+      <div>
+        <h3 className="font-medium text-gray-800">{title}</h3>
+        <p className="text-sm text-gray-500">{time}</p>
       </div>
+
+      <span
+        className={`px-3 py-1 rounded-full text-xs font-medium
+        ${
+          status === "Completed"
+            ? "bg-green-100 text-green-700"
+            : status === "Pending"
+            ? "bg-yellow-100 text-yellow-700"
+            : "bg-blue-100 text-blue-700"
+        }`}
+      >
+        {status}
+      </span>
     </div>
   );
-}
+};
+
+export default ActivityCard;

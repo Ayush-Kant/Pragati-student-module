@@ -1,31 +1,29 @@
-import React from 'react';
-import { recentUpdates } from '../../types/dashboardDummyData';
-import { validateRecentUpdate } from '../../validations/dashboardValidation';
-import { RECENT_UPDATES_TITLE } from '../../constants/dashboardConstants';
+const updates = [
+  "Amazon Drive starts on 15 July",
+  "Microsoft shortlisted 120 students",
+  "Placement Report uploaded",
+  "New Company Registration Approved",
+];
 
-export default function RecentUpdates() {
+const RecentUpdates = () => {
   return (
-    <div className="border rounded-lg p-4 shadow-sm">
-      <h2 className="text-xl font-bold mb-4">
-        {RECENT_UPDATES_TITLE}
+    <div className="bg-white rounded-xl shadow border p-5">
+      <h2 className="text-lg font-semibold mb-5">
+        Recent Updates
       </h2>
 
-      {recentUpdates
-        .filter(validateRecentUpdate)
-        .map((update) => (
-          <div
-            key={update.id}
-            className="mb-3 pb-2 border-b"
+      <ul className="space-y-3">
+        {updates.map((item, index) => (
+          <li
+            key={index}
+            className="border-b pb-2 text-gray-600"
           >
-            <h3 className="font-medium">
-              {update.title}
-            </h3>
-
-            <p className="text-sm text-gray-500">
-              {update.date}
-            </p>
-          </div>
+            • {item}
+          </li>
         ))}
+      </ul>
     </div>
   );
-}
+};
+
+export default RecentUpdates;

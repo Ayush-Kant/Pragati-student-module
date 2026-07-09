@@ -1,179 +1,102 @@
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
--- TABLE 1: auth_users (login credentials)
-CREATE TABLE IF NOT EXISTS auth_users (
-  id                  SERIAL PRIMARY KEY,
-  uuid_id             UUID DEFAULT gen_random_uuid() UNIQUE,
-  email               VARCHAR(255) UNIQUE NOT NULL,
-  password_hash       VARCHAR(255) NOT NULL,
-  role                VARCHAR(20) NOT NULL
-                      CHECK (role IN ('mentor','student','company','admin','college')),
-  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- TABLE 2: users
-CREATE TABLE IF NOT EXISTS users (
-  id            SERIAL PRIMARY KEY,
-  full_name     VARCHAR(255),
-  auth_user_id  BIGINT UNIQUE NOT NULL
-                REFERENCES auth_users(id)
-                ON DELETE CASCADE,
-  email         VARCHAR(255) UNIQUE NOT NULL,
-  role          VARCHAR(50) NOT NULL,
-  username      VARCHAR(255),
-  phone         VARCHAR(20),
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- TABLE 3: mentors
-CREATE TABLE IF NOT EXISTS mentors (
-  id                SERIAL PRIMARY KEY,
-  user_id           INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  bio               TEXT,
-  expertise_tags    TEXT[],
-  avatar_url        VARCHAR(500),
-  availability_json JSONB,
-  verified          BOOLEAN NOT NULL DEFAULT false,
-  status            VARCHAR(50) NOT NULL DEFAULT 'pending'
-);
-
--- TABLE 4: college_profiles
-CREATE TABLE IF NOT EXISTS college_profiles (
+-- Student profile schema for PostgreSQL
+-- Assumes the existing students table already exists.
+CREATE TABLE IF NOT EXISTS student_resumes (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    college_name VARCHAR(255) NOT NULL,
-    college_code VARCHAR(100) UNIQUE,
-    address TEXT,
-    website VARCHAR(255),
-    contact_number VARCHAR(20),
-    established_year INTEGER,
-    accreditation VARCHAR(100),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-<<<<<<< HEAD
+    student_id INT NOT NULL UNIQUE,
+    resume_url TEXT NOT NULL,
+    file_name VARCHAR(255),
+    file_size BIGINT,
+    mime_type VARCHAR(100),
+    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_resumes_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
 );
 
--- TABLE 5: companies
-CREATE TABLE IF NOT EXISTS companies (
+CREATE INDEX IF NOT EXISTS idx_student_resumes_student_id
+    ON student_resumes(student_id);
+
+CREATE TABLE IF NOT EXISTS student_portfolios (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    industry VARCHAR(100),
-    size VARCHAR(50),
-    location VARCHAR(255),
-    status VARCHAR(50) NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','approved','rejected','suspended')),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    student_id INT NOT NULL UNIQUE,
+    headline VARCHAR(150),
+    bio TEXT,
+    website_url TEXT,
+    github_url TEXT,
+    linkedin_url TEXT,
+    portfolio_url TEXT,
+    is_public BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_portfolios_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
 );
 
--- TABLE 6: recruitment_drives
-CREATE TABLE IF NOT EXISTS recruitment_drives (
-  id         SERIAL PRIMARY KEY,
-  title      VARCHAR(255) NOT NULL,
-  company_id INTEGER REFERENCES companies(id),
-  mentor_id  INTEGER REFERENCES users(id),
-  status     VARCHAR(50) NOT NULL DEFAULT 'active'
-             CHECK (status IN ('active','closed','draft','completed','upcoming')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+CREATE INDEX IF NOT EXISTS idx_student_portfolios_student_id
+    ON student_portfolios(student_id);
 
--- TABLE 7: courses
-CREATE TABLE IF NOT EXISTS courses (
-  id           SERIAL PRIMARY KEY,
-  mentor_id    INTEGER NOT NULL REFERENCES mentors(id) ON DELETE CASCADE,
-  drive_id     INTEGER REFERENCES recruitment_drives(id) ON DELETE SET NULL,
-  title        VARCHAR(255) NOT NULL,
-  description  TEXT,
-  skill_tags   TEXT[],
-  status       VARCHAR(50) NOT NULL DEFAULT 'draft'
-               CHECK (status IN ('draft', 'published', 'archived')),
-  created_at   TIMESTAMPTZ DEFAULT NOW(),
-  updated_at   TIMESTAMPTZ DEFAULT NOW()
-=======
-);
-
--- TABLE 5: companies
-CREATE TABLE IF NOT EXISTS companies (
+CREATE TABLE IF NOT EXISTS student_projects (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    industry VARCHAR(100),
-    size VARCHAR(50),
-    location VARCHAR(255),
-    status VARCHAR(50) NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','approved','rejected','suspended')),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    student_id INT NOT NULL,
+    project_title VARCHAR(150) NOT NULL,
+    project_description TEXT,
+    project_url TEXT,
+    github_url TEXT,
+    technologies TEXT[] DEFAULT '{}',
+    start_date DATE,
+    end_date DATE,
+    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_projects_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
 );
 
--- TABLE 6: recruitment_drives
-CREATE TABLE IF NOT EXISTS recruitment_drives (
-  id         SERIAL PRIMARY KEY,
-  title      VARCHAR(255) NOT NULL,
-  company_id INTEGER REFERENCES companies(id),
-  mentor_id  INTEGER REFERENCES users(id),
-  status     VARCHAR(50) NOT NULL DEFAULT 'active'
-             CHECK (status IN ('active','closed','draft','completed','upcoming')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+CREATE INDEX IF NOT EXISTS idx_student_projects_student_id
+    ON student_projects(student_id);
 
--- TABLE 7: courses
-CREATE TABLE IF NOT EXISTS courses (
-  id           SERIAL PRIMARY KEY,
-  mentor_id    INTEGER NOT NULL REFERENCES mentors(id) ON DELETE CASCADE,
-  drive_id     INTEGER REFERENCES recruitment_drives(id) ON DELETE SET NULL,
-  title        VARCHAR(255) NOT NULL,
-  description  TEXT,
-  skill_tags   TEXT[],
-  status       VARCHAR(50) NOT NULL DEFAULT 'draft'
-               CHECK (status IN ('draft', 'published', 'archived')),
-  created_at   TIMESTAMPTZ DEFAULT NOW(),
-  updated_at   TIMESTAMPTZ DEFAULT NOW()
-);
+CREATE INDEX IF NOT EXISTS idx_student_projects_featured
+    ON student_projects(student_id, is_featured);
 
--- TABLE 8: dashboard_stats
-CREATE TABLE IF NOT EXISTS dashboard_stats (
+CREATE TABLE IF NOT EXISTS student_skills (
     id SERIAL PRIMARY KEY,
-    total_students INTEGER DEFAULT 0,
-    active_drives INTEGER DEFAULT 0,
-    placements INTEGER DEFAULT 0,
-    total_companies INTEGER DEFAULT 0,
-    revenue NUMERIC(15, 2) DEFAULT 0.00,
-    last_updated TIMESTAMPTZ DEFAULT NOW()
+    student_id INT NOT NULL,
+    skill_name VARCHAR(120) NOT NULL,
+    skill_level VARCHAR(50),
+    category VARCHAR(100),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_skills_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE,
+    CONSTRAINT uq_student_skill UNIQUE (student_id, skill_name)
 );
 
--- TABLE 9: dashboard_activities
-CREATE TABLE IF NOT EXISTS dashboard_activities (
+CREATE INDEX IF NOT EXISTS idx_student_skills_student_id
+    ON student_skills(student_id);
+
+CREATE TABLE IF NOT EXISTS student_social_links (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    status VARCHAR(50) DEFAULT 'info',
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    student_id INT NOT NULL UNIQUE,
+    linkedin_url TEXT,
+    github_url TEXT,
+    portfolio_url TEXT,
+    twitter_url TEXT,
+    website_url TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_social_links_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
 );
 
--- TABLE 10: dashboard_reports
-CREATE TABLE IF NOT EXISTS dashboard_reports (
-    id SERIAL PRIMARY KEY,
-    report_type VARCHAR(100) NOT NULL,
-    report_data JSONB NOT NULL,
-    generated_at TIMESTAMPTZ DEFAULT NOW()
->>>>>>> 58a8a53a33b49bd9f036a85f4634dd94794f37b4
-);
-
--- INDEXES
-CREATE INDEX IF NOT EXISTS idx_auth_users_email ON auth_users(email);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_college_profiles_user_id ON college_profiles(user_id);
-CREATE INDEX IF NOT EXISTS idx_companies_user_id ON companies(user_id);
-CREATE INDEX IF NOT EXISTS idx_mentors_expertise ON mentors USING GIN(expertise_tags);
-<<<<<<< HEAD
-=======
-CREATE INDEX IF NOT EXISTS idx_dashboard_activities_created_at ON dashboard_activities(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_dashboard_reports_type ON dashboard_reports(report_type);
->>>>>>> 58a8a53a33b49bd9f036a85f4634dd94794f37b4
+CREATE INDEX IF NOT EXISTS idx_student_social_links_student_id
+    ON student_social_links(student_id);

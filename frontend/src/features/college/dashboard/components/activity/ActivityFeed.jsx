@@ -1,24 +1,44 @@
-import React from 'react';
-import ActivityCard from './ActivityCard';
-import { activities } from '../../types/dashboardDummyData';
-import { validateActivity } from '../../validations/dashboardValidation';
-import { ACTIVITY_FEED_TITLE } from '../../constants/dashboardConstants';
+import ActivityCard from "./ActivityCard";
 
-export default function ActivityFeed() {
+const defaultActivities = [
+  {
+    title: "TCS Placement Drive Published",
+    time: "10 min ago",
+    status: "Completed",
+  },
+  {
+    title: "150 Students Registered",
+    time: "35 min ago",
+    status: "Completed",
+  },
+  {
+    title: "Infosys Eligibility Updated",
+    time: "1 hour ago",
+    status: "Pending",
+  },
+  {
+    title: "College Profile Updated",
+    time: "2 hours ago",
+    status: "Info",
+  },
+];
+
+const ActivityFeed = ({ activities = [] }) => {
+  const displayActivities = activities.length > 0 ? activities : defaultActivities;
+
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">
-        {ACTIVITY_FEED_TITLE}
+    <div className="bg-white rounded-xl shadow border p-5">
+      <h2 className="text-lg font-semibold mb-5">
+        Recent Activities
       </h2>
 
-      {activities
-        .filter(validateActivity)
-        .map((activity) => (
-          <ActivityCard
-            key={activity.id}
-            activity={activity}
-          />
+      <div className="space-y-4">
+        {displayActivities.map((item, index) => (
+          <ActivityCard key={index} {...item} />
         ))}
+      </div>
     </div>
   );
-}
+};
+
+export default ActivityFeed;

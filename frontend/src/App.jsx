@@ -1,4 +1,4 @@
- import { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // ── Auth Pages  ──

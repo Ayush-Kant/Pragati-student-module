@@ -1,0 +1,16 @@
+import express from "express";
+import * as offerController from "../controllers/offer.controller.js";
+
+const router = express.Router();
+
+router.post("/", offerController.createOffer);
+
+router.get("/", offerController.getOffers);
+
+router.get("/:id", offerController.getOfferById);
+
+router.patch("/:id/status", offerController.updateOfferStatus);
+
+router.delete("/:id", offerController.deleteOffer);
+
+export default router;
