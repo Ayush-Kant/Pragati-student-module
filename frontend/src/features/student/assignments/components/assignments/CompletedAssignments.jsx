@@ -2,7 +2,7 @@ import { ASSIGNMENT_STATUS } from "../../constants/assignmentConstants";
 import { formatDate, getStatusColor } from "../../utils/assignmentHelpers";
 import EmptyState from "../common/EmptyState";
 import SectionHeader from "../common/SectionHeader";
-
+import { CheckCircle2 } from "lucide-react";
 const CompletedAssignments = ({ assignments = [], onSelect }) => {
   const completed = assignments.filter(
     (a) => a.status === ASSIGNMENT_STATUS.COMPLETED
@@ -10,10 +10,15 @@ const CompletedAssignments = ({ assignments = [], onSelect }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
-      <SectionHeader
-        title="✅ Completed Assignments"
-        subtitle={`${completed.length} completed`}
-      />
+    <SectionHeader
+      title={
+      <div className="flex items-center gap-2">
+      <CheckCircle2 className="w-5 h-5 text-green-600" />
+      <span>Completed Assignments</span>
+      </div>
+    }
+    subtitle={`${completed.length} completed`}
+    />
 
       {completed.length === 0 ? (
         <EmptyState

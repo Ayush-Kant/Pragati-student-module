@@ -1,17 +1,30 @@
 import EmptyState from "../common/EmptyState";
 import SectionHeader from "../common/SectionHeader";
+import {
+  MessageSquare,
+  ClipboardCheck,
+  FileCheck2,
+} from "lucide-react";
 
 const EvaluationSummary = ({ criteria = [] }) => (
   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
-    <SectionHeader title="📊 Evaluation Summary" />
+   <SectionHeader 
+    title={
+    <div className="flex items-center gap-2">
+      <FileCheck2 className="w-5 h-5 text-blue-600" />
+      <span>Evaluation Summary</span>
+    </div>
+  } 
+  />
 
-    {criteria.length === 0 ? (
-      <EmptyState
-        icon="📋"
-        title="No evaluation data"
-        description="Marks breakdown will appear after grading."
-      />
-    ) : (
+  {criteria.length === 0 ? (
+  <EmptyState
+    // Pass the Lucide icon as a JSX element with some standard empty-state sizing/colors
+    icon={<ClipboardCheck className="w-12 h-12 text-gray-400" />}
+    title="No evaluation data"
+    description="Marks breakdown will appear after grading."
+  />
+  ) : (
       <div className="flex flex-col gap-3">
         {criteria.map((item, index) => {
           const pct = item.total > 0

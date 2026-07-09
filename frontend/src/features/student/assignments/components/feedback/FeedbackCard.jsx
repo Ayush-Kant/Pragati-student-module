@@ -1,5 +1,5 @@
 import { formatDate } from "../../utils/assignmentHelpers";
-
+import { MessageSquare}  from "lucide-react";
 const FeedbackCard = ({ feedback }) => {
   if (!feedback) return null;
 
@@ -7,7 +7,7 @@ const FeedbackCard = ({ feedback }) => {
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-lg">💬</span>
+          <MessageSquare className="w-5 h-5 text-blue-500" />
           <h3 className="text-base font-bold text-gray-800">Instructor Feedback</h3>
         </div>
         {feedback.date && (

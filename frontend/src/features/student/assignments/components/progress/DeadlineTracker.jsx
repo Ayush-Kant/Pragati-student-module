@@ -2,7 +2,8 @@ import { formatDate, calculateDaysLeft } from "../../utils/assignmentHelpers";
 import { ASSIGNMENT_STATUS } from "../../constants/assignmentConstants";
 import EmptyState from "../common/EmptyState";
 import SectionHeader from "../common/SectionHeader";
-
+import { CheckCircle2 } from "lucide-react";
+import { AlarmClock } from "lucide-react";
 const DeadlineTracker = ({ assignments = [] }) => {
   const pending = assignments
     .filter((a) => a.status === ASSIGNMENT_STATUS.PENDING)
@@ -12,13 +13,18 @@ const DeadlineTracker = ({ assignments = [] }) => {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
       <SectionHeader
-        title="⏰ Deadline Tracker"
-        subtitle={`${pending.length} upcoming deadline${pending.length !== 1 ? "s" : ""}`}
+      title={
+        <div className="flex items-center gap-2">
+            <AlarmClock className="w-5 h-5 text-rose-500" />
+            <span>Deadline Tracker</span>
+          </div>
+        }
+      subtitle={`${pending.length} upcoming deadline${pending.length !== 1 ? "s" : ""}`}
       />
 
       {pending.length === 0 ? (
         <EmptyState
-          icon="✅"
+          icon=<CheckCircle2 className="w-5 h-5 text-green-500"/>
           title="No upcoming deadlines"
           description="All pending assignments will be tracked here."
         />

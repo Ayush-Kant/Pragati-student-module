@@ -1,3 +1,4 @@
+import { Target } from "lucide-react";
 const GradeCard = ({ marksObtained, totalMarks, title = "Grade" }) => {
   const hasGrade = marksObtained !== null && marksObtained !== undefined;
   const percentage = hasGrade && totalMarks > 0
@@ -15,7 +16,7 @@ const GradeCard = ({ marksObtained, totalMarks, title = "Grade" }) => {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-lg">🎯</span>
+        <Target className="w-5 h-5 text-red-500" />
         <h3 className="text-base font-bold text-gray-800">{title}</h3>
       </div>
 

@@ -1,3 +1,8 @@
+import {
+  CalendarDays,
+  
+} from "lucide-react";
+
 import { formatDate, calculateDaysLeft, getStatusColor } from "../../utils/assignmentHelpers";
 
 const AssignmentCard = ({ assignment, onClick }) => {
@@ -27,7 +32,7 @@ const AssignmentCard = ({ assignment, onClick }) => {
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span>📅</span>
+          <CalendarDays className="w-4 h-4 text-gray-500" />
           <span>Due {formatDate(assignment.dueDate)}</span>
         </div>
 

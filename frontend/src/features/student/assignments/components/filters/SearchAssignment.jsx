@@ -1,8 +1,10 @@
+import { Search } from "lucide-react";
+
 const SearchAssignment = ({ value, onChange }) => (
   <div className="relative flex-1">
-    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
-      🔍
-    </span>
+    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+      <Search size={18} className="text-gray-400" />
+    </div>
     <input
       type="text"
       value={value}

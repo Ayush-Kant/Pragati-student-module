@@ -1,10 +1,12 @@
+import {ClipboardCheck} from 'lucide-react';
+
 const InstructorRemarks = ({ remarks = [] }) => {
   if (!remarks || remarks.length === 0) return null;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-lg">📝</span>
+        <ClipboardCheck className="w-5 h-5 text-blue-600" />
         <h3 className="text-base font-bold text-gray-800">Instructor Remarks</h3>
       </div>
 
