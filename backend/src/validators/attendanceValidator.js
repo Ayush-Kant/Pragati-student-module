@@ -21,3 +21,7 @@ export const validateAttendance = Joi.object({
 export const validateAttendanceParams = Joi.object({
   id: Joi.number().integer().positive().required()
 });
+
+export const validateAttendanceQuery = Joi.object({
+  sessionId: Joi.number().integer().positive().required()
+}).unknown(false);

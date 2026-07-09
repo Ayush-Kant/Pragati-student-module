@@ -3,6 +3,7 @@ import express from "express";
 import liveSessionController from "../controllers/liveSessionController.js";
 import recordingRoutes from "./recordingRoutes.js";
 import attendanceRoutes from "./attendanceRoutes.js";
+import participantRoutes from "./participantRoutes.js";
 import scheduleRoutes from "./scheduleRoutes.js";
 import authenticateJWT from "../middleware/authenticateJWT.js";
 import authorizeStudent from "../middleware/authorizeStudent.js";
@@ -19,6 +20,7 @@ router.use(authorizeStudent);
 router.use("/recordings", recordingRoutes);
 
 router.use("/attendance", attendanceRoutes);
+router.use("/participants", participantRoutes);
 
 router.use("/schedules", scheduleRoutes);
 

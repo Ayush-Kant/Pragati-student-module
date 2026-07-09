@@ -5,7 +5,7 @@ export const getAttendance = async (req, res, next) => {
   try {
 
     const studentId = req.user.id;
-    const { sessionId } = req.query;
+    const { sessionId } = req.validatedQuery || req.query;
 
     const records = await attendanceService.getAttendance(
       sessionId,

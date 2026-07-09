@@ -6,11 +6,12 @@ export const resolveStudentReference = (studentId, users = []) => {
   }
 
   for (const user of users) {
-
-    if (Number(user.id) === normalizedReference) {
+    if (
+      Number(user.id) === normalizedReference ||
+      Number(user.auth_user_id) === normalizedReference
+    ) {
       return Number(user.id);
     }
-
   }
 
   return null;
@@ -29,9 +30,9 @@ export const resolveStudentUserId = async (dbClient, studentId) => {
 
   const result = await dbClient.query(
     `
-    SELECT id
+    SELECT id, auth_user_id
     FROM users
-    WHERE id = $1
+    WHERE (id = $1 OR auth_user_id = $1)
     AND role = 'student'
     LIMIT 1
     `,

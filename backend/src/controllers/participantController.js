@@ -16,7 +16,8 @@ export const getParticipants = async (req, res, next) => {
 export const addParticipant = async (req, res, next) => {
   try {
     const { id: sessionId } = req.validatedParams || req.params;
-    const studentId = req.user.id;
+    const body = req.validatedBody || req.body;
+    const studentId = body?.studentId ?? req.user.id;
     const participant = await participantService.addParticipant(sessionId, studentId);
     res.status(200).json({
       success: true,

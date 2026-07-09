@@ -1,7 +1,16 @@
 import { pool } from "../../config/db.js";
+import { resolveStudentUserId } from "../utils/studentReferenceResolver.js";
 
 
 export const getAttendance = async (sessionId, studentId) => {
+
+    const resolvedStudentId = await resolveStudentUserId(pool, studentId);
+
+    if (!resolvedStudentId) {
+        const error = new Error("Student not found");
+        error.status = 404;
+        throw error;
+    }
 
     const result = await pool.query(
         `
@@ -17,7 +26,7 @@ export const getAttendance = async (sessionId, studentId) => {
         AND sa.student_id = $2
         ORDER BY sa.created_at DESC
         `,
-        [sessionId, studentId]
+        [sessionId, resolvedStudentId]
     );
 
     return result.rows;
@@ -30,6 +39,14 @@ export const markAttendance = async (
     studentId,
     status
 ) => {
+
+    const resolvedStudentId = await resolveStudentUserId(pool, studentId);
+
+    if (!resolvedStudentId) {
+        const error = new Error("Student not found");
+        error.status = 404;
+        throw error;
+    }
 
     const result = await pool.query(
         `
@@ -57,7 +74,7 @@ export const markAttendance = async (
         `,
         [
             sessionId,
-            studentId,
+            resolvedStudentId,
             status
         ]
     );
@@ -72,6 +89,14 @@ export const updateAttendance = async (
     studentId,
     status
 ) => {
+
+    const resolvedStudentId = await resolveStudentUserId(pool, studentId);
+
+    if (!resolvedStudentId) {
+        const error = new Error("Student not found");
+        error.status = 404;
+        throw error;
+    }
 
     const result = await pool.query(
         `
@@ -91,7 +116,7 @@ export const updateAttendance = async (
         `,
         [
             sessionId,
-            studentId,
+            resolvedStudentId,
             status
         ]
     );

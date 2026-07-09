@@ -81,14 +81,11 @@ export const removeParticipant = async (
   participantId
 ) => {
 
-  const result = await pool.query(
+  const studentRemovalResult = await pool.query(
     `
     DELETE FROM session_participants
     WHERE session_id = $1
-    AND (
-        student_id = $2 
-        OR id = $2
-    )
+    AND student_id = $2
     RETURNING
         id,
         session_id AS "sessionId",
@@ -100,8 +97,27 @@ export const removeParticipant = async (
     ]
   );
 
+  if (studentRemovalResult.rows[0]) {
+    return studentRemovalResult.rows[0];
+  }
 
-  return result.rows[0] || null;
+  const rowRemovalResult = await pool.query(
+    `
+    DELETE FROM session_participants
+    WHERE session_id = $1
+    AND id = $2
+    RETURNING
+        id,
+        session_id AS "sessionId",
+        student_id AS "studentId"
+    `,
+    [
+      sessionId,
+      Number(participantId)
+    ]
+  );
+
+  return rowRemovalResult.rows[0] || null;
 };
 
 
