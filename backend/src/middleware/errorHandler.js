@@ -1,12 +1,13 @@
+// Simple error handler
 export const errorHandler = (err, req, res, next) => {
-  console.error("Error occurred:", err);
+    console.error("Error occurred:", err);
 
-  const status = err.status || 500;
+    const status = err.status || 500;
 
-  res.status(status).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
+    res.status(status).json({
+        success: false,
+        message: err.message || "Internal Server Error",
+    });
 };
 
 export default errorHandler;

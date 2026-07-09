@@ -11,6 +11,42 @@ import studentLessonRoutes from "./src/routes/lessonRoutes.js";
 import studentResourceRoutes from "./src/routes/resourceRoutes.js";
 import studentProgressRoutes from "./src/routes/progressRoutes.js";
 
+// Live Sessions Routes
+import liveSessionRoutes from "./src/routes/liveSessionRoutes.js";
+
+// Admin Routes
+import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
+import adminCollegeRoutes from "./routes/admin.college.routes.js";
+import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
+import adminDriveRoutes from "./routes/admin.drive.routes.js";
+import adminNotificationRoutes from "./routes/admin.notification.routes.js";
+import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
+
+// Standard & Role-Specific Routes
+import authRouter from "./routes/auth.routes.js";
+import contentRoutes from "./routes/content.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
+import companyRoutes from "./routes/company.routes.js";
+import companyProfileRoutes from "./modules/company/routes/companyProfile.routes.js";
+import interviewRoutes from "./routes/interview.routes.js";
+import questionBankRouter from "./routes/questionBank.routes.js";
+import mentorRoutes from "./routes/mentor.routes.js";
+import trainingRoutes from "./routes/trainingRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
+import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
+
+// Student Profile Module (if present)
+import studentProfileRouter from "./src/routes/index.js";
+
+// Middleware
+import errorHandler from "./src/middleware/errorHandler.js";
+
+import studentTrainingRoutes from "./src/routes/trainingRoutes.js";
+import studentCourseRoutes from "./src/routes/courseRoutes.js";
+import studentLessonRoutes from "./src/routes/lessonRoutes.js";
+import studentResourceRoutes from "./src/routes/resourceRoutes.js";
+import studentProgressRoutes from "./src/routes/progressRoutes.js";
+
 
 // Admin Routes
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
@@ -99,7 +135,27 @@ connectDB()
     app.listen(PORT, () => {
       console.log(`✅ Server running on PORT : ${PORT}`);
     });
+<<<<<<< HEAD
+  })
+  .catch((err) => {
+=======
+});
+
+// ── Student Profile Module Routes ─────────────────────────────────────────────
+app.use(studentProfileRouter);
+
+// ── Global Error Handler (must be last) ──────────────────────────────────────
+// ─── Global Error Handler (must be registered LAST) ──────────
+app.use(errorHandler);
+
+// ─── Database Connection & Server Start ─────────────────────
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on PORT : ${PORT}`);
+    });
   })
   .catch((err) => {
     console.error("❌ PostgreSQL connection failed:", err.message);
+    process.exit(1);
   });
