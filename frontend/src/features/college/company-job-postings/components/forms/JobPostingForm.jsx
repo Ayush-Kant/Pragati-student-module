@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useState } from "react";
 import { Plus } from "lucide-react";
 import { validateJobPosting } from "../../validations/companyJobPostingValidation";
+import { DEPARTMENTS, BATCHES } from "../../constants/companyJobPostingConstants";
 
 const getInitialFormData = (job) => ({
   role: job?.role || "",
@@ -10,6 +11,10 @@ const getInitialFormData = (job) => ({
   batch: job?.batch || "",
   deadline: job?.deadline || "",
   status: job?.status || "Open",
+  department: job?.department || "",
+  package: job?.package || "",
+  jobDescription: job?.jobDescription || "",
+  hiringProcess: job?.hiringProcess || "",
 });
 
 const formReducer = (state, action) => {
@@ -42,6 +47,10 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
     cgpa: "",
     batch: "",
     deadline: "",
+    department: "",
+    package: "",
+    jobDescription: "",
+    hiringProcess: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,16 +62,18 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
       payload: getInitialFormData(editingJob),
     });
 
-    // Reset errors in the next microtask to avoid synchronous setState in effect
-    Promise.resolve().then(() => {
-      setErrors({
-        role: "",
-        company: "",
-        location: "",
-        cgpa: "",
-        batch: "",
-        deadline: "",
-      });
+    // Reset errors synchronously to avoid asynchronous setState issues
+    setErrors({
+      role: "",
+      company: "",
+      location: "",
+      cgpa: "",
+      batch: "",
+      deadline: "",
+      department: "",
+      package: "",
+      jobDescription: "",
+      hiringProcess: "",
     });
   }, [editingJob]);
 
@@ -107,6 +118,10 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
         cgpa: "",
         batch: "",
         deadline: "",
+        department: "",
+        package: "",
+        jobDescription: "",
+        hiringProcess: "",
       });
     } catch (err) {
       console.error(err);
@@ -161,6 +176,31 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
           )}
         </div>
 
+        {/* Department select dropdown */}
+        <div>
+          <select
+            name="department"
+            value={formData.department}
+            onChange={handleChange}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 bg-white ${
+              errors.department ? "border border-red-500" : "border"
+            }`}
+          >
+            <option value="">Select Department</option>
+            {DEPARTMENTS.map((dept) => (
+              <option key={dept} value={dept}>
+                {dept}
+              </option>
+            ))}
+          </select>
+
+          {errors.department && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.department}
+            </p>
+          )}
+        </div>
+
         {/* Location */}
         <div>
           <input
@@ -180,12 +220,32 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
           )}
         </div>
 
+        {/* Package */}
+        <div>
+          <input
+            name="package"
+            placeholder="Package (e.g., 12 LPA)"
+            value={formData.package}
+            onChange={handleChange}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
+              errors.package ? "border border-red-500" : "border"
+            }`}
+          />
+
+          {errors.package && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.package}
+            </p>
+          )}
+        </div>
+
         {/* CGPA */}
         <div>
           <input
             type="number"
+            step="0.01"
             name="cgpa"
-            placeholder="CGPA"
+            placeholder="CGPA Limit (0-10)"
             value={formData.cgpa}
             onChange={handleChange}
             className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
@@ -200,17 +260,23 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
           )}
         </div>
 
-        {/* Batch */}
+        {/* Batch select dropdown */}
         <div>
-          <input
+          <select
             name="batch"
-            placeholder="Batch"
             value={formData.batch}
             onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 bg-white ${
               errors.batch ? "border border-red-500" : "border"
             }`}
-          />
+          >
+            <option value="">Select Batch</option>
+            {BATCHES.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
 
           {errors.batch && (
             <p className="text-red-500 text-sm mt-1">
@@ -221,6 +287,9 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
 
         {/* Deadline */}
         <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            Application Deadline
+          </label>
           <input
             type="date"
             name="deadline"
@@ -234,6 +303,46 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
           {errors.deadline && (
             <p className="text-red-500 text-sm mt-1">
               {errors.deadline}
+            </p>
+          )}
+        </div>
+
+        {/* Job Description */}
+        <div>
+          <textarea
+            name="jobDescription"
+            placeholder="Job Description (minimum 10 characters)"
+            value={formData.jobDescription}
+            onChange={handleChange}
+            rows={3}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
+              errors.jobDescription ? "border border-red-500" : "border"
+            }`}
+          />
+
+          {errors.jobDescription && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.jobDescription}
+            </p>
+          )}
+        </div>
+
+        {/* Hiring Process */}
+        <div>
+          <textarea
+            name="hiringProcess"
+            placeholder="Hiring Process"
+            value={formData.hiringProcess}
+            onChange={handleChange}
+            rows={3}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
+              errors.hiringProcess ? "border border-red-500" : "border"
+            }`}
+          />
+
+          {errors.hiringProcess && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.hiringProcess}
             </p>
           )}
         </div>

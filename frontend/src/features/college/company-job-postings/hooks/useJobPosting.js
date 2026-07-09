@@ -63,20 +63,24 @@ const useJobPosting = () => {
   };
 
   const toggleJobStatus = async (id) => {
-    const selectedJob = jobs.find((job) => job.id === id);
+    try {
+      const selectedJob = jobs.find((job) => job.id === id);
 
-    if (!selectedJob) return;
+      if (!selectedJob) return;
 
-    const updatedStatus =
-      selectedJob.status === "Open" ? "Closed" : "Open";
+      const updatedStatus =
+        selectedJob.status === "Open" ? "Closed" : "Open";
 
-    const updatedJob = await updateJobPosting(id, {
-      status: updatedStatus,
-    });
+      const updatedJob = await updateJobPosting(id, {
+        status: updatedStatus,
+      });
 
-    setJobs((prev) =>
-      prev.map((job) => (job.id === id ? updatedJob : job))
-    );
+      setJobs((prev) =>
+        prev.map((job) => (job.id === id ? updatedJob : job))
+      );
+    } catch {
+      setError("Unable to toggle job status.");
+    }
   };
 
   return {

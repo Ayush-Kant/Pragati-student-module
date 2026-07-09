@@ -41,6 +41,7 @@ const CompanyRow = ({
           <button
             onClick={() => onView(company)}
             className="text-blue-600 hover:text-blue-800"
+            aria-label="View company details"
           >
             <Eye size={18}/>
           </button>
@@ -48,6 +49,7 @@ const CompanyRow = ({
           <button
             onClick={() => onEdit(company)}
             className="text-yellow-500 hover:text-yellow-700"
+            aria-label="Edit company details"
           >
             <Pencil size={18}/>
           </button>
@@ -55,6 +57,7 @@ const CompanyRow = ({
           <button
             onClick={() => onDelete(company.id)}
             className="text-red-500 hover:text-red-700"
+            aria-label="Delete company"
           >
             <Trash2 size={18}/>
           </button>

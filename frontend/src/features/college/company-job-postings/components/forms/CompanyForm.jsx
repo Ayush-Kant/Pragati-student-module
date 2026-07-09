@@ -45,17 +45,11 @@ const CompanyForm = ({ onSubmit, editingCompany, companies = [] }) => {
       payload: getInitialFormData(editingCompany),
     });
 
-    // Defer setting errors to avoid synchronous setState inside effect
-    // which can cause cascading renders.
-    const t = setTimeout(() => {
-      setErrors({
-        company: "",
-        location: "",
-        package: "",
-      });
-    }, 0);
-
-    return () => clearTimeout(t);
+    setErrors({
+      company: "",
+      location: "",
+      package: "",
+    });
   }, [editingCompany]);
 
   const handleChange = (e) => {

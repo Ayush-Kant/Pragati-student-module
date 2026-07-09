@@ -23,8 +23,8 @@ export const validateCompany = (data, existingCompanies = [], editingCompanyId =
     errors.location = "Location is required";
   } else if (location.length < 2) {
     errors.location = "Location must be at least 2 characters";
-  } else if (!/^[a-zA-Z\s]+$/.test(location)) {
-    errors.location = "Location must contain only letters and spaces";
+  } else if (!/^[a-zA-Z0-9\s,\-.]+$/.test(location)) {
+    errors.location = "Location must contain only letters, numbers, spaces, commas, hyphens, or periods";
   }
 
   const pkg = (data.package || "").trim();
@@ -83,8 +83,8 @@ export const validateJobPosting = (data, existingJobs = [], editingJobId = null)
     errors.location = "Location is required";
   } else if (location.length < 2) {
     errors.location = "Location must be at least 2 characters";
-  } else if (!/^[a-zA-Z\s]+$/.test(location)) {
-    errors.location = "Location must contain only letters and spaces";
+  } else if (!/^[a-zA-Z0-9\s,\-.]+$/.test(location)) {
+    errors.location = "Location must contain only letters, numbers, spaces, commas, hyphens, or periods";
   }
 
   if (!data.deadline) {
@@ -100,6 +100,39 @@ export const validateJobPosting = (data, existingJobs = [], editingJobId = null)
         errors.deadline = "Deadline must be a future date";
       }
     }
+  }
+
+  const department = (data.department || "").trim();
+  if (!department) {
+    errors.department = "Department is required";
+  }
+
+  const pkg = (data.package || "").trim();
+  if (!pkg) {
+    errors.package = "Package is required";
+  } else {
+    const packageRegex = /^(\d+(\.\d+)?)\s*(LPA)?$/i;
+    const match = pkg.match(packageRegex);
+    if (!match) {
+      errors.package = "Package must be a valid number, optionally followed by 'LPA' (e.g., '12' or '12 LPA')";
+    } else {
+      const numericVal = parseFloat(match[1]);
+      if (isNaN(numericVal) || numericVal <= 0) {
+        errors.package = "Package must be a positive value";
+      }
+    }
+  }
+
+  const jobDescription = (data.jobDescription || "").trim();
+  if (!jobDescription) {
+    errors.jobDescription = "Job description is required";
+  } else if (jobDescription.length < 10) {
+    errors.jobDescription = "Job description must be at least 10 characters";
+  }
+
+  const hiringProcess = (data.hiringProcess || "").trim();
+  if (!hiringProcess) {
+    errors.hiringProcess = "Hiring process is required";
   }
 
   // Delegate eligibility validations (CGPA and Batch)
