@@ -31,7 +31,7 @@ export const markAttendance = async (req, res, next) => {
 
     const body = req.validatedBody || req.body;
 
-    const studentId = body.studentId || req.user.id;
+    const studentId = req.user.id;
 
     const { status } = body;
 
@@ -64,7 +64,7 @@ export const updateAttendance = async (req, res, next) => {
 
     const body = req.validatedBody || req.body;
 
-    const studentId = body.studentId || req.user.id;
+    const studentId = req.user.id;
 
     const { status } = body;
 

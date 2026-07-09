@@ -12,8 +12,8 @@ export const getSchedules = async () => {
         ls.title,
         ls.trainer,
 
-        COALESCE(ls.date, ls.session_date) AS "date",
-        COALESCE(ls.time, ls.session_time) AS "time",
+        ls.date AS "date",
+        ls.time AS "time",
         ls.duration,
 
         ss.status,
@@ -44,8 +44,8 @@ export const getUpcomingSessions = async () => {
         ls.title,
         ls.trainer,
 
-        COALESCE(ls.date, ls.session_date) AS "date",
-        COALESCE(ls.time, ls.session_time) AS "time",
+        ls.date AS "date",
+        ls.time AS "time",
         ls.duration,
 
         ss.status,

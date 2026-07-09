@@ -1,7 +1,7 @@
 import { pool } from "../../config/db.js";
 
 
-export const getAttendance = async () => {
+export const getAttendance = async (sessionId, studentId) => {
 
     const result = await pool.query(
         `
@@ -13,9 +13,11 @@ export const getAttendance = async () => {
             sa.created_at AS "createdAt"
 
         FROM session_attendance sa
-
+        WHERE sa.session_id = $1
+        AND sa.student_id = $2
         ORDER BY sa.created_at DESC
-        `
+        `,
+        [sessionId, studentId]
     );
 
     return result.rows;

@@ -26,10 +26,6 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 
 // Live Sessions Routes
 import liveSessionRoutes from "./src/routes/liveSessionRoutes.js";
-import attendanceRoutes from "./src/routes/attendanceRoutes.js";
-import recordingRoutes from "./src/routes/recordingRoutes.js";
-import participantRoutes from "./src/routes/participantRoutes.js";
-import scheduleRoutes from "./src/routes/scheduleRoutes.js";
 import initializeLiveSessionModule from "./src/database/migrations/liveSessionSchema.js";
 
 // Middleware
@@ -65,10 +61,6 @@ app.use("/api/student/dashboard", dashboardRoutes);
 
 // Live Sessions Routes
 app.use("/api/student/live-sessions", liveSessionRoutes);
-app.use("/api/student/live-sessions", attendanceRoutes);
-app.use("/api/student/live-sessions", recordingRoutes);
-app.use("/api/student/live-sessions", participantRoutes);
-app.use("/api/student/live-sessions", scheduleRoutes);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
