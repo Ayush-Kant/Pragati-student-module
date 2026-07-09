@@ -29,7 +29,7 @@ const collegeRoute = (
       </Route>
     </Route>
   </Route>
-  </>
+
 );
 
 export default collegeRoute;
