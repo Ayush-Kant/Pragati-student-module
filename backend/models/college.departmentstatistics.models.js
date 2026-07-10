@@ -91,7 +91,7 @@ export const recomputeDepartmentStatistics = async (departmentId) => {
     `SELECT
         COUNT(*)::int AS total_courses,
         COALESCE(AVG(credits), 0)::numeric(4,2) AS average_credits
-     FROM courses
+     FROM college_courses
      WHERE department_id = $1
        AND is_active = TRUE`,
     [departmentId]

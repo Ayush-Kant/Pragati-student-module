@@ -13,7 +13,7 @@ const BASE_SELECT = `
     c.id, c.course_name, c.course_code, c.semester, c.credits,
     c.department_id, d.name AS department_name, d.code AS department_code,
     c.description, c.is_active, c.created_at, c.updated_at
-  FROM courses c
+  FROM college_courses c
   JOIN departments d ON d.id = c.department_id
 `;
 
@@ -60,7 +60,7 @@ export const countCourses = async ({ departmentId, semester } = {}) => {
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-  const { rows } = await pool.query(`SELECT COUNT(*)::int AS total FROM courses ${where}`, params);
+  const { rows } = await pool.query(`SELECT COUNT(*)::int AS total FROM college_courses ${where}`, params);
   return rows[0].total;
 };
 
@@ -76,7 +76,7 @@ export const getCourseByCode = async (code) => {
 
 export const createCourse = async ({ courseName, courseCode, semester, credits, departmentId, description }) => {
   const { rows } = await pool.query(
-    `INSERT INTO courses (course_name, course_code, semester, credits, department_id, description)
+    `INSERT INTO college_courses (course_name, course_code, semester, credits, department_id, description)
      VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING id, course_name, course_code, semester, credits, department_id, description, is_active, created_at, updated_at`,
     [courseName, courseCode, semester, credits, departmentId, description || null]
@@ -111,7 +111,7 @@ export const updateCourse = async (id, fields) => {
 
   params.push(id);
   const { rows } = await pool.query(
-    `UPDATE courses SET ${setClauses.join(", ")} WHERE id = $${idx}
+    `UPDATE college_courses SET ${setClauses.join(", ")} WHERE id = $${idx}
      RETURNING id, course_name, course_code, semester, credits, department_id, description, is_active, created_at, updated_at`,
     params
   );
@@ -119,7 +119,7 @@ export const updateCourse = async (id, fields) => {
 };
 
 export const deleteCourse = async (id) => {
-  const { rows } = await pool.query(`DELETE FROM courses WHERE id = $1 RETURNING id`, [id]);
+  const { rows } = await pool.query(`DELETE FROM college_courses WHERE id = $1 RETURNING id`, [id]);
   return rows[0] || null;
 };
 

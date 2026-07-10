@@ -37,7 +37,7 @@ CREATE INDEX IF NOT EXISTS idx_departments_is_active ON departments (is_active);
 -- ------------------------------------------------------------
 -- Table: courses
 -- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS courses (
+CREATE TABLE IF NOT EXISTS college_courses (
     id              SERIAL PRIMARY KEY,
     course_name     VARCHAR(150) NOT NULL,
     course_code     VARCHAR(20)  NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS courses (
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT uq_courses_code UNIQUE (course_code),
+    CONSTRAINT uq_college_courses_code UNIQUE (course_code),
     CONSTRAINT fk_courses_department
         FOREIGN KEY (department_id)
         REFERENCES departments (id)
@@ -60,9 +60,9 @@ CREATE TABLE IF NOT EXISTS courses (
     CONSTRAINT chk_courses_code_format CHECK (course_code ~ '^[A-Z0-9]{3,20}$')
 );
 
-CREATE INDEX IF NOT EXISTS idx_courses_department_id ON courses (department_id);
-CREATE INDEX IF NOT EXISTS idx_courses_semester ON courses (semester);
-CREATE INDEX IF NOT EXISTS idx_courses_name ON courses USING GIN (to_tsvector('english', course_name));
+CREATE INDEX IF NOT EXISTS idx_college_courses_department_id ON college_courses (department_id);
+CREATE INDEX IF NOT EXISTS idx_college_courses_semester ON college_courses (semester);
+CREATE INDEX IF NOT EXISTS idx_college_courses_name ON college_courses USING GIN (to_tsvector('english', course_name));
 
 -- ------------------------------------------------------------
 -- Table: department_courses (junction table)
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS department_courses (
         ON DELETE CASCADE,
     CONSTRAINT fk_dc_course
         FOREIGN KEY (course_id)
-        REFERENCES courses (id)
+        REFERENCES college_courses (id)
         ON DELETE CASCADE
 );
 
@@ -131,7 +131,7 @@ CREATE TRIGGER trg_departments_updated_at
     BEFORE UPDATE ON departments
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
-DROP TRIGGER IF EXISTS trg_courses_updated_at ON courses;
+DROP TRIGGER IF EXISTS trg_courses_updated_at ON college_courses;
 CREATE TRIGGER trg_courses_updated_at
-    BEFORE UPDATE ON courses
+    BEFORE UPDATE ON college_courses
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
