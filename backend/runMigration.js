@@ -3,7 +3,7 @@ import fs from "fs";
 import { pool } from "./config/db.js";
 
 const sql = fs.readFileSync(
-  "./migrations/005_create_recruitment_drives.sql",
+  "./migrations/006_create_question_bank.sql",
   "utf8"
 );
 

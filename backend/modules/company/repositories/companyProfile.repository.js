@@ -1,4 +1,4 @@
-import pool from "../../../config/db.js";
+import { pool } from "../../../config/db.js";
 
 export const getCompanyByIdRepo = async (companyId) => {
   const result = await pool.query(
@@ -24,8 +24,14 @@ export const updateCompanyRepo = async (companyId, data) => {
       size = $4,
       description = $5,
       logo_url = $6,
+      location = $7,
+      default_work_mode = $8,
+      probation_period = $9,
+      notice_period = $10,
+      currency = $11,
+      notifications = $12,
       updated_at = CURRENT_TIMESTAMP
-    WHERE id = $7
+    WHERE id = $13
     RETURNING *
     `,
     [
@@ -35,6 +41,12 @@ export const updateCompanyRepo = async (companyId, data) => {
       data.size,
       data.description,
       data.logo_url,
+      data.location,
+      data.default_work_mode,
+      data.probation_period,
+      data.notice_period,
+      data.currency,
+      data.notifications,
       companyId,
     ],
   );
