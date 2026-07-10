@@ -1,4 +1,5 @@
-import express from "express";
+import { Router } from 'express';
+import authMiddleware from '../middleware/authMiddleware.js';
 import {
   getStudents,
   getStudentById,
@@ -12,41 +13,33 @@ import {
   updateAcademicDetails,
   getStudentSkills,
   addStudentSkill,
-  updateStudentSkill,
-  removeStudentSkill
-} from "../controllers/student.controller.js";
+  deleteStudentSkill,
+} from '../controllers/student.controller.js';
 
-import {
-  validateStudent,
-  validateAcademicDetails,
-  validateSkill,
-  validateRequestBody
-} from "../validators/student.validator.js";
+const router = Router();
 
-import authMiddleware from "../middleware/authMiddleware.js";
-import roleMiddleware from "../middleware/roleMiddleware.js";
-
-const router = express.Router();
-
-router.use(validateRequestBody);
+// All student routes require authentication
 router.use(authMiddleware);
 
-router.get("/search", searchStudents);
-router.get("/filter", filterStudents);
-router.get("/statistics", roleMiddleware("admin", "staff", "company"), getStudentStatistics);
+// ─── Search & Filter & Statistics (before /:id to avoid conflicts) ────────────
+router.get('/search',     searchStudents);
+router.get('/filter',     filterStudents);
+router.get('/statistics', getStudentStatistics);
 
-router.get("/", getStudents);
-router.get("/:id", getStudentById);
-router.post("/", roleMiddleware("admin", "staff", "college"), validateStudent, createStudent);
-router.put("/:id", roleMiddleware("admin", "staff", "student", "college"), validateStudent, updateStudent);
-router.delete("/:id", roleMiddleware("admin", "college"), deleteStudent);
+// ─── Student CRUD ─────────────────────────────────────────────────────────────
+router.get('/',    getStudents);
+router.post('/',   createStudent);
+router.get('/:id',    getStudentById);
+router.put('/:id',    updateStudent);
+router.delete('/:id', deleteStudent);
 
-router.get("/:id/academic", getAcademicDetails);
-router.put("/:id/academic", roleMiddleware("admin", "staff", "student"), validateAcademicDetails, updateAcademicDetails);
+// ─── Academic Details ─────────────────────────────────────────────────────────
+router.get('/:id/academic', getAcademicDetails);
+router.put('/:id/academic', updateAcademicDetails);
 
-router.get("/:id/skills", getStudentSkills);
-router.post("/:id/skills", roleMiddleware("admin", "staff", "student"), validateSkill, addStudentSkill);
-router.put("/:id/skills/:skillId", roleMiddleware("admin", "staff", "student"), validateSkill, updateStudentSkill);
-router.delete("/:id/skills/:skillId", roleMiddleware("admin", "staff", "student"), removeStudentSkill);
+// ─── Skills ───────────────────────────────────────────────────────────────────
+router.get('/:id/skills',             getStudentSkills);
+router.post('/:id/skills',            addStudentSkill);
+router.delete('/:id/skills/:skillId', deleteStudentSkill);
 
 export default router;

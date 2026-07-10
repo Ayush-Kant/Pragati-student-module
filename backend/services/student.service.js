@@ -1,200 +1,117 @@
-import studentModel from "../models/studentModel.js";
-import academicModel from "../models/academicModel.js";
-import skillsModel from "../models/skillsModel.js";
+import * as StudentModel from '../models/studentModel.js';
+import { sanitizeInput } from '../validators/student.validator.js';
 
-class StudentService {
-  async getStudents(page = 1, limit = 10) {
-    const offset = (page - 1) * limit;
-    const students = await studentModel.getAllStudents(limit, offset);
-    return {
-      success: true,
-      message: "Students fetched successfully",
-      data: students,
-      pagination: {
-        page,
-        limit,
-      }
-    };
+// ─── Get all students ─────────────────────────────────────────────────────────
+export const getStudents = async (filters = {}, pagination = {}) => {
+  const { students, total, page, pageSize } = await StudentModel.getAllStudents(filters, pagination);
+  return {
+    success:    true,
+    data:       students,
+    pagination: { total, page, pageSize, totalPages: Math.ceil(total / pageSize) },
+  };
+};
+
+// ─── Get single student ───────────────────────────────────────────────────────
+export const getStudent = async (id) => {
+  const student = await StudentModel.getStudentById(id);
+  if (!student) return { success: false, message: 'Student not found' };
+  return { success: true, data: student };
+};
+
+// ─── Add new student ──────────────────────────────────────────────────────────
+export const addStudent = async (rawData) => {
+  const data   = sanitizeInput(rawData);
+  const skills = Array.isArray(data.skills) ? data.skills : [];
+
+  // Check duplicates
+  const duplicate = await StudentModel.checkDuplicate(data.enrollmentNo, data.email);
+  if (duplicate) {
+    return { success: false, message: 'A student with this enrollment number or email already exists' };
   }
 
-  async getStudent(id) {
-    const student = await studentModel.getStudentById(id);
-    if (!student) {
-      throw new Error("Student not found");
-    }
-    
-    const academic = await academicModel.getAcademicDetails(id);
-    const skills = await skillsModel.getStudentSkills(id);
+  const student = await StudentModel.createStudent(data, skills);
+  return { success: true, data: student, message: 'Student created successfully' };
+};
 
-    return {
-      success: true,
-      message: "Student details fetched successfully",
-      data: {
-        ...student,
-        academic: academic || null,
-        skills: skills || []
-      }
-    };
-  }
+// ─── Edit student ─────────────────────────────────────────────────────────────
+export const editStudent = async (id, rawData) => {
+  const data   = sanitizeInput(rawData);
+  const skills = data.skills !== undefined ? (Array.isArray(data.skills) ? data.skills : []) : undefined;
 
-  async addStudent(studentData) {
-    try {
-      const newStudent = await studentModel.createStudent(studentData);
-      return {
-        success: true,
-        message: "Student created successfully",
-        data: newStudent
-      };
-    } catch (error) {
-      if (error.code === '23505') { 
-        throw new Error("Student with this enrollment number or email already exists");
-      }
-      throw error;
+  // Check duplicates (excluding self)
+  if (data.enrollmentNo || data.email) {
+    const duplicate = await StudentModel.checkDuplicate(
+      data.enrollmentNo || '', data.email || '', id
+    );
+    if (duplicate) {
+      return { success: false, message: 'A student with this enrollment number or email already exists' };
     }
   }
 
-  async editStudent(id, studentData) {
-    const existing = await studentModel.getStudentById(id);
-    if (!existing) {
-      throw new Error("Student not found");
-    }
+  const student = await StudentModel.updateStudent(id, data, skills);
+  if (!student) return { success: false, message: 'Student not found' };
+  return { success: true, data: student, message: 'Student updated successfully' };
+};
 
-    try {
-      const updatedStudent = await studentModel.updateStudent(id, studentData);
-      return {
-        success: true,
-        message: "Student updated successfully",
-        data: updatedStudent
-      };
-    } catch (error) {
-      if (error.code === '23505') { 
-        throw new Error("Student with this enrollment number or email already exists");
-      }
-      throw error;
-    }
-  }
+// ─── Remove student ───────────────────────────────────────────────────────────
+export const removeStudent = async (id) => {
+  const deleted = await StudentModel.deleteStudent(id);
+  if (!deleted) return { success: false, message: 'Student not found' };
+  return { success: true, message: 'Student deleted successfully' };
+};
 
-  async removeStudent(id) {
-    const existing = await studentModel.getStudentById(id);
-    if (!existing) {
-      throw new Error("Student not found");
-    }
+// ─── Search students ──────────────────────────────────────────────────────────
+export const searchStudents = async (query, pagination = {}) => {
+  return getStudents({ search: query }, pagination);
+};
 
-    await studentModel.deleteStudent(id);
-    return {
-      success: true,
-      message: "Student deleted successfully"
-    };
-  }
+// ─── Filter students ──────────────────────────────────────────────────────────
+export const filterStudents = async (filters, pagination = {}) => {
+  return getStudents(filters, pagination);
+};
 
-  async searchStudents(searchTerm) {
-    if (!searchTerm) {
-      return this.getStudents(1, 100);
-    }
-    const students = await studentModel.searchStudents(searchTerm);
-    return {
-      success: true,
-      message: "Students search results",
-      data: students
-    };
-  }
+// ─── Get student statistics ───────────────────────────────────────────────────
+export const getStatistics = async (college = null) => {
+  const stats = await StudentModel.getStudentStatistics(college);
+  return { success: true, data: stats };
+};
 
-  async filterStudents(filters) {
-    const students = await studentModel.filterStudents(filters);
-    return {
-      success: true,
-      message: "Filtered students",
-      data: students
-    };
-  }
+// ─── Academic details ─────────────────────────────────────────────────────────
+export const getAcademicDetails = async (studentId) => {
+  const exists = await StudentModel.getStudentById(studentId);
+  if (!exists) return { success: false, message: 'Student not found' };
 
-  async getStatistics() {
-    const stats = await studentModel.getStudentStatistics();
-    return {
-      success: true,
-      message: "Student statistics fetched successfully",
-      data: stats
-    };
-  }
+  const academic = await StudentModel.getAcademicDetails(studentId);
+  return { success: true, data: academic };
+};
 
-  async getAcademicDetails(studentId) {
-    const academic = await academicModel.getAcademicDetails(studentId);
-    if (!academic) {
-      throw new Error("Academic details not found");
-    }
-    return {
-      success: true,
-      message: "Academic details fetched successfully",
-      data: academic
-    };
-  }
+export const updateAcademicDetails = async (studentId, data) => {
+  const exists = await StudentModel.getStudentById(studentId);
+  if (!exists) return { success: false, message: 'Student not found' };
 
-  async updateAcademicDetails(studentId, academicData) {
-    const student = await studentModel.getStudentById(studentId);
-    if (!student) {
-      throw new Error("Student not found");
-    }
+  const academic = await StudentModel.upsertAcademicDetails(studentId, data);
+  return { success: true, data: academic, message: 'Academic details updated' };
+};
 
-    const updated = await academicModel.updateAcademicDetails(studentId, academicData);
-    return {
-      success: true,
-      message: "Academic details updated successfully",
-      data: updated
-    };
-  }
+// ─── Skills ───────────────────────────────────────────────────────────────────
+export const getStudentSkills = async (studentId) => {
+  const exists = await StudentModel.getStudentById(studentId);
+  if (!exists) return { success: false, message: 'Student not found' };
 
-  async getStudentSkills(studentId) {
-    const skills = await skillsModel.getStudentSkills(studentId);
-    return {
-      success: true,
-      message: "Skills fetched successfully",
-      data: skills
-    };
-  }
+  const skills = await StudentModel.getStudentSkills(studentId);
+  return { success: true, data: skills };
+};
 
-  async addStudentSkill(studentId, skillData) {
-    const student = await studentModel.getStudentById(studentId);
-    if (!student) {
-      throw new Error("Student not found");
-    }
+export const addStudentSkill = async (studentId, skillName) => {
+  const exists = await StudentModel.getStudentById(studentId);
+  if (!exists) return { success: false, message: 'Student not found' };
 
-    try {
-      const newSkill = await skillsModel.addStudentSkill(studentId, skillData);
-      return {
-        success: true,
-        message: "Skill added successfully",
-        data: newSkill
-      };
-    } catch (error) {
-       if (error.code === '23505') { 
-        throw new Error("Skill already exists for this student");
-      }
-      throw error;
-    }
-  }
+  const skill = await StudentModel.addStudentSkill(studentId, skillName);
+  return { success: true, data: skill, message: 'Skill added successfully' };
+};
 
-  async updateStudentSkill(studentId, skillId, skillData) {
-    const updatedSkill = await skillsModel.updateStudentSkill(studentId, skillId, skillData);
-    if (!updatedSkill) {
-      throw new Error("Skill not found");
-    }
-    return {
-      success: true,
-      message: "Skill updated successfully",
-      data: updatedSkill
-    };
-  }
-
-  async removeStudentSkill(studentId, skillId) {
-    const deleted = await skillsModel.deleteStudentSkill(studentId, skillId);
-    if (!deleted) {
-      throw new Error("Skill not found");
-    }
-    return {
-      success: true,
-      message: "Skill removed successfully"
-    };
-  }
-}
-
-export default new StudentService();
+export const deleteStudentSkill = async (studentId, skillId) => {
+  const deleted = await StudentModel.deleteStudentSkill(studentId, skillId);
+  if (!deleted) return { success: false, message: 'Skill not found' };
+  return { success: true, message: 'Skill deleted successfully' };
+};

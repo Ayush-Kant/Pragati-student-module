@@ -1,110 +1,99 @@
-// studentValidator.js
+// ─── Student Validators ───────────────────────────────────────────────────────
 
-export const sanitizeInput = (input) => {
-  if (typeof input === 'string') {
-    return input.trim();
-  }
-  return input;
-};
-
-export const validateRequestBody = (req, res, next) => {
-  const sanitizeObject = (obj) => {
-    for (const key in obj) {
-      if (typeof obj[key] === 'string') {
-        obj[key] = sanitizeInput(obj[key]);
-      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-        sanitizeObject(obj[key]);
-      }
+export const sanitizeInput = (data) => {
+  const sanitized = {};
+  for (const key in data) {
+    const val = data[key];
+    if (typeof val === 'string') {
+      sanitized[key] = val.trim() === '' ? null : val.trim();
+    } else {
+      sanitized[key] = val;
     }
-  };
-  
-  if (req.body) {
-    sanitizeObject(req.body);
   }
-  
-  next();
+  return sanitized;
 };
 
-export const validateStudent = (req, res, next) => {
-  const { enrollment_no, name, email, phone, semester, cgpa } = req.body;
+export const validateStudent = (data) => {
   const errors = [];
 
-  if (req.method === 'POST') {
-    if (!enrollment_no) errors.push("enrollment_no is required");
-    if (!name) errors.push("name is required");
+  // Required fields
+  if (!data.enrollmentNo) errors.push('Enrollment number is required');
+  if (!data.name)         errors.push('Name is required');
+  if (!data.email)        errors.push('Email is required');
+
+  // Email format
+  if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.push('Invalid email format');
   }
 
-  if (email && !/^\S+@\S+\.\S+$/.test(email)) {
-    errors.push("Invalid email format");
+  // Phone format (10 digits)
+  if (data.phone && !/^\d{10}$/.test(data.phone.replace(/[\s\-\+]/g, ''))) {
+    errors.push('Phone must be a valid 10-digit number');
   }
 
-  if (phone && !/^\d{10}$/.test(phone)) {
-    errors.push("Invalid phone format (must be 10 digits)");
-  }
-
-  if (cgpa !== undefined) {
-    const cgpaNum = parseFloat(cgpa);
-    if (isNaN(cgpaNum) || cgpaNum < 0 || cgpaNum > 10) {
-      errors.push("CGPA must be a number between 0 and 10");
+  // CGPA validation (0 - 10)
+  if (data.cgpa !== undefined && data.cgpa !== null) {
+    const cgpa = parseFloat(data.cgpa);
+    if (isNaN(cgpa) || cgpa < 0 || cgpa > 10) {
+      errors.push('CGPA must be between 0 and 10');
     }
   }
 
-  if (semester !== undefined) {
-    const semNum = parseInt(semester);
-    if (isNaN(semNum) || semNum < 1 || semNum > 8) {
-      errors.push("Semester must be between 1 and 8");
+  // Semester validation (1 - 8)
+  if (data.semester !== undefined && data.semester !== null) {
+    const sem = parseInt(data.semester);
+    if (isNaN(sem) || sem < 1 || sem > 8) {
+      errors.push('Semester must be between 1 and 8');
     }
   }
 
-  if (errors.length > 0) {
-    return res.status(400).json({ success: false, message: "Validation failed", errors });
+  // Enrollment number format
+  if (data.enrollmentNo && !/^[A-Za-z0-9]+$/.test(data.enrollmentNo)) {
+    errors.push('Enrollment number must be alphanumeric');
   }
 
-  next();
+  return errors;
 };
 
-export const validateAcademicDetails = (req, res, next) => {
-  const { tenth_percentage, twelfth_percentage, diploma_percentage } = req.body;
+export const validateAcademicDetails = (data) => {
   const errors = [];
 
-  const validatePercentage = (val, fieldName) => {
-    if (val !== undefined && val !== null) {
-      const num = parseFloat(val);
-      if (isNaN(num) || num < 0 || num > 100) {
-        errors.push(`${fieldName} must be between 0 and 100`);
-      }
+  if (data.tenthPercentage !== undefined && data.tenthPercentage !== null) {
+    const pct = parseFloat(data.tenthPercentage);
+    if (isNaN(pct) || pct < 0 || pct > 100) {
+      errors.push('10th percentage must be between 0 and 100');
     }
-  };
-
-  validatePercentage(tenth_percentage, 'tenth_percentage');
-  validatePercentage(twelfth_percentage, 'twelfth_percentage');
-  validatePercentage(diploma_percentage, 'diploma_percentage');
-
-  if (errors.length > 0) {
-    return res.status(400).json({ success: false, message: "Validation failed", errors });
   }
 
-  next();
+  if (data.twelfthPercentage !== undefined && data.twelfthPercentage !== null) {
+    const pct = parseFloat(data.twelfthPercentage);
+    if (isNaN(pct) || pct < 0 || pct > 100) {
+      errors.push('12th percentage must be between 0 and 100');
+    }
+  }
+
+  if (data.backlogs !== undefined && data.backlogs !== null) {
+    if (parseInt(data.backlogs) < 0) {
+      errors.push('Backlogs cannot be negative');
+    }
+  }
+
+  return errors;
 };
 
-export const validateSkill = (req, res, next) => {
-  const { skill_name, skill_level } = req.body;
+export const validateSkill = (data) => {
   const errors = [];
-
-  if (req.method === 'POST' && !skill_name) {
-    errors.push("skill_name is required");
+  if (!data.skillName || data.skillName.trim() === '') {
+    errors.push('Skill name is required');
   }
-  
-  if (skill_level) {
-    const allowedLevels = ["Beginner", "Intermediate", "Advanced", "Expert"];
-    if (!allowedLevels.includes(skill_level)) {
-      errors.push(`skill_level must be one of: ${allowedLevels.join(", ")}`);
-    }
-  }
+  return errors;
+};
 
+export const validateRequestBody = (req, res, validatorFn) => {
+  const errors = validatorFn(req.body);
   if (errors.length > 0) {
-    return res.status(400).json({ success: false, message: "Validation failed", errors });
+    res.status(400).json({ success: false, message: 'Validation failed', errors });
+    return false;
   }
-
-  next();
+  return true;
 };
