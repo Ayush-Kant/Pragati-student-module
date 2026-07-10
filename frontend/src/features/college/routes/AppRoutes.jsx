@@ -28,6 +28,7 @@ const collegeRoute = (
       <Route path="companies" element={<CompanyJobPostingsPage />} />
     </Route>
   </>
+
 );
 
 export default collegeRoute;
