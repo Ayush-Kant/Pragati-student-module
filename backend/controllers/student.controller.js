@@ -1,246 +1,177 @@
-import { pool } from "../config/db.js";
-import studentService from "../services/student.service.js";
+import * as studentService from '../services/student.service.js';
+import { validateStudent, validateAcademicDetails, validateSkill, validateRequestBody } from '../validators/student.validator.js';
+import { pool } from '../config/db.js';
 
-export const getStudentProfile = async (req, res) => {
+// Helper: get college name for the logged-in user
+const getCollegeName = async (userId) => {
   try {
-    const userId = 1;
-
-    const result = await pool.query(
-      "SELECT * FROM student_profiles WHERE user_id = $1",
-      [userId]
-    );
-
-    res.status(200).json({
-      success: true,
-      data: result.rows[0] || null,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch profile",
-    });
+    const res = await pool.query('SELECT name FROM colleges WHERE user_id = $1', [userId]);
+    return res.rows[0]?.name || null;
+  } catch {
+    return null;
   }
 };
 
-export const updateStudentProfile = async (req, res) => {
+// ─── GET /api/students ────────────────────────────────────────────────────────
+export const getStudents = async (req, res, next) => {
   try {
-    const userId = 1;
+    const { department, course, batch, semester, placementStatus, search, page, pageSize } = req.query;
 
-    const {
-      name,
-      phone,
-      city,
-      department,
-      cgpa,
-      skills,
-    } = req.body || {};
-    let parsedCgpa = cgpa;
-    if (cgpa === "") parsedCgpa = null;
-    else if (cgpa !== undefined && cgpa !== null) parsedCgpa = Number(cgpa);
+    // Scope to the logged-in college automatically
+    const collegeName = await getCollegeName(req.user.userId);
+    const filters    = { department, course, batch, semester, placementStatus, search, college: collegeName || undefined };
+    const pagination = { page, pageSize };
 
-    let parsedSkills = skills;
-    if (Array.isArray(skills)) {
-      parsedSkills = JSON.stringify(skills);
-    }
-
-    const result = await pool.query(
-      `
-      INSERT INTO student_profiles
-      (user_id, name, phone, city, department, cgpa, skills)
-      VALUES ($1,$2,$3,$4,$5,$6,$7)
-
-      ON CONFLICT (user_id)
-
-      DO UPDATE SET
-      name = EXCLUDED.name,
-      phone = EXCLUDED.phone,
-      city = EXCLUDED.city,
-      department = EXCLUDED.department,
-      cgpa = EXCLUDED.cgpa,
-      skills = EXCLUDED.skills
-
-      RETURNING *;
-      `,
-      [userId, name, phone, city, department, parsedCgpa, parsedSkills]
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Profile updated successfully",
-      data: result.rows[0],
-    });
+    const result = await studentService.getStudents(filters, pagination);
+    return res.status(200).json(result);
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to update profile",
-      error: error.message
-    });
+    next(error);
   }
 };
 
-export const getStudents = async (req, res) => {
+// ─── GET /api/students/:id ────────────────────────────────────────────────────
+export const getStudentById = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const result = await studentService.getStudents(page, limit);
-    res.status(200).json(result);
+    const result = await studentService.getStudent(parseInt(req.params.id));
+    if (!result.success) return res.status(404).json(result);
+    return res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const getStudentById = async (req, res) => {
+// ─── POST /api/students ───────────────────────────────────────────────────────
+export const createStudent = async (req, res, next) => {
   try {
-    const result = await studentService.getStudent(req.params.id);
-    res.status(200).json(result);
-  } catch (error) {
-    if (error.message === "Student not found") {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+    if (!validateRequestBody(req, res, validateStudent)) return;
 
-export const createStudent = async (req, res) => {
-  try {
+    // Auto-attach the college name from the logged-in user's profile
+    const collegeName = await getCollegeName(req.user.userId);
+    if (collegeName) req.body.college = collegeName;
+
     const result = await studentService.addStudent(req.body);
-    res.status(201).json(result);
+    if (!result.success) return res.status(409).json(result);
+    return res.status(201).json(result);
   } catch (error) {
-    if (error.message.includes("already exists")) {
-      return res.status(409).json({ success: false, message: error.message });
-    }
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const updateStudent = async (req, res) => {
+// ─── PUT /api/students/:id ────────────────────────────────────────────────────
+export const updateStudent = async (req, res, next) => {
   try {
-    const result = await studentService.editStudent(req.params.id, req.body);
-    res.status(200).json(result);
+    const result = await studentService.editStudent(parseInt(req.params.id), req.body);
+    if (!result.success) return res.status(404).json(result);
+    return res.status(200).json(result);
   } catch (error) {
-    if (error.message === "Student not found") {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    if (error.message.includes("already exists")) {
-      return res.status(409).json({ success: false, message: error.message });
-    }
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const deleteStudent = async (req, res) => {
+// ─── DELETE /api/students/:id ─────────────────────────────────────────────────
+export const deleteStudent = async (req, res, next) => {
   try {
-    const result = await studentService.removeStudent(req.params.id);
-    res.status(200).json(result);
+    const result = await studentService.removeStudent(parseInt(req.params.id));
+    if (!result.success) return res.status(404).json(result);
+    return res.status(200).json(result);
   } catch (error) {
-    if (error.message === "Student not found") {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const searchStudents = async (req, res) => {
+// ─── GET /api/students/search?q=... ──────────────────────────────────────────
+export const searchStudents = async (req, res, next) => {
   try {
-    const { q } = req.query;
-    const result = await studentService.searchStudents(q);
-    res.status(200).json(result);
+    const { q, page, pageSize } = req.query;
+    const result = await studentService.searchStudents(q || '', { page, pageSize });
+    return res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const filterStudents = async (req, res) => {
+// ─── GET /api/students/filter ─────────────────────────────────────────────────
+export const filterStudents = async (req, res, next) => {
   try {
-    const filters = req.query;
-    const result = await studentService.filterStudents(filters);
-    res.status(200).json(result);
+    const { department, course, batch, semester, placementStatus, college, page, pageSize } = req.query;
+    const result = await studentService.filterStudents(
+      { department, course, batch, semester, placementStatus, college },
+      { page, pageSize }
+    );
+    return res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const getStudentStatistics = async (req, res) => {
+// ─── GET /api/students/statistics ─────────────────────────────────────────────
+export const getStudentStatistics = async (req, res, next) => {
   try {
-    const result = await studentService.getStatistics();
-    res.status(200).json(result);
+    const { college } = req.query;
+    const result = await studentService.getStatistics(college || null);
+    return res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const getAcademicDetails = async (req, res) => {
+// ─── GET /api/students/:id/academic ───────────────────────────────────────────
+export const getAcademicDetails = async (req, res, next) => {
   try {
-    const result = await studentService.getAcademicDetails(req.params.id);
-    res.status(200).json(result);
+    const result = await studentService.getAcademicDetails(parseInt(req.params.id));
+    if (!result.success) return res.status(404).json(result);
+    return res.status(200).json(result);
   } catch (error) {
-    if (error.message === "Academic details not found") {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const updateAcademicDetails = async (req, res) => {
+// ─── PUT /api/students/:id/academic ──────────────────────────────────────────
+export const updateAcademicDetails = async (req, res, next) => {
   try {
-    const result = await studentService.updateAcademicDetails(req.params.id, req.body);
-    res.status(200).json(result);
+    if (!validateRequestBody(req, res, validateAcademicDetails)) return;
+
+    const result = await studentService.updateAcademicDetails(parseInt(req.params.id), req.body);
+    if (!result.success) return res.status(404).json(result);
+    return res.status(200).json(result);
   } catch (error) {
-    if (error.message === "Student not found") {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const getStudentSkills = async (req, res) => {
+// ─── GET /api/students/:id/skills ─────────────────────────────────────────────
+export const getStudentSkills = async (req, res, next) => {
   try {
-    const result = await studentService.getStudentSkills(req.params.id);
-    res.status(200).json(result);
+    const result = await studentService.getStudentSkills(parseInt(req.params.id));
+    if (!result.success) return res.status(404).json(result);
+    return res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const addStudentSkill = async (req, res) => {
+// ─── POST /api/students/:id/skills ────────────────────────────────────────────
+export const addStudentSkill = async (req, res, next) => {
   try {
-    const result = await studentService.addStudentSkill(req.params.id, req.body);
-    res.status(201).json(result);
+    if (!validateRequestBody(req, res, validateSkill)) return;
+    const result = await studentService.addStudentSkill(parseInt(req.params.id), req.body.skillName);
+    if (!result.success) return res.status(404).json(result);
+    return res.status(201).json(result);
   } catch (error) {
-    if (error.message === "Student not found") {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    if (error.message === "Skill already exists for this student") {
-      return res.status(409).json({ success: false, message: error.message });
-    }
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const updateStudentSkill = async (req, res) => {
+// ─── DELETE /api/students/:id/skills/:skillId ─────────────────────────────────
+export const deleteStudentSkill = async (req, res, next) => {
   try {
-    const result = await studentService.updateStudentSkill(req.params.id, req.params.skillId, req.body);
-    res.status(200).json(result);
+    const result = await studentService.deleteStudentSkill(
+      parseInt(req.params.id),
+      parseInt(req.params.skillId)
+    );
+    if (!result.success) return res.status(404).json(result);
+    return res.status(200).json(result);
   } catch (error) {
-    if (error.message === "Skill not found") {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const removeStudentSkill = async (req, res) => {
-  try {
-    const result = await studentService.removeStudentSkill(req.params.id, req.params.skillId);
-    res.status(200).json(result);
-  } catch (error) {
-    if (error.message === "Skill not found") {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };

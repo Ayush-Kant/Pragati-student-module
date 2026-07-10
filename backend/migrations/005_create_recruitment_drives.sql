@@ -73,3 +73,9 @@ CREATE INDEX IF NOT EXISTS idx_drives_stage ON recruitment_drives(current_stage)
 CREATE INDEX IF NOT EXISTS idx_sdp_drive ON student_drive_progress(drive_id);
 CREATE INDEX IF NOT EXISTS idx_sdp_student ON student_drive_progress(student_id);
 CREATE INDEX IF NOT EXISTS idx_sdp_stage ON student_drive_progress(current_stage);
+
+-- Add foreign key constraint to courses now that recruitment_drives exists
+DO $$ BEGIN
+  ALTER TABLE courses ADD CONSTRAINT courses_drive_id_fk FOREIGN KEY (drive_id) REFERENCES recruitment_drives(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;

@@ -50,13 +50,9 @@ const StudentDatabasePage = () => {
 
   const handleAddSubmit = async (data) => {
     setFormLoading(true)
-    const res = await addStudent(data)
+    await addStudent(data)
     setFormLoading(false)
-    if (res && !res.success) {
-      alert("Error: " + (res.message || "Failed to add student"))
-    } else {
-      setShowAddForm(false)
-    }
+    setShowAddForm(false)
   }
 
   const handleEditSubmit = async (data) => {

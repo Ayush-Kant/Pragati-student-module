@@ -4,32 +4,27 @@
 
 CREATE TABLE IF NOT EXISTS companies (
     id SERIAL PRIMARY KEY,
-
-    user_id INTEGER REFERENCES users(id),
-
     name VARCHAR(255) NOT NULL,
-
-    email VARCHAR(255) UNIQUE NOT NULL,
-
-    industry VARCHAR(100),
-
-    size VARCHAR(50),
-
-    location VARCHAR(255),
-
-    status VARCHAR(50) NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','approved','rejected','suspended')),
-
-    rejection_reason TEXT,
-
-    suspension_reason TEXT,
-
-    verified_at TIMESTAMPTZ,
-
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS email VARCHAR(255) UNIQUE;
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS industry VARCHAR(100);
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS size VARCHAR(50);
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS location VARCHAR(255);
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS status VARCHAR(50) NOT NULL DEFAULT 'pending';
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS suspension_reason TEXT;
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+DO $$ BEGIN
+  ALTER TABLE companies ADD CONSTRAINT companies_status_check
+    CHECK (status IN ('pending','approved','rejected','suspended'));
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
 
 -- ============================================================
 -- COMPANY STATS TABLE
