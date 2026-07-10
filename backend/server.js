@@ -1,8 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+
 import connectDB from "./config/db.js";
 import authRouter from "./routes/auth.routes.js";
+import studentRoutes from "./routes/student.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
@@ -30,20 +32,22 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
+import errorMiddleware from "./middleware/errorMiddleware.js";
+
+
+
 
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost")) {
+      if (!origin || origin.startsWith("http://localhost"))
         return callback(null, true);
-      }
 
       const clientUrl = process.env.CLIENT_URL;
 
-      if (clientUrl && origin === clientUrl) {
+      if (clientUrl && origin === clientUrl)
         return callback(null, true);
-      }
 
       return callback(
         new Error(`CORS policy: origin ${origin} not allowed`)
@@ -66,14 +70,20 @@ app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/mentor", contentRoutes);
+app.use("/api/v1/company/jobs", collegeJobsRoutes);
+app.use("/api/v1/company", companyRoutes);
+app.use("/api/v1/company/interviews", interviewRoutes);
+app.use("/api/mentor", contentRoutes);
+app.use("/api/mentor", mentorRoutes);
+
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
+
+app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
-app.use("/api/departments/statistics", departmentStatisticsRoutes);
-
 // Health Check
 app.get("/", (req, res) => {
   res.json({
