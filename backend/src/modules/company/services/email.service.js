@@ -8,7 +8,12 @@
 
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
+
+if (!resend) {
+  console.warn("[email.service] RESEND_API_KEY is not configured. Email sending is disabled.");
+}
 
 const FROM = "onboarding@resend.dev";
 
@@ -19,6 +24,11 @@ const FROM = "onboarding@resend.dev";
  * Never throws — email failures are non-fatal (logged and swallowed).
  */
 const sendEmail = async ({ to, subject, html }) => {
+  if (!resend) {
+    console.warn("[email.service] Skipping email send because RESEND_API_KEY is not configured.");
+    return { success: false, error: "RESEND_API_KEY not configured" };
+  }
+
   try {
     const { data, error } = await resend.emails.send({
       from: FROM,

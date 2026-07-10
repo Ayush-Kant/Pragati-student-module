@@ -47,7 +47,7 @@ CREATE INDEX idx_sdp_drive             ON student_drive_progress(drive_id);
 
 
 INSERT INTO students (
-    full_name,
+    name,
     email,
     gpa,
     skills,
@@ -62,7 +62,7 @@ VALUES (
 );
 
 INSERT INTO students (
-    full_name,
+    name,
     email,
     gpa,
     skills,

@@ -1,5 +1,5 @@
 import express from "express";
-import { connectDB } from "./config/db.js";
+import connectDB from "./config/db.js";
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
 import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
@@ -16,11 +16,9 @@ import mentorRoutes from "./routes/mentor.routes.js";
 import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
 
 import dotenv from "dotenv";
-
-
-import connectDB from "./config/db.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
+import studentAssessmentRoutes from "./routes/student.assessment.routes.js";
 
 
 dotenv.config();
@@ -46,7 +44,7 @@ app.use(
 
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
-
+app.use("/api/student/assessments", studentAssessmentRoutes);
 
 app.use("/api/auth", authRouter);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
@@ -60,29 +58,18 @@ app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 
-connectDB(process.env.POSTGRESQL_URI).then(() => {
-  app.get("/", (req, res) => {
-    res.json({
-      message: "Backend is running",
-    });
-  });
-  app.listen(PORT, () => {
-    console.log(`✅ Server running on PORT : ${PORT}`);
-  });
-});
-
-
-
 let server;
-if (process.env.NODE_ENV !== "test") {
-  server = app.listen(PORT, () => {
-    console.log(`✅ Server running on PORT : ${PORT}`);
+connectDB()
+  .then(() => {
+    if (process.env.NODE_ENV !== "test") {
+      server = app.listen(PORT, () => {
+        console.log(`✅ Server running on PORT : ${PORT}`);
+      });
+    }
+  })
+  .catch((err) => {
+    console.error("❌ PostgreSQL connection failed:", err.message);
   });
-}
-
-connectDB().catch((err) => {
-  console.error("❌ PostgreSQL connection failed:", err.message);
-});
 
 export { app, server };
 export default app;

@@ -2,22 +2,18 @@
 --   users, recruitment_drives, student_drive_progress
  
 -- TABLE: colleges
-CREATE TABLE IF NOT EXISTS colleges (
-  id               SERIAL PRIMARY KEY,
-  user_id          INTEGER REFERENCES users(id),
-  name             VARCHAR(255) NOT NULL,
-  email            VARCHAR(255) UNIQUE NOT NULL,
-  location         VARCHAR(255),
-  departments      TEXT[],             -- e.g. ['CSE','ECE','MBA']
-  student_strength INTEGER DEFAULT 0,
-  status           VARCHAR(50) NOT NULL DEFAULT 'pending'
+ALTER TABLE colleges
+  ADD COLUMN IF NOT EXISTS user_id          INTEGER REFERENCES users(id),
+  ADD COLUMN IF NOT EXISTS email            VARCHAR(255) UNIQUE NOT NULL,
+  ADD COLUMN IF NOT EXISTS location         VARCHAR(255),
+  ADD COLUMN IF NOT EXISTS departments      TEXT[],             -- e.g. ['CSE','ECE','MBA']
+  ADD COLUMN IF NOT EXISTS student_strength INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS status           VARCHAR(50) NOT NULL DEFAULT 'pending'
                    CHECK (status IN ('pending','approved','rejected','suspended')),
-  rejection_reason TEXT,
-  suspension_reason TEXT,
-  verified_at      TIMESTAMPTZ,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
- 
+  ADD COLUMN IF NOT EXISTS rejection_reason TEXT,
+  ADD COLUMN IF NOT EXISTS suspension_reason TEXT,
+  ADD COLUMN IF NOT EXISTS verified_at      TIMESTAMPTZ;
+
 -- TABLE: college_stats
 -- Aggregated performance data per college
 CREATE TABLE IF NOT EXISTS college_stats (

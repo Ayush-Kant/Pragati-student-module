@@ -2,34 +2,36 @@
 -- COMPANIES TABLE
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS companies (
-    id SERIAL PRIMARY KEY,
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
 
-    user_id INTEGER REFERENCES users(id),
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS email VARCHAR(255) UNIQUE NOT NULL;
 
-    name VARCHAR(255) NOT NULL,
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS industry VARCHAR(100);
 
-    email VARCHAR(255) UNIQUE NOT NULL,
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS size VARCHAR(50);
 
-    industry VARCHAR(100),
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS location VARCHAR(255);
 
-    size VARCHAR(50),
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS status VARCHAR(50) NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending','approved','rejected','suspended'));
 
-    location VARCHAR(255),
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
 
-    status VARCHAR(50) NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','approved','rejected','suspended')),
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS suspension_reason TEXT;
 
-    rejection_reason TEXT,
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
 
-    suspension_reason TEXT,
-
-    verified_at TIMESTAMPTZ,
-
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+ALTER TABLE companies
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 -- ============================================================
 -- COMPANY STATS TABLE

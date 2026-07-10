@@ -1,67 +1,3 @@
-CREATE TABLE IF NOT EXISTS offers_v2 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    drive_id UUID NOT NULL REFERENCES recruitment_drives_v2 (id) ON DELETE CASCADE,
-    candidate_id UUID NOT NULL REFERENCES candidates (id) ON DELETE CASCADE,
-    offer_letter_number VARCHAR(100) UNIQUE NOT NULL,
-    gross_ctc NUMERIC(12, 2) NOT NULL,
-    net_ctc NUMERIC(12, 2),
-    fixed_component NUMERIC(12, 2),
-    variable_component NUMERIC(12, 2),
-    joining_date DATE,
-    offer_document_url TEXT,
-    offer_status VARCHAR(50) NOT NULL DEFAULT 'DRAFT' CHECK (
-        offer_status IN (
-            'DRAFT',
-            'SENT',
-            'ACCEPTED',
-            'DECLINED',
-            'REVOKED',
-            'EXPIRED',
-            'LAPSED'
-        )
-    ),
-    candidate_response_at TIMESTAMPTZ,
-    candidate_remarks TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE (drive_id, candidate_id)
-);
-
-CREATE TABLE IF NOT EXISTS recruitment_drives_v2 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    company_id UUID NOT NULL REFERENCES companies_v2 (id),
-    drive_name VARCHAR(255) NOT NULL,
-    status VARCHAR(50) DEFAULT 'DRAFT' CHECK (
-        status IN (
-            'DRAFT',
-            'PENDING_APPROVAL',
-            'APPROVED',
-            'ACTIVE',
-            'COMPLETED',
-            'CANCELLED'
-        )
-    ),
-    ctc_details JSONB,
-    total_positions INTEGER DEFAULT 0,
-    filled_positions INTEGER DEFAULT 0,
-    registration_start TIMESTAMPTZ,
-    registration_end TIMESTAMPTZ,
-    drive_date DATE,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS offer_amendments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    offer_id UUID NOT NULL REFERENCES offers_v2 (id) ON DELETE CASCADE,
-    amendment_type VARCHAR(100) NOT NULL,
-    old_values JSONB NOT NULL,
-    new_values JSONB NOT NULL,
-    reason TEXT NOT NULL,
-    candidate_acknowledgement BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
 CREATE TABLE IF NOT EXISTS companies_v2 (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     legal_name VARCHAR(255) NOT NULL,
@@ -103,6 +39,85 @@ CREATE TABLE IF NOT EXISTS companies_v2 (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS candidates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    college_id UUID,
+    current_location VARCHAR(255),
+    resume_url TEXT,
+    graduation_year INTEGER,
+    cgpa NUMERIC(4, 2),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS recruitment_drives_v2 (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    company_id UUID NOT NULL REFERENCES companies_v2 (id),
+    drive_name VARCHAR(255) NOT NULL,
+    status VARCHAR(50) DEFAULT 'DRAFT' CHECK (
+        status IN (
+            'DRAFT',
+            'PENDING_APPROVAL',
+            'APPROVED',
+            'ACTIVE',
+            'COMPLETED',
+            'CANCELLED'
+        )
+    ),
+    ctc_details JSONB,
+    total_positions INTEGER DEFAULT 0,
+    filled_positions INTEGER DEFAULT 0,
+    registration_start TIMESTAMPTZ,
+    registration_end TIMESTAMPTZ,
+    drive_date DATE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS offers_v2 (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    drive_id UUID NOT NULL REFERENCES recruitment_drives_v2 (id) ON DELETE CASCADE,
+    candidate_id UUID NOT NULL REFERENCES candidates (id) ON DELETE CASCADE,
+    offer_letter_number VARCHAR(100) UNIQUE NOT NULL,
+    gross_ctc NUMERIC(12, 2) NOT NULL,
+    net_ctc NUMERIC(12, 2),
+    fixed_component NUMERIC(12, 2),
+    variable_component NUMERIC(12, 2),
+    joining_date DATE,
+    offer_document_url TEXT,
+    offer_status VARCHAR(50) NOT NULL DEFAULT 'DRAFT' CHECK (
+        offer_status IN (
+            'DRAFT',
+            'SENT',
+            'ACCEPTED',
+            'DECLINED',
+            'REVOKED',
+            'EXPIRED',
+            'LAPSED'
+        )
+    ),
+    candidate_response_at TIMESTAMPTZ,
+    candidate_remarks TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (drive_id, candidate_id)
+);
+
+CREATE TABLE IF NOT EXISTS offer_amendments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    offer_id UUID NOT NULL REFERENCES offers_v2 (id) ON DELETE CASCADE,
+    amendment_type VARCHAR(100) NOT NULL,
+    old_values JSONB NOT NULL,
+    new_values JSONB NOT NULL,
+    reason TEXT NOT NULL,
+    candidate_acknowledgement BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS candidate_drive_mapping (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     candidate_id UUID NOT NULL REFERENCES candidates (id),
@@ -128,21 +143,6 @@ CREATE TABLE IF NOT EXISTS candidate_drive_mapping (
     rejected_at TIMESTAMPTZ,
     rejection_reason TEXT,
     UNIQUE (candidate_id, drive_id)
-);
-
-CREATE TABLE IF NOT EXISTS candidates (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    phone VARCHAR(20),
-    college_id UUID,
-    current_location VARCHAR(255),
-    resume_url TEXT,
-    graduation_year INTEGER,
-    cgpa NUMERIC(4, 2),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS interviews_v2 (

@@ -11,13 +11,17 @@ async function runMigrations() {
     console.log("Dropping existing tables to start fresh...");
     await pool.query(`
       DROP TABLE IF EXISTS 
+        assessment_submissions,
+        assessment_attempts,
+        assessment_assignments,
+        assessment_questions,
+        assessments,
         student_progress, 
         student_drive_progress, 
         live_sessions, 
         recruitment_drives, 
         notifications, 
         submissions, 
-        assessments, 
         modules, 
         courses, 
         mentors, 
@@ -44,8 +48,7 @@ async function runMigrations() {
         interviews_v2,
         recruitment_drives_v2,
         candidates,
-        companies_v2
-
+        companies_v2,
         trainings,
         training_progress,
         mentor_feedback
@@ -56,30 +59,25 @@ async function runMigrations() {
 
     const migrationsDir = path.join(__dirname, "../migrations");
     const migrationFiles = [
-
-  "001_create_users_mentors.sql",
-  "002_create_content_tables.sql",
-  "003_create_admin_dashboard.sql",
-  "004_create_college_management.sql",
-  "004_create_notifications.sql",
-  "005_create_company_management.sql",
-  "005_create_company_tables.sql",
-  "005_create_student_management.sql",
-  "006_create_college_profiles.sql",
-  "006_create_reports_analytics_tables.sql",
-  "006_update_interviews_table.sql",
-  "007_create_dashboard_tables.sql",
-  "007_offers_hiring_tables.sql",
-  "Students.sql",
-];
-
       "001_create_users_mentors.sql",
-      "Students.sql",
-      "004_create_college_management.sql",
-      "005_create_company_management.sql",
       "003_create_admin_dashboard.sql",
       "002_create_content_tables.sql",
+      "004_create_college_management.sql",
+      "004_create_notifications.sql",
+      "005_create_company_management.sql",
+      "005_create_company_tables.sql",
+      "005_create_student_management.sql",
+      "005_create_recruitment_drives.sql",
+      "006_create_assessments.sql",
+      "006_create_college_profiles.sql",
+      "007_offers_hiring_tables.sql",
+      "006_create_reports_analytics_tables.sql",
+      "006_update_interviews_table.sql",
       "006_create_training_coordination.sql",
+      "007_create_dashboard_tables.sql",
+      "008_create_notifications.sql",
+      "010_create_disputes.sql",
+      "011_create_student_assessment_tables.sql",
     ];
 
 
