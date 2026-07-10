@@ -59,6 +59,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
+
 app.use("/api/v1/company", companyRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
 
@@ -71,9 +72,11 @@ app.use("/api/students", studentRoutes);
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
 
+// College Department Module
+// IMPORTANT: Register statistics BEFORE departments
+app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
-app.use("/api/departments/statistics", departmentStatisticsRoutes);
 
 // Health Check
 app.get("/", (req, res) => {
