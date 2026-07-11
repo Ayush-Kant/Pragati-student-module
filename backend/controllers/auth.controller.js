@@ -16,8 +16,8 @@ export const login = async (req, res) => {
     }
 
     const result = await pool.query(
-      `SELECT id, full_name, email, role, password_hash
-       FROM users
+      `SELECT id, email, role, password_hash
+       FROM auth_users
        WHERE email = $1`,
       [email]
     );
@@ -56,7 +56,6 @@ export const login = async (req, res) => {
       token,
       user: {
         id: user.id,
-        full_name: user.full_name,
         email: user.email,
         role: user.role
       }
@@ -73,12 +72,12 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { full_name, email, password, role } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!full_name || !email || !password || !role) {
+    if (!email || !password || !role) {
       return res.status(400).json({
         success: false,
-        message: "Full name, email, password, and role are required",
+        message: "Email, password, and role are required",
       });
     }
 
@@ -90,7 +89,7 @@ export const register = async (req, res) => {
     }
 
     const existing = await pool.query(
-      `SELECT id FROM users WHERE email = $1`,
+      `SELECT id FROM auth_users WHERE email = $1`,
       [email]
     );
 
@@ -104,10 +103,10 @@ export const register = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
     
     const result = await pool.query(
-      `INSERT INTO users (full_name, email, password_hash, role, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, NOW(), NOW())
-       RETURNING id, full_name, email, role`,
-      [full_name, email, passwordHash, role]
+      `INSERT INTO auth_users (email, password_hash, role, created_at)
+       VALUES ($1, $2, $3, NOW())
+       RETURNING id, email, role`,
+      [email, passwordHash, role]
     );
 
     const user = result.rows[0];
@@ -128,7 +127,6 @@ export const register = async (req, res) => {
       token,
       user: {
         id: user.id,
-        full_name: user.full_name,
         email: user.email,
         role: user.role
       }

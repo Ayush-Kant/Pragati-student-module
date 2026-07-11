@@ -1,4 +1,4 @@
-- 007_offers_hiring_tables.sql
+-- 007_offers_hiring_tables.sql
 -- Dependency-ordered tables for the offers/hiring module
 
 

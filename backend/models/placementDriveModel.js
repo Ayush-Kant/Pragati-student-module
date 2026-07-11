@@ -83,10 +83,10 @@ export const getDriveStatistics = async () => {
       pd.drive_date,
       pd.deadline,
       pd.status,
-      COALESCE(ds.registered_students,0) AS registered_students,
-      COALESCE(ds.eligible_students,0) AS eligible_students,
-      COALESCE(ds.selected_students,0) AS selected_students,
-      COALESCE(ds.rejected_students,0) AS rejected_students
+      COALESCE(ds.total_applied,0) AS registered_students,
+      0 AS eligible_students,
+      COALESCE(ds.total_selected,0) AS selected_students,
+      0 AS rejected_students
     FROM placement_drives pd
     LEFT JOIN drive_statistics ds
       ON pd.id = ds.drive_id

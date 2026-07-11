@@ -3,8 +3,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import connectDB from "./config/db.js";
-
-// Routes
 import authRouter from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
@@ -17,33 +15,38 @@ import collegeProfileRoutes from "./routes/collage.profile.routes.js";
 import companyRoutes from "./routes/company.routes.js";
 import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
-import departmentRoutes from "./src/routes/department.routes.js";
 import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
-
-// Middleware
-import errorMiddleware from "./middleware/errorMiddleware.js";
+import collegeJobsRoutes from "./routes/college.jobs.routes.js";
+import departmentRoutes from "./routes/college.department.routes.js";
+import courseRoutes from "./routes/college.course.routes.js";
+import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
+import placementDriveRoutes from "./routes/placementDrives.routes.js";
 
 dotenv.config();
 
 const app = express();
+app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;
 
-
+// Middleware
 app.use(express.json());
+import errorMiddleware from "./middleware/errorMiddleware.js";
+
+
+
+
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost")) {
+      if (!origin || origin.startsWith("http://localhost"))
         return callback(null, true);
-      }
 
       const clientUrl = process.env.CLIENT_URL;
 
-      if (clientUrl && origin === clientUrl) {
+      if (clientUrl && origin === clientUrl)
         return callback(null, true);
-      }
 
       return callback(
         new Error(`CORS policy: origin ${origin} not allowed`)
@@ -59,30 +62,28 @@ app.use("/api/auth", authRouter);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
+app.use("/api/v1/company/jobs", collegeJobsRoutes);
+app.use("/api/v1/company", companyRoutes);
 app.use("/api/mentor", contentRoutes);
-app.use("/api/v1/company", companyRoutes);
+app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
-app.use("/api/student/notifications", notificationRoutes);
-app.use("/api/departments", departmentRoutes);
-
-app.use(errorMiddleware);
-
-
-app.use("/api/v1/company", companyRoutes);
-app.use("/api/v1/admin/drives", adminDriveRoutes);
-app.use("/api/v1/company/interviews", interviewRoutes);
-
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/mentor", contentRoutes);
+app.use("/api/v1/company/jobs", collegeJobsRoutes);
+app.use("/api/v1/company", companyRoutes);
+app.use("/api/v1/company/interviews", interviewRoutes);
+app.use("/api/mentor", contentRoutes);
+app.use("/api/mentor", mentorRoutes);
 
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/students", studentRoutes);
-
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
 
-app.use(errorMiddleware);
-
+app.use("/api/departments/statistics", departmentStatisticsRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/placement-drives", placementDriveRoutes);
 // Health Check
 app.get("/", (req, res) => {
   res.json({
@@ -90,6 +91,7 @@ app.get("/", (req, res) => {
     message: "Backend is running",
   });
 });
+
 
 connectDB()
   .then(() => {

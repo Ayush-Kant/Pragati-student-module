@@ -114,14 +114,14 @@ const AuthPage = () => {
       });
 
       if (result.success) {
+        const userRole = result.user?.role;
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
-        login(result.role, result.token);
+        login(userRole, result.token);
 
-        if(result.role === 'college' && !profileData?.id){
+        if(userRole === 'college' && !profileData?.id){
           navigate(`/add-profile`);
         }else{
-          navigate(`/${result.role}/dashboard`);
-
+          navigate(`/${userRole}/dashboard`);
         }
       } else {
         setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
