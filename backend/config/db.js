@@ -14,9 +14,10 @@ const pgConfig = {
   max: 5,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 15000,
-  ssl: process.env.NODE_ENV === "production"
-    ? { rejectUnauthorized: true }
-    : false,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: true }
+      : false,
 };
 
 export const pool = new Pool(pgConfig);
@@ -26,9 +27,11 @@ export const connectDB = async () => {
     await pool.query("SELECT 1");
     console.log("✅ PostgreSQL connected");
   } catch (error) {
-    console.error("❌ PostgreSQL connection failed:", error.message);
+    console.error("❌ PostgreSQL connection failed:");
+    console.error(error);
+    console.error(error.message);
+    console.error(error.stack);
     throw error;
   }
 };
-
 export default connectDB;
