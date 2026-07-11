@@ -99,50 +99,32 @@ export const suspendCollege = async (id, reason) => {
     throw error;
   }
 };
-<<<<<<< HEAD
-export const fetchDashboardStats = async () => {
-  const response = await API.get("/api/admin/dashboard/stats");
-=======
 
 export const createMentor = registerMentor;
 export const deleteMentor = removeMentor;
 
 export const fetchDashboardStats = async () => {
   const response = await API.get("/api/v1/admin/dashboard/stats", getConfig());
->>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
   return response.data;
 };
 
 export const fetchDashboardFunnel = async () => {
-<<<<<<< HEAD
-  const response = await API.get("/api/admin/dashboard/funnel");
-=======
   const response = await API.get("/api/v1/admin/dashboard/funnel", getConfig());
->>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
   return response.data;
 };
 
 export const fetchCompanyStats = async () => {
-<<<<<<< HEAD
-  const response = await API.get("/api/admin/dashboard/company-stats");
-=======
   const response = await API.get("/api/v1/admin/dashboard/company-stats", getConfig());
->>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
   return response.data;
 };
 
 export const fetchCollegePerformance = async () => {
-<<<<<<< HEAD
-  const response = await API.get("/api/admin/dashboard/college-performance");
-=======
   const response = await API.get("/api/v1/admin/dashboard/college-performance", getConfig());
->>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
   return response.data;
 };
 
 export const fetchActivityFeed = async () => {
-<<<<<<< HEAD
-  const response = await API.get("/api/admin/dashboard/activity-feed");
+  const response = await API.get("/api/v1/admin/dashboard/activity-feed", getConfig());
   return response.data;
 };
 
@@ -548,9 +530,4 @@ export const assignAssessment = async (assessmentId, payload) => {
 
   return response.data;
 };
-=======
-  const response = await API.get("/api/v1/admin/dashboard/activity-feed", getConfig());
-  return response.data;
-};
 
->>>>>>> a442310 (fix: wire company dashboard routes and fix navigation/compilation issues)
