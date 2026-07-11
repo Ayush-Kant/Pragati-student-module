@@ -1,3 +1,5 @@
+// college.email.service.js
+
 import { Resend } from 'resend';
 
 // Lazy client — instantiated on first send so a missing key doesn't crash the server at startup

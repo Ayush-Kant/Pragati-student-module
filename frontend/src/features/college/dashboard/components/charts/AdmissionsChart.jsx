@@ -10,7 +10,7 @@ import {
 
 import ChartWrapper from "./ChartWrapper";
 
-const admissionsData = [
+const defaultData = [
   { month: "Jan", admissions: 120 },
   { month: "Feb", admissions: 145 },
   { month: "Mar", admissions: 180 },
@@ -19,10 +19,8 @@ const admissionsData = [
   { month: "Jun", admissions: 300 },
 ];
 
-
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
-
   return (
     <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-lg">
       <p className="text-xs font-medium text-gray-500">{label}</p>
@@ -34,7 +32,10 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-const AdmissionsChart = () => {
+const AdmissionsChart = ({ data }) => {
+  const chartData =
+    data?.admissionsTrend?.length > 0 ? data.admissionsTrend : defaultData;
+
   return (
     <ChartWrapper
       title="Admissions Analytics"
@@ -43,10 +44,9 @@ const AdmissionsChart = () => {
     >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
-          data={admissionsData}
+          data={chartData}
           margin={{ top: 10, right: 16, left: -10, bottom: 0 }}
         >
-          {/* Gradient fill */}
           <defs>
             <linearGradient id="admissionsGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#2563EB" stopOpacity={0.25} />
@@ -54,11 +54,7 @@ const AdmissionsChart = () => {
             </linearGradient>
           </defs>
 
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="#E5E7EB"
-            vertical={false}
-          />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
 
           <XAxis
             dataKey="month"
@@ -77,11 +73,7 @@ const AdmissionsChart = () => {
 
           <Tooltip
             content={<CustomTooltip />}
-            cursor={{
-              stroke: "#93C5FD",
-              strokeWidth: 1,
-              strokeDasharray: "4 4",
-            }}
+            cursor={{ stroke: "#93C5FD", strokeWidth: 1, strokeDasharray: "4 4" }}
           />
 
           <Area

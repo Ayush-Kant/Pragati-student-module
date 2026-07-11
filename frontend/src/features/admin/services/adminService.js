@@ -25,6 +25,7 @@ API.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
 export const getAdminProfile = async () => {
   const response = await API.get("/profile");
   return response.data;
