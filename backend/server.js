@@ -20,6 +20,7 @@ import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 
 import studentRoutes from "./routes/student.routes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
+import nominationRoutes from './routes/collegeStudentNominations.routes.js'
 
 
 dotenv.config();
@@ -55,6 +56,7 @@ app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
 app.use("/api/students", studentRoutes);
+app.use('/api', nominationRoutes)
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
   app.get("/", (req, res) => {
