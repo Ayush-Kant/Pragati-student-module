@@ -5,7 +5,7 @@ import { Resend } from 'resend';
 // Lazy client — instantiated on first send so a missing key doesn't crash the server at startup
 let _resend = null;
 const getClient = () => {
-    if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+    if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY || 're_dummykey123');
     return _resend;
 };
 

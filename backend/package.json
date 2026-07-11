@@ -11,15 +11,29 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "@sequelize/core": "^7.0.0-alpha.48",
+    "@sequelize/postgres": "^7.0.0-alpha.48",
+>>>>>>> origin/develop
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
+    "curl": "^0.1.4",
     "dns": "^0.1.2",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+<<<<<<< HEAD
+=======
+    "joi": "^18.2.3",
+>>>>>>> origin/develop
     "jsonwebtoken": "^9.0.3",
     "node-pg": "^1.0.1",
-    "nodemon": "^3.1.14",
     "pg": "^8.21.0",
-    "resend": "^6.12.3"
+    "resend": "^6.12.3",
+    "sequelize": "^3.35.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
