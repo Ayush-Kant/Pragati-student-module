@@ -8,21 +8,15 @@ export const getSchedules = async () => {
     SELECT 
         ss.id,
         ss.session_id AS "sessionId",
-
-        ls.title,
-        ls.trainer,
-
-        ls.date AS "date",
-        ls.time AS "time",
-        ls.duration,
-
+        ss.title,
+        ss.trainer,
+        ss.date AS "date",
+        ss.time AS "time",
+        ss.duration,
         ss.status,
         ss.created_at AS "createdAt"
 
     FROM session_schedules ss
-
-    JOIN live_sessions ls
-    ON ss.session_id = ls.id
 
     ORDER BY ss.created_at DESC
     `
@@ -40,21 +34,15 @@ export const getUpcomingSessions = async () => {
     SELECT 
         ss.id,
         ss.session_id AS "sessionId",
-
-        ls.title,
-        ls.trainer,
-
-        ls.date AS "date",
-        ls.time AS "time",
-        ls.duration,
-
+        ss.title,
+        ss.trainer,
+        ss.date AS "date",
+        ss.time AS "time",
+        ss.duration,
         ss.status,
         ss.created_at AS "createdAt"
 
     FROM session_schedules ss
-
-    JOIN live_sessions ls
-    ON ss.session_id = ls.id
 
     WHERE ss.status IN ('Upcoming','Scheduled')
 

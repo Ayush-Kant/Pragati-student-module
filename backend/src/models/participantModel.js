@@ -10,7 +10,7 @@ export const getParticipants = async (sessionId) => {
         sp.session_id AS "sessionId",
         sp.student_id AS "studentId",
         sp.joined_at AS "joinedAt",
-        u.name,
+        u.full_name AS "fullName",
         u.email
     FROM session_participants sp
     JOIN users u 

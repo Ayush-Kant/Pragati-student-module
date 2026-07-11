@@ -28,6 +28,10 @@ CREATE TABLE IF NOT EXISTS session_attendance (
   UNIQUE(session_id, student_id)
 );
 
+ALTER TABLE session_attendance
+ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Absent',
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+
 CREATE TABLE IF NOT EXISTS session_participants (
   id SERIAL PRIMARY KEY,
   session_id INTEGER NOT NULL REFERENCES live_sessions(id) ON DELETE CASCADE,

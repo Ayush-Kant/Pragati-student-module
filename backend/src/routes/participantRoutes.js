@@ -16,14 +16,14 @@ router.use(authorizeStudent);
 
 // Get participants
 router.get(
-  "/:id/participants",
+  "/:id",
   validateRequest(validateParticipantParams, "params"),
   participantController.getParticipants
 );
 
 // Add participant
 router.post(
-  "/:id/participants",
+  "/:id",
   validateRequest(validateParticipantParams, "params"),
   validateRequest(validateParticipant, "body"),
   participantController.addParticipant
@@ -31,7 +31,7 @@ router.post(
 
 // Remove participant
 router.delete(
-  "/:id/participants/:participantId",
+  "/:id/:participantId",
   validateRequest(validateDeleteParticipantParams, "params"),
   participantController.removeParticipant
 );

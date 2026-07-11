@@ -63,6 +63,10 @@ const createLiveSessionTablesQuery = `
     UNIQUE(session_id, student_id)
   );
 
+  ALTER TABLE session_attendance
+  ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Absent',
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+
   CREATE TABLE IF NOT EXISTS session_participants (
     id SERIAL PRIMARY KEY,
     session_id INTEGER NOT NULL REFERENCES live_sessions(id) ON DELETE CASCADE,
@@ -182,9 +186,9 @@ export const seedLiveSessionData = async () => {
 
   for (const schedule of scheduleSeedData) {
     await pool.query(
-      `INSERT INTO session_schedules (title, trainer, date, time, duration, status)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [schedule.title, schedule.trainer, schedule.date, schedule.time, schedule.duration, schedule.status],
+      `INSERT INTO session_schedules (session_id, title, trainer, date, time, duration, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [firstSessionId, schedule.title, schedule.trainer, schedule.date, schedule.time, schedule.duration, schedule.status],
     );
   }
 
