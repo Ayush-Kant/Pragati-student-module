@@ -1,1 +1,38 @@
+<<<<<<< HEAD
 {}
+=======
+{
+  "name": "coding-challenges-backend",
+  "version": "1.0.0",
+  "description": "Backend module for coding challenges using Node.js, Express.js, and PostgreSQL.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "joi": "^17.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.22.0"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6",
+    "nodemon": "^2.0.7"
+  },
+  "keywords": [
+    "coding",
+    "challenges",
+    "backend",
+    "nodejs",
+    "express",
+    "postgresql"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
+>>>>>>> 61c0bb6dbe72babebc1782d25c04b31425c871d4
