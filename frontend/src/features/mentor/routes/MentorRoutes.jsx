@@ -11,13 +11,13 @@ import { ActivityProvider } from "../context/ActivityContext";
 import Activities from "../pages/Activities";
 import CreateActivity from "../pages/CreateActivity";
 import ProjectCreationPage from "../pages/ProjectCreationPage";
-
 import QuestionBankPage from "../pages/QuestionBankPage";
 import CreateQuestionPage from "../pages/CreateQuestionPage";
 import EditQuestionPage from "../pages/EditQuestionPage";
 import QuestionPreviewPage from "../pages/QuestionPreviewPage";
 import QuizBuilderPage from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
+import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
@@ -29,6 +29,7 @@ const mentorRoute = (
         <Route path="courses/create" element={<CreateCourse />} />
         <Route path="export-report" element={<ExportReport />} />
         <Route path="projects/create" element={<ProjectCreationPage />} />
+        <Route path="challenge-creator" element={<ChallengeCreatorPage />} />
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
           <Route path="activities/create" element={<CreateActivity />} />
