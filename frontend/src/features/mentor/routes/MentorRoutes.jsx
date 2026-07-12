@@ -3,6 +3,9 @@ import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
 import MentorLayout from "../components/layout/MentorLayout";
 import Dashboard from "../pages/Dashboard";
+import Courses from "../../../pages/mentor/CoursesPage";
+import CreateCourse from "../../../pages/mentor/CreateCoursePage";
+
 import ExportReport from "../pages/ExportReport";
 import { ActivityProvider } from "../context/ActivityContext";
 import Activities from "../pages/Activities";
@@ -22,6 +25,8 @@ const mentorRoute = (
       <Route path="mentor" element={<MentorLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="courses" element={<Courses />} />
+        <Route path="courses/create" element={<CreateCourse />} />
         <Route path="export-report" element={<ExportReport />} />
         <Route path="projects/create" element={<ProjectCreationPage />} />
         <Route path="challenge-creator" element={<ChallengeCreatorPage />} />
