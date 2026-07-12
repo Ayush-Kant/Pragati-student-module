@@ -23,7 +23,6 @@ import questionBankRouter from "./routes/questionBank.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
-import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
 
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
