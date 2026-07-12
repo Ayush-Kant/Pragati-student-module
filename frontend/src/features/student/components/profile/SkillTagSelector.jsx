@@ -117,4 +117,3 @@ const SkillTagSelector = ({ skills = [], onChange }) => {
 };
 
 export default SkillTagSelector;
-

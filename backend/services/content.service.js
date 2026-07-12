@@ -15,17 +15,20 @@ export const createCourseService = async ({
   try {
     // 1. Fetch mentor id and check drive ownership in parallel to avoid sequential awaits
     const mentorQuery = `
-      SELECT m.id
-      FROM mentors m
-      JOIN users u ON u.id = m.user_id
-      JOIN auth_users a ON a.id = u.auth_user_id
-      WHERE a.uuid_id = $1;
+      SELECT mentors.id
+      FROM mentors
+      INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
+      WHERE auth_users.uuid_id = $1
     `;
 
     const driveQuery = `
-      SELECT r.id
-      FROM recruitment_drives r
-      WHERE r.mentor_id = $1;
+      SELECT recruitment_drives.id
+      FROM recruitment_drives
+      INNER JOIN users ON users.id = recruitment_drives.mentor_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
+      WHERE recruitment_drives.id = $1
+        AND auth_users.uuid_id = $2
     `;
 
     const mentorRes = await pool.query(mentorQuery, [userId]);
@@ -105,11 +108,11 @@ export const getCoursesService = async ({ userId, status, driveId }) => {
   try {
     // 1. Resolve mentor existence
     const mentorQuery = `
-      SELECT m.id
-      FROM mentors m
-      JOIN users u ON u.id = m.user_id
-      JOIN auth_users a ON a.id = u.auth_user_id
-      WHERE a.uuid_id = $1;
+      SELECT mentors.id
+      FROM mentors
+      INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
+      WHERE auth_users.uuid_id = $1
     `;
 
     const mentorRes = await pool.query(mentorQuery, [userId]);
@@ -173,13 +176,14 @@ export const getCourseByIdService = async ({ userId, courseId }) => {
         courses.title,
         courses.status,
         courses.skill_tags,
-        users.auth_user_id AS mentor_auth_uid,
+        auth_users.uuid_id AS mentor_auth_uuid,
         modules.id AS module_id,
         modules.title AS module_title,
         modules.order_index
       FROM courses
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       LEFT JOIN modules ON modules.course_id = courses.id
       WHERE courses.id = $1
       ORDER BY modules.order_index ASC
@@ -197,7 +201,7 @@ export const getCourseByIdService = async ({ userId, courseId }) => {
     const firstRow = result.rows[0];
 
     // Check ownership
-    if (String(firstRow.mentor_auth_uid) !== String(userId)) {
+    if (String(firstRow.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         message: "Forbidden",
@@ -250,10 +254,11 @@ export const updateCourseService = async ({
       SELECT
         courses.id,
         courses.status,
-        users.auth_user_id AS mentor_auth_uid
+        auth_users.uuid_id AS mentor_auth_uuid
       FROM courses
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE courses.id = $1
     `;
 
@@ -269,7 +274,7 @@ export const updateCourseService = async ({
 
     const courseData = checkRes.rows[0];
 
-    if (String(courseData.mentor_auth_uid) !== String(userId)) {
+    if (String(courseData.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         success: false,
@@ -363,10 +368,11 @@ export const deleteCourseService = async ({ courseId, userId }) => {
     const checkQuery = `
       SELECT
         courses.id,
-        users.auth_user_id AS mentor_auth_uid
+        auth_users.uuid_id AS mentor_auth_uuid
       FROM courses
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE courses.id = $1
     `;
 
@@ -382,7 +388,7 @@ export const deleteCourseService = async ({ courseId, userId }) => {
 
     const courseData = checkRes.rows[0];
 
-    if (String(courseData.mentor_auth_uid) !== String(userId)) {
+    if (String(courseData.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         success: false,
@@ -424,10 +430,11 @@ export const createModuleService = async ({
     const checkQuery = `
       SELECT
         courses.id,
-        users.auth_user_id AS mentor_auth_uid
+        auth_users.uuid_id AS mentor_auth_uuid
       FROM courses
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE courses.id = $1
     `;
 
@@ -443,7 +450,7 @@ export const createModuleService = async ({
 
     const courseData = checkRes.rows[0];
 
-    if (String(courseData.mentor_auth_uid) !== String(userId)) {
+    if (String(courseData.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         success: false,
@@ -489,11 +496,12 @@ export const deleteModuleService = async ({ moduleId, userId }) => {
     const checkQuery = `
       SELECT
         modules.id,
-        users.auth_user_id AS mentor_auth_uid
+        auth_users.uuid_id AS mentor_auth_uuid
       FROM modules
       INNER JOIN courses ON courses.id = modules.course_id
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE modules.id = $1
     `;
 
@@ -509,7 +517,7 @@ export const deleteModuleService = async ({ moduleId, userId }) => {
 
     const moduleData = checkRes.rows[0];
 
-    if (String(moduleData.mentor_auth_uid) !== String(userId)) {
+    if (String(moduleData.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         success: false,

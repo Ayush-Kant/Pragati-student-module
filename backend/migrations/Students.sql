@@ -1,28 +1,26 @@
-CREATE TABLE students (
+-- Students.sql
+-- Merges student schema expectations across modules
+
+CREATE TABLE IF NOT EXISTS students (
     id SERIAL PRIMARY KEY,
-    
-    full_name VARCHAR(100) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(20),
-    
-    gender VARCHAR(20),
-    date_of_birth DATE,
-    
-    college VARCHAR(255),
-    branch VARCHAR(100),
-    graduation_year INT,
-    
-    skills TEXT[],
-    
-    linkedin_url TEXT,
-    github_url TEXT,
-    resume_url TEXT,
-    profile_image TEXT,
-    
-    bio TEXT,
-    
-    profile_completeness INT DEFAULT 0,
-    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Safely append missing fields expected by other modules
+ALTER TABLE students ADD COLUMN IF NOT EXISTS full_name VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS gender VARCHAR(20);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS date_of_birth DATE;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS college VARCHAR(255);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS branch VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS graduation_year INT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS skills TEXT[];
+ALTER TABLE students ADD COLUMN IF NOT EXISTS linkedin_url TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS github_url TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS resume_url TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS profile_image TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS bio TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS profile_completeness INT DEFAULT 0;
