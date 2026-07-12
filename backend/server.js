@@ -19,6 +19,10 @@ import notificationRoutes from "./routes/notification.routes.js";
 import companyRoutes from "./routes/company.routes.js";
 import companyProfileRoutes from "./modules/company/routes/companyProfile.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
+import questionBankRouter from "./routes/questionBank.routes.js";
+import mentorRoutes from "./routes/mentor.routes.js";
+import trainingRoutes from "./routes/trainingRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
 
 // Middleware
@@ -28,8 +32,9 @@ dotenv.config();
 console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 
 const app = express();
-app.use(express.json());
+const PORT = process.env.PORT || 5000;
 
+app.use(express.json());
 app.use(errorMiddleware);
 
 app.use(
@@ -65,7 +70,6 @@ app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
-
 
 app.get("/", (req, res) => {
   res.json({

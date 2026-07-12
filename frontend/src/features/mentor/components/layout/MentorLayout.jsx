@@ -21,47 +21,55 @@ export default function MentorLayout() {
   const { pathname } = useLocation();
 
   const menuItems = [
-  {
-    name: "Dashboard",
-    path: "/mentor/dashboard",
-    icon: <LayoutDashboard className="w-5 h-5" />,
-  },
-  {
-    name: "My Mentees",
-    path: "/mentor/mentees",
-    icon: <Users className="w-5 h-5" />,
-  },
-  {
-    name: "Sessions",
-    path: "/mentor/sessions",
-    icon: <CalendarDays className="w-5 h-5" />,
-  },
-  {
-    name: "Assessments",
-    path: "/mentor/assessments",
-    icon: <ClipboardList className="w-5 h-5" />,
-  },
-  {
-    name: "Tasks & Assignments",
-    path: "/mentor/tasks",
-    icon: <ListTodo className="w-5 h-5" />,
-  },
-  {
-    name: "Reports & Analytics",
-    path: "/mentor/export-report",
-    icon: <LineChart className="w-5 h-5" />,
-  },
-  {
-    name: "Settings",
-    path: "/mentor/settings",
-    icon: <Settings className="w-5 h-5" />,
-  },
-];
+    {
+      name: "Dashboard",
+      path: "/mentor/dashboard",
+      icon: <LayoutDashboard className="w-5 h-5" />,
+    },
+    {
+      name: "Projects",
+      path: "/mentor/projects/create",
+      icon: <Briefcase className="w-5 h-5" />,
+    },
+    {
+      name: "My Mentees",
+      path: "/mentor/mentees",
+      icon: <Users className="w-5 h-5" />,
+    },
+    {
+      name: "Sessions",
+      path: "/mentor/sessions",
+      icon: <CalendarDays className="w-5 h-5" />,
+    },
+    {
+      name: "Assessments",
+      path: "/mentor/assessments",
+      icon: <ClipboardList className="w-5 h-5" />,
+    },
+    {
+      name: "Tasks & Assignments",
+      path: "/mentor/tasks",
+      icon: <ListTodo className="w-5 h-5" />,
+    },
+    {
+      name: "Reports & Analytics",
+      path: "/mentor/export-report",
+      icon: <LineChart className="w-5 h-5" />,
+    },
+    {
+      name: "Settings",
+      path: "/mentor/settings",
+      icon: <Settings className="w-5 h-5" />,
+    },
+  ];
 
   const isItemActive = (item) => {
     if (item.path === "#") return false;
     if (item.path === "/mentor/dashboard") {
-      return location.pathname === "/mentor/dashboard" || location.pathname === "/mentor";
+      return (
+        location.pathname === "/mentor/dashboard" ||
+        location.pathname === "/mentor"
+      );
     }
     return location.pathname.startsWith(item.path);
   };
@@ -191,7 +199,10 @@ export default function MentorLayout() {
           {menuItems.map((item, idx) => (
             <div
               key={idx}
-              onClick={() => {console.log("Clicked:", item);navigate(item.path)}}
+              onClick={() => {
+                console.log("Clicked:", item);
+                navigate(item.path);
+              }}
               style={{
                 display: "flex",
                 alignItems: "center",
