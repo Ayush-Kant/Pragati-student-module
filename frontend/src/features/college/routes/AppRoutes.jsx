@@ -8,6 +8,7 @@ import OrganizationProfile from "../profile/pages/AddCollegeProfile";
 import StudentDatabasePage from "../students/pages/StudentDatabasePage";
 import CompanyJobPostingsPage from "../company-job-postings/pages/CompanyJobPostingsPage";
 import PlacementDrivesPage from "../placement-drives/pages/PlacementDrivesPage";
+import ReportsPage from "../reports/pages/ReportsPage";
 
 const collegeRoute = (
   <>
@@ -60,6 +61,12 @@ const collegeRoute = (
       <Route
         path="drives"
         element={<PlacementDrivesPage />}
+      />
+
+      {/* Reports */}
+      <Route
+        path="reports"
+        element={<ReportsPage />}
       />
     </Route>
   </>

@@ -1,0 +1,32 @@
+import React from "react";
+import { REPORT_TYPES } from "../../constants/reportsConstants";
+
+export const ReportTypeFilter = ({ activeType, onChange }) => {
+  const options = ["All", ...REPORT_TYPES];
+
+  return (
+    <div className="flex flex-col space-y-2">
+      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Report Type</label>
+      <div className="flex flex-wrap gap-2">
+        {options.map((type) => {
+          const isActive = activeType === type;
+          return (
+            <button
+              key={type}
+              onClick={() => onChange(type)}
+              className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-150 active:scale-97 cursor-pointer ${
+                isActive
+                  ? "bg-primary border-primary text-white shadow-md shadow-orange-500/10"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300"
+              }`}
+            >
+              {type}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default ReportTypeFilter;
