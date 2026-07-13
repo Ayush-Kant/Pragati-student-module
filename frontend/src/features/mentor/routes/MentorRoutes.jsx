@@ -1,6 +1,7 @@
 import { Route, Navigate } from "react-router-dom";
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
+
 import MentorLayout from "../components/layout/MentorLayout";
 import Dashboard from "../pages/Dashboard";
 import Courses from "../../../pages/mentor/CoursesPage";
@@ -18,14 +19,20 @@ import QuestionPreviewPage from "../pages/QuestionPreviewPage";
 import QuizBuilderPage from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
 import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
-import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage.jsx";
+import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage";
+
+import HiringPipelinePage from "../pages/HiringPipelinePage";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
     <Route element={<RoleRoute allowedRoles={["mentor"]} />}>
       <Route path="mentor" element={<MentorLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
+
         <Route path="dashboard" element={<Dashboard />} />
+
+        <Route path="hiring-pipeline" element={<HiringPipelinePage />} />
+
         <Route path="courses" element={<Courses />} />
         <Route path="courses/create" element={<CreateCourse />} />
         <Route path="export-report" element={<ExportReport />} />
@@ -35,6 +42,7 @@ const mentorRoute = (
           path="challenge-workspace"
           element={<ChallengeWorkspacePage />}
         />
+
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
           <Route path="activities/create" element={<CreateActivity />} />
@@ -51,7 +59,10 @@ const mentorRoute = (
           path="question-bank/quiz-builder"
           element={<QuizBuilderPage />}
         />
-        <Route path="question-bank/attempts" element={<AttemptHistoryPage />} />
+        <Route
+          path="question-bank/attempts"
+          element={<AttemptHistoryPage />}
+        />
       </Route>
     </Route>
   </Route>
