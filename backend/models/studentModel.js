@@ -25,7 +25,10 @@ const buildFilter = (filters) => {
     conditions.push(`placement_status = $${values.length + 1}`);
     values.push(filters.placementStatus);
   }
-  if (filters.college) {
+  if (filters.collegeId) {
+    conditions.push(`college_id = $${values.length + 1}`);
+    values.push(filters.collegeId);
+  } else if (filters.college) {
     conditions.push(`college ILIKE $${values.length + 1}`);
     values.push(`%${filters.college}%`);
   }
@@ -62,6 +65,7 @@ const formatStudent = (row, skills = []) => ({
   placedAt:        row.placed_at,
   package:         row.package,
   college:         row.college,
+  collegeId:       row.college_id,
   skills:          skills,
   createdAt:       row.created_at,
   updatedAt:       row.updated_at,
@@ -134,8 +138,8 @@ export const createStudent = async (data, skills = []) => {
       `INSERT INTO students
         (enrollment_no, name, email, phone, department, course, semester, batch,
          cgpa, placement_status, address, resume_status, linkedin, github,
-         placed_at, package, college)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+         placed_at, package, college, college_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
        RETURNING *`,
       [
         data.enrollmentNo,
@@ -155,6 +159,7 @@ export const createStudent = async (data, skills = []) => {
         data.placedAt || null,
         data.package || null,
         data.college || null,
+        data.collegeId || null,
       ]
     );
 
@@ -205,8 +210,9 @@ export const updateStudent = async (id, data, skills) => {
         placed_at        = COALESCE($15, placed_at),
         package          = COALESCE($16, package),
         college          = COALESCE($17, college),
+        college_id       = COALESCE($18, college_id),
         updated_at       = CURRENT_TIMESTAMP
-       WHERE id = $18
+       WHERE id = $19
        RETURNING *`,
       [
         data.enrollmentNo || null,
@@ -226,6 +232,7 @@ export const updateStudent = async (id, data, skills) => {
         data.placedAt !== undefined ? data.placedAt : null,
         data.package !== undefined ? data.package : null,
         data.college !== undefined ? data.college : null,
+        data.collegeId !== undefined ? data.collegeId : null,
         id,
       ]
     );
@@ -270,9 +277,17 @@ export const deleteStudent = async (id) => {
 };
 
 // ─── Get student statistics ───────────────────────────────────────────────────
-export const getStudentStatistics = async (college = null) => {
-  const whereClause = college ? 'WHERE college ILIKE $1' : '';
-  const values      = college ? [`%${college}%`] : [];
+export const getStudentStatistics = async (college = null, collegeId = null) => {
+  let whereClause = '';
+  let values = [];
+  
+  if (collegeId) {
+    whereClause = 'WHERE college_id = $1';
+    values = [collegeId];
+  } else if (college) {
+    whereClause = 'WHERE college ILIKE $1';
+    values = [`%${college}%`];
+  }
 
   const result = await pool.query(
     `SELECT
