@@ -69,22 +69,6 @@ export const updateAttendance = async (req, res, next) => {
     const { status } = body;
 
 
-    const existing = await attendanceService.getAttendance(
-      sessionId,
-      studentId
-    );
-
-
-    if (!existing || existing.length === 0) {
-
-      return res.status(404).json({
-        success: false,
-        message: "Attendance record not found to update",
-      });
-
-    }
-
-
     const record = await attendanceService.updateAttendance(
       sessionId,
       studentId,

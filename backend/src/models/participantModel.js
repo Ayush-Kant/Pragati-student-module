@@ -35,7 +35,6 @@ export const addParticipant = async (sessionId, studentId) => {
 
   if (!resolvedStudentId) {
     const error = new Error("Student not found");
-    error.status = 404;
     throw error;
   }
 
@@ -78,14 +77,12 @@ export const addParticipant = async (sessionId, studentId) => {
 
 export const removeParticipant = async (
   sessionId,
-  participantId
+  studentId
 ) => {
-
-  const studentRemovalResult = await pool.query(
+  const result = await pool.query(
     `
     DELETE FROM session_participants
-    WHERE session_id = $1
-    AND student_id = $2
+    WHERE session_id = $1 AND (student_id = $2 OR id = $2)
     RETURNING
         id,
         session_id AS "sessionId",
@@ -93,31 +90,11 @@ export const removeParticipant = async (
     `,
     [
       sessionId,
-      Number(participantId)
+      Number(studentId)
     ]
   );
 
-  if (studentRemovalResult.rows[0]) {
-    return studentRemovalResult.rows[0];
-  }
-
-  const rowRemovalResult = await pool.query(
-    `
-    DELETE FROM session_participants
-    WHERE session_id = $1
-    AND id = $2
-    RETURNING
-        id,
-        session_id AS "sessionId",
-        student_id AS "studentId"
-    `,
-    [
-      sessionId,
-      Number(participantId)
-    ]
-  );
-
-  return rowRemovalResult.rows[0] || null;
+  return result.rows[0] || null;
 };
 
 

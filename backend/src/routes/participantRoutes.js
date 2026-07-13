@@ -1,7 +1,5 @@
 import express from "express";
 import participantController from "../controllers/participantController.js";
-import authenticateJWT from "../middleware/authenticateJWT.js";
-import authorizeStudent from "../middleware/authorizeStudent.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 import {
   validateParticipant,
@@ -10,9 +8,6 @@ import {
 } from "../validators/participantValidator.js";
 
 const router = express.Router();
-
-router.use(authenticateJWT);
-router.use(authorizeStudent);
 
 // Get participants
 router.get(
@@ -31,7 +26,7 @@ router.post(
 
 // Remove participant
 router.delete(
-  "/:id/:participantId",
+  "/:id/:studentId",
   validateRequest(validateDeleteParticipantParams, "params"),
   participantController.removeParticipant
 );

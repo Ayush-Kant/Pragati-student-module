@@ -8,7 +8,6 @@ export const getAttendance = async (sessionId, studentId) => {
 
     if (!resolvedStudentId) {
         const error = new Error("Student not found");
-        error.status = 404;
         throw error;
     }
 
@@ -44,7 +43,6 @@ export const markAttendance = async (
 
     if (!resolvedStudentId) {
         const error = new Error("Student not found");
-        error.status = 404;
         throw error;
     }
 
@@ -94,7 +92,6 @@ export const updateAttendance = async (
 
     if (!resolvedStudentId) {
         const error = new Error("Student not found");
-        error.status = 404;
         throw error;
     }
 

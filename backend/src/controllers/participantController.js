@@ -31,16 +31,16 @@ export const addParticipant = async (req, res, next) => {
 
 export const removeParticipant = async (req, res, next) => {
   try {
-    const { id: sessionId, participantId } = req.validatedParams || req.params;
+    const { id: sessionId, studentId } = req.validatedParams || req.params;
 
-    if (req.user.role === "student" && Number(participantId) !== req.user.id) {
+    if (req.user.role === "student" && Number(studentId) !== req.user.id) {
       return res.status(403).json({
         success: false,
         message: "Students can only remove themselves from a session.",
       });
     }
 
-    const participant = await participantService.removeParticipant(sessionId, participantId);
+    const participant = await participantService.removeParticipant(sessionId, studentId);
     res.status(200).json({
       success: true,
       message: "Participant removed successfully",

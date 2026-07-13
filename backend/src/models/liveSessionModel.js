@@ -27,7 +27,6 @@ export const joinSession = async (sessionId, studentId) => {
 
   if (!resolvedStudentId) {
     const error = new Error("Student not found");
-    error.status = 404;
     throw error;
   }
 
@@ -47,7 +46,6 @@ export const leaveSession = async (sessionId, studentId) => {
 
   if (!resolvedStudentId) {
     const error = new Error("Student not found");
-    error.status = 404;
     throw error;
   }
 

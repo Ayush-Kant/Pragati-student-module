@@ -21,7 +21,15 @@ export const joinSession = async (sessionId, studentId) => {
     error.status = 404;
     throw error;
   }
-  return await liveSessionModel.joinSession(sessionId, studentId);
+
+  try {
+    return await liveSessionModel.joinSession(sessionId, studentId);
+  } catch (error) {
+    if (error.message === "Student not found") {
+      error.status = 404;
+    }
+    throw error;
+  }
 };
 
 export const leaveSession = async (sessionId, studentId) => {
@@ -31,13 +39,21 @@ export const leaveSession = async (sessionId, studentId) => {
     error.status = 404;
     throw error;
   }
-  const participant = await liveSessionModel.leaveSession(sessionId, studentId);
-  if (!participant) {
-    const error = new Error("Student was not joined to this session");
-    error.status = 400;
+
+  try {
+    const participant = await liveSessionModel.leaveSession(sessionId, studentId);
+    if (!participant) {
+      const error = new Error("Student was not joined to this session");
+      error.status = 400;
+      throw error;
+    }
+    return participant;
+  } catch (error) {
+    if (error.message === "Student not found") {
+      error.status = 404;
+    }
     throw error;
   }
-  return participant;
 };
 
 export default {
