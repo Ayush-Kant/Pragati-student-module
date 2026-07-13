@@ -26,6 +26,7 @@ const migrationFiles = [
   "006_create_college_profiles.sql",
   "006_create_dashboard_support.sql",
   "006_create_training_coordination.sql",
+  "006_create_mentor_management.sql",
   "006_create_question_bank.sql",
   "007_create_dashboard_tables.sql",
   "007_offers_hiring_tables.sql",
@@ -38,8 +39,9 @@ const migrationFiles = [
   "009_create_reports_analytics_tables.sql",
   "011_create_job_posting_tables.sql",
   "012_create_jobs_table.sql",
+  "019_create_notifications.sql",
   "college.department.course.seeddata.sql",
-  "student_module.sql",
+  "student_module.sql"
 ];
 
 async function runMigrationsFresh() {

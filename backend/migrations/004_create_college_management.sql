@@ -50,7 +50,15 @@ CREATE TABLE IF NOT EXISTS college_stats (
   last_updated            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(college_id)
 );
- 
+ ALTER TABLE colleges ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS location VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS departments TEXT[];
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS student_strength INTEGER DEFAULT 0;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS status VARCHAR(50) NOT NULL DEFAULT 'pending';
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS suspension_reason TEXT;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
 -- INDEXES
 CREATE INDEX idx_colleges_status     ON colleges(status);
 CREATE INDEX idx_colleges_name       ON colleges(name);

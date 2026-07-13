@@ -6,7 +6,7 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import roleMiddleware from '../middleware/roleMiddleware.js';
 
 import * as validator from '../validators/admin.company.validator.js';
-import * as controller from '../controllers/company.controller.js';
+import * as controller from '../controllers/admin.company.controller.js';
 
 const router = express.Router();
 

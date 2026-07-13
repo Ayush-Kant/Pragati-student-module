@@ -18,9 +18,11 @@ const AuthPage = () => {
   const { login, isAuthenticated, userRole } = useAuth();
   const [profileData, setProfileData] = useState({});
 
+  const getRedirectPath = (role) => (role === 'admin' ? '/admin' : `/${role}/dashboard`);
+
   useEffect(() => {
     if (isAuthenticated && userRole) {
-      navigate(`/${userRole}/dashboard`);
+      navigate(getRedirectPath(userRole));
     }
   }, [isAuthenticated, userRole, navigate]);
 
@@ -122,12 +124,10 @@ const AuthPage = () => {
       if (result.success) {
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
         login(result.role, result.token);
-
-        if(result.role === 'college' && !profileData?.id){
+        if (result.role === 'college' && !profileData?.id) {
           navigate(`/add-profile`);
-        }else{
-          navigate(`/${result.role}/dashboard`);
-
+        } else {
+          navigate(getRedirectPath(result.role));
         }
       } else {
         setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
