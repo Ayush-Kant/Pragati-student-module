@@ -35,7 +35,6 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 dotenv.config();
 
-console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -79,11 +78,6 @@ app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/v1/company/assessment", companyAssessmentRoutes);
 
-app.use("/api/student/training", studentTrainingRoutes);
-app.use("/api/student/training", studentCourseRoutes);
-app.use("/api/student/training", studentLessonRoutes);
-app.use("/api/student/training", studentResourceRoutes);
-app.use("/api/student/training", studentProgressRoutes);
 
 
 app.get("/", (req, res) => {
@@ -91,10 +85,6 @@ app.get("/", (req, res) => {
     message: "Backend is running",
   });
 });
-app.use(
-  "/api/v1/company/assessments",
-  companyAssessmentRoutes
-);
 
 app.use(errorMiddleware);
 
