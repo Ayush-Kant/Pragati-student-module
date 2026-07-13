@@ -36,11 +36,8 @@ import initializeLiveSessionModule from "./src/database/migrations/liveSessionSc
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
 dotenv.config();
-
-
 const app = express();
 const PORT = process.env.PORT || 5000;
-
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -58,7 +55,6 @@ app.use(
   }),
 );
 app.use(express.json());
-
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
@@ -81,9 +77,7 @@ app.use("/api/student/training", studentResourceRoutes);
 app.use("/api/student/training", studentProgressRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
-app.use("/api/v1/company/assessment", companyAssessmentRoutes);
-
-
+app.use("/api/v1/company/assessments", companyAssessmentRoutes);
 
 app.get("/", (req, res) => {
   res.json({
