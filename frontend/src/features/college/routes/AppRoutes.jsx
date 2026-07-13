@@ -1,4 +1,5 @@
 import { Navigate, Route } from "react-router-dom";
+
 import CollegeLayout from "../layouts/CollegeLayout";
 
 import DashboardPage from "../dashboard/pages/DashboardPage";
@@ -7,20 +8,50 @@ import OrganizationProfile from "../profile/pages/AddCollegeProfile";
 import StudentDatabasePage from "../students/pages/StudentDatabasePage";
 import CompanyJobPostingsPage from "../company-job-postings/pages/CompanyJobPostingsPage";
 import StudentProfilePage from "../student-profile/pages/StudentProfilePage";
+import PlacementDrivesPage from "../placement-drives/pages/PlacementDrivesPage";
 
 const collegeRoute = (
   <>
-    <Route path="add-profile" element={<OrganizationProfile />} />
-
-    <Route path="college" element={<CollegeLayout />}>
-      <Route index element={<Navigate to="dashboard" replace />} />
-
-      <Route path="dashboard" element={<DashboardPage />} />
-      <Route path="student" element={<StudentDatabasePage />} />
-      <Route path="profile" element={<CollegeProfilePage />} />
-      <Route path="update-profile" element={<OrganizationProfile />} />
+    {/* College Layout */}
+    <Route
+      path="college"
+      element={<CollegeLayout />}
+    >
       <Route
-        path="company-job-postings"
+        path="add-profile"
+        element={<OrganizationProfile />}
+      />
+      <Route
+        index
+        element={<Navigate to="dashboard" replace />}
+      />
+
+      {/* Dashboard */}
+      <Route
+        path="dashboard"
+        element={<DashboardPage />}
+      />
+
+      {/* Profile */}
+      <Route
+        path="profile"
+        element={<CollegeProfilePage />}
+      />
+
+      <Route
+        path="update-profile"
+        element={<OrganizationProfile />}
+      />
+
+      {/* Students */}
+      <Route
+        path="student"
+        element={<StudentDatabasePage />}
+      />
+
+      {/* Companies */}
+      <Route
+        path="companies"
         element={<CompanyJobPostingsPage />}
       />
 
@@ -30,6 +61,11 @@ const collegeRoute = (
       <Route path="student-profile/:id" element={<StudentProfilePage />} />
       <Route path="student-performance" element={<StudentProfilePage />} />
       <Route path="companies" element={<CompanyJobPostingsPage />} />
+      {/* Placement Drives */}
+      <Route
+        path="drives"
+        element={<PlacementDrivesPage />}
+      />
     </Route>
   </>
 );

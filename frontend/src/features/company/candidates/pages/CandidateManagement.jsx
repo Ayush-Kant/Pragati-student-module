@@ -75,42 +75,65 @@ const CandidateManagement = () => {
   return (
     <div>
       <div className="w-full">
-        {/* Header */}
-        <CandidateHeader />
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Main Candidate Table Area */}
+          <div className="flex-1 min-w-0 w-full">
+            {/* Header */}
+            <CandidateHeader />
 
-        {/* Filters */}
-        <CandidateFilters
-          filters={filters}
-          updateFilter={updateFilter}
-          getUniqueValues={getUniqueValues}
-          allCandidates={allCandidates}
-        />
+            {/* Filters */}
+            <CandidateFilters
+              filters={filters}
+              updateFilter={updateFilter}
+              getUniqueValues={getUniqueValues}
+              allCandidates={allCandidates}
+            />
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm">
-            <p className="text-red-700 text-sm font-medium">{error}</p>
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm">
+                <p className="text-red-700 text-sm font-medium">{error}</p>
+              </div>
+            )}
+
+            {/* Table */}
+            <CandidateTable
+              candidates={candidates}
+              loading={loading}
+              onSelectCandidate={handleSelectCandidate}
+              onMenuClick={handleSelectCandidate}
+              onEdit={handleOpenEdit}
+            />
           </div>
-        )}
 
-        {/* Table */}
-        <CandidateTable
-          candidates={candidates}
-          loading={loading}
-          onSelectCandidate={handleSelectCandidate}
-          onMenuClick={handleSelectCandidate}
-          onEdit={handleOpenEdit}
-        />
+          {/* Inline Candidate Profile Details card (Desktop - lg and above) */}
+          {isDrawerOpen && selectedCandidate && (
+            <div className="hidden lg:block w-[420px] shrink-0 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden sticky top-[90px]">
+              <CandidateDrawer
+                isOpen={isDrawerOpen}
+                candidate={selectedCandidate}
+                onClose={handleCloseDrawer}
+                onShortlist={handleShortlist}
+                onReject={handleReject}
+                isUpdating={isUpdating}
+                inline={true}
+              />
+            </div>
+          )}
+        </div>
 
-        {/* Drawer */}
-        <CandidateDrawer
-          isOpen={isDrawerOpen}
-          candidate={selectedCandidate}
-          onClose={handleCloseDrawer}
-          onShortlist={handleShortlist}
-          onReject={handleReject}
-          isUpdating={isUpdating}
-        />
+        {/* Floating Backdrop drawer fallback (Mobile / Tablet - under lg size) */}
+        <div className="block lg:hidden">
+          <CandidateDrawer
+            isOpen={isDrawerOpen}
+            candidate={selectedCandidate}
+            onClose={handleCloseDrawer}
+            onShortlist={handleShortlist}
+            onReject={handleReject}
+            isUpdating={isUpdating}
+            inline={false}
+          />
+        </div>
 
         {/* Edit Candidate Modal */}
         {editingCandidate && (

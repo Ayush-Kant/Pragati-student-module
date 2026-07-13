@@ -63,28 +63,11 @@ const getCompanyById = async (id) => {
             json_build_object(
                 'offerAcceptanceRate', s.offer_acceptance_rate,
                 'interviewToHireRate', s.interview_to_hire_rate,
-                'avgResponseTime', s.avg_response_time,
+                'avgResponseTime', s.avg_response_time_days,
                 'totalJobsPosted', s.total_jobs_posted,
                 'totalHires', s.total_hires,
                 'engagementScore', s.engagement_score
-            ) AS stats,
-
-            (
-                SELECT json_agg(logs)
-                FROM (
-                    SELECT
-                        action,
-                        reason,
-                        performed_by AS "performedBy",
-                        created_at AS "createdAt"
-                    FROM audit_logs
-                    WHERE
-                        entity_type = 'company'
-                        AND entity_id = c.id
-                    ORDER BY created_at DESC
-                    LIMIT 10
-                ) logs
-            ) AS "recentActivity"
+            ) AS stats
 
         FROM companies c
 
@@ -107,7 +90,7 @@ const getCompanyStats = async (id) => {
             company_id AS "companyId",
             offer_acceptance_rate AS "offerAcceptanceRate",
             interview_to_hire_rate AS "interviewToHireRate",
-            avg_response_time AS "avgResponseTime",
+            avg_response_time_days AS "avgResponseTime",
             total_jobs_posted AS "totalJobsPosted",
             total_hires AS "totalHires",
             engagement_score AS "engagementScore"
@@ -127,10 +110,8 @@ const getCompanyDrives = async (id) => {
             d.id AS "driveId",
             d.title,
             d.status,
-            d.location,
-            d.start_date AS "startDate",
-            d.end_date AS "endDate"
-        FROM drives d
+            d.created_at AS "createdAt"
+        FROM recruitment_drives d
         WHERE d.company_id = $1
         ORDER BY d.created_at DESC
         `,

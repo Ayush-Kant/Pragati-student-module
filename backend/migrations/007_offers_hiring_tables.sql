@@ -1,3 +1,8 @@
+-- 007_offers_hiring_tables.sql
+-- Dependency-ordered tables for the offers/hiring module
+
+
+-- 1. COMPANIES V2 (independent table)
 CREATE TABLE IF NOT EXISTS companies_v2 (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     legal_name VARCHAR(255) NOT NULL,
@@ -39,6 +44,25 @@ CREATE TABLE IF NOT EXISTS companies_v2 (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+
+-- 2. CANDIDATES (independent table)
+CREATE TABLE IF NOT EXISTS candidates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    college_id UUID,
+    current_location VARCHAR(255),
+    resume_url TEXT,
+    graduation_year INTEGER,
+    cgpa NUMERIC(4, 2),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+
+-- 3. RECRUITMENT DRIVES V2 (depends on companies_v2)
 CREATE TABLE IF NOT EXISTS recruitment_drives_v2 (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     company_id UUID NOT NULL REFERENCES companies_v2 (id),
@@ -63,21 +87,8 @@ CREATE TABLE IF NOT EXISTS recruitment_drives_v2 (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS candidates (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    phone VARCHAR(20),
-    college_id UUID,
-    current_location VARCHAR(255),
-    resume_url TEXT,
-    graduation_year INTEGER,
-    cgpa NUMERIC(4, 2),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
 
+-- 4. OFFERS V2 (depends on recruitment_drives_v2, candidates)
 CREATE TABLE IF NOT EXISTS offers_v2 (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     drive_id UUID NOT NULL REFERENCES recruitment_drives_v2 (id) ON DELETE CASCADE,
@@ -107,6 +118,8 @@ CREATE TABLE IF NOT EXISTS offers_v2 (
     UNIQUE (drive_id, candidate_id)
 );
 
+
+-- 5. OFFER AMENDMENTS (depends on offers_v2)
 CREATE TABLE IF NOT EXISTS offer_amendments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     offer_id UUID NOT NULL REFERENCES offers_v2 (id) ON DELETE CASCADE,
@@ -118,6 +131,8 @@ CREATE TABLE IF NOT EXISTS offer_amendments (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+
+-- 6. CANDIDATE DRIVE MAPPING (depends on candidates, recruitment_drives_v2)
 CREATE TABLE IF NOT EXISTS candidate_drive_mapping (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     candidate_id UUID NOT NULL REFERENCES candidates (id),
@@ -145,6 +160,8 @@ CREATE TABLE IF NOT EXISTS candidate_drive_mapping (
     UNIQUE (candidate_id, drive_id)
 );
 
+
+-- 7. INTERVIEWS V2 (depends on recruitment_drives_v2, candidates)
 CREATE TABLE IF NOT EXISTS interviews_v2 (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     drive_id UUID NOT NULL REFERENCES recruitment_drives_v2 (id) ON DELETE CASCADE,
@@ -173,7 +190,8 @@ CREATE TABLE IF NOT EXISTS interviews_v2 (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Then the indexes
+
+-- Indexes
 CREATE INDEX idx_candidates_email ON candidates (email);
 CREATE INDEX idx_candidates_college ON candidates (college_id);
 CREATE INDEX idx_interviews_v2_drive ON interviews_v2 (drive_id);
@@ -185,3 +203,5 @@ CREATE INDEX idx_offers_v2_status ON offers_v2 (offer_status);
 CREATE INDEX idx_offers_joining_date ON offers_v2 (joining_date);
 CREATE INDEX idx_offer_amendments_offer ON offer_amendments (offer_id);
 CREATE INDEX idx_offer_amendments_created ON offer_amendments (created_at DESC);
+
+

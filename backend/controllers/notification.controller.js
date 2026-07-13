@@ -10,7 +10,7 @@ export const getNotifications = async (
   res
 ) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
 
     const result =
       await getNotificationsService(userId);
@@ -30,7 +30,7 @@ export const getNotifications = async (
 export const markNotificationRead =
   async (req, res) => {
     try {
-      const userId = req.user.uid;
+      const userId = req.user.userId;
 
       const { notificationId } = req.params;
 
@@ -58,7 +58,7 @@ export const markNotificationRead =
 export const markAllNotificationsRead =
   async (req, res) => {
     try {
-      const userId = req.user.uid;
+      const userId = req.user.userId;
 
       await markAllNotificationsReadService(
         userId

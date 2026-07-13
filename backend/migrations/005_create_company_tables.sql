@@ -4,11 +4,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- Companies Table
 -- =====================================
 
-CREATE TABLE IF NOT EXISTS companies (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- companies table moved to 003_create_admin_dashboard.sql
 
 ALTER TABLE companies ADD COLUMN IF NOT EXISTS website VARCHAR(255);
 ALTER TABLE companies ADD COLUMN IF NOT EXISTS description TEXT;
