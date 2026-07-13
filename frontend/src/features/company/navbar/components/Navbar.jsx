@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { GlobalSearch } from "./GlobalSearch";
+import { useAuth } from "../../../../context/AuthContext";
 
 import { FiBell, FiSettings, FiSearch, FiMenu } from "react-icons/fi";
 import {
@@ -442,13 +443,12 @@ const ChangePasswordModal = ({ onClose }) => {
 
 const LogoutModal = ({ onClose }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    // Clear any local auth state if present
-    try { localStorage.clear(); } catch (_) { }
+    logout();
     toast.success("Logged out successfully");
     onClose();
-    // Navigate to login if route exists, otherwise root
     navigate("/login", { replace: true });
   };
 
