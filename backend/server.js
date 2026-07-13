@@ -3,6 +3,14 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import { connectDB } from "./config/db.js";
+import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
+
+import studentTrainingRoutes from "./src/routes/trainingRoutes.js";
+import studentCourseRoutes from "./src/routes/courseRoutes.js";
+import studentLessonRoutes from "./src/routes/lessonRoutes.js";
+import studentResourceRoutes from "./src/routes/resourceRoutes.js";
+import studentProgressRoutes from "./src/routes/progressRoutes.js";
+
 
 // Admin Routes
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
@@ -23,8 +31,6 @@ import questionBankRouter from "./routes/questionBank.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
-//company Assessment route
-import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
 dotenv.config();
@@ -64,8 +70,20 @@ app.use("/api/v1/admin/company", companyRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/company", companyProfileRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
+app.use("/api/student/training", studentTrainingRoutes);
+app.use("/api/student/training", studentCourseRoutes);
+app.use("/api/student/training", studentLessonRoutes);
+app.use("/api/student/training", studentResourceRoutes);
+app.use("/api/student/training", studentProgressRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
+app.use("/api/v1/company/assessment", companyAssessmentRoutes);
+
+app.use("/api/student/training", studentTrainingRoutes);
+app.use("/api/student/training", studentCourseRoutes);
+app.use("/api/student/training", studentLessonRoutes);
+app.use("/api/student/training", studentResourceRoutes);
+app.use("/api/student/training", studentProgressRoutes);
 
 
 app.get("/", (req, res) => {
