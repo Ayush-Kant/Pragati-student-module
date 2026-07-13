@@ -14,12 +14,12 @@ const migrationsDir = path.join(__dirname, "../migrations");
 // Hardcoded execution order based on your dependencies
 const migrationFiles = [
   "001_create_users_mentors.sql",
+  "002_create_content_tables.sql",
   "005_create_company_management.sql",
   "004_create_college_management.sql",
   "005_create_student_management.sql",
   "005_create_recruitment_drives.sql",
   "005_create_company_tables.sql",
-  "002_create_content_tables.sql",
   "003_create_admin_dashboard.sql",
   "004_create_notifications.sql",
   "006_create_assessments.sql",
