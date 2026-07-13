@@ -1,9 +1,21 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import sidebarMenu from "./sidebarMenu";
 import { GraduationCap, X } from "lucide-react";
+import { useAuth } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const CollegeSidebar = ({ openSidebar, setOpenSidebar, darkMode }) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logout();
+    toast.success("Logged out successfully");
+    navigate("/login", { replace: true });
+  };
+
   return (
     <aside
       className={`
@@ -65,7 +77,12 @@ const CollegeSidebar = ({ openSidebar, setOpenSidebar, darkMode }) => {
                   <NavLink
                     key={item.name}
                     to={item.path}
-                    onClick={() => setOpenSidebar(false)}
+                    onClick={(e) => {
+                      setOpenSidebar(false);
+                      if (item.name === "Logout") {
+                        handleLogout(e);
+                      }
+                    }}
                     className={({ isActive }) =>
                       `
                         flex items-center gap-3
