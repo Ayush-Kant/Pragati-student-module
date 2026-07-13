@@ -8,6 +8,7 @@ import CollegeProfilePage from "../profile/pages/CollegeProfilePage";
 import OrganizationProfile from "../profile/pages/AddCollegeProfile";
 import StudentDatabasePage from "../students/pages/StudentDatabasePage";
 import CompanyJobPostingsPage from "../company-job-postings/pages/CompanyJobPostingsPage";
+import PlacementDrivesPage from "../placement-drives/pages/PlacementDrivesPage";
 
 const collegeRoute = (
   <Route element={<PrivateRoute />}>
@@ -21,6 +22,9 @@ const collegeRoute = (
         <Route path="update-profile" element={<OrganizationProfile />} />
         <Route path="company-job-postings" element={<CompanyJobPostingsPage />} />
         <Route path="companies" element={<CompanyJobPostingsPage />} />
+        <Route path="drives" element={<PlacementDrivesPage />} />
+        {/* Render a blank page with sidebar/footer if page is not created yet */}
+        <Route path="*" element={<div className="min-h-[400px]" />} />
       </Route>
     </Route>
   </Route>

@@ -16,9 +16,6 @@ import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
 
-// Placement Drives
-import CollegeLayout from "./features/college/layouts/CollegeLayout";
-import PlacementDrivesPage from "./features/college/placement-drives/pages/PlacementDrivesPage";
 
 function App() {
 
@@ -43,9 +40,6 @@ function App() {
 
         {/* ── College ── */}
         {collegeRoute}
-        <Route path="/college" element={<CollegeLayout />}>
-          <Route path="drives" element={<PlacementDrivesPage />} />
-        </Route>
 
         {/* ── Company ── */}
         {CompanyRoute}
