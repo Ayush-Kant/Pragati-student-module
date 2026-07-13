@@ -26,15 +26,15 @@ const migrationFiles = [
   "006_create_college_profiles.sql",
   "006_create_dashboard_support.sql",
   "006_create_question_bank.sql",
-  "006_create_reports_analytics_tables.sql",
   "006_create_training_coordination.sql",
+  "007_offers_hiring_tables.sql",
   "006_update_interviews_table.sql",
   "007_create_dashboard_tables.sql",
-  "007_offers_hiring_tables.sql",
+  "006_create_reports_analytics_tables.sql",
   "008_create_coding_challenges.sql",
   "008_create_notifications.sql",
   "010_create_disputes.sql",
-  "Students.sql", // 021
+  "Students.sql",
 ];
 
 async function runMigrationsFresh() {

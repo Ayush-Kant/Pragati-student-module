@@ -233,7 +233,7 @@ const exportStudents       = async ({ college, skills, status, gpaMin, gpaMax })
         `
         SELECT
             s.id,
-            s.full_name,
+            s.name AS full_name,
             s.email,
             s.college,
             s.skills,
