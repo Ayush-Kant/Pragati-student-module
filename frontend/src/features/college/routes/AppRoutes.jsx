@@ -6,6 +6,7 @@ import CollegeProfilePage from "../profile/pages/CollegeProfilePage";
 import OrganizationProfile from "../profile/pages/AddCollegeProfile";
 import StudentDatabasePage from "../students/pages/StudentDatabasePage";
 import CompanyJobPostingsPage from "../company-job-postings/pages/CompanyJobPostingsPage";
+import StudentProfilePage from "../student-profile/pages/StudentProfilePage";
 
 const collegeRoute = (
   <>
@@ -25,6 +26,9 @@ const collegeRoute = (
 
       {/* Student Database */}
       <Route path="student" element={<StudentDatabasePage />} />
+      <Route path="student-profile" element={<StudentProfilePage />} />
+      <Route path="student-profile/:id" element={<StudentProfilePage />} />
+      <Route path="student-performance" element={<StudentProfilePage />} />
       <Route path="companies" element={<CompanyJobPostingsPage />} />
     </Route>
   </>
