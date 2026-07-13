@@ -16,15 +16,19 @@ import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
 
+// Placement Drives
+import CollegeLayout from "./features/college/layouts/CollegeLayout";
+import PlacementDrivesPage from "./features/college/placement-drives/pages/PlacementDrivesPage";
+
 function App() {
+
   return (
     <AuthProvider>
       <Toaster />
       <Routes>
-        
         <Route path="/" element={<Navigate to="/login" replace />} />
         
-        {/* ── Auth Routes ────────────────────────────────────────── */}
+        {/* ── Auth Routes ── */}
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
 
@@ -32,22 +36,20 @@ function App() {
         {mentorRoute}
 
         {/* ── Admin ─────────────────────────────────────────────────── */}
-       
         {AdminRoute}
 
         {/* ── Student ───────────────────────────────────────────────── */}
         {StudentRoutes}
 
-      {/* Collge */}
+        {/* ── College ── */}
+        {collegeRoute}
+        <Route path="/college" element={<CollegeLayout />}>
+          <Route path="drives" element={<PlacementDrivesPage />} />
+        </Route>
 
-      {collegeRoute}
+        {/* ── Company ── */}
+        {CompanyRoute}
 
-
-  {/* Company */}
-
-      {CompanyRoute}
-
-      
         {/* Public certificate verification */}
         <Route path='/verify/:code' element={<VerificationPage />} />
 
