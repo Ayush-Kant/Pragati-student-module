@@ -1,0 +1,1 @@
+export { verifyToken as authenticateJWT } from "../../middleware/auth.js";
