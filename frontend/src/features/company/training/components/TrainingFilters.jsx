@@ -19,9 +19,9 @@ export const TrainingFilters = ({ filters, updateFilter, getUniqueValues }) => {
   };
 
   return (
-    <div className="app-filter-bar flex items-center justify-between gap-4 bg-white border border-slate-200 rounded-t-2xl px-5 py-5 shadow-sm">
+    <div className="app-filter-bar flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white border border-slate-200 rounded-t-2xl px-5 py-5 shadow-sm">
       {/* Search Input */}
-      <div className="relative flex-1 flex items-center">
+      <div className="relative w-full md:flex-1 flex items-center">
         <Search
           className="absolute left-4 text-gray-400"
           size={20}
@@ -53,12 +53,12 @@ export const TrainingFilters = ({ filters, updateFilter, getUniqueValues }) => {
       </div>
 
       {/* Filters on the right */}
-      <div className="app-filter-group flex items-center gap-4">
+      <div className="app-filter-group flex items-center gap-4 w-full md:w-auto">
         {/* Status Filter Dropdown */}
-        <div className="relative">
+        <div className="relative flex-1 md:flex-none">
           <button
             onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-            className="h-12 w-[120px] rounded-xl border border-slate-200 bg-white px-4 flex items-center justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+            className="h-12 w-full md:w-[120px] rounded-xl border border-slate-200 bg-white px-4 flex items-center justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
           >
             <span>{filters.status || 'Status'}</span>
             <ChevronDown className="w-4 h-4 text-gray-400" size={18} />
@@ -89,10 +89,10 @@ export const TrainingFilters = ({ filters, updateFilter, getUniqueValues }) => {
         </div>
 
         {/* Mentor Filter Dropdown */}
-        <div className="relative">
+        <div className="relative flex-1 md:flex-none">
           <button
             onClick={() => setMentorDropdownOpen(!mentorDropdownOpen)}
-            className="h-12 w-[140px] rounded-xl border border-slate-200 bg-white px-4 flex items-center justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+            className="h-12 w-full md:w-[140px] rounded-xl border border-slate-200 bg-white px-4 flex items-center justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
           >
             <span>{filters.mentor || 'Mentor'}</span>
             <ChevronDown className="w-4 h-4 text-gray-400" size={18} />

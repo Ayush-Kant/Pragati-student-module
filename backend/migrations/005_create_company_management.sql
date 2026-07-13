@@ -2,36 +2,50 @@
 -- COMPANIES TABLE
 -- ============================================================
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
+CREATE TABLE IF NOT EXISTS companies (
+    id SERIAL PRIMARY KEY,
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS email VARCHAR(255) UNIQUE NOT NULL;
+    user_id INTEGER REFERENCES users(id),
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS industry VARCHAR(100);
+    name VARCHAR(255) NOT NULL,
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS size VARCHAR(50);
+    email VARCHAR(255) UNIQUE NOT NULL,
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS location VARCHAR(255);
+    industry VARCHAR(100),
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS status VARCHAR(50) NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','approved','rejected','suspended'));
+    size VARCHAR(50),
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+    location VARCHAR(255),
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS suspension_reason TEXT;
+    website VARCHAR(255),
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
+    description TEXT,
 
-ALTER TABLE companies
-    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+    logo_url TEXT,
+
+    default_work_mode VARCHAR(50) DEFAULT 'Hybrid',
+
+    probation_period INTEGER DEFAULT 3,
+
+    notice_period INTEGER DEFAULT 30,
+
+    currency VARCHAR(10) DEFAULT 'INR',
+
+    notifications JSONB DEFAULT '{"emailNotifications": true, "interviewReminders": true, "weeklyAnalyticsReport": false, "offerNotifications": true}',
+
+    status VARCHAR(50) NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending','approved','rejected','suspended')),
+
+    rejection_reason TEXT,
+
+    suspension_reason TEXT,
+
+    verified_at TIMESTAMPTZ,
+
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
 -- ============================================================
 -- COMPANY STATS TABLE
