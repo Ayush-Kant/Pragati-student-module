@@ -1,9 +1,30 @@
 
+
 CREATE TABLE IF NOT EXISTS companies (
-  id         SERIAL PRIMARY KEY,
-  name       VARCHAR(255) NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    industry VARCHAR(100),
+    size VARCHAR(50),
+    location VARCHAR(255),
+    website VARCHAR(255),
+    description TEXT,
+    logo_url TEXT,
+    default_work_mode VARCHAR(50) DEFAULT 'Hybrid',
+    probation_period INTEGER DEFAULT 3,
+    notice_period INTEGER DEFAULT 30,
+    currency VARCHAR(10) DEFAULT 'INR',
+    notifications JSONB DEFAULT '{"emailNotifications": true, "interviewReminders": true, "weeklyAnalyticsReport": false, "offerNotifications": true}',
+    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected','suspended')),
+    verification_status VARCHAR(50) DEFAULT 'pending',
+    rejection_reason TEXT,
+    suspension_reason TEXT,
+    verified_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
 
 CREATE TABLE IF NOT EXISTS colleges (
   id         SERIAL PRIMARY KEY,

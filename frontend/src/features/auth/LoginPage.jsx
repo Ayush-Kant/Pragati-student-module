@@ -5,6 +5,7 @@ import manager from "./images/managers.png";
 import mentor from "./images/mentor.png";
 import { loginApi } from './services/auth.services';
 import { useAuth } from '../../context/AuthContext';
+import { getProfile } from '../college/services/collegeService';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -14,13 +15,7 @@ const AuthPage = () => {
   const [errors, setErrors] = useState({});
   const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, isAuthenticated, userRole } = useAuth();
-
-  useEffect(() => {
-    if (isAuthenticated && userRole) {
-      navigate(`/${userRole}/dashboard`);
-    }
-  }, [isAuthenticated, userRole, navigate]);
+  const { login } = useAuth();
 
   const slidesData = [
     {
@@ -106,9 +101,11 @@ const AuthPage = () => {
       });
 
       if (result.success) {
+        const userRole = result.user?.role;
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
-        login(result.role, result.token);
-        navigate(`/${result.role}/dashboard`);
+        login(userRole, result.token);
+
+        navigate(`/${userRole}/dashboard`);
       } else {
         setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
       }

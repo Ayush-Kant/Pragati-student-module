@@ -1,3 +1,5 @@
+
+
 -- Assumes these tables already exist (created by earlier interns):
 --   users, colleges, recruitment_drives
 -- TABLE: students
@@ -20,11 +22,14 @@ created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
+
+
 -- INDEXES
 CREATE INDEX idx_students_status       ON students(status);
 CREATE INDEX idx_students_college      ON students(college_id);
 CREATE INDEX idx_students_name         ON students(name);
 CREATE INDEX idx_students_skills       ON students USING GIN(skills);
+
 
 INSERT INTO students (
     name,
@@ -40,6 +45,7 @@ VALUES (
     ARRAY['MERN','Node.js'],
     2023
 );
+
 
 INSERT INTO students (
     name,
@@ -67,4 +73,7 @@ VALUES
     'blocked'
 );
 
+
 SELECT * FROM students;
+
+
