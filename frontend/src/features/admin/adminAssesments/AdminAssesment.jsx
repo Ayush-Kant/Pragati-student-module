@@ -1,6 +1,7 @@
-import React from 'react';
+import AssessmentManagement from "../pages/AssessmentManagement";
 
-export default function () {
-  return <div> Component</div>;
-}
+const AdminAssesment = () => {
+  return <AssessmentManagement />;
+};
 
+export default AdminAssesment;

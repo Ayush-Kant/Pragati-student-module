@@ -323,21 +323,39 @@ const [selectedType, setSelectedType] =
                 <FiSearch className="search-icon" />
 
     <input
-      type="text"
-      placeholder="Search assessments..."
-    />
+  type="text"
+  placeholder="Search assessments..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+/>
 
               </div>
 
-  <button className="filter-btn">
-    <FiFilter />
-    Type
-  </button>
+  <select
+  value={typeFilter}
+  onChange={(e) => setTypeFilter(e.target.value)}
+  className="filter-btn"
+>
+  <option value="">All Types</option>
+  {TYPE_FILTERS.map((type) => (
+    <option key={type} value={type}>
+      {type}
+    </option>
+  ))}
+</select>
 
-  <button className="filter-btn">
-    <FiFilter />
-    Difficulty
-  </button>
+  <select
+  value={difficultyFilter}
+  onChange={(e) => setDifficultyFilter(e.target.value)}
+  className="filter-btn"
+>
+  <option value="">All Difficulty</option>
+  {DIFFICULTY_FILTERS.map((difficulty) => (
+    <option key={difficulty} value={difficulty}>
+      {difficulty}
+    </option>
+  ))}
+</select>
 
 </div>
 
@@ -660,7 +678,140 @@ const [selectedType, setSelectedType] =
           </div>
 
         )}
+{/* VIEW MODAL */}
+{dialogMode === "view" && selectedAssessment && (
+  <div className="assessment-modal">
+    <div className="assessment-modal-content">
+      <h2 className="modal-title"> {selectedAssessment.title}</h2>
 
+      <p><strong>Type:</strong> {selectedAssessment.type}</p>
+      <p><strong>Difficulty:</strong> {selectedAssessment.difficulty}</p>
+      <p><strong>Duration:</strong> {selectedAssessment.duration}</p>
+      <p><strong>Candidates:</strong> {selectedAssessment.candidates}</p>
+
+      <button 
+      className="cancel-btn" 
+      onClick={closeAssessmentDialog}>
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
+{/* EDIT MODAL */}
+{dialogMode === "edit" && selectedAssessment && (
+  <div className="assessment-modal">
+    <div className="assessment-modal-content">
+      <h2 className="edit-title"> Edit Assessment </h2>
+
+      <form onSubmit={handleSaveAssessment}>
+        <input
+          type="text"
+          value={editForm.title}
+          onChange={(e) =>
+            setEditForm({
+              ...editForm,
+              title: e.target.value,
+            })
+          }
+        />
+
+        <select
+          value={editForm.type}
+          onChange={(e) =>
+            setEditForm({
+              ...editForm,
+              type: e.target.value,
+            })
+          }
+        >
+          <option>Technical</option>
+          <option>Aptitude</option>
+          <option>Design</option>
+        </select>
+
+        <select
+          value={editForm.difficulty}
+          onChange={(e) =>
+            setEditForm({
+              ...editForm,
+              difficulty: e.target.value,
+            })
+          }
+        >
+          <option>Easy</option>
+          <option>Medium</option>
+          <option>Hard</option>
+        </select>
+
+        <input
+          type="text"
+          value={editForm.duration}
+          onChange={(e) =>
+            setEditForm({
+              ...editForm,
+              duration: e.target.value,
+            })
+          }
+        />
+
+        <button
+        className="save-btn"
+        type="submit"
+        >
+          Save Changes
+        </button>
+
+        <button
+        className="cancel-btn"
+          type="button"
+          onClick={closeAssessmentDialog}
+        >
+          Cancel
+        </button>
+      </form>
+    </div>
+  </div>
+)}
+
+{/* DELETE MODAL */}
+{dialogMode === "delete" && selectedAssessment && (
+  <div className="assessment-modal">
+    <div className="assessment-modal-content delete-modal">
+
+  <h2 className="delete-title">
+    Delete Assessment
+  </h2>
+
+  <h3 className="delete-assessment-name">
+    {selectedAssessment.title}
+  </h3>
+
+  <p className="delete-text">
+    Are you sure you want to delete this assessment?
+  </p>
+
+  <div className="delete-btn-group">
+
+    <button
+      className="delete-confirm-btn"
+      onClick={handleConfirmDelete}
+    >
+      Yes Delete
+    </button>
+
+    <button
+      className="cancel-btn"
+      onClick={closeAssessmentDialog}
+    >
+      Cancel
+    </button>
+
+  </div>
+
+</div>
+  </div>
+)}
       </div>
 
     </div>

@@ -7,6 +7,9 @@ import {
   createCompanyTeamMember,
   updateCompanyTeamMember,
   deleteCompanyTeamMember,
+  getCompanySettings,
+  updateCompanySettings,
+  uploadCompanyLogo,
 } from "../controllers/companyProfile.controller.js";
 
 import authMiddleware from "../../../middleware/authMiddleware.js";
@@ -14,6 +17,10 @@ import authMiddleware from "../../../middleware/authMiddleware.js";
 import roleMiddleware from "../../../middleware/roleMiddleware.js";
 
 const router = express.Router();
+
+router.get("/settings", authMiddleware, getCompanySettings);
+router.put("/settings", authMiddleware, updateCompanySettings);
+router.post("/logo", authMiddleware, uploadCompanyLogo);
 
 router.get("/profile", authMiddleware, getCompanyProfile);
 

@@ -1,6 +1,7 @@
-import React from 'react';
+import TrainingManagement from "../pages/TrainingManagement";
 
-export default function () {
-  return <div> Component</div>;
+const AdminTraining = () => {
+  return <TrainingManagement />;
 }
 
+export default AdminTraining;

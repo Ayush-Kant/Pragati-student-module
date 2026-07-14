@@ -1,6 +1,3 @@
-// SkillTagSelector.jsx
-// Purpose: Multi-select autocomplete tag input that lets students add and remove skill tags
-
 import { useState, useRef } from "react";
 
 const SUGGESTED_SKILLS = [
@@ -120,4 +117,3 @@ const SkillTagSelector = ({ skills = [], onChange }) => {
 };
 
 export default SkillTagSelector;
-

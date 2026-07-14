@@ -1,6 +1,7 @@
-import React from 'react';
+import StudentManagement from "../pages/StudentManagement";
 
-export default function () {
-  return <div> Component</div>;
-}
+const AdminStudent = () => {
+  return <StudentManagement />;
+};
 
+export default AdminStudent;

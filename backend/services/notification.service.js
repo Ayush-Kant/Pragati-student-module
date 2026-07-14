@@ -5,17 +5,19 @@ export const getNotificationsService = async (
   userId
 ) => {
   try {
+    // userId is auth_users.uuid_id from req.user.userId
     const query = `
       SELECT
-        id AS "notificationId",
-        title,
-        message,
-        type,
-        is_read AS "isRead",
-        created_at AS "createdAt"
-      FROM notifications
-      WHERE student_auth_user_id = $1
-      ORDER BY created_at DESC
+        n.id AS "notificationId",
+        n.title,
+        n.message,
+        n.type,
+        n.is_read AS "isRead",
+        n.created_at AS "createdAt"
+      FROM notifications n
+      INNER JOIN auth_users ON auth_users.id = n.student_auth_user_id
+      WHERE auth_users.uuid_id = $1
+      ORDER BY n.created_at DESC
     `;
 
     const result = await pool.query(query, [
@@ -40,11 +42,14 @@ export const getNotificationsService = async (
 export const markNotificationReadService =
   async (notificationId, userId) => {
     try {
+      // userId is auth_users.uuid_id from req.user.userId
       const query = `
       UPDATE notifications
       SET is_read = true
       WHERE id = $1
-      AND student_auth_user_id = $2
+        AND student_auth_user_id = (
+          SELECT id FROM auth_users WHERE uuid_id = $2
+        )
     `;
 
       await pool.query(query, [
@@ -65,10 +70,13 @@ export const markNotificationReadService =
 export const markAllNotificationsReadService =
   async (userId) => {
     try {
+      // userId is auth_users.uuid_id from req.user.userId
       const query = `
       UPDATE notifications
       SET is_read = true
-      WHERE student_auth_user_id = $1
+      WHERE student_auth_user_id = (
+        SELECT id FROM auth_users WHERE uuid_id = $1
+      )
     `;
 
       await pool.query(query, [userId]);

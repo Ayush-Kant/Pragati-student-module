@@ -11,7 +11,7 @@ export const getDashboardOverview = async (userId) => {
     const college = await getCollegeByUser(userId);
     if (!college) return { success: true, data: { totalStudents: 0, activeDrives: 0, departments: 0, placementRate: "0%" } };
 
-    const studentsResult = await pool.query('SELECT count(*) as count FROM students WHERE college = $1', [college.name]);
+    const studentsResult = await pool.query('SELECT count(*) as count FROM students WHERE college_id = $1', [college.id]);
     const totalStudents = parseInt(studentsResult.rows[0].count, 10);
     
     // Departments count is from colleges.departments array
@@ -19,7 +19,7 @@ export const getDashboardOverview = async (userId) => {
     
     // For active drives, if there is a way to link them, we can do it. Assuming drives are global or linked by some table. We'll return a dynamic dummy or 0 if none.
     // Placement Rate: number of students placed / total students
-    const placedResult = await pool.query("SELECT count(*) as count FROM students WHERE college = $1 AND placement_status = 'Placed'", [college.name]);
+    const placedResult = await pool.query("SELECT count(*) as count FROM students WHERE college_id = $1 AND placement_status = 'Placed'", [college.id]);
     const totalPlaced = parseInt(placedResult.rows[0].count, 10);
     const placementRate = totalStudents > 0 ? Math.round((totalPlaced / totalStudents) * 100) + "%" : "0%";
 
@@ -41,12 +41,12 @@ export const getDashboardOverview = async (userId) => {
 export const getDashboardStats = async (userId) => {
   try {
     const college = await getCollegeByUser(userId);
-    const collegeName = college ? college.name : '';
+    if (!college) return { success: true, data: [] };
 
-    const studentsResult = await pool.query('SELECT count(*) as count FROM students WHERE college = $1', [collegeName]);
+    const studentsResult = await pool.query('SELECT count(*) as count FROM students WHERE college_id = $1', [college.id]);
     const totalStudents = parseInt(studentsResult.rows[0].count, 10);
 
-    const placedResult = await pool.query("SELECT count(*) as count FROM students WHERE college = $1 AND placement_status = 'Placed'", [collegeName]);
+    const placedResult = await pool.query("SELECT count(*) as count FROM students WHERE college_id = $1 AND placement_status = 'Placed'", [college.id]);
     const placements = parseInt(placedResult.rows[0].count, 10);
     const placementRate = totalStudents > 0 ? Math.round((placements / totalStudents) * 100) + "%" : "0%";
 
@@ -74,12 +74,12 @@ export const getDashboardStats = async (userId) => {
 export const getDashboardActivities = async (userId) => {
   try {
     const college = await getCollegeByUser(userId);
-    const collegeName = college ? college.name : '';
+    if (!college) return { success: true, data: [] };
     
     // Fetch recently added students
     const recentStudents = await pool.query(
-      'SELECT name, created_at FROM students WHERE college = $1 ORDER BY created_at DESC LIMIT 5',
-      [collegeName]
+      'SELECT name, created_at FROM students WHERE college_id = $1 ORDER BY created_at DESC LIMIT 5',
+      [college.id]
     );
 
     const activities = recentStudents.rows.map(student => ({
