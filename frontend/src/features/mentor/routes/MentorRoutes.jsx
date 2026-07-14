@@ -15,6 +15,8 @@ import EditQuestionPage from "../pages/EditQuestionPage";
 import QuestionPreviewPage from "../pages/QuestionPreviewPage";
 import QuizBuilderPage from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
+import CertificateTemplatePage from '../pages/CertificateTemplatePage';
+
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
@@ -24,6 +26,8 @@ const mentorRoute = (
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="export-report" element={<ExportReport />} />
         <Route path="projects/create" element={<ProjectCreationPage />} />
+        {/* Add this line among the other mentor routes */}
+        <Route path="/mentor/certificates/template" element={<CertificateTemplatePage />} />
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
           <Route path="activities/create" element={<CreateActivity />} />

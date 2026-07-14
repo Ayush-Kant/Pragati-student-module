@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import TemplateConfiguration from '../components/TemplateConfiguration';
 import LiveCertificatePreview from '../components/LiveCertificatePreview';
 import PreviewToolbar from '../components/PreviewToolbar';
+
 // This will be created by Dev A, but we'll use a mock version for now
 import { useCertificateTemplate } from '../hooks/useCertificateTemplate'; 
 
