@@ -1,14 +1,5 @@
 
-const roleMiddleware = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        error: "Access forbidden",
-      });
-    }
-
-
-export const roleMiddleware = (...allowedRoles) => {
+const roleMiddleware = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
@@ -20,8 +11,5 @@ export const roleMiddleware = (...allowedRoles) => {
     next();
   };
 };
-
-
-export default roleMiddleware;
 
 export default roleMiddleware;

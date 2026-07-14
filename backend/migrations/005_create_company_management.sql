@@ -17,6 +17,22 @@ CREATE TABLE IF NOT EXISTS companies (
 
     location VARCHAR(255),
 
+    website VARCHAR(255),
+
+    description TEXT,
+
+    logo_url TEXT,
+
+    default_work_mode VARCHAR(50) DEFAULT 'Hybrid',
+
+    probation_period INTEGER DEFAULT 3,
+
+    notice_period INTEGER DEFAULT 30,
+
+    currency VARCHAR(10) DEFAULT 'INR',
+
+    notifications JSONB DEFAULT '{"emailNotifications": true, "interviewReminders": true, "weeklyAnalyticsReport": false, "offerNotifications": true}',
+
     status VARCHAR(50) NOT NULL DEFAULT 'pending'
     CHECK (status IN ('pending','approved','rejected','suspended')),
 

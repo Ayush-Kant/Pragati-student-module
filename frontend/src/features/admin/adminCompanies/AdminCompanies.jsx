@@ -1,6 +1,5 @@
-import React from 'react';
+import CompanyManagement from "../pages/CompanyManagement";
 
-export default function () {
-  return <div> Component</div>;
+export default function AdminCompanies() {
+  return <CompanyManagement />;
 }
-

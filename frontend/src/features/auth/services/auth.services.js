@@ -16,7 +16,7 @@ export const registerApi = async (userData , role) => {
     const response = await api.post('/auth/register', { ...userData, role });
     return response.data;
   } catch (error) {
-    const errro_message =  error.response ? error.response.data : 'Network error';
+    const errro_message =  error.response?.data?.message || error.response?.data?.error || 'Network error';
     return { success: false, message: errro_message };
   }
 };

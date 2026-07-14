@@ -1,10 +1,10 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- =====================================
--- Companies Table
+-- Companies v2 Table
 -- =====================================
 
-CREATE TABLE IF NOT EXISTS companies (
+CREATE TABLE IF NOT EXISTS companies_v2 (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     name VARCHAR(255) NOT NULL,
     website VARCHAR(255),
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS companies (
 
 CREATE TABLE IF NOT EXISTS company_team_members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    company_id UUID NOT NULL,
+    company_id INTEGER NOT NULL,
     user_id UUID,
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS company_team_members (
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
+    CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies_v2 (id) ON DELETE CASCADE
 );
 
 -- =====================================
