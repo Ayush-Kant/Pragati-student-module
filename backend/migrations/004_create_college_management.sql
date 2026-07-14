@@ -1,7 +1,21 @@
 -- Assumes these tables already exist (created by earlier interns):
 --   users, recruitment_drives, student_drive_progress
 
--- TABLE: colleges
+CREATE TABLE IF NOT EXISTS colleges (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE,
+  location VARCHAR(255),
+  departments TEXT[],
+  student_strength INTEGER DEFAULT 0,
+  status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  rejection_reason TEXT,
+  suspension_reason TEXT,
+  verified_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 ALTER TABLE colleges
   ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id),
   ADD COLUMN IF NOT EXISTS email VARCHAR(255) UNIQUE,

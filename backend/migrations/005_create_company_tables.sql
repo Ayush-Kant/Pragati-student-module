@@ -1,8 +1,21 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- =====================================
--- Companies v2 Table
+-- Companies Table
 -- =====================================
+
+CREATE TABLE IF NOT EXISTS companies (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    website VARCHAR(255),
+    industry VARCHAR(100),
+    size VARCHAR(50),
+    description TEXT,
+    logo_url TEXT,
+    verification_status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE IF NOT EXISTS companies_v2 (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

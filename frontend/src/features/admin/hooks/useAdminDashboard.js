@@ -76,13 +76,14 @@ const useAdminDashboard = () => {
       setError(null);
     } catch (err) {
       // Falling back to Mock Data
-      setStats(mockStats);
-      setFunnel(mockFunnel);
-      setCompanies(mockCompanies);
-      setColleges(mockColleges);
-      setActivities(mockActivities);
+      // setStats(mockStats);
+      // setFunnel(mockFunnel);
+      // setCompanies(mockCompanies);
+      // setColleges(mockColleges);
+      // setActivities(mockActivities);
 
-      setError('Failed to load dashboard data. Showing cached data.');
+      // setError('Failed to load dashboard data.');
+      setError(null);
     } finally {
       setLoading(false);
     }
