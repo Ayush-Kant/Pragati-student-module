@@ -1,10 +1,10 @@
 import "./../styles/navbar.css";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { GlobalSearch } from "./GlobalSearch";
 
-import { FiBell, FiSettings, FiSearch, FiMenu } from "react-icons/fi";
+import { FiBell, FiSettings, FiSearch } from "react-icons/fi";
 import {
   X,
   User,
@@ -486,24 +486,8 @@ const LogoutModal = ({ onClose }) => {
 
 // ─── Main Navbar ──────────────────────────────────────────────────────────────
 
-const Navbar = ({ openSidebar, setOpenSidebar }) => {
+const Navbar = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const getPageTitle = () => {
-    const path = location.pathname;
-    if (path.includes("/dashboard")) return "Dashboard";
-    if (path.includes("/drives")) return "Recruitment Drives";
-    if (path.includes("/candidates")) return "Candidate Management";
-    if (path.includes("/assessments")) return "Assessments";
-    if (path.includes("/interviews")) return "Interviews";
-    if (path.includes("/training")) return "Training Management";
-    if (path.includes("/messages")) return "Messages";
-    if (path.includes("/offers")) return "Offers";
-    if (path.includes("/reports")) return "Reports & Analytics";
-    if (path.includes("/settings")) return "Settings";
-    return "Company Portal";
-  };
 
   // Notifications
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
@@ -572,25 +556,17 @@ const Navbar = ({ openSidebar, setOpenSidebar }) => {
       <header className="navbar">
         {/* Left */}
         <div className="navbar-left">
-          <button
-            onClick={() => setOpenSidebar && setOpenSidebar(!openSidebar)}
-            className="md:hidden text-gray-600 hover:text-gray-900 mr-2 p-1 hover:bg-gray-100 rounded-lg transition"
-            title="Toggle Sidebar"
-          >
-            <FiMenu size={20} />
-          </button>
           <div className="navbar-logo">P</div>
           <h2>Pragati</h2>
         </div>
 
         {/* Center */}
         <div className="navbar-center">
-          <div className="navbar-search-container">
-            <FiSearch size={16} className="navbar-search-icon" />
+          <div className="search-box">
+            <FiSearch size={16} className="search-icon" />
             <input
               type="text"
-              className="navbar-search-input"
-              placeholder="Search candidates, drives, assessments..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={handleSearchChange}
               onKeyDown={handleSearchKeyDown}
@@ -650,7 +626,7 @@ const Navbar = ({ openSidebar, setOpenSidebar }) => {
           {/* Settings icon (existing) */}
           <div
             className="nav-icon"
-            onClick={() => navigate("/company/settings")}
+            onClick={() => navigate("/settings")}
             style={{ cursor: "pointer" }}
           >
             <FiSettings size={18} />

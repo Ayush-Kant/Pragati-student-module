@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from "@sequelize/core";
 import sequelize from "../../config/sequelize.js";
 
 class Company extends Model {}
@@ -26,7 +26,7 @@ Company.init(
     tableName: "companies",
     underscored: true,
     timestamps: false,
-  }
+  },
 );
 
 export default Company;

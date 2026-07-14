@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import PropTypes from "prop-types";
 
 const ProjectCard = ({ project = {}, onEdit, onDelete }) => {
@@ -12,7 +11,9 @@ const ProjectCard = ({ project = {}, onEdit, onDelete }) => {
             {project?.title || "Untitled Project"}
           </h3>
 
-          <p className="text-sm text-gray-600 mt-2">{project?.description || "No description available"}</p>
+          <p className="text-sm text-gray-600 mt-2">
+            {project?.description || "No description available"}
+          </p>
 
           <div className="flex gap-2 mt-3 flex-wrap">
             {tags?.length > 0 ? (
@@ -32,7 +33,7 @@ const ProjectCard = ({ project = {}, onEdit, onDelete }) => {
             Edit
           </button>
 
-          <button onClick={() => onDelete?.(project.id ?? project)} className="px-3 py-1 text-sm bg-red-100 rounded">
+          <button onClick={() => onDelete?.(project?.id ?? project)} className="px-3 py-1 text-sm bg-red-100 rounded">
             Delete
           </button>
         </div>

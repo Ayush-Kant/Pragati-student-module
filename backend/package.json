@@ -11,6 +11,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@sequelize/core": "^7.0.0-alpha.48",
+    "@sequelize/postgres": "^7.0.0-alpha.48",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "curl": "^0.1.4",
@@ -23,7 +25,7 @@
     "node-pg": "^1.0.1",
     "pg": "^8.21.0",
     "resend": "^6.12.3",
-    "sequelize": "^6.37.8",
+    "sequelize": "^3.35.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

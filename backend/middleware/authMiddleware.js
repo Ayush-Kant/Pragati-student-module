@@ -10,7 +10,7 @@ const authMiddleware = (req, res, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
-        message: "Invalid or expired JWT token",
+        message: "No token provided",
       });
     }
 
@@ -19,11 +19,16 @@ const authMiddleware = (req, res, next) => {
 
     req.user = decoded;
     next();
-  } catch (_err) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired JWT token",
-    });
+  } catch (error) {
+    if (error?.name === "TokenExpiredError") {
+      return res.status(401).json({ success: false, message: "Token expired" });
+    }
+
+    if (error?.name === "JsonWebTokenError") {
+      return res.status(401).json({ success: false, message: "Invalid token" });
+    }
+
+    return res.status(401).json({ success: false, message: "Unauthorized" });
   }
 };
 
