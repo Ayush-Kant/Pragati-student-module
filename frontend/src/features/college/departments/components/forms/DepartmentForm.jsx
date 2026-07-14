@@ -16,7 +16,10 @@ const DepartmentForm = ({ onSubmit, onCancel }) => {
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+  e.target.type === "number"
+    ? Number(e.target.value)
+    : e.target.value
     }));
 
     // Clear error while typing

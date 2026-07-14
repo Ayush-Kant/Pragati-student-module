@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { validateDepartment } from "../../validations/departmentValidation";
 
 const EditDepartmentForm = ({
@@ -7,15 +7,23 @@ const EditDepartmentForm = ({
   onCancel,
 }) => {
   const [formData, setFormData] = useState({
-    ...department,
+    ...department ?? {},
   });
 
   const [errors, setErrors] = useState({});
+  useEffect(() => {
+  setFormData({
+    ...department,
+  });
+}, [department]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+  e.target.type === "number"
+    ? Number(e.target.value)
+    : e.target.value,
     }));
 
     setErrors((prev) => ({
