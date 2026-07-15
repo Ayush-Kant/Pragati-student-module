@@ -1,4 +1,3 @@
-import React from "react";
 import { X, Calendar, User, HardDrive, Download, FileText, CheckCircle2 } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 import { formatDate } from "../../utils/reportsHelpers";

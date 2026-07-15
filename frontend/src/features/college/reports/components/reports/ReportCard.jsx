@@ -1,4 +1,3 @@
-import React from "react";
 import { Eye, Trash2, Calendar, HardDrive, DownloadCloud } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 import DownloadReport from "../export/DownloadReport";
@@ -52,40 +51,42 @@ export const ReportCard = ({
 
       <div>
         {/* Statistics Row */}
-        <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400 mb-4 bg-slate-50 rounded-xl p-2.5">
-          <div className="flex items-center space-x-1">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{formatDate(report.generatedOn)}</span>
+        <div className="flex items-center text-[11px] font-semibold text-slate-400 mb-4 bg-slate-50 rounded-xl px-3 py-2 gap-3">
+          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
+            <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="truncate">{formatDate(report.generatedOn)}</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <HardDrive className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 flex-shrink-0 ml-auto">
+            <HardDrive className="w-3.5 h-3.5 flex-shrink-0" />
             <span>{report.size || "1.2 MB"}</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <DownloadCloud className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <DownloadCloud className="w-3.5 h-3.5 flex-shrink-0" />
             <span>{report.downloadCount || 0} dl</span>
           </div>
         </div>
 
         {/* Actions Footer */}
-        <div className="flex items-center justify-between space-x-2 border-t border-slate-50 pt-3">
+        <div className="flex items-center justify-between gap-2 border-t border-slate-50 pt-3">
           <button
             onClick={() => onPreview(report)}
-            className="flex-1 flex items-center justify-center space-x-1.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-800 text-xs font-semibold rounded-xl transition duration-150 cursor-pointer"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-800 text-xs font-semibold rounded-xl transition duration-150 cursor-pointer min-w-0"
           >
-            <Eye className="w-3.5 h-3.5" />
+            <Eye className="w-3.5 h-3.5 shrink-0" />
             <span>Preview</span>
           </button>
           
-          <DownloadReport
-            onClick={() => onDownload(report)}
-            isDownloading={downloadingId === report.reportName}
-            label="Get"
-          />
+          <div className="shrink-0">
+            <DownloadReport
+              onClick={() => onDownload(report)}
+              isDownloading={downloadingId === report.reportName}
+              label="Get"
+            />
+          </div>
 
           <button
             onClick={() => onDelete(report.id)}
-            className="p-2 bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-xl transition duration-150 cursor-pointer"
+            className="shrink-0 p-2 bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-xl transition duration-150 cursor-pointer"
             title="Delete Report"
           >
             <Trash2 className="w-4 h-4" />

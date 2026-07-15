@@ -1,4 +1,3 @@
-import React from "react";
 import { COMPANIES } from "../../constants/reportsConstants";
 
 export const CompanyFilter = ({ value, onChange }) => {

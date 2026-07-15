@@ -1,4 +1,3 @@
-import React from "react";
 import { REPORT_TYPES } from "../../constants/reportsConstants";
 
 export const ReportTypeFilter = ({ activeType, onChange }) => {
@@ -14,9 +13,9 @@ export const ReportTypeFilter = ({ activeType, onChange }) => {
             <button
               key={type}
               onClick={() => onChange(type)}
-              className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-150 active:scale-97 cursor-pointer ${
+              className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-150 active:scale-97 cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? "bg-primary border-primary text-white shadow-md shadow-orange-500/10"
+                  ? "bg-primary border-2px text-black shadow-md shadow-orange-500"
                   : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300"
               }`}
             >

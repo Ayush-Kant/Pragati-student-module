@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { TrendingUp, BarChart2, CheckCircle2 } from "lucide-react";
 
 export const ReportStatistics = ({ reports }) => {
@@ -60,6 +60,15 @@ export const ReportStatistics = ({ reports }) => {
     ];
     return colors[index % colors.length];
   };
+
+  const barColors = [
+    "bg-orange-500",
+    "bg-blue-500",
+    "bg-purple-500",
+    "bg-emerald-500",
+    "bg-amber-500",
+    "bg-pink-500"
+  ];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -137,7 +146,7 @@ export const ReportStatistics = ({ reports }) => {
                   {/* SVG Bar Pillar */}
                   <div 
                     style={{ height: `${Math.max(12, pct * 1.1)}px` }}
-                    className="w-12 bg-primary/20 group-hover:bg-primary border border-primary/10 rounded-t-xl transition-all duration-200"
+                    className={`w-12 ${barColors[idx % barColors.length]} rounded-t-xl transition-all duration-200 shadow-md`}
                   ></div>
 
                   {/* Label */}

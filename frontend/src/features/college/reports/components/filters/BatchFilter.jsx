@@ -1,4 +1,3 @@
-import React from "react";
 import { BATCHES } from "../../constants/reportsConstants";
 
 export const BatchFilter = ({ value, onChange }) => {

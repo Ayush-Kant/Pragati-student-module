@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+
+/* reports section college-team */
+@theme {
+  --color-primary: #ff6d34;
+  --color-primary-light: #fff0ea;
+  --color-primary-hover: #e0531b;
+}
+
 /* *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

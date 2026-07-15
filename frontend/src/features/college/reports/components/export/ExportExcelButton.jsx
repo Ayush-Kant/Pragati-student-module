@@ -1,4 +1,3 @@
-import React from "react";
 import { FileSpreadsheet, Loader2 } from "lucide-react";
 
 export const ExportExcelButton = ({ onClick, isExporting }) => {

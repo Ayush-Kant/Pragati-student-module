@@ -1,4 +1,3 @@
-import React from "react";
 import { DEPARTMENTS } from "../../constants/reportsConstants";
 
 export const DepartmentFilter = ({ value, onChange }) => {

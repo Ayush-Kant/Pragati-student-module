@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, SlidersHorizontal, RefreshCw, Grid, List, Sparkles, X, Check } from "lucide-react";
+import { SlidersHorizontal, RefreshCw, Grid, List, Sparkles, X, Check } from "lucide-react";
 
 // Hooks
 import useReports from "../hooks/useReports";
@@ -38,13 +38,13 @@ export const ReportsPage = () => {
   const [layoutMode, setLayoutMode] = useState("table");
   // Toggle for filters drawer on mobile/tablet
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  
+
   // Modals state
   const [isGenModalOpen, setIsGenModalOpen] = useState(false);
   const [previewingReport, setPreviewingReport] = useState(null);
   const [inspectingReport, setInspectingReport] = useState(null);
   const [deletingReportId, setDeletingReportId] = useState(null);
-  
+
   // Notification Toast state
   const [notification, setNotification] = useState(null);
 
@@ -115,7 +115,7 @@ export const ReportsPage = () => {
   const handleGenerateReportSubmit = async (e) => {
     e.preventDefault();
     const validation = validateReport(formData);
-    
+
     if (!validation.isValid) {
       setFormErrors(validation.errors);
       triggerToast("Please check form errors.", "error");
@@ -150,56 +150,106 @@ export const ReportsPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      
-      {/* 1. Header (No-Print) */}
-      <header className="bg-brand-dark text-white shadow-md border-b border-slate-800 no-print">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            {/* Logo */}
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center font-black text-white text-base shadow-lg shadow-orange-500/20">
-              U
-            </div>
-            <div>
-              <div className="flex items-center space-x-1.5">
-                <span className="font-extrabold text-lg tracking-tight">UpToSkills</span>
-                <span className="bg-primary/20 text-primary text-[9px] font-bold px-1.5 py-0.5 rounded border border-primary/20 uppercase tracking-widest">
-                  AI-Hub
-                </span>
-              </div>
-              <p className="text-[10px] text-slate-400 font-semibold tracking-wide">
-                PLACEMENT & TRAINING REPORTS GENERATOR
-              </p>
-            </div>
-          </div>
+      <style>{`
+        :root {
+          --color-primary: #ff6d34;
+          --color-primary-light: #fff0ea;
+          --color-primary-hover: #e0531b;
+        }
+
+        /* Utility classes to mirror tailwind utilities of custom colors */
+        .bg-primary {
+          background-color: var(--color-primary) !important;
+        }
+
+        .text-primary {
+          color: var(--color-primary) !important;
+        }
+
+        .border-primary {
+          border-color: var(--color-primary) !important;
+        }
+
+        .border-t-primary {
+          border-top-color: var(--color-primary) !important;
+        }
+
+        .bg-primary-light {
+          background-color: var(--color-primary-light) !important;
+        }
+
+        .text-primary-light {
+          color: var(--color-primary-light) !important;
+        }
+
+        .border-primary-light {
+          border-color: var(--color-primary-light) !important;
+        }
+
+        /* Hover variants */
+        .hover\\:bg-primary-hover:hover {
+          background-color: var(--color-primary-hover) !important;
+        }
+
+        .hover\\:bg-primary-light:hover {
+          background-color: var(--color-primary-light) !important;
+        }
+
+        .hover\\:text-primary:hover {
+          color: var(--color-primary) !important;
+        }
+
+        .hover\\:text-primary-hover:hover {
+          color: var(--color-primary-hover) !important;
+        }
+
+        /* Focus variants */
+        .focus\\:border-primary:focus {
+          border-color: var(--color-primary) !important;
+        }
+
+        /* Print-specific configurations */
+        @media print {
+          .no-print {
+            display: none !important;
+          }
           
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => {
-                setFormData(initialFormState);
-                setIsGenModalOpen(true);
-              }}
-              className="flex items-center space-x-1.5 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl transition duration-150 shadow-md shadow-orange-500/10 active:scale-97 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Generate Report</span>
-            </button>
-            <div className="flex items-center space-x-2">
-              <span className="w-8 h-8 rounded-full bg-slate-800 text-slate-300 font-bold border border-slate-700 flex items-center justify-center text-xs">
-                AD
-              </span>
-            </div>
-          </div>
+          .print-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            color: black !important;
+            box-shadow: none !important;
+            z-index: 9999 !important;
+          }
+          
+          /* Ensure colors and backgrounds are printed correctly by the browser */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+        }
+      `}</style>
+
+      {/* New Header */}
+      <div className="bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold text-slate-800">Reports</h1>
         </div>
-      </header>
+      </div>
 
       {/* 2. Toast Notifications */}
       {notification && (
         <div className="fixed top-6 right-6 z-50 animate-slide-in">
-          <div className={`flex items-center space-x-2.5 px-4.5 py-3 rounded-2xl shadow-xl border text-sm font-semibold ${
-            notification.type === "success" 
-              ? "bg-emerald-50 border-emerald-100 text-emerald-800" 
-              : "bg-red-50 border-red-100 text-red-800"
-          }`}>
+          <div className={`flex items-center space-x-2.5 px-4.5 py-3 rounded-2xl shadow-xl border text-sm font-semibold ${notification.type === "success"
+            ? "bg-emerald-50 border-emerald-100 text-emerald-800"
+            : "bg-red-50 border-red-100 text-red-800"
+            }`}>
             <span className={`p-1 rounded-full text-white ${notification.type === "success" ? "bg-emerald-500" : "bg-red-500"}`}>
               {notification.type === "success" ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
             </span>
@@ -214,21 +264,19 @@ export const ReportsPage = () => {
           <div className="flex space-x-6 h-full">
             <button
               onClick={() => setActiveTab("dashboard")}
-              className={`h-full px-1 border-b-2 flex items-center text-sm font-bold transition duration-150 cursor-pointer ${
-                activeTab === "dashboard"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-slate-500 hover:text-slate-700"
-              }`}
+              className={`h-full px-1 border-b-2 flex items-center text-sm font-bold transition duration-150 cursor-pointer ${activeTab === "dashboard"
+                ? "border-primary text-primary"
+                : "border-transparent text-slate-500 hover:text-slate-700"
+                }`}
             >
               Dashboard Overview
             </button>
             <button
               onClick={() => setActiveTab("database")}
-              className={`h-full px-1 border-b-2 flex items-center text-sm font-bold transition duration-150 cursor-pointer ${
-                activeTab === "database"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-slate-500 hover:text-slate-700"
-              }`}
+              className={`h-full px-1 border-b-2 flex items-center text-sm font-bold transition duration-150 cursor-pointer ${activeTab === "database"
+                ? "border-primary text-primary"
+                : "border-transparent text-slate-500 hover:text-slate-700"
+                }`}
             >
               Reports Database ({reports.length})
             </button>
@@ -249,9 +297,9 @@ export const ReportsPage = () => {
 
       {/* 4. Main Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
+
         {reportsError && <ErrorState message={reportsError} onRetry={fetchReports} />}
-        
+
         {isLoading ? (
           <div className="py-20"><LoadingSpinner message="Accessing secure database servers..." /></div>
         ) : (
@@ -271,7 +319,7 @@ export const ReportsPage = () => {
             {/* TAB 2: REPORTS DATABASE VIEW */}
             {activeTab === "database" && (
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-                
+
                 {/* A. Left Sidebar Filter Panel (Desktop View) (No-Print) */}
                 <aside className="hidden lg:flex flex-col space-y-5 bg-white border border-slate-100 p-5 rounded-2xl shadow-sm no-print">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -279,29 +327,29 @@ export const ReportsPage = () => {
                       <SlidersHorizontal className="w-4 h-4 text-primary" />
                       <span>Search & Filters</span>
                     </h4>
-                    <button 
+                    <button
                       onClick={resetFilters}
                       className="text-[11px] font-bold text-slate-400 hover:text-primary transition cursor-pointer"
                     >
                       Clear All
                     </button>
                   </div>
-                  
-                  <SearchReport 
-                    value={filters.search} 
-                    onChange={(val) => setFilter("search", val)} 
+
+                  <SearchReport
+                    value={filters.search}
+                    onChange={(val) => setFilter("search", val)}
                   />
-                  <DepartmentFilter 
-                    value={filters.department} 
-                    onChange={(val) => setFilter("department", val)} 
+                  <DepartmentFilter
+                    value={filters.department}
+                    onChange={(val) => setFilter("department", val)}
                   />
-                  <CompanyFilter 
-                    value={filters.company} 
-                    onChange={(val) => setFilter("company", val)} 
+                  <CompanyFilter
+                    value={filters.company}
+                    onChange={(val) => setFilter("company", val)}
                   />
-                  <BatchFilter 
-                    value={filters.batch} 
-                    onChange={(val) => setFilter("batch", val)} 
+                  <BatchFilter
+                    value={filters.batch}
+                    onChange={(val) => setFilter("batch", val)}
                   />
                   <DateRangeFilter
                     startDate={filters.startDate}
@@ -321,7 +369,7 @@ export const ReportsPage = () => {
                     <SlidersHorizontal className="w-3.5 h-3.5" />
                     <span>{showMobileFilters ? "Hide Filters" : "Show Filters"}</span>
                   </button>
-                  <button 
+                  <button
                     onClick={resetFilters}
                     className="text-xs font-bold text-slate-400 hover:text-primary transition cursor-pointer"
                   >
@@ -354,23 +402,21 @@ export const ReportsPage = () => {
                       activeType={filters.type}
                       onChange={(val) => setFilter("type", val)}
                     />
-                    
+
                     {/* Layout Toggler buttons */}
                     <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200/50 p-1.5 rounded-xl self-end sm:self-auto">
                       <button
                         onClick={() => setLayoutMode("table")}
-                        className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${
-                          layoutMode === "table" ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
-                        }`}
+                        className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${layoutMode === "table" ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
+                          }`}
                         title="Tabular List"
                       >
                         <List className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setLayoutMode("grid")}
-                        className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${
-                          layoutMode === "grid" ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
-                        }`}
+                        className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${layoutMode === "grid" ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
+                          }`}
                         title="Grid Layout"
                       >
                         <Grid className="w-4 h-4" />
@@ -417,7 +463,7 @@ export const ReportsPage = () => {
       {isGenModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto no-print">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg border border-slate-100 overflow-hidden animate-scale-up">
-            
+
             {/* Header */}
             <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center space-x-2">
@@ -429,7 +475,7 @@ export const ReportsPage = () => {
                   <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Parameters and scope definition</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsGenModalOpen(false)}
                 className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition cursor-pointer"
               >
@@ -439,7 +485,7 @@ export const ReportsPage = () => {
 
             {/* Form */}
             <form onSubmit={handleGenerateReportSubmit} className="p-6 space-y-4">
-              
+
               {/* Report Name */}
               <div className="flex flex-col space-y-1">
                 <label className="text-xs font-bold text-slate-500 uppercase">Report Name *</label>
@@ -448,11 +494,10 @@ export const ReportsPage = () => {
                   value={formData.reportName}
                   onChange={(e) => handleInputChange("reportName", e.target.value)}
                   placeholder="e.g. Placement Report 2026 Batch CSE"
-                  className={`w-full px-3 py-2.5 bg-slate-50 focus:bg-white text-slate-800 text-sm font-medium rounded-xl border focus:ring-4 transition outline-none ${
-                    formErrors.reportName 
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-500/10" 
-                      : "border-slate-200 focus:border-primary focus:ring-orange-500/10"
-                  }`}
+                  className={`w-full px-3 py-2.5 bg-slate-50 focus:bg-white text-slate-800 text-sm font-medium rounded-xl border focus:ring-4 transition outline-none ${formErrors.reportName
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-slate-200 focus:border-primary focus:ring-orange-500/10"
+                    }`}
                 />
                 {formErrors.reportName && (
                   <span className="text-[10px] font-semibold text-red-500">{formErrors.reportName}</span>
@@ -528,9 +573,8 @@ export const ReportsPage = () => {
                     type="date"
                     value={formData.startDate}
                     onChange={(e) => handleInputChange("startDate", e.target.value)}
-                    className={`w-full px-3 py-2 bg-slate-50 focus:bg-white text-slate-800 text-sm font-semibold rounded-xl border outline-none ${
-                      formErrors.startDate ? "border-red-300" : "border-slate-200"
-                    }`}
+                    className={`w-full px-3 py-2 bg-slate-50 focus:bg-white text-slate-800 text-sm font-semibold rounded-xl border outline-none ${formErrors.startDate ? "border-red-300" : "border-slate-200"
+                      }`}
                   />
                   {formErrors.startDate && (
                     <span className="text-[10px] font-semibold text-red-500">{formErrors.startDate}</span>
@@ -543,9 +587,8 @@ export const ReportsPage = () => {
                     type="date"
                     value={formData.endDate}
                     onChange={(e) => handleInputChange("endDate", e.target.value)}
-                    className={`w-full px-3 py-2 bg-slate-50 focus:bg-white text-slate-800 text-sm font-semibold rounded-xl border outline-none ${
-                      formErrors.endDate ? "border-red-300" : "border-slate-200"
-                    }`}
+                    className={`w-full px-3 py-2 bg-slate-50 focus:bg-white text-slate-800 text-sm font-semibold rounded-xl border outline-none ${formErrors.endDate ? "border-red-300" : "border-slate-200"
+                      }`}
                   />
                   {formErrors.endDate && (
                     <span className="text-[10px] font-semibold text-red-500">{formErrors.endDate}</span>
@@ -630,15 +673,6 @@ export const ReportsPage = () => {
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeletingReportId(null)}
       />
-
-      {/* 6. Footer (No-Print) */}
-      <footer className="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-500 font-semibold no-print">
-        <div className="max-w-7xl mx-auto px-4">
-          <p>© {new Date().getFullYear()} UpToSkills. College Placements and Career Services Analytics Portal.</p>
-          <p className="text-[10px] text-slate-600 mt-1 uppercase tracking-widest">Authorized operations console. Unauthorized duplication is flagged.</p>
-        </div>
-      </footer>
-
     </div>
   );
 };

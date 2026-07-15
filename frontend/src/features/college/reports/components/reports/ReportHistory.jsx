@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, Download, Trash, RefreshCw, Sparkles } from "lucide-react";
+import { Download, RefreshCw, Sparkles } from "lucide-react";
 import { formatDate } from "../../utils/reportsHelpers";
 
 export const ReportHistory = ({ reports }) => {
@@ -12,7 +12,7 @@ export const ReportHistory = ({ reports }) => {
     // Sort reports by generated date desc
     const sorted = [...reports].sort((a, b) => new Date(b.generatedOn) - new Date(a.generatedOn));
     
-    sorted.forEach((report, index) => {
+    sorted.forEach((report) => {
       // Log for generation
       logs.push({
         id: `gen-${report.id}`,

@@ -1,4 +1,3 @@
-import React from "react";
 import { Download, Loader2 } from "lucide-react";
 
 export const DownloadReport = ({ onClick, isDownloading, label = "Download", isIcon = false }) => {
@@ -23,7 +22,7 @@ export const DownloadReport = ({ onClick, isDownloading, label = "Download", isI
     <button
       onClick={onClick}
       disabled={isDownloading}
-      className="flex items-center space-x-2 px-3.5 py-2 bg-primary hover:bg-primary-hover text-white disabled:opacity-50 text-xs font-semibold rounded-xl transition duration-150 shadow-md shadow-orange-500/10 active:scale-97 cursor-pointer"
+      className="flex items-center space-x-2 px-3.5 py-2 border border-border bg-background hover:bg-muted text-foreground disabled:opacity-50 text-xs font-semibold rounded-xl transition duration-150 active:scale-97 cursor-pointer"
     >
       {isDownloading ? (
         <Loader2 className="w-3.5 h-3.5 animate-spin" />

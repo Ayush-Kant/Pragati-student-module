@@ -1,4 +1,3 @@
-import React from "react";
 import { Database, Loader2 } from "lucide-react";
 
 export const ExportCSVButton = ({ onClick, isExporting }) => {

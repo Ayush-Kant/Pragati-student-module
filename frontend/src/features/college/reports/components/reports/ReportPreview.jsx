@@ -1,11 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { X, Printer, FileText, FileSpreadsheet, Database, ShieldAlert, Award, TrendingUp, Users, DollarSign } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Printer, ShieldAlert, Award, TrendingUp, Users, DollarSign } from "lucide-react";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ErrorState from "../common/ErrorState";
 import { previewReport } from "../../services/reportsService";
 import ExportPDFButton from "../export/ExportPDFButton";
 import ExportExcelButton from "../export/ExportExcelButton";
 import ExportCSVButton from "../export/ExportCSVButton";
+
+const barColors = [
+  "bg-blue-400",
+  "bg-emerald-400",
+  "bg-amber-400",
+  "bg-rose-400",
+  "bg-purple-400",
+  "bg-cyan-400"
+];
 
 export const ReportPreview = ({ 
   reportId, 
@@ -147,8 +156,7 @@ export const ReportPreview = ({
                           {/* Column Bar */}
                           <div 
                             style={{ height: `${pct * 1.2}px` }} 
-                            className="w-8 sm:w-12 bg-primary/80 group-hover:bg-primary rounded-t transition-all duration-200"
-                          ></div>
+                            className={`w-12 ${barColors[idx % barColors.length]} rounded-t-xl transition-all duration-200 shadow-md`}></div>
                           
                           {/* Label */}
                           <span className="text-[10px] font-bold text-slate-500 mt-2 text-center truncate w-full max-w-[60px] sm:max-w-none">

@@ -1,4 +1,3 @@
-import React from "react";
 import { FileText, Calendar, CloudDownload, Award } from "lucide-react";
 
 export const ReportSummaryCards = ({ statistics }) => {

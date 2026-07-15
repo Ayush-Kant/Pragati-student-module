@@ -1,4 +1,3 @@
-import React from "react";
 import { CheckCircle2, Clock, AlertTriangle, FileCheck } from "lucide-react";
 
 export const StatusBadge = ({ status }) => {
