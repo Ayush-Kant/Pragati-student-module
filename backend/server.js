@@ -23,7 +23,13 @@ import departmentStatisticsRoutes from "./routes/college.departmentstatistics.ro
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import liveSessionRoutes from "./src/routes/liveSessionRoutes.js";
+import assignmentRoutes from "./src/routes/assignmentRoutes.js";
+import submissionRoutes from "./src/routes/submissionRoutes.js";
+import feedbackRoutes from "./src/routes/feedbackRoutes.js";
+import gradeRoutes from "./src/routes/gradeRoutes.js";
+import deadlineRoutes from "./src/routes/deadlineRoutes.js";
 import initializeLiveSessionModule from "./src/database/migrations/liveSessionSchema.js";
+import initializeAssignmentModule from "./src/database/migrations/assignmentSchema.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 
 dotenv.config();
@@ -75,6 +81,11 @@ app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
+app.use("/api/student/assignments", assignmentRoutes);
+app.use("/api/student/assignments", submissionRoutes);
+app.use("/api/student/assignments", feedbackRoutes);
+app.use("/api/student/assignments", gradeRoutes);
+app.use("/api/student/assignments", deadlineRoutes);
 
 app.get("/", (req, res) => {
   res.json({
@@ -92,6 +103,13 @@ connectDB()
       console.log("✅ Live session module initialized");
     } catch (error) {
       console.error("⚠️ Live session module initialization failed:", error.message);
+    }
+
+    try {
+      await initializeAssignmentModule();
+      console.log("✅ Assignment module initialized");
+    } catch (error) {
+      console.error("⚠️ Assignment module initialization failed:", error.message);
     }
 
     app.listen(PORT, () => {
