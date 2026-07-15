@@ -33,6 +33,9 @@ console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(express.json());
+app.use(errorMiddleware);
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -49,6 +52,7 @@ app.use(
     credentials: true,
   }),
 );
+
 app.use(express.json());
 
 // Routes
@@ -64,8 +68,8 @@ app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/company", companyProfileRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/student/notifications", notificationRoutes);
-app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
+app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 
 app.get("/", (req, res) => {
   res.json({

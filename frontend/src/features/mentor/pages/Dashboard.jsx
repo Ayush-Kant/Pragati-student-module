@@ -67,7 +67,7 @@ const MentorDashboard = () => {
         style={{
           background: "#FEF2F2",
           color: "#DC2626",
-          padding: "16px",
+          padding: "12px",
           margin: "24px",
           borderRadius: "12px",
           border: "1px solid #FCA5A5",
@@ -80,9 +80,8 @@ const MentorDashboard = () => {
   return (
     <div
       style={{
-        display: "flex",
-        height: "100vh",
-        overflow: "hidden",
+        minHeight: "100%",
+        width:"100%",
         background: "#f8f9fc",
         fontFamily: "'Segoe UI', sans-serif",
         position: "relative",
@@ -101,254 +100,22 @@ const MentorDashboard = () => {
         />
       )}
 
-      {/* Sidebar */}
-      <div
-        style={{
-          width: "200px",
-          minWidth: "200px",
-          background: "#fff",
-          boxShadow: "2px 0 8px rgba(0,0,0,0.06)",
-          display: "flex",
-          flexDirection: "column",
-          padding: "16px 12px",
-          gap: "2px",
-          overflowY: "auto",
-          zIndex: 50,
-          position: windowWidth < 768 ? "fixed" : "relative",
-          left: windowWidth < 768 ? (sidebarOpen ? "0" : "-200px") : "0",
-          top: 0,
-          height: "100vh",
-          transition: "left 0.3s ease",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "16px",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "18px",
-              fontWeight: "800",
-              color: "#FF6B35",
-              paddingLeft: "8px",
-            }}
-          >
-            UptoSkills
-          </div>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            style={{
-              display: windowWidth < 768 ? "block" : "none",
-              background: "none",
-              border: "none",
-              fontSize: "18px",
-              cursor: "pointer",
-            }}
-          >
-            ✕
-          </button>
-        </div>
-
-        {[
-          { label: "Dashboard", icon: "🏠" },
-          { label: "My Mentees", icon: "👥" },
-          { label: "Sessions", icon: "📅" },
-          { label: "Assessments", icon: "📋" },
-          { label: "Tasks & Assignments", icon: "✅" },
-          { label: "Reports & Analytics", icon: "📊" },
-          { label: "Resources", icon: "📚" },
-          { label: "Calendar", icon: "🗓️" },
-          { label: "Messages", icon: "💬" },
-          { label: "Notifications", icon: "🔔" },
-          { label: "Settings", icon: "⚙️" },
-        ].map((item, i) => (
-          <div
-            key={i}
-            style={{
-              padding: "8px 10px",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "12px",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              background:
-                item.label === "Dashboard" ? "#EEF2FF" : "transparent",
-              color: item.label === "Dashboard" ? "#4F46E5" : "#6B7280",
-              fontWeight: item.label === "Dashboard" ? "600" : "400",
-            }}
-          >
-            <span>{item.icon}</span>
-            {item.label}
-          </div>
-        ))}
-
-        <div
-          style={{
-            marginTop: "auto",
-            background: "#EEF2FF",
-            borderRadius: "10px",
-            padding: "10px",
-            textAlign: "center",
-          }}
-        >
-          <div style={{ fontSize: "24px" }}>🦉</div>
-          <p
-            style={{
-              fontSize: "10px",
-              color: "#4F46E5",
-              fontWeight: "600",
-              margin: "4px 0 2px",
-            }}
-          >
-            Need Help?
-          </p>
-          <p style={{ fontSize: "9px", color: "#6B7280" }}>
-            Our Support Team is here to help you!
-          </p>
-          <button
-            style={{
-              marginTop: "6px",
-              background: "#4F46E5",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              padding: "4px 10px",
-              fontSize: "10px",
-              cursor: "pointer",
-            }}
-          >
-            Get Support →
-          </button>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          minWidth: 0,
-        }}
+        style={{ width: "100%"}}
       >
-        {/* Top Nav */}
-        <div
-          style={{
-            background: "#fff",
-            padding: "10px 16px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-            flexShrink: 0,
-            gap: "10px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <button
-              onClick={() => setSidebarOpen(true)}
-              style={{
-                display: windowWidth < 768 ? "block" : "none",
-                background: "none",
-                border: "none",
-                fontSize: "20px",
-                cursor: "pointer",
-              }}
-            >
-              ☰
-            </button>
-            <input
-              type="text"
-              placeholder="Search..."
-              style={{
-                border: "1px solid #E5E7EB",
-                borderRadius: "20px",
-                padding: "6px 16px",
-                fontSize: "12px",
-                width: windowWidth < 640 ? "130px" : "260px",
-                outline: "none",
-              }}
-            />
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div style={{ position: "relative" }}>
-              <div
-                style={{
-                  width: "30px",
-                  height: "30px",
-                  background: "#FEE2E2",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "13px",
-                }}
-              >
-                🔔
-              </div>
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  width: "7px",
-                  height: "7px",
-                  background: "#EF4444",
-                  borderRadius: "50%",
-                }}
-              ></div>
-            </div>
-            <div
-              style={{
-                width: "30px",
-                height: "30px",
-                background: "#4F46E5",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#fff",
-                fontSize: "12px",
-                fontWeight: "700",
-              }}
-            >
-              A
-            </div>
-            <button
-              style={{
-                background: "#FF6B35",
-                color: "#fff",
-                border: "none",
-                borderRadius: "16px",
-                padding: "5px 10px",
-                fontSize: "10px",
-                fontWeight: "600",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              For Enterprise
-            </button>
-          </div>
-        </div>
+
 
         {/* Dashboard Body */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "6px 8px" }}>
           {/* Welcome Banner */}
           <div
             style={{
               background:
                 "linear-gradient(135deg, #EEF2FF 0%, #FAF5FF 50%, #FFF7ED 100%)",
               borderRadius: "16px",
-              padding: "14px 18px",
-              marginBottom: "12px",
+              padding: "8px 10px",
+              marginBottom: "6px",
               position: "relative",
               overflow: "hidden",
             }}
@@ -403,8 +170,8 @@ const MentorDashboard = () => {
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "12px",
-              marginBottom: "12px",
+              gap: "6px",
+              marginBottom: "6px",
             }}
           >
             {/* Pie Chart */}

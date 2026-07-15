@@ -1,89 +1,127 @@
-import React from 'react';
+import React from "react";
 
-const TemplateConfiguration = ({ templateData }) => {
+import LogoUploadDropzone from "./LogoUploadDropzone";
+import BrandColorPicker from "./BrandColorPicker";
+import MentorSignatureManager from "./MentorSignatureManager";
+import SkillTagInput from "./SkillTagInput";
+
+const TemplateConfiguration = ({
+  templateData,
+  certificate,
+}) => {
+  const {
+    register,
+    watch,
+    setValue,
+    errors,
+    handleSubmit,
+    onSubmit,
+    isSaving,
+  } = certificate;
+
   return (
-    <div className="space-y-8 pb-20 relative min-h-full">
-      
-      {/* Dev A's Target: Logo Upload Component */}
+    <div className="space-y-8 pb-24 relative min-h-full">
+
+      {/* Logo Upload */}
       <section>
-        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
           Organization Logo
         </label>
-        <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer flex flex-col items-center gap-2">
-           {/* Dev A will put the Dropzone here */}
-           <div className="text-gray-500 text-sm font-medium">Click to upload or drag & drop</div>
-           <div className="text-gray-400 text-xs">SVG, PNG, JPG (max. 2MB)</div>
-        </div>
+
+        <LogoUploadDropzone
+          watch={watch}
+          setValue={setValue}
+          errors={errors}
+        />
       </section>
 
-      {/* Dev A's Target: Brand Color Pickers */}
+      {/* Brand Colors */}
       <section>
-        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
           Brand Colors
         </label>
-        <div className="flex gap-4">
-          <div className="flex-1">
-             <span className="text-xs text-gray-500 mb-1 block">Primary Color</span>
-             <div className="h-10 w-full border border-gray-200 rounded-lg flex items-center p-1 gap-2">
-               <div className="w-8 h-8 rounded-md" style={{ backgroundColor: templateData.brandColors.primary }}></div>
-               <span className="text-sm text-gray-700 font-medium">{templateData.brandColors.primary}</span>
-             </div>
-          </div>
-          <div className="flex-1">
-             <span className="text-xs text-gray-500 mb-1 block">Secondary Color</span>
-             <div className="h-10 w-full border border-gray-200 rounded-lg flex items-center p-1 gap-2">
-               <div className="w-8 h-8 rounded-md" style={{ backgroundColor: templateData.brandColors.secondary }}></div>
-               <span className="text-sm text-gray-700 font-medium">{templateData.brandColors.secondary}</span>
-             </div>
-          </div>
-        </div>
+
+        <BrandColorPicker
+          register={register}
+          watch={watch}
+          setValue={setValue}
+          errors={errors}
+        />
       </section>
 
-      {/* Dev A's Target: Mentor Signature Manager */}
+      {/* Mentor Signature */}
       <section>
-        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
           Mentor Signature
         </label>
-        <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between">
-           <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-xs">IMG</div>
-              <div>
-                <p className="text-sm font-medium text-gray-900">{templateData.signature.fileName}</p>
-                <p className="text-xs text-gray-500">{templateData.signature.size}</p>
-              </div>
-           </div>
-        </div>
-        <button className="text-blue-600 text-sm font-medium mt-2 hover:underline">
-          + Replace Signature
-        </button>
+
+        <MentorSignatureManager
+          watch={watch}
+          setValue={setValue}
+          errors={errors}
+        />
       </section>
 
-      {/* Dev A's Target: Skill Tag Input */}
+      {/* Skills */}
       <section>
-        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
           Acquired Skills
         </label>
-        <div className="border border-gray-200 rounded-xl p-3 min-h-[100px] flex flex-wrap content-start gap-2">
-          {templateData.skillTags.map(skill => (
-            <span key={skill} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium flex items-center gap-1 border border-blue-100">
-              {skill} <span className="cursor-pointer hover:text-blue-900">&times;</span>
-            </span>
-          ))}
-          <input 
-            type="text" 
-            placeholder="Add another skill..." 
-            className="outline-none text-sm flex-1 min-w-[120px] bg-transparent mt-1 ml-1"
-            disabled
-          />
-        </div>
+
+        <SkillTagInput
+          watch={watch}
+          setValue={setValue}
+        />
       </section>
 
-      {/* Fixed Save Button */}
-      <div className="absolute bottom-0 left-0 w-full pt-4 bg-white border-t border-gray-100">
-        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2">
-          Save Template
+      {/* Live Preview Information */}
+      {templateData && (
+        <section className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <h3 className="text-sm font-semibold mb-3">
+            Current Template
+          </h3>
+
+          <div className="space-y-2 text-sm">
+
+            <div className="flex justify-between">
+              <span>Primary Color</span>
+              <span className="font-medium">
+                {watch("primaryColor")}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Secondary Color</span>
+              <span className="font-medium">
+                {watch("secondaryColor")}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Total Skills</span>
+              <span className="font-medium">
+                {(watch("skills") || []).length}
+              </span>
+            </div>
+
+          </div>
+        </section>
+      )}
+
+      {/* Save Button */}
+      <div className="sticky bottom-0 bg-white pt-4 border-t">
+
+        <button
+          type="button"
+          onClick={handleSubmit(onSubmit)}
+          disabled={isSaving}
+          className="w-full rounded-lg bg-blue-600 py-3 text-white font-medium hover:bg-blue-700 disabled:opacity-60"
+        >
+          {isSaving ? "Saving Template..." : "Save Template"}
         </button>
+
       </div>
+
     </div>
   );
 };

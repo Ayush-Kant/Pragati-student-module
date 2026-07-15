@@ -56,13 +56,20 @@ export default function MentorLayout() {
       path: "/mentor/export-report",
       icon: <LineChart className="w-5 h-5" />,
     },
-    { name: "Settings", path: "#", icon: <Settings className="w-5 h-5" /> },
+    {
+      name: "Settings",
+      path: "/mentor/settings",
+      icon: <Settings className="w-5 h-5" />,
+    },
   ];
 
   const isItemActive = (item) => {
     if (item.path === "#") return false;
     if (item.path === "/mentor/dashboard") {
-      return location.pathname === "/mentor/dashboard" || location.pathname === "/mentor";
+      return (
+        location.pathname === "/mentor/dashboard" ||
+        location.pathname === "/mentor"
+      );
     }
     return location.pathname.startsWith(item.path);
   };
@@ -192,7 +199,10 @@ export default function MentorLayout() {
           {menuItems.map((item, idx) => (
             <div
               key={idx}
-              onClick={() => {console.log("Clicked:", item);navigate(item.path)}}
+              onClick={() => {
+                console.log("Clicked:", item);
+                navigate(item.path);
+              }}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -282,7 +292,7 @@ export default function MentorLayout() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 40px",
+            padding: "0 16px",
             boxSizing: "border-box",
             position: "sticky",
             top: 0,
@@ -366,7 +376,7 @@ export default function MentorLayout() {
         {/* Inner Content Injection Frame */}
         <div
           style={{
-            padding: "32px 40px",
+            padding: "12px 16px",
             boxSizing: "border-box",
             width: "100%",
           }}

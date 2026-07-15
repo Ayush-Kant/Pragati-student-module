@@ -31,12 +31,10 @@ export const createCourseService = async ({
         AND auth_users.uuid_id = $2
     `;
 
-    const [mentorRes, driveRes] = await Promise.all([
-      pool.query(mentorQuery, [userId]),
-      pool.query(driveQuery, [driveId, userId]),
-    ]);
-
+    const mentorRes = await pool.query(mentorQuery, [userId]);
     const mentorId = mentorRes.rows[0]?.id;
+
+    const driveRes = await pool.query(driveQuery, [mentorId]);
 
     if (!mentorId) {
       return {
@@ -116,6 +114,7 @@ export const getCoursesService = async ({ userId, status, driveId }) => {
       INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE auth_users.uuid_id = $1
     `;
+
     const mentorRes = await pool.query(mentorQuery, [userId]);
     const mentorId = mentorRes.rows[0]?.id;
 
@@ -252,7 +251,7 @@ export const updateCourseService = async ({
   try {
     // 1. Single roundtrip to fetch existence, ownership and current status
     const checkQuery = `
-      SELECT 
+      SELECT
         courses.id,
         courses.status,
         auth_users.uuid_id AS mentor_auth_uuid
@@ -367,7 +366,7 @@ export const deleteCourseService = async ({ courseId, userId }) => {
   try {
     // 1. Single roundtrip to fetch existence, ownership and current status
     const checkQuery = `
-      SELECT 
+      SELECT
         courses.id,
         auth_users.uuid_id AS mentor_auth_uuid
       FROM courses
@@ -429,7 +428,7 @@ export const createModuleService = async ({
   try {
     // 1. Single roundtrip to fetch existence and ownership of course
     const checkQuery = `
-      SELECT 
+      SELECT
         courses.id,
         auth_users.uuid_id AS mentor_auth_uuid
       FROM courses
@@ -495,7 +494,7 @@ export const deleteModuleService = async ({ moduleId, userId }) => {
   try {
     // 1. Single roundtrip to fetch existence and ownership through module & parent course join
     const checkQuery = `
-      SELECT 
+      SELECT
         modules.id,
         auth_users.uuid_id AS mentor_auth_uuid
       FROM modules
