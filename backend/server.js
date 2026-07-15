@@ -20,6 +20,7 @@ import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
+import placementDriveRoutes from "./routes/placementDrives.routes.js";
 
 dotenv.config();
 
@@ -82,6 +83,7 @@ app.use("/api/college/dashboard", collegeDashboardRoutes);
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/placement-drives", placementDriveRoutes);
 // Health Check
 app.get("/", (req, res) => {
   res.json({

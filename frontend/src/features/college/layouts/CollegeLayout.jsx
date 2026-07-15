@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { getProfile } from "../services/collegeService";
 
 import CollegeNavbar from "../navbar/components/Navbar";
 import CollegeSidebar from "../components/CollegeSidebar";
@@ -12,6 +13,40 @@ const CollegeLayout = () => {
 
   // Dark Mode
   const [darkMode, setDarkMode] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const checkProfile = async () => {
+      // Don't redirect if they are already on the add-profile page
+      if (location.pathname === "/college/add-profile") return;
+      
+      try {
+        const result = await getProfile();
+        // If the API returns success:true but data is null, or if it outright fails
+        if (!result || !result.data) {
+          navigate("/college/add-profile", { replace: true });
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile during layout mount:", err);
+      }
+    };
+    
+    checkProfile();
+  }, [navigate, location.pathname]);
+
+  if (location.pathname === "/college/add-profile") {
+    return (
+      <div className={`min-h-screen transition-all duration-300 flex items-center justify-center ${
+        darkMode ? "bg-slate-900 text-white" : "bg-slate-100 text-black"
+      }`}>
+        <div className="w-full max-w-4xl p-6">
+          <Outlet context={{ darkMode }} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

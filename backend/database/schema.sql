@@ -98,5 +98,32 @@ CREATE TABLE IF NOT EXISTS student_social_links (
         ON DELETE CASCADE
 );
 
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_users_firebase_uid ON users(firebase_uid);
+CREATE INDEX IF NOT EXISTS idx_recruitment_drives_mentor_id ON recruitment_drives(mentor_id);
+CREATE INDEX IF NOT EXISTS idx_live_sessions_mentor_id_scheduled_at ON live_sessions(mentor_id, scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_student_progress_student_id ON student_progress(student_id);
+CREATE INDEX IF NOT EXISTS idx_student_progress_drive_id ON student_progress(drive_id);
+CREATE INDEX IF NOT EXISTS idx_submissions_assessment_id ON submissions(assessment_id);
+CREATE INDEX IF NOT EXISTS idx_assessments_course_id ON assessments(course_id);
+CREATE INDEX IF NOT EXISTS idx_courses_mentor_id ON courses(mentor_id);
+
+-- Departments Management Schema
+CREATE TABLE IF NOT EXISTS departments (
+    dept_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    courses TEXT[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create index on department name for query optimization
+CREATE INDEX IF NOT EXISTS idx_departments_name ON departments(name);
+
+-- Insert dummy department records
+INSERT INTO departments (name, courses) VALUES 
+('Computer Science', '{"DSA", "DBMS", "OS"}'),
+('Information Technology', '{"CN", "Web Dev", "Software Engineering"}'),
+('Electronics and Communication', '{"Signals", "Microprocessors", "Communication Systems"}'),
+('Mechanical Engineering', '{"Thermodynamics", "Fluid Mechanics", "Machine Design"}');
 CREATE INDEX IF NOT EXISTS idx_student_social_links_student_id
     ON student_social_links(student_id);

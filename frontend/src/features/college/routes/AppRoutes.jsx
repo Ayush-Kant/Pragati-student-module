@@ -12,17 +12,15 @@ import ReportsPage from "../reports/pages/ReportsPage";
 
 const collegeRoute = (
   <>
-    {/* Public Route */}
-    <Route
-      path="add-profile"
-      element={<OrganizationProfile />}
-    />
-
     {/* College Layout */}
     <Route
       path="college"
       element={<CollegeLayout />}
     >
+      <Route
+        path="add-profile"
+        element={<OrganizationProfile />}
+      />
       <Route
         index
         element={<Navigate to="dashboard" replace />}

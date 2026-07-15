@@ -2,7 +2,7 @@ import AdminAssessmentService from "../services/admin.assessment.service.js";
 
 const createAssessment = async (req, res) => {
   try {
-    const createdBy = req.user ? req.user.id : null;
+    const createdBy = req.user ? req.user.userId : null;
     await AdminAssessmentService.createAssessment(req.body, createdBy);
     
     res.status(201).json({ message: "Assessment created as draft." });
