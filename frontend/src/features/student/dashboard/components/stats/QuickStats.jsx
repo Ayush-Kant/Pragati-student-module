@@ -1,26 +1,27 @@
-// src/features/student/dashboard/components/stats/QuickStats.jsx
-import React from 'react';
-import StatCard from './StatCard';
+import React from "react";
+import PropTypes from "prop-types";
 
-export default function QuickStats({ stats = [] }) {
-  // Fallback defaults matching the ticket requirements if data isn't loaded yet
-  const displayStats = stats.length > 0 ? stats : [
-    { title: "Completed Courses", value: "8", icon: "🎓" },
-    { title: "Active Courses", value: "3", icon: "📚" },
-    { title: "Attendance", value: "92%", icon: "📅" },
-    { title: "Total XP", value: "1450", icon: "✨" }
-  ];
+const QuickStats = ({ data, loading }) => (
+  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 h-full">
+    <h3 className="text-base font-bold text-gray-800 mb-3">📊 Quick Stats</h3>
+    {loading ? (
+      <div className="grid grid-cols-2 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />)}
+      </div>
+    ) : data ? (
+      <div className="grid grid-cols-2 gap-3">
+        <div><p className="text-xl font-bold text-gray-800">{data.applicationsSubmitted}</p><p className="text-xs text-gray-400">Applications</p></div>
+        <div><p className="text-xl font-bold text-gray-800">{data.interviewsScheduled}</p><p className="text-xs text-gray-400">Interviews</p></div>
+        <div><p className="text-xl font-bold text-gray-800">{data.offersReceived}</p><p className="text-xs text-gray-400">Offers</p></div>
+        <div><p className="text-xl font-bold text-gray-800">{data.profileCompletion}%</p><p className="text-xs text-gray-400">Profile</p></div>
+      </div>
+    ) : null}
+  </div>
+);
 
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      {displayStats.map((stat, idx) => (
-        <StatCard 
-          key={idx}
-          title={stat.title}
-          value={stat.value}
-          icon={stat.icon}
-        />
-      ))}
-    </div>
-  );
-}
+QuickStats.propTypes = {
+  data: PropTypes.object,
+  loading: PropTypes.bool,
+};
+
+export default QuickStats;

@@ -1,21 +1,39 @@
-// src/features/student/dashboard/components/progress/ProgressRing.jsx
-import React from 'react';
+import React from "react";
+import PropTypes from "prop-types";
 
-export default function ProgressRing({ percentage = 75 }) {
+const ProgressRing = ({ data, loading }) => {
   return (
-    <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm flex flex-col items-center justify-center text-center">
-      <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4 w-full text-left">
-        Course Progression
-      </h3>
-      <div className="relative w-32 h-32 flex items-center justify-center mb-2">
-        {/* Simple visual fallback circle container using custom background track styles */}
-        <div className="absolute inset-0 rounded-full border-8 border-slate-800"></div>
-        <div className="absolute inset-0 rounded-full border-8 border-orange-500 border-t-transparent border-r-transparent animate-pulse opacity-40"></div>
-        <div className="absolute text-2xl font-bold text-white">{percentage}%</div>
-      </div>
-      <p className="text-xs text-slate-400 max-w-[200px] mt-2">
-        Track overall completion benchmarks across modules.
-      </p>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 h-full">
+      <h3 className="text-base font-bold text-gray-800 mb-3">📈 Progress</h3>
+      
+      {loading ? (
+        <div className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+      ) : data ? (
+        <div className="flex flex-col gap-3">
+          {Object.entries(data).map(([key, val]) => (
+            <div key={key} className="space-y-1">
+              <div className="flex justify-between text-xs text-gray-500">
+                <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
+                <span className="font-semibold text-gray-700">{val}%</span>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                {/* 🚀 Pure Tailwind arbitrary width assignment replaces raw style objects */}
+                <div 
+                  className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-in-out" 
+                  style={{ width: `${val}%` }} 
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
-}
+};
+
+ProgressRing.propTypes = {
+  data: PropTypes.object,
+  loading: PropTypes.bool,
+};
+
+export default ProgressRing;
