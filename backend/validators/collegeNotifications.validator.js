@@ -3,7 +3,7 @@
  * backend/validators/collegeNotifications.validator.js
  */
 
-const TITLE_REGEX = /^[A-Za-z][A-Za-z0-9&.,'()\- ]{2,149}$/;
+const TITLE_REGEX = /^[A-Za-z0-9][A-Za-z0-9&.,'()\-:!?/" ]{2,149}$/;
 
 export const validateNotification = (req, res, next) => {
   const {

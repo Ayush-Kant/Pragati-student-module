@@ -4,7 +4,7 @@ import { pool } from "../config/db.js";
 export const getAllNotifications = async () => {
   const { rows } = await pool.query(
     `SELECT *
-     FROM notifications
+     FROM announcement_notifications
      ORDER BY created_at DESC`
   );
 
@@ -15,7 +15,7 @@ export const getAllNotifications = async () => {
 export const getNotificationById = async (id) => {
   const { rows } = await pool.query(
     `SELECT *
-     FROM notifications
+     FROM announcement_notifications
      WHERE id = $1`,
     [id]
   );
@@ -32,7 +32,7 @@ export const createNotification = async ({
   scheduled_at,
 }) => {
   const { rows } = await pool.query(
-    `INSERT INTO notifications
+    `INSERT INTO announcement_notifications
       (announcement_id, title, message, audience, scheduled_at)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
@@ -66,7 +66,7 @@ export const updateNotification = async (id, data) => {
   values.push(id);
 
   const query = `
-    UPDATE notifications
+    UPDATE announcement_notifications
     SET ${fields.join(", ")}
     WHERE id = $${index}
     RETURNING *;
@@ -80,7 +80,7 @@ export const updateNotification = async (id, data) => {
 // Delete notification
 export const deleteNotification = async (id) => {
   const { rows } = await pool.query(
-    `DELETE FROM notifications
+    `DELETE FROM announcement_notifications
      WHERE id = $1
      RETURNING *`,
     [id]
@@ -92,7 +92,7 @@ export const deleteNotification = async (id) => {
 // Send notification
 export const sendNotification = async (id) => {
   const { rows } = await pool.query(
-    `UPDATE notifications
+    `UPDATE announcement_notifications
      SET status = 'Sent',
          sent_at = CURRENT_TIMESTAMP
      WHERE id = $1
@@ -107,7 +107,7 @@ export const sendNotification = async (id) => {
 export const getNotificationHistory = async () => {
   const { rows } = await pool.query(
     `SELECT *
-     FROM notifications
+     FROM announcement_notifications
      ORDER BY sent_at DESC NULLS LAST`
   );
 

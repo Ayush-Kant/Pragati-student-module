@@ -3,7 +3,7 @@
  * backend/validators/collegeAnnouncements.validator.js
  */
 
-const TITLE_REGEX = /^[A-Za-z][A-Za-z0-9&.,'()\- ]{2,149}$/;
+const TITLE_REGEX = /^[A-Za-z0-9][A-Za-z0-9&.,'()\-:!?/" ]{2,149}$/;
 
 export const validateAnnouncement = (req, res, next) => {
   const {

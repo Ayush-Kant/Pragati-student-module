@@ -82,10 +82,7 @@ app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
-app.use(
-  "/api/college-communication",
-  collegeCommunicationAnnouncementsRoutes
-);
+app.use("/api", collegeCommunicationAnnouncementsRoutes);
 // Health Check
 app.get("/", (req, res) => {
   res.json({

@@ -33,9 +33,9 @@ const seedDatabase = async () => {
       );
     `);
 
-    // Notifications
+    // announcement_notifications
     await pool.query(`
-      INSERT INTO notifications
+      INSERT INTO announcement_notifications
       (
         announcement_id,
         title,

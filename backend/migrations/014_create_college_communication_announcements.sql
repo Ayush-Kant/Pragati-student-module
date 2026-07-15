@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS announcements (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Notifications
-CREATE TABLE IF NOT EXISTS notifications (
+-- Announcement Notifications
+CREATE TABLE IF NOT EXISTS announcement_notifications (
     id SERIAL PRIMARY KEY,
     announcement_id INTEGER REFERENCES announcements(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
@@ -36,13 +36,14 @@ CREATE TABLE IF NOT EXISTS notifications (
         CHECK (status IN ('Pending','Sent')),
     scheduled_at TIMESTAMP,
     sent_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Notification Recipients
 CREATE TABLE IF NOT EXISTS notification_recipients (
     id SERIAL PRIMARY KEY,
-    notification_id INTEGER REFERENCES notifications(id) ON DELETE CASCADE,
+    notification_id INTEGER REFERENCES announcement_notifications(id) ON DELETE CASCADE,
     recipient_name VARCHAR(150),
     recipient_email VARCHAR(255),
     status VARCHAR(20) DEFAULT 'Pending'
@@ -58,11 +59,11 @@ CREATE TABLE IF NOT EXISTS notification_recipients (
 CREATE INDEX IF NOT EXISTS idx_announcements_status
 ON announcements(status);
 
-CREATE INDEX IF NOT EXISTS idx_notifications_status
-ON notifications(status);
+CREATE INDEX IF NOT EXISTS idx_announcement_notifications_status
+ON announcement_notifications(status);
 
-CREATE INDEX IF NOT EXISTS idx_notifications_audience
-ON notifications(audience);
+CREATE INDEX IF NOT EXISTS idx_announcement_notifications_audience
+ON announcement_notifications(audience);
 
 CREATE INDEX IF NOT EXISTS idx_notification_recipients_email
 ON notification_recipients(recipient_email);
