@@ -39,14 +39,18 @@ const MentorSignatureManager = ({
 
     try {
       setUploading(true);
+const response = await uploadSignature(file);
 
-      const response = await uploadSignature(file);
+const signatureUrl = response.url.startsWith("http")
+  ? response.url
+  : `http://localhost:5000${response.url}`;
 
-      setValue("signature", {
-        url: response.url,
-        fileName: file.name,
-        size: `${(file.size / 1024).toFixed(1)} KB`,
-      });
+setValue("signature", {
+  url: signatureUrl,
+  preview: signatureUrl,
+  fileName: file.name,
+  size: `${(file.size / 1024).toFixed(1)} KB`,
+});
     } catch (err) {
       console.error(err);
       setUploadError("Failed to upload signature.");
@@ -73,7 +77,7 @@ const MentorSignatureManager = ({
         <div className="border rounded-xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src={signature.url}
+              src={signature.preview || signature.url} 
               alt="Signature"
               className="w-20 h-12 object-contain border rounded bg-white"
             />

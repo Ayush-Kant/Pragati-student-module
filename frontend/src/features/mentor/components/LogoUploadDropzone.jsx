@@ -8,6 +8,7 @@ const ALLOWED_TYPES = [
   "image/jpeg",
   "image/jpg",
   "image/svg+xml",
+  "image/webp"
 ];
 
 const LogoUploadDropzone = ({
@@ -40,13 +41,15 @@ const LogoUploadDropzone = ({
 
     try {
       setUploading(true);
+const response = await uploadLogo(file);
 
-      const response = await uploadLogo(file);
+const logoUrl = `http://localhost:5000${response.url}`;
 
-      setValue("logo", {
-        url: response.url,
-        fileName: file.name,
-      });
+setValue("logo", {
+  url: logoUrl,
+  preview: logoUrl,
+  fileName: file.name,
+});
     } catch (err) {
       console.error(err);
       setUploadError("Failed to upload logo.");
@@ -99,29 +102,30 @@ const LogoUploadDropzone = ({
       </div>
 
       {logo?.url && (
-        <div className="border rounded-lg p-3 flex items-center gap-3">
-          <img
-            src={logo.url}
-            alt="Logo"
-            className="w-14 h-14 object-contain border rounded"
-          />
+  <div className="border rounded-lg p-3 flex items-center gap-3">
 
-          <div className="flex-1">
-            <p className="font-medium">
-              {logo.fileName}
-            </p>
-          </div>
+    <img
+      src={logo.preview || logo.url}
+      alt="Logo"
+      className="w-14 h-14 object-contain border rounded"
+    />
 
-          <button
-            type="button"
-            onClick={() => setValue("logo", null)}
-            className="text-red-500 text-sm"
-          >
-            Remove
-          </button>
-        </div>
-      )}
+    <div className="flex-1">
+      <p className="font-medium">
+        {logo.fileName}
+      </p>
+    </div>
 
+    <button
+      type="button"
+      onClick={() => setValue("logo", null)}
+      className="text-red-500 text-sm"
+    >
+      Remove
+    </button>
+
+  </div>
+)}
       {uploadError && (
         <p className="text-red-500 text-sm">
           {uploadError}

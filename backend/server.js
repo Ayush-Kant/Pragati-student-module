@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
 
 import { connectDB } from "./config/db.js";
 
@@ -23,6 +26,9 @@ import questionBankRouter from "./routes/questionBank.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import certificateRoutes from "./routes/certificate.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
+import skillsRoutes from "./routes/skills.routes.js";
 
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
@@ -30,11 +36,14 @@ dotenv.config();
 
 console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 
+
+
 const app = express();
 const PORT = process.env.PORT || 5000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-app.use(express.json());
-app.use(errorMiddleware);
+
 
 app.use(
   cors({
@@ -54,6 +63,12 @@ app.use(
 );
 
 app.use(express.json());
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "src/uploads"))
+);
+
+
 
 // Routes
 app.use("/api/auth", authRouter);
@@ -70,6 +85,10 @@ app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
+app.use("/api/v1/certificates", certificateRoutes);
+app.use("/api/v1/upload", uploadRoutes);
+app.use("/api/v1/skills", skillsRoutes);
+
 
 app.get("/", (req, res) => {
   res.json({

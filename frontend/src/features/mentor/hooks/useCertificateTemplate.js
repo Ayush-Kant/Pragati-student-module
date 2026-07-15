@@ -9,34 +9,41 @@ import {
   saveCertificateTemplate,
 } from "../services/certificateService";
 
-// -----------------------------
-// Validation Schema
-// -----------------------------
 const certificateSchema = z.object({
-  primaryColor: z
-    .string()
-    .min(1, "Primary color is required"),
-
-  secondaryColor: z
-    .string()
-    .min(1, "Secondary color is required"),
-
+  primaryColor: z.string().min(1, "Primary color is required"),
+  secondaryColor: z.string().min(1, "Secondary color is required"),
   skills: z.array(z.string()).optional(),
-
   logo: z.any().optional(),
-
   signature: z.any().optional(),
 });
 
 export const useCertificateTemplate = () => {
   const navigate = useNavigate();
 
-  const [templateData, setTemplateData] = useState(null);
+  const [templateData, setTemplateData] = useState({
+    organizationName: "UPTOSKILLS",
+
+    brandColors: {
+      primary: "#2563EB",
+      secondary: "#9333EA",
+    },
+
+    logo: null,
+
+    signature: null,
+
+    skillTags: [],
+
+    previewPlaceholders: {
+      studentName: "Student Name",
+      programName: "Program Name",
+      score: "95%",
+      mentorName: "Mentor Name",
+    },
+  });
 
   const [isLoading, setIsLoading] = useState(true);
-
   const [isSaving, setIsSaving] = useState(false);
-
   const [error, setError] = useState("");
 
   const {
@@ -63,51 +70,82 @@ export const useCertificateTemplate = () => {
   // Load Template
   // -----------------------------
   useEffect(() => {
-    loadTemplate();
-  }, []);
+    const loadTemplate = async () => {
+      try {
+        setIsLoading(true);
 
-  const loadTemplate = async () => {
-    try {
-      setIsLoading(true);
+        const data = await getCertificateTemplate();
 
-      const data = await getCertificateTemplate();
+        if (data) {
+          setTemplateData((prev) => ({
+            ...prev,
+            ...data,
+          }));
 
-      setTemplateData(data);
+          reset({
+            primaryColor: data.brandColors?.primary || "#2563EB",
+            secondaryColor: data.brandColors?.secondary || "#9333EA",
+            skills: data.skillTags || [],
+            logo: data.logo || null,
+            signature: data.signature || null,
+          });
+        }
+      } catch (err) {
+        console.error(err);
 
-      reset({
-        primaryColor: data.brandColors?.primary || "#2563EB",
-        secondaryColor: data.brandColors?.secondary || "#9333EA",
-        skills: data.skillTags || [],
-        logo: data.logo || null,
-        signature: data.signature || null,
-      });
-    } catch (err) {
-      console.error(err);
+        if (err.response?.status === 401) {
+          navigate("/login");
+        }
 
-      if (err.response?.status === 401) {
-        navigate("/login");
+        setError("Unable to load certificate template.");
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      setError("Unable to load certificate template.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    loadTemplate();
+  }, [navigate, reset]);
 
   // -----------------------------
-  // Save Template
+  // Live Preview
+  // -----------------------------
+  useEffect(() => {
+    const subscription = watch((values) => {
+      setTemplateData((prev) => ({
+        ...prev,
+
+        brandColors: {
+          primary: values.primaryColor || "#2563EB",
+          secondary: values.secondaryColor || "#9333EA",
+        },
+
+        skillTags: values.skills || [],
+
+        logo: values.logo || prev.logo,
+
+        signature: values.signature || prev.signature,
+      }));
+    });
+
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
+  // -----------------------------
+  // Save
   // -----------------------------
   const onSubmit = async (values) => {
     try {
       setIsSaving(true);
 
       const payload = {
+        ...templateData,
+
         brandColors: {
           primary: values.primaryColor,
           secondary: values.secondaryColor,
         },
 
-        skillTags: values.skills,
+        skillTags: values.skills || [],
 
         logo: values.logo,
 
@@ -116,7 +154,10 @@ export const useCertificateTemplate = () => {
 
       const response = await saveCertificateTemplate(payload);
 
-      setTemplateData(response);
+      setTemplateData((prev) => ({
+        ...prev,
+        ...response,
+      }));
 
       alert("Template saved successfully.");
     } catch (err) {

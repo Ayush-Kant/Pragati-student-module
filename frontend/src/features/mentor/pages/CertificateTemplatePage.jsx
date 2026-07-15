@@ -2,24 +2,26 @@ import React, { useState } from "react";
 import TemplateConfiguration from "../components/TemplateConfiguration";
 import LiveCertificatePreview from "../components/LiveCertificatePreview";
 import PreviewToolbar from "../components/PreviewToolbar";
-
 import { useCertificateTemplate } from "../hooks/useCertificateTemplate";
 
 const CertificateTemplatePage = () => {
   const certificate = useCertificateTemplate();
 
-  const {
-    templateData,
-    isLoading,
-  } = certificate;
+  const { templateData, isLoading } = certificate;
 
   const [zoomLevel, setZoomLevel] = useState(1);
 
-  const handleZoomIn = () =>
+  const handleZoomIn = () => {
     setZoomLevel((prev) => Math.min(prev + 0.1, 2));
+  };
 
-  const handleZoomOut = () =>
+  const handleZoomOut = () => {
     setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
+  };
+
+  const handleDownload = () => {
+    window.print();
+  };
 
   if (isLoading) {
     return (
@@ -30,46 +32,47 @@ const CertificateTemplatePage = () => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-64px)] w-full bg-gray-50 overflow-hidden">
+    <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-gray-100">
 
       {/* Left Panel */}
-      <div className="w-full lg:w-[400px] xl:w-[450px] bg-white border-r border-gray-200 flex flex-col shadow-sm">
+      <div className="flex w-[420px] flex-col border-r border-gray-200 bg-white">
 
-        <div className="p-6 border-b border-gray-100">
+        <div className="border-b p-6">
           <h1 className="text-xl font-semibold">
             Template Configuration
           </h1>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="mt-1 text-sm text-gray-500">
             Design your premium completion certificate.
           </p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-
           <TemplateConfiguration
             templateData={templateData}
             certificate={certificate}
           />
-
         </div>
+
       </div>
 
       {/* Right Panel */}
-      <div className="flex-1 bg-slate-800 flex flex-col">
+      <div className="flex-1 overflow-auto bg-slate-900">
 
-        <PreviewToolbar
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          zoomLevel={zoomLevel}
-        />
+        <div className="mx-auto flex w-full max-w-[1000px] flex-col p-6">
 
-        <div className="flex-1 overflow-auto flex items-center justify-center p-8">
+          <PreviewToolbar
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onDownload={handleDownload}
+            zoomLevel={zoomLevel}
+          />
 
           <div
-            className="transition-transform duration-200"
+            className="mt-6 transition-transform duration-300"
             style={{
               transform: `scale(${zoomLevel})`,
+              transformOrigin: "top center",
             }}
           >
             <LiveCertificatePreview

@@ -6,84 +6,66 @@ const BrandColorPicker = ({
   setValue,
   errors,
 }) => {
-  const primaryColor = watch("primaryColor") || "#2563EB";
-  const secondaryColor = watch("secondaryColor") || "#9333EA";
+  const primaryColor = watch("primaryColor") || "#2563eb";
+  const secondaryColor = watch("secondaryColor") || "#1e293b";
 
-  return (
-    <div className="space-y-6">
+  const ColorField = ({
+    label,
+    name,
+    value,
+    error,
+  }) => (
+    <div>
+      <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+        {label}
+      </label>
 
-      {/* Primary Color */}
-      <div>
-        <label className="block text-sm font-medium mb-2">
-          Primary Color
-        </label>
+      <div className="flex items-center gap-2 border rounded-lg px-2 py-2 bg-white">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => setValue(name, e.target.value)}
+          className="w-10 h-10 border rounded cursor-pointer"
+        />
 
-        <div className="flex items-center gap-3">
-
-          <input
-            type="color"
-            value={primaryColor}
-            onChange={(e) =>
-              setValue("primaryColor", e.target.value)
-            }
-            className="w-12 h-12 rounded-lg border cursor-pointer"
-          />
-
-          <input
-            type="text"
-            {...register("primaryColor")}
-            value={primaryColor}
-            onChange={(e) =>
-              setValue("primaryColor", e.target.value)
-            }
-            className="flex-1 border rounded-lg px-3 py-2"
-          />
-        </div>
-
-        {errors?.primaryColor && (
-          <p className="text-red-500 text-xs mt-2">
-            {errors.primaryColor.message}
-          </p>
-        )}
+        <input
+          type="text"
+          {...register(name)}
+          value={value}
+          onChange={(e) => setValue(name, e.target.value)}
+          className="w-full outline-none text-sm font-medium bg-transparent"
+        />
       </div>
 
-      {/* Secondary Color */}
-      <div>
-        <label className="block text-sm font-medium mb-2">
-          Secondary Color
-        </label>
-
-        <div className="flex items-center gap-3">
-
-          <input
-            type="color"
-            value={secondaryColor}
-            onChange={(e) =>
-              setValue("secondaryColor", e.target.value)
-            }
-            className="w-12 h-12 rounded-lg border cursor-pointer"
-          />
-
-          <input
-            type="text"
-            {...register("secondaryColor")}
-            value={secondaryColor}
-            onChange={(e) =>
-              setValue("secondaryColor", e.target.value)
-            }
-            className="flex-1 border rounded-lg px-3 py-2"
-          />
-        </div>
-
-        {errors?.secondaryColor && (
-          <p className="text-red-500 text-xs mt-2">
-            {errors.secondaryColor.message}
-          </p>
-        )}
-      </div>
-
+      {error && (
+        <p className="text-red-500 text-xs mt-1">
+          {error.message}
+        </p>
+      )}
     </div>
   );
+
+  return (
+   
+  
+  <div className="space-y-4">
+    <div className="grid grid-cols-2 gap-4">
+      <ColorField
+        label="Primary Color"
+        name="primaryColor"
+        value={primaryColor}
+        error={errors?.primaryColor}
+      />
+
+      <ColorField
+        label="Secondary Color"
+        name="secondaryColor"
+        value={secondaryColor}
+        error={errors?.secondaryColor}
+      />
+    </div>
+  </div>
+);
 };
 
 export default BrandColorPicker;

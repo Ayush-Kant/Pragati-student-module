@@ -1,45 +1,72 @@
-import React from 'react';
-import { ZoomIn, ZoomOut, Download } from 'lucide-react';
+import React from "react";
+import { ZoomIn, ZoomOut, Download } from "lucide-react";
 
-const PreviewToolbar = ({ onZoomIn, onZoomOut, zoomLevel }) => {
+const PreviewToolbar = ({
+  onZoomIn,
+  onZoomOut,
+  onDownload,
+  zoomLevel,
+}) => {
   return (
-    <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center pointer-events-none">
-      
-      {/* Live Preview Badge */}
-      <div className="bg-gray-900/80 backdrop-blur-sm border border-gray-700 rounded-full px-4 py-2 flex items-center gap-2 shadow-lg pointer-events-auto">
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-        </span>
-        <span className="text-xs font-medium text-white tracking-wide uppercase">Live Preview</span>
+    <div className="flex items-center justify-between w-full">
+
+      {/* Live Preview */}
+      <div className="flex items-center gap-3">
+
+        <div className="relative flex h-3 w-3">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+          <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+        </div>
+
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-white">
+            LIVE PREVIEW
+          </p>
+
+          <p className="text-[11px] text-slate-300">
+            Updates Instantly
+          </p>
+        </div>
+
       </div>
 
-      {/* Controls */}
-      <div className="bg-gray-900/80 backdrop-blur-sm border border-gray-700 rounded-lg flex items-center shadow-lg pointer-events-auto">
-        <button 
+      {/* Zoom & Download Controls */}
+      <div className="flex items-center overflow-hidden rounded-lg border border-slate-600 bg-slate-800 shadow-lg">
+
+        {/* Zoom Out */}
+        <button
+          type="button"
           onClick={onZoomOut}
-          className="p-2.5 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors border-r border-gray-700 rounded-l-lg"
-          title="Zoom Out"
+          className="flex h-10 w-10 items-center justify-center hover:bg-slate-700 transition"
         >
-          <ZoomOut size={18} />
+          <ZoomOut size={18} className="text-white" />
         </button>
-        <span className="px-3 text-xs font-medium text-gray-300 w-14 text-center">
+
+        {/* Percentage */}
+        <div className="border-x border-slate-600 px-4 py-2 text-sm font-semibold text-white min-w-[70px] text-center">
           {Math.round(zoomLevel * 100)}%
-        </span>
-        <button 
+        </div>
+
+        {/* Zoom In */}
+        <button
+          type="button"
           onClick={onZoomIn}
-          className="p-2.5 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors border-l border-gray-700"
-          title="Zoom In"
+          className="flex h-10 w-10 items-center justify-center hover:bg-slate-700 transition"
         >
-          <ZoomIn size={18} />
+          <ZoomIn size={18} className="text-white" />
         </button>
-        <button 
-          className="p-2.5 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors border-l border-gray-700 rounded-r-lg"
-          title="Download Mockup"
+
+        {/* Download */}
+        <button
+          type="button"
+          onClick={onDownload}
+          className="flex h-10 w-10 items-center justify-center border-l border-slate-600 hover:bg-blue-600 transition"
         >
-          <Download size={18} />
+          <Download size={18} className="text-white" />
         </button>
+
       </div>
+
     </div>
   );
 };
