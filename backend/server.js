@@ -40,23 +40,21 @@ app.use(express.json());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost"))
+      if (!origin || origin.startsWith("http://localhost")) {
         return callback(null, true);
+      }
 
       const clientUrl = process.env.CLIENT_URL;
-
-      if (clientUrl && origin === clientUrl)
+      if (clientUrl && origin === clientUrl) {
         return callback(null, true);
+      }
 
-      return callback(
-        new Error(`CORS policy: origin ${origin} not allowed`)
-      );
+      return callback(new Error(`CORS policy: origin ${origin} not allowed`));
     },
     credentials: true,
   })
 );
 
-// Routes
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/live-sessions", liveSessionRoutes);
@@ -69,17 +67,15 @@ app.use("/api/v1/company", companyRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
-
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
-
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
-// Health Check
+
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -87,6 +83,7 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use(errorMiddleware);
 
 connectDB()
   .then(async () => {

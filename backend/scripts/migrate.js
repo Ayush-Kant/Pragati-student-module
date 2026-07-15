@@ -80,8 +80,4 @@ export default runMigrations;
 
 if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
   runMigrations();
-}    process.exit(1);
-  }
 }
-
-runMigrations();

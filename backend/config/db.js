@@ -6,7 +6,6 @@ dns.setDefaultResultOrder("ipv4first");
 dotenv.config();
 
 const { Pool } = pg;
-
 const connectionString = process.env.POSTGRESQL_URI;
 
 if (!connectionString) {
@@ -26,10 +25,8 @@ export const connectDB = async () => {
 
   try {
     console.log("🔄 Connecting to PostgreSQL...");
-
     client = await pool.connect();
     await client.query("SELECT NOW()");
-
     console.log("✅ PostgreSQL connected successfully");
   } catch (error) {
     console.error("❌ PostgreSQL connection failed:");
