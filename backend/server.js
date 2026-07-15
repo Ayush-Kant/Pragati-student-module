@@ -17,6 +17,8 @@ import adminDriveRoutes from "./routes/admin.drive.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
 import collegeJobsRoutes from "./routes/college.jobs.routes.js";
+import nominationRoutes from "./routes/collegeStudentNominations.routes.js";
+
 import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
@@ -67,18 +69,13 @@ app.use("/api/v1/company", companyRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/company/interviews", interviewRoutes);
-app.use("/api/mentor", mentorRoutes);
-app.use("/api/mentor", contentRoutes);
-app.use("/api/v1/company/jobs", collegeJobsRoutes);
-app.use("/api/v1/company", companyRoutes);
-app.use("/api/v1/company/interviews", interviewRoutes);
-app.use("/api/mentor", contentRoutes);
-app.use("/api/mentor", mentorRoutes);
 
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
+
+app.use("/api", nominationRoutes); 
 
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
