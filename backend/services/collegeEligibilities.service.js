@@ -3,6 +3,7 @@ import {
   checkEligibility,
   getEligibleDepartments,
   getEligibleBatches,
+  createEligibleStudent,
 } from '../models/collegeEligibilities.model.js'
 import { getPagination, getPaginationMeta } from '../utils/pagination.js'
 
@@ -26,4 +27,8 @@ export const getEligibleDepartmentsService = async () => {
 
 export const getEligibleBatchesService = async () => {
   return await getEligibleBatches()
+}
+
+export const createEligibleStudentService = async (data) => {
+  return await createEligibleStudent(data)
 }

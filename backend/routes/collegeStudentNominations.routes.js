@@ -17,6 +17,7 @@ import {
   checkEligibility,
   getEligibleDepartments,
   getEligibleBatches,
+  createEligibleStudent,
 } from '../controllers/collegeEligibilities.controller.js'
 import {
   getNominationStatistics,
@@ -24,14 +25,17 @@ import {
   getDepartmentStatistics,
 } from '../controllers/collegeNominationStatistics.controller.js'
 import { sanitizeInput } from '../validators/collegeRequests.validator.js'
+import authMiddleware from '../middleware/authMiddleware.js'
 
 const router = express.Router()
 
-// Apply sanitization to all routes
+// Apply authentication and sanitization to all routes
+router.use(authMiddleware)
 router.use(sanitizeInput)
 
 // Eligibility Routes
 router.get('/nominations/eligible', getEligibleStudents)
+router.post('/nominations/eligible', createEligibleStudent)
 router.get('/nominations/eligible/departments', getEligibleDepartments)
 router.get('/nominations/eligible/batches', getEligibleBatches)
 router.get('/nominations/eligible/:studentId', checkEligibility)
