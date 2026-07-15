@@ -6,13 +6,7 @@ import { pool } from "../config/db.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function runMigrations() {
-  try {
-    console.log("Dropping existing tables to start fresh...");
-    await pool.query(`
-      DROP SCHEMA public CASCADE;
-      CREATE SCHEMA public;
-      GRANT ALL ON SCHEMA public TO public;
+
     `);
     console.log("Existing tables dropped successfully.");
 

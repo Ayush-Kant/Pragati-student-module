@@ -22,6 +22,7 @@ import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
 
+
 dotenv.config();
 
 const app = express();
@@ -58,7 +59,6 @@ app.use(
 
 // Routes
 app.use("/api/auth", authRouter);
-
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
@@ -94,7 +94,14 @@ app.get("/", (req, res) => {
 
 
 connectDB()
-  .then(() => {
+  .then(async () => {
+    try {
+      await initializeLiveSessionModule();
+      console.log("✅ Live session module initialized");
+    } catch (error) {
+      console.error("⚠️ Live session module initialization failed:", error.message);
+    }
+
     app.listen(PORT, () => {
       console.log(`✅ Server running on PORT ${PORT}`);
     });
