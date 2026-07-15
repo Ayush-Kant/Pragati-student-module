@@ -1,15 +1,16 @@
 import React from "react";
 import { Check, UserCheck, Layers, ClipboardCheck, BookOpen, UserRoundCheck, Landmark } from "lucide-react";
 
+const steps = [
+  { label: "Profile Registered", icon: UserCheck },
+  { label: "Academics Verified", icon: ClipboardCheck },
+  { label: "Resume Verified", icon: BookOpen },
+  { label: "Eligibility Check", icon: UserRoundCheck },
+  { label: "Drives & Interviews", icon: Layers },
+  { label: "Placed", icon: Landmark }
+];
+
 export const PlacementProgress = ({ studentStatus = "Eligible" }) => {
-  const steps = [
-    { label: "Profile Registered", icon: UserCheck },
-    { label: "Academics Verified", icon: ClipboardCheck },
-    { label: "Resume Verified", icon: BookOpen },
-    { label: "Eligibility Check", icon: UserRoundCheck },
-    { label: "Drives & Interviews", icon: Layers },
-    { label: "Placed", icon: Landmark }
-  ];
 
   // Determine current active index based on placementStatus
   let activeIndex = 3; // default: eligibility check

@@ -1,5 +1,4 @@
 import React from "react";
-import { Building2, Calendar, DollarSign, ExternalLink } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 import { formatDate } from "../../utils/studentProfileHelpers";
 
@@ -26,8 +25,8 @@ export const AppliedCompanies = ({ placements = [] }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50/50 text-xs text-gray-600">
-              {placements.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50/20 transition-colors">
+              {placements.map((item, index) => (
+                <tr key={item.id || `${item.company}-${index}`} className="hover:bg-slate-50/20 transition-colors">
                   <td className="py-3 font-semibold text-gray-800 flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100/50 flex items-center justify-center text-indigo-600 font-bold">
                       {item.company[0]}

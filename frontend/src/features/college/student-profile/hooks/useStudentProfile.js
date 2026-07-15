@@ -1,19 +1,21 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { getStudentProfile } from "../services/studentProfileService";
+import { validateProfile } from "../validations/studentProfileValidation";
 
 export const useStudentProfile = (studentId) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState(null);
 
   const fetchProfileData = useCallback(async () => {
     if (!studentId) return;
     setLoading(true);
     setError(null);
+    setValidationErrors(null);
     try {
       const result = await getStudentProfile(studentId);
       
-      // Safety checks for response structure
       let profileObj = null;
       if (result) {
         if (result.studentProfile) {
@@ -22,6 +24,14 @@ export const useStudentProfile = (studentId) => {
           profileObj = result.data.studentProfile;
         } else {
           profileObj = result;
+        }
+      }
+
+      if (profileObj) {
+        // Run validation on the resolved profile data
+        const validation = validateProfile(profileObj);
+        if (!validation.isValid) {
+          setValidationErrors(validation.errors);
         }
       }
 
@@ -37,14 +47,15 @@ export const useStudentProfile = (studentId) => {
     fetchProfileData();
   }, [fetchProfileData]);
 
-  const updateProfileLocal = (updatedFields) => {
+  const updateProfileLocal = useCallback((updatedFields) => {
     setProfile((prev) => (prev ? { ...prev, ...updatedFields } : prev));
-  };
+  }, []);
 
   return {
     profile,
     loading,
     error,
+    validationErrors,
     refetch: fetchProfileData,
     updateProfileLocal,
   };

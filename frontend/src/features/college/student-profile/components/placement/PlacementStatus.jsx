@@ -1,18 +1,24 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Briefcase, CheckCircle, ShieldAlert, Award } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 
 export const PlacementStatus = ({ student = {}, placements = [] }) => {
   const isEligible = student.placementStatus !== "Not Eligible";
   
-  // Calculate average target packages based on applied companies
-  const activeOffers = placements.filter((p) => p.status === "Placed" || p.status === "Offered");
-  const highestOffer = activeOffers.length > 0
-    ? activeOffers.reduce((max, curr) => {
-        const ctcVal = parseFloat(curr.ctc.replace(/[^0-9.]/g, ""));
-        return ctcVal > max ? ctcVal : max;
-      }, 0)
-    : 0;
+  // Performance Optimization: Memoize active offers
+  const activeOffers = useMemo(() => {
+    return placements.filter((p) => p.status === "Placed" || p.status === "Offered");
+  }, [placements]);
+
+  // Performance Optimization: Memoize highest offer calculation
+  const highestOffer = useMemo(() => {
+    return activeOffers.length > 0
+      ? activeOffers.reduce((max, curr) => {
+          const ctcVal = parseFloat(curr.ctc.replace(/[^0-9.]/g, ""));
+          return ctcVal > max ? ctcVal : max;
+        }, 0)
+      : 0;
+  }, [activeOffers]);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col justify-between">

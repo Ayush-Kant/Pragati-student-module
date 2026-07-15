@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { getAcademicPerformance } from "../services/studentProfileService";
+import { validateAcademicData } from "../validations/studentProfileValidation";
 
 export const useAcademicPerformance = (studentId) => {
   const [academics, setAcademics] = useState([]);
@@ -13,7 +14,6 @@ export const useAcademicPerformance = (studentId) => {
     try {
       const result = await getAcademicPerformance(studentId);
       
-      // Safety checks for API response structure
       let academicsArray = [];
       if (Array.isArray(result)) {
         academicsArray = result;
@@ -22,6 +22,11 @@ export const useAcademicPerformance = (studentId) => {
       } else if (result && result.data && Array.isArray(result.data.academicPerformance)) {
         academicsArray = result.data.academicPerformance;
       }
+
+      // Validate each academic semester entry
+      academicsArray.forEach((sem) => {
+        validateAcademicData(sem);
+      });
 
       setAcademics(academicsArray);
     } catch (err) {
@@ -35,22 +40,27 @@ export const useAcademicPerformance = (studentId) => {
     fetchAcademics();
   }, [fetchAcademics]);
 
-  const semestersCompleted = academics.length;
+  const semestersCompleted = useMemo(() => academics.length, [academics]);
 
-  // Compute overall statistics with safety defaults
-  const currentCGPA = semestersCompleted > 0 
-    ? (academics.reduce((sum, sem) => sum + (parseFloat(sem.sgpa) || 0), 0) / semestersCompleted).toFixed(2)
-    : "0.00";
+  // Performance Optimization: Memoize CGPA calculation
+  const currentCGPA = useMemo(() => {
+    return semestersCompleted > 0 
+      ? (academics.reduce((sum, sem) => sum + (parseFloat(sem.sgpa) || 0), 0) / semestersCompleted).toFixed(2)
+      : "0.00";
+  }, [academics, semestersCompleted]);
 
-  const averageAttendance = semestersCompleted > 0
-    ? Math.round(
-        academics.reduce((sum, sem) => {
-          const attendanceStr = sem.attendance || "0%";
-          const attendanceVal = parseFloat(String(attendanceStr).replace("%", ""));
-          return sum + (isNaN(attendanceVal) ? 0 : attendanceVal);
-        }, 0) / semestersCompleted
-      )
-    : 0;
+  // Performance Optimization: Memoize average attendance calculation
+  const averageAttendance = useMemo(() => {
+    return semestersCompleted > 0
+      ? Math.round(
+          academics.reduce((sum, sem) => {
+            const attendanceStr = sem.attendance || "0%";
+            const attendanceVal = parseFloat(String(attendanceStr).replace("%", ""));
+            return sum + (isNaN(attendanceVal) ? 0 : attendanceVal);
+          }, 0) / semestersCompleted
+        )
+      : 0;
+  }, [academics, semestersCompleted]);
 
   return {
     academics,

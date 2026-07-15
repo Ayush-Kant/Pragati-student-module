@@ -1,5 +1,5 @@
 import React from "react";
-import { Code, Users, Award } from "lucide-react";
+import { Code, Users } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 
 export const SkillsCard = ({ skills = {} }) => {

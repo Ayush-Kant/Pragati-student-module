@@ -1,22 +1,30 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Layers, Award, Building2, Calendar, ClipboardList } from "lucide-react";
 
 export const StudentStatistics = ({ student, academics = [], placements = [] }) => {
   const safeStudent = student || {};
-  const semestersCompleted = academics.length;
   
-  const techSkillsCount = safeStudent.skills?.technical?.length || 0;
-  const softSkillsCount = safeStudent.skills?.soft?.length || 0;
-  const totalSkills = techSkillsCount + softSkillsCount;
+  // Performance Optimization: Memoize all metric calculations
+  const semestersCompleted = useMemo(() => academics.length, [academics]);
   
-  const totalApplied = placements.length;
-  const interviewsScheduled = placements.reduce(
-    (count, item) => count + (item && Array.isArray(item.rounds) ? item.rounds.filter(r => r.status === "Scheduled").length : 0),
-    0
-  );
-  const activeOffers = placements.filter(
-    (item) => item && (item.status === "Placed" || item.status === "Offered")
-  ).length;
+  const techSkillsCount = useMemo(() => safeStudent.skills?.technical?.length || 0, [safeStudent.skills?.technical]);
+  const softSkillsCount = useMemo(() => safeStudent.skills?.soft?.length || 0, [safeStudent.skills?.soft]);
+  const totalSkills = useMemo(() => techSkillsCount + softSkillsCount, [techSkillsCount, softSkillsCount]);
+  
+  const totalApplied = useMemo(() => placements.length, [placements]);
+  
+  const interviewsScheduled = useMemo(() => {
+    return placements.reduce(
+      (count, item) => count + (item && Array.isArray(item.rounds) ? item.rounds.filter(r => r.status === "Scheduled").length : 0),
+      0
+    );
+  }, [placements]);
+  
+  const activeOffers = useMemo(() => {
+    return placements.filter(
+      (item) => item && (item.status === "Placed" || item.status === "Offered")
+    ).length;
+  }, [placements]);
 
   const stats = [
     {

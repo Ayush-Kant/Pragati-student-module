@@ -49,7 +49,7 @@ export const PlacementChart = ({ placements = [] }) => {
               <span className="block text-2xl font-black text-gray-800">{totalApplications}</span>
               <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Applied</span>
             </div>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <PieChart>
                 <Pie
                   data={chartData}

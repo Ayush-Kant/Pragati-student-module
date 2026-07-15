@@ -1,5 +1,5 @@
 import React from "react";
-import { FolderGit2, ExternalLink, Code } from "lucide-react";
+import { ExternalLink, Code } from "lucide-react";
 
 export const ProjectsCard = ({ projects = [] }) => {
   return (

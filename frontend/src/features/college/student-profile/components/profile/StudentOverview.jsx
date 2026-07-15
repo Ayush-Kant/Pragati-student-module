@@ -1,26 +1,35 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Award, Code, Briefcase, TrendingUp } from "lucide-react";
 
 export const StudentOverview = ({ student, academics = [], placements = [] }) => {
   const safeStudent = student || {};
   
-  // Find top achievements and projects
-  const topProject = safeStudent.projects?.[0]?.title || "No projects listed yet";
-  const latestInternship = safeStudent.internships?.[0]
-    ? `${safeStudent.internships[0].role} at ${safeStudent.internships[0].company}`
-    : "No internships listed yet";
-  const primarySkills = safeStudent.skills?.technical?.slice(0, 3).map((s) => s.name).join(", ") || "No skills listed yet";
+  // Performance Optimization: Memoize computations
+  const topProject = useMemo(() => {
+    return safeStudent.projects?.[0]?.title || "No projects listed yet";
+  }, [safeStudent.projects]);
 
-  // Placed company or target eligibility
-  let statusSummary = "Preparing for placements";
-  if (safeStudent.placementStatus === "Placed") {
-    const placedItem = placements.find((p) => p.status === "Placed");
-    statusSummary = placedItem
-      ? `Placed at ${placedItem.company} (${placedItem.ctc})`
-      : "Placed";
-  } else if (safeStudent.placementStatus === "Eligible") {
-    statusSummary = "Eligible and actively participating in placement drives";
-  }
+  const latestInternship = useMemo(() => {
+    return safeStudent.internships?.[0]
+      ? `${safeStudent.internships[0].role} at ${safeStudent.internships[0].company}`
+      : "No internships listed yet";
+  }, [safeStudent.internships]);
+
+  const primarySkills = useMemo(() => {
+    return safeStudent.skills?.technical?.slice(0, 3).map((s) => s.name).join(", ") || "No skills listed yet";
+  }, [safeStudent.skills?.technical]);
+
+  const statusSummary = useMemo(() => {
+    if (safeStudent.placementStatus === "Placed") {
+      const placedItem = placements.find((p) => p.status === "Placed");
+      return placedItem
+        ? `Placed at ${placedItem.company} (${placedItem.ctc})`
+        : "Placed";
+    } else if (safeStudent.placementStatus === "Eligible") {
+      return "Eligible and actively participating in placement drives";
+    }
+    return "Preparing for placements";
+  }, [safeStudent.placementStatus, placements]);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">

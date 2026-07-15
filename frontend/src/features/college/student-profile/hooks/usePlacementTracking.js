@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { getPlacementHistory } from "../services/studentProfileService";
 
 export const usePlacementTracking = (studentId) => {
@@ -34,17 +34,21 @@ export const usePlacementTracking = (studentId) => {
     fetchPlacements();
   }, [fetchPlacements]);
 
-  // Aggregate values safely
-  const appliedCount = placements.length;
+  // Performance Optimization: Memoize aggregates
+  const appliedCount = useMemo(() => placements.length, [placements]);
   
-  const interviewsCount = placements.reduce(
-    (count, item) => count + (item && Array.isArray(item.rounds) ? item.rounds.filter(r => r.status === "Scheduled").length : 0),
-    0
-  );
+  const interviewsCount = useMemo(() => {
+    return placements.reduce(
+      (count, item) => count + (item && Array.isArray(item.rounds) ? item.rounds.filter(r => r.status === "Scheduled").length : 0),
+      0
+    );
+  }, [placements]);
   
-  const offersCount = placements.filter(
-    (item) => item && (item.status === "Placed" || item.status === "Offered")
-  ).length;
+  const offersCount = useMemo(() => {
+    return placements.filter(
+      (item) => item && (item.status === "Placed" || item.status === "Offered")
+    ).length;
+  }, [placements]);
 
   return {
     placements,

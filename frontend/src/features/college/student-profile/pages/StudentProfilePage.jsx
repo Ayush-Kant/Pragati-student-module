@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, User, GraduationCap, Briefcase, Award } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 // Hooks
 import useStudentProfile from "../hooks/useStudentProfile";
@@ -77,11 +78,11 @@ export const StudentProfilePage = () => {
   const handleAcceptOffer = (offerId, companyName) => {
     // Local state modification mock or real API hook integration
     updateProfileLocal({ placementStatus: "Placed" });
-    alert(`Congratulations! You have accepted the job offer from ${companyName}.`);
+    toast.success(`Congratulations! You have accepted the job offer from ${companyName}.`);
   };
 
   const handleRejectOffer = (offerId, companyName) => {
-    alert(`Declined the offer from ${companyName}.`);
+    toast.error(`Declined the offer from ${companyName}.`);
   };
 
   if (isLoading) {

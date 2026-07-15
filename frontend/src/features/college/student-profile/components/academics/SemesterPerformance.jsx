@@ -1,14 +1,12 @@
-import React, { useState } from "react";
-import { ChevronDown, ChevronUp, BookOpen, Layers } from "lucide-react";
+import React from "react";
+import { ChevronDown, ChevronUp, BookOpen } from "lucide-react";
 
-export const SemesterPerformance = ({ academics = [] }) => {
-  const [expandedSemester, setExpandedSemester] = useState(null);
-
+export const SemesterPerformance = ({ academics = [], selectedSemester, onSelectSemester }) => {
   const toggleSemester = (semNum) => {
-    if (expandedSemester === semNum) {
-      setExpandedSemester(null);
+    if (selectedSemester === semNum) {
+      onSelectSemester(null);
     } else {
-      setExpandedSemester(semNum);
+      onSelectSemester(semNum);
     }
   };
 
@@ -26,7 +24,7 @@ export const SemesterPerformance = ({ academics = [] }) => {
           <div className="text-center py-6 text-sm text-gray-400">No semester details recorded</div>
         ) : (
           academics.map((sem) => {
-            const isExpanded = expandedSemester === sem.semester;
+            const isExpanded = selectedSemester === sem.semester;
             return (
               <div
                 key={sem.semester}

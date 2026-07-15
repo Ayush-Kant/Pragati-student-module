@@ -1,12 +1,14 @@
-import React from "react";
-import { Check, ClipboardList, Download, X } from "lucide-react";
+import React, { useMemo } from "react";
+import { Check, Download, X } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 
 export const OfferHistory = ({ placements = [], onAcceptOffer, onRejectOffer }) => {
   // Extract companies that have "Placed" or "Offered" status
-  const offersList = placements.filter(
-    (comp) => comp.status === "Placed" || comp.status === "Offered"
-  );
+  const offersList = useMemo(() => {
+    return placements.filter(
+      (comp) => comp.status === "Placed" || comp.status === "Offered"
+    );
+  }, [placements]);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
@@ -21,9 +23,9 @@ export const OfferHistory = ({ placements = [], onAcceptOffer, onRejectOffer }) 
             No active job offers secured yet.
           </div>
         ) : (
-          offersList.map((offer) => (
+          offersList.map((offer, index) => (
             <div
-              key={offer.id}
+              key={offer.id || `${offer.company}-${index}`}
               className="p-5 rounded-xl border border-indigo-100/60 bg-gradient-to-br from-indigo-50/20 to-white flex flex-col justify-between gap-4"
             >
               <div className="flex justify-between items-start gap-4">

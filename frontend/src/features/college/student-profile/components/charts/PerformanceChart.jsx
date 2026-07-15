@@ -39,7 +39,7 @@ export const PerformanceChart = ({ data = [] }) => {
             No semester data available
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <LineChart
               data={chartData}
               margin={{ top: 10, right: 10, left: -25, bottom: 0 }}

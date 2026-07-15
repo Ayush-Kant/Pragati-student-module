@@ -6,6 +6,8 @@ export const AttendanceCard = ({ attendancePercent = 0 }) => {
     ? parseFloat(attendancePercent.replace("%", "")) 
     : attendancePercent;
 
+  const clampedPercent = Math.max(0, Math.min(100, isNaN(percentNum) ? 0 : percentNum));
+
   let trackColor = "bg-indigo-600 shadow-indigo-100";
   let statusText = "Excellent";
   let statusDesc = "Maintained excellent class presence.";
@@ -54,7 +56,7 @@ export const AttendanceCard = ({ attendancePercent = 0 }) => {
       <div className="mt-5">
         <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
           <div
-            style={{ width: `${percentNum}%` }}
+            style={{ width: `${clampedPercent}%` }}
             className={`h-full rounded-full transition-all duration-1000 shadow-sm ${trackColor}`}
           />
         </div>

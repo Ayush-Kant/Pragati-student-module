@@ -1,23 +1,23 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { MessageSquare, Calendar, HelpCircle } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 import { formatDate } from "../../utils/studentProfileHelpers";
 
 export const InterviewHistory = ({ placements = [] }) => {
-  // Extract all interview rounds across companies
-  const roundsList = placements.flatMap((comp) => {
-    if (!comp.rounds) return [];
-    return comp.rounds.map((r) => ({
-      ...r,
-      companyName: comp.company,
-      jobRole: comp.role
-    }));
-  });
-
-  // Sort by date descending
-  const sortedRounds = roundsList.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  // Performance Optimization: Memoize transformed and sorted interview rounds list
+  const sortedRounds = useMemo(() => {
+    const roundsList = placements.flatMap((comp) => {
+      if (!comp.rounds) return [];
+      return comp.rounds.map((r) => ({
+        ...r,
+        companyName: comp.company,
+        jobRole: comp.role
+      }));
+    });
+    return roundsList.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  }, [placements]);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] h-full">

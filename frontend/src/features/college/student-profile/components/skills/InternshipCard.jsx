@@ -1,5 +1,5 @@
 import React from "react";
-import { Briefcase, Calendar, Building, MapPin } from "lucide-react";
+import { Calendar, Building } from "lucide-react";
 
 export const InternshipCard = ({ internships = [] }) => {
   return (

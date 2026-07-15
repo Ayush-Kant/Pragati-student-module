@@ -54,7 +54,7 @@ export const SkillsChart = ({ technicalSkills = [] }) => {
             No technical skills available
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <BarChart
               data={chartData}
               margin={{ top: 10, right: 10, left: -25, bottom: 0 }}

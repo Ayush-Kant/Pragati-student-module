@@ -1,9 +1,11 @@
-import React from "react";
-import { Milestone, Trophy, Award, CheckCircle } from "lucide-react";
+import React, { useMemo } from "react";
+import { Trophy, Award, CheckCircle } from "lucide-react";
 
 export const AcademicTimeline = ({ academics = [] }) => {
-  // Sort semesters ascending
-  const sortedTerms = [...academics].sort((a, b) => b.semester - a.semester);
+  // Sort semesters descending
+  const sortedTerms = useMemo(() => {
+    return [...academics].sort((a, b) => b.semester - a.semester);
+  }, [academics]);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] h-full">

@@ -1,5 +1,5 @@
 import React from "react";
-import { Award, Calendar, ExternalLink, ShieldCheck } from "lucide-react";
+import { Calendar, ExternalLink, ShieldCheck } from "lucide-react";
 import { formatDate } from "../../utils/studentProfileHelpers";
 
 export const Certifications = ({ certifications = [] }) => {
