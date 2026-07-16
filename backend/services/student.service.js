@@ -61,8 +61,9 @@ export const removeStudent = async (id) => {
 };
 
 // ─── Search students ──────────────────────────────────────────────────────────
-export const searchStudents = async (query, pagination = {}) => {
-  return getStudents({ search: query }, pagination);
+export const searchStudents = async (query, options = {}) => {
+  const { page, pageSize, ...extraFilters } = options;
+  return getStudents({ search: query, ...extraFilters }, { page, pageSize });
 };
 
 // ─── Filter students ──────────────────────────────────────────────────────────
@@ -71,8 +72,8 @@ export const filterStudents = async (filters, pagination = {}) => {
 };
 
 // ─── Get student statistics ───────────────────────────────────────────────────
-export const getStatistics = async (college = null) => {
-  const stats = await StudentModel.getStudentStatistics(college);
+export const getStatistics = async (college = null, collegeId = null) => {
+  const stats = await StudentModel.getStudentStatistics(college, collegeId);
   return { success: true, data: stats };
 };
 

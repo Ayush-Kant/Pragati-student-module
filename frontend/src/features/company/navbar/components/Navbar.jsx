@@ -518,7 +518,6 @@ const Navbar = ({ openSidebar, setOpenSidebar }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
   const searchInputRef = useRef(null);
-  const [globalSearchKey, setGlobalSearchKey] = useState(null);
 
   // Modals
   const [activeModal, setActiveModal] = useState(null); // 'profile' | 'settings' | 'password' | 'logout'
@@ -647,7 +646,7 @@ const Navbar = ({ openSidebar, setOpenSidebar }) => {
             )}
           </div>
 
-          {/* Settings icon (existing) */}
+          {/* Settings icon */}
           <div
             className="nav-icon"
             onClick={() => navigate("/company/settings")}

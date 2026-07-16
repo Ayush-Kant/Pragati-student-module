@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import { connectDB } from "./config/db.js";
+import { initializeLiveSessionModule } from "./src/database/migrations/liveSessionSchema.js";
 
 // Admin Routes
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
@@ -33,6 +34,7 @@ import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
+import placementDriveRoutes from "./routes/placementDrives.routes.js";
 
 // company Assessment route
 import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
@@ -83,7 +85,7 @@ app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
 app.use('/api/v1/admin/students', adminStudentRoutes);
 app.use('/api/v1/admin/mentors', adminMentorRoutes);
 app.use("/api/v1/admin/courses", adminCourseRoutes);
-app.use("/api/v1/admin/drives",adminDriveRoutes);
+app.use("/api/v1/admin/drives", adminDriveRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/admin/company", adminCompanyRoutes);
@@ -101,6 +103,7 @@ app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/v1/company/assessments", companyAssessmentRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
+app.use("/api/placement-drives", placementDriveRoutes);
 
 app.get("/", (req, res) => {
   res.json({
@@ -111,7 +114,14 @@ app.get("/", (req, res) => {
 app.use(errorMiddleware);
 
 connectDB()
-  .then(() => {
+  .then(async () => {
+    try {
+      await initializeLiveSessionModule();
+      console.log("✅ Live session module initialized");
+    } catch (error) {
+      console.error("⚠️ Live session module initialization failed:", error.message);
+    }
+
     app.listen(PORT, () => {
       console.log(`✅ Server running on PORT : ${PORT}`);
     });

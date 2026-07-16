@@ -66,7 +66,6 @@ const AuthPage = () => {
   ];
 
   useEffect(() => {
-    fetchProfile();
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev === slidesData.length - 1 ? 0 : prev + 1));
     }, 3500);
@@ -74,17 +73,6 @@ const AuthPage = () => {
   }, [slidesData.length]);
 
   const current = slidesData[currentSlide];
-
-    const fetchProfile = async () => {
-     try {
-        const result = await getProfile();
-        if(result.success){
-          setProfileData(result.data);
-        }
-      } catch (err) {
-        console.error('Login error:', err);
-      }
-     };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -122,6 +110,7 @@ const AuthPage = () => {
       });
 
       if (result.success) {
+        const userRole = result.user?.role;
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
         login(result.role, result.token);
         if (result.role === 'college' && !profileData?.id) {

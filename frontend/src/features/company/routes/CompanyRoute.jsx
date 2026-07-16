@@ -35,5 +35,3 @@ const CompanyRoute = (
 );
 
 export default CompanyRoute;
-
-
