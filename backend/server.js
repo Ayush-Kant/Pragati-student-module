@@ -44,6 +44,8 @@ import companyRoutes from "./routes/company.routes.js";
 import mentorHiringRoutes from "./routes/mentorHiring.routes.js";
 // -----------------------
 
+// company Assessment route
+import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
 

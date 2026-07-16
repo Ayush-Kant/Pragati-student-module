@@ -19,6 +19,9 @@ import QuizBuilderPage from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
 import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
 import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage.jsx";
+import SubmissionMonitoringPage from "../pages/SubmissionMonitoringPage";
+import ReviewGradingPage from "../pages/ReviewGradingPage";
+import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
@@ -35,6 +38,13 @@ const mentorRoute = (
           path="challenge-workspace"
           element={<ChallengeWorkspacePage />}
         />
+        <Route
+          path="submission-monitoring"
+          element={<SubmissionMonitoringPage />}
+        />
+        <Route path="review-grading" element={<ReviewGradingPage />} />
+        <Route path="project-analytics" element={<AnalyticsDashboardPage />} />
+
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
           <Route path="activities/create" element={<CreateActivity />} />

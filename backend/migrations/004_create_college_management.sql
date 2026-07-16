@@ -4,19 +4,37 @@
 -- TABLE: colleges
 CREATE TABLE IF NOT EXISTS colleges (
   id               SERIAL PRIMARY KEY,
-  user_id          INTEGER REFERENCES users(id),
   name             VARCHAR(255) NOT NULL,
-  email            VARCHAR(255) UNIQUE NOT NULL,
-  location         VARCHAR(255),
-  departments      TEXT[],             -- e.g. ['CSE','ECE','MBA']
-  student_strength INTEGER DEFAULT 0,
-  status           VARCHAR(50) NOT NULL DEFAULT 'pending'
-                   CHECK (status IN ('pending','approved','rejected','suspended')),
-  rejection_reason TEXT,
-  suspension_reason TEXT,
-  verified_at      TIMESTAMPTZ,
   created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES auth_users(id);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS email VARCHAR(255) UNIQUE;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS profile_code VARCHAR(100);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS established INTEGER;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS category VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS contact_person VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS designation VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS contact_lead VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS website VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS learners_guided INTEGER DEFAULT 0;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS about TEXT;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS location VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS departments TEXT[];
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS student_strength INTEGER DEFAULT 0;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS status VARCHAR(50) NOT NULL DEFAULT 'pending';
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS suspension_reason TEXT;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
+
+DO $$ BEGIN
+  ALTER TABLE colleges ADD CONSTRAINT colleges_status_check
+    CHECK (status IN ('pending','approved','rejected','suspended'));
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
  
 -- TABLE: college_stats
 -- Aggregated performance data per college
@@ -32,13 +50,17 @@ CREATE TABLE IF NOT EXISTS college_stats (
   last_updated            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(college_id)
 );
- 
+ ALTER TABLE colleges ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS location VARCHAR(255);
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS departments TEXT[];
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS student_strength INTEGER DEFAULT 0;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS status VARCHAR(50) NOT NULL DEFAULT 'pending';
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS suspension_reason TEXT;
+ALTER TABLE colleges ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
 -- INDEXES
 CREATE INDEX idx_colleges_status     ON colleges(status);
 CREATE INDEX idx_colleges_name       ON colleges(name);
 CREATE INDEX idx_college_stats_rank  ON college_stats(performance_rank ASC NULLS LAST);
 CREATE INDEX idx_colleges_dept       ON colleges USING GIN(departments);
-
-
-
-

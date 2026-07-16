@@ -34,13 +34,13 @@ export const createCourseService = async ({
     const mentorRes = await pool.query(mentorQuery, [userId]);
     const mentorId = mentorRes.rows[0]?.id;
 
-    const driveRes = await pool.query(driveQuery, [mentorId]);
-
     if (!mentorId) {
       return {
         status: "FORBIDDEN",
       };
     }
+
+    const driveRes = await pool.query(driveQuery, [driveId, userId]);
 
     if (driveRes.rows.length === 0) {
       return {
@@ -104,7 +104,7 @@ export const createCourseService = async ({
 // ==========================================
 // 2. GET ALL COURSES FOR MENTOR
 // ==========================================
-export const getCoursesService = async ({ userId, status, driveId }) => {
+export const getCoursesService = async ({ userId, userRole, status, driveId }) => {
   try {
     // 1. Resolve mentor existence
     const mentorQuery = `
@@ -117,6 +117,25 @@ export const getCoursesService = async ({ userId, status, driveId }) => {
 
     const mentorRes = await pool.query(mentorQuery, [userId]);
     const mentorId = mentorRes.rows[0]?.id;
+
+    if (!mentorId && userRole === "mentor") {
+      // Older mentor accounts may predate mentor-profile provisioning. Create
+      // the missing profile once so a valid mentor can access their courses.
+      await pool.query(
+        `INSERT INTO mentors (user_id)
+         SELECT users.id
+         FROM users
+         INNER JOIN auth_users ON auth_users.id = users.auth_user_id
+         WHERE auth_users.uuid_id = $1
+           AND NOT EXISTS (
+             SELECT 1 FROM mentors WHERE mentors.user_id = users.id
+           )`,
+        [userId],
+      );
+
+      const ensuredMentor = await pool.query(mentorQuery, [userId]);
+      mentorId = ensuredMentor.rows[0]?.id;
+    }
 
     if (!mentorId) {
       return {

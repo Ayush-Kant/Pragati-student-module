@@ -35,7 +35,7 @@ const StudentTable = ({ students, darkMode=false }) => {
               key={student.id}
               className={`border-b transition ${darkMode ? "border-slate-700 hover:bg-slate-950" : "border-gray-200 hover:bg-slate-50"}`}
             >
-              <td className={`py-5 px-4 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{student.name}</td>
+              <td onClick={() => navigate(`/admin/students/${student.id}`)} className={`py-5 px-4 ${darkMode ? "text-slate-100" : "text-slate-900"} hover:underline cursor-pointer`}>{student.name}</td>
 
               <td className={`p-3 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
                 {student.email}
