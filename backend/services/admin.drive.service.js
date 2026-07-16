@@ -246,7 +246,7 @@ export const advanceDrive = async (id, adminId) => {
            status = $2,
            updated_at = NOW()
        WHERE id = $3`,
-      [nextStage, isFinal ? 'completed' : 'active', id]
+      [nextStage, isFinal ? 'closed' : 'active', id]
     );
 
     await client.query('COMMIT');
@@ -291,7 +291,7 @@ export const freezeDrive = async (id, adminId) => {
 
     const updateResult = await client.query(
       `UPDATE recruitment_drives
-       SET frozen = TRUE, status = 'frozen', frozen_at = NOW(), frozen_by = $1, updated_at = NOW()
+       SET frozen = TRUE, status = 'active', frozen_at = NOW(), frozen_by = $1, updated_at = NOW()
        WHERE id = $2
        RETURNING frozen_at`,
       [frozenByIntId, id]

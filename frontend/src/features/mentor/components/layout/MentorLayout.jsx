@@ -14,12 +14,16 @@ import {
   HelpCircle,
   Briefcase,
 } from "lucide-react";
+import { useAuth } from "../../../../context/AuthContext";
 
 export default function MentorLayout() {
+  const { logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
   const menuItems = [
     {
       name: "Dashboard",
@@ -56,17 +60,24 @@ export default function MentorLayout() {
       path: "/mentor/export-report",
       icon: <LineChart className="w-5 h-5" />,
     },
-    { name: "Settings", path: "#", icon: <Settings className="w-5 h-5" /> },
+    {
+      name: "Settings",
+      path: "/mentor/settings",
+      icon: <Settings className="w-5 h-5" />,
+    },
   ];
 
   const isItemActive = (item) => {
     if (item.path === "#") return false;
     if (item.path === "/mentor/dashboard") {
-      return location.pathname === "/mentor/dashboard" || location.pathname === "/mentor";
+      return (
+        location.pathname === "/mentor/dashboard" ||
+        location.pathname === "/mentor"
+      );
     }
     return location.pathname.startsWith(item.path);
   };
-
+  const [isOpen, setIsOpen] = useState(false);
   const [{ mentorName, initials }] = useState(() => {
     try {
       const token = localStorage.getItem("token");
@@ -192,7 +203,10 @@ export default function MentorLayout() {
           {menuItems.map((item, idx) => (
             <div
               key={idx}
-              onClick={() => {console.log("Clicked:", item);navigate(item.path)}}
+              onClick={() => {
+                console.log("Clicked:", item);
+                navigate(item.path);
+              }}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -282,7 +296,7 @@ export default function MentorLayout() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 40px",
+            padding: "0 16px",
             boxSizing: "border-box",
             position: "sticky",
             top: 0,
@@ -321,7 +335,10 @@ export default function MentorLayout() {
             <span style={{ cursor: "pointer", color: "#64748b" }}>
               <Bell className="w-5 h-5" />
             </span>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div
+              onClick={() => setIsOpen(!isOpen)}
+              style={{ display: "flex", alignItems: "center", gap: "12px" }}
+            >
               <div
                 style={{
                   width: "38px",
@@ -359,6 +376,35 @@ export default function MentorLayout() {
                   Mentor Console
                 </div>
               </div>
+              {isOpen && (
+                <div className="absolute size-72 w-55 h-33 top-16 right-3 bg-white border border-t-2 border-t-blue-500 rounded-bl-lg flex flex-col">
+                  <div className="m-4">
+                    <button
+                      onClick={handleLogout}
+                      type="button"
+                      className="inline-flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-red-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-red-600 active:scale-95"
+                    >
+                      {/* Logout SVG Icon */}
+                      <svg
+                        xmlns="http://w3.org"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="h-5 w-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          pathLength="1"
+                          d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
+                        />
+                      </svg>
+                      <span>Log out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -366,7 +412,7 @@ export default function MentorLayout() {
         {/* Inner Content Injection Frame */}
         <div
           style={{
-            padding: "32px 40px",
+            padding: "12px 16px",
             boxSizing: "border-box",
             width: "100%",
           }}

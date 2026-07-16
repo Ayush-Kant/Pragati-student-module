@@ -20,7 +20,7 @@ export const getProfile = async (req, res) => {
               mentors.verified,
               mentors.availability_json,
               drives.id AS drive_id,
-              drives.title
+              drives.title AS drive_title
           FROM mentors
 
           JOIN users

@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import bcrypt from "bcrypt";
 
 async function seedData() {
   const client = await pool.connect();
@@ -54,12 +55,13 @@ async function seedData() {
     `);
 
     console.log("Inserting auth_users...");
+    const passwordHash = await bcrypt.hash("Password123", 10);
     const authUserResult = await client.query(`
       INSERT INTO auth_users (id, email, password_hash, role) VALUES 
-      (1, 'mentor@example.com', '$2b$10$mSD6Bqp4SvDs5hXDMj4rPOBI.LnWQWYo5gZkFwcTfhdwC/JwEf.bC', 'mentor'),
-      (2, 'company@gmail.com', '$2b$10$mSD6Bqp4SvDs5hXDMj4rPOBI.LnWQWYo5gZkFwcTfhdwC/JwEf.bC', 'company')
+      (1, 'mentor@example.com', $1, 'mentor'),
+      (2, 'company@gmail.com', $1, 'company')
       RETURNING id, email, role;
-    `);
+    `, [passwordHash]);
     const authUser = authUserResult.rows[0];
 
     console.log("Inserting users...");
