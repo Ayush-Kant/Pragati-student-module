@@ -1,11 +1,18 @@
 import deadlineModel from "../models/deadlineModel.js";
+import assignmentModel from "../models/assignmentModel.js";
 
-export const getDeadlines = async (query = {}) => {
-  return await deadlineModel.getDeadlines(query);
+export const getDeadlines = async (query = {}, user) => {
+  return await deadlineModel.getDeadlines(query, user);
 };
 
-export const updateDeadline = async (assignmentId, payload) => {
-  return await deadlineModel.updateDeadline(assignmentId, payload);
+export const updateDeadline = async (assignmentId, payload, user) => {
+  const assignment = await assignmentModel.getAssignmentById(assignmentId);
+  if (!assignment) {
+    const error = new Error("Assignment not found");
+    error.status = 404;
+    throw error;
+  }
+  return await deadlineModel.updateDeadline(assignmentId, payload, user);
 };
 
 export default { getDeadlines, updateDeadline };

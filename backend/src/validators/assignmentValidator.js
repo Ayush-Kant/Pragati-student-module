@@ -1,5 +1,4 @@
 import Joi from "joi";
-import { sanitizeInput } from "../utils/assignmentHelpers.js";
 
 export const validateAssignment = (data) => {
   const schema = Joi.object({
@@ -31,12 +30,3 @@ export const validateAssignmentQuery = (data) => {
   return schema.validate(data, { abortEarly: false });
 };
 
-export const sanitizeAssignmentInput = (payload) => {
-  if (!payload || typeof payload !== "object") {
-    return payload;
-  }
-
-  return Object.fromEntries(
-    Object.entries(payload).map(([key, value]) => [key, sanitizeInput(value)])
-  );
-};

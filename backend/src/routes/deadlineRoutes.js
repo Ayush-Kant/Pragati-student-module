@@ -4,11 +4,11 @@ import { validateRequest } from "../middleware/validateRequest.js";
 import { validateAssignmentParams } from "../validators/assignmentValidator.js";
 import { validateDeadline } from "../validators/deadlineValidator.js";
 import { authenticateJWT } from "../middleware/authenticateJWT.js";
-import { authorizeStudent } from "../middleware/authorizeStudent.js";
+import { authorizeAssignmentAccess } from "../middleware/authorizeAssignmentAccess.js";
 
 const router = express.Router();
 
-router.use(authenticateJWT, authorizeStudent);
+router.use(authenticateJWT, authorizeAssignmentAccess);
 router.get("/deadlines", deadlineController.getDeadlines);
 router.patch("/:id/deadline", validateRequest(validateAssignmentParams, "params"), validateRequest(validateDeadline, "body"), deadlineController.updateDeadline);
 

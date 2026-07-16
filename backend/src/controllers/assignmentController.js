@@ -2,7 +2,7 @@ import assignmentService from "../services/assignmentService.js";
 
 export const getAllAssignments = async (req, res, next) => {
   try {
-    const assignments = await assignmentService.getAssignments(req.query);
+    const assignments = await assignmentService.getAssignments(req.validatedQuery || req.query);
     res.status(200).json({ success: true, data: assignments });
   } catch (error) {
     next(error);
@@ -11,7 +11,7 @@ export const getAllAssignments = async (req, res, next) => {
 
 export const getAssignmentById = async (req, res, next) => {
   try {
-    const assignment = await assignmentService.getAssignment(req.params.id);
+    const assignment = await assignmentService.getAssignment(req.validatedParams?.id || req.params.id);
     res.status(200).json({ success: true, data: assignment });
   } catch (error) {
     next(error);

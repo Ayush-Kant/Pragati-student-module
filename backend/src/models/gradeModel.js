@@ -32,7 +32,13 @@ export const getGrades = async (query = {}) => {
   return result.rows;
 };
 
-export const updateGrades = async (assignmentId, payload = {}) => {
+export const updateGrades = async (assignmentId, payload = {}, user = {}) => {
+  if (!payload.studentId) {
+    const error = new Error("studentId is required");
+    error.status = 400;
+    throw error;
+  }
+
   const result = await pool.query(`
     INSERT INTO assignment_grades (assignment_id, student_id, marks, grade)
     VALUES ($1, $2, $3, $4)
@@ -41,7 +47,7 @@ export const updateGrades = async (assignmentId, payload = {}) => {
       grade = EXCLUDED.grade,
       updated_at = NOW()
     RETURNING id, assignment_id AS "assignmentId", student_id AS "studentId", marks, grade, created_at AS "createdAt", updated_at AS "updatedAt"
-  `, [assignmentId, payload.studentId || 101, payload.marks || 0, payload.grade || "N/A"]);
+  `, [assignmentId, payload.studentId, payload.marks || 0, payload.grade || "N/A"]);
   return result.rows[0];
 };
 
