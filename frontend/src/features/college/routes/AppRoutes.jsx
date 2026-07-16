@@ -5,6 +5,7 @@ import DashboardPage from "../dashboard/pages/DashboardPage";
 import CollegeProfilePage from "../profile/pages/CollegeProfilePage";
 import OrganizationProfile from "../profile/pages/AddCollegeProfile";
 import StudentDatabasePage from "../students/pages/StudentDatabasePage";
+import StudentNominationPage from "../student-nomination/pages/StudentNominationPage";
 
 const collegeRoute = (
   <>
@@ -17,6 +18,7 @@ const collegeRoute = (
       <Route path="student" element={<StudentDatabasePage />} />
       <Route path="profile" element={<CollegeProfilePage />} />
       <Route path="update-profile" element={<OrganizationProfile />} />
+      <Route path="student-nomination" element={<StudentNominationPage />} />
     </Route>
   </>
 );
