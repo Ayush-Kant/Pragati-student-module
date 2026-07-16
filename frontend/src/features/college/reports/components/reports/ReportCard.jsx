@@ -79,7 +79,7 @@ export const ReportCard = ({
           <div className="shrink-0">
             <DownloadReport
               onClick={() => onDownload(report)}
-              isDownloading={downloadingId === report.reportName}
+              isDownloading={downloadingId === report.id}
               label="Get"
             />
           </div>

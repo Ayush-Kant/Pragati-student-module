@@ -89,6 +89,7 @@ export const getReportMockDetails = (report) => {
   if (!report) return null;
   
   const baseData = {
+    id: report.id,
     title: report.reportName,
     type: report.type,
     generatedOn: report.generatedOn,

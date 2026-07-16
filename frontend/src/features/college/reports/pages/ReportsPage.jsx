@@ -90,6 +90,7 @@ export const ReportsPage = () => {
 
   const {
     exportingId,
+    error: exportError,
     exportPDF,
     exportExcel,
     exportCSV,
@@ -98,6 +99,15 @@ export const ReportsPage = () => {
     triggerToast("Report file downloaded successfully.");
     fetchReports(); // Refresh download counts & statistics
   });
+
+  React.useEffect(() => {
+    if (exportError) {
+      const timer = setTimeout(() => {
+        triggerToast(exportError, "error");
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [exportError]);
 
   // Filtered reports computed list
   const filteredReportsList = React.useMemo(() => {
