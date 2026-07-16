@@ -24,7 +24,12 @@ async function seedData() {
         mentor_feedback,
         dashboard_stats,
         dashboard_activities,
-        dashboard_reports
+        dashboard_reports,
+        live_sessions,
+        session_attendance,
+        session_participants,
+        session_recordings,
+        session_schedules
       RESTART IDENTITY CASCADE;
     `);
 

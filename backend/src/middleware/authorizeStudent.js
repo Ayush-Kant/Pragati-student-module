@@ -1,19 +1,11 @@
-const authorizeStudent = (req, res, next) => {
-    if (!req.user) {
-        return res.status(401).json({
-            success: false,
-            message: "Unauthorized",
-        });
-    }
+export const authorizeStudent = (req, res, next) => {
+  if (!req.user || req.user.role !== "student") {
+    return res.status(403).json({
+      error: "Access forbidden",
+    });
+  }
 
-    if (req.user.role !== "student") {
-        return res.status(403).json({
-            success: false,
-            message: "Student access only",
-        });
-    }
-
-    next();
+  next();
 };
 
 export default authorizeStudent;

@@ -31,6 +31,8 @@ import questionBankRouter from "./routes/questionBank.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import liveSessionRoutes from "./src/routes/liveSessionRoutes.js";
+import initializeLiveSessionModule from "./src/database/migrations/liveSessionSchema.js";
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
 dotenv.config();
@@ -60,6 +62,9 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
+
+// Live Sessions Routes
+app.use("/api/student/live-sessions", liveSessionRoutes);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
@@ -89,7 +94,14 @@ app.get("/", (req, res) => {
 app.use(errorMiddleware);
 
 connectDB()
-  .then(() => {
+  .then(async () => {
+    try {
+      await initializeLiveSessionModule();
+      console.log("✅ Live session module initialized");
+    } catch (error) {
+      console.error("⚠️ Live session module initialization failed:", error.message);
+    }
+
     app.listen(PORT, () => {
       console.log(`✅ Server running on PORT : ${PORT}`);
     });
