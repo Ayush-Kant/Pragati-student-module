@@ -86,5 +86,11 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error("❌ PostgreSQL connection failed:", err.message);
+    console.error("⚠️ PostgreSQL connection failed:", err.message);
+    console.warn(
+      "Starting server without a database connection. Routes that require PostgreSQL will fail until the database is reachable.",
+    );
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on PORT : ${PORT} (database unavailable)`);
+    });
   });

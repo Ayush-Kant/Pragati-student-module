@@ -127,6 +127,14 @@ export const register = async (req, res) => {
       );
       userId = userResult.rows[0].id;
 
+      if (role === 'mentor') {
+        await client.query(
+          `INSERT INTO mentors (user_id)
+           VALUES ($1)`,
+          [userId]
+        );
+      }
+
       if (role === 'company') {
         const companyResult = await client.query(
           `INSERT INTO companies (user_id, name, email)
