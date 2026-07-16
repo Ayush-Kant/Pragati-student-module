@@ -36,6 +36,14 @@ import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
 
+// Company Assessment route
+import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
+
+// --- Intern Features ---
+import companyRoutes from "./routes/company.routes.js";
+import mentorHiringRoutes from "./routes/mentorHiring.routes.js";
+// -----------------------
+
 // company Assessment route
 import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 // Middleware
@@ -49,7 +57,6 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(errorMiddleware);
 
 app.use(
   cors({
@@ -74,8 +81,6 @@ app.use(
   }),
 );
 
-app.use(express.json());
-
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
@@ -86,23 +91,31 @@ app.use("/api/v1/admin/students", adminStudentRoutes);
 app.use("/api/v1/admin/mentors", adminMentorRoutes);
 app.use("/api/v1/admin/courses", adminCourseRoutes);
 app.use("/api/v1/admin/drives", adminDriveRoutes);
-app.use("/api/mentor", contentRoutes);
-app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/admin/company", adminCompanyRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
-app.use("/api/v1/company", companyProfileRoutes);
-app.use("/api/v1/company/training", trainingRoutes);
-app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
+app.use("/api/v1/admin/disputes", adminDisputeRoutes);
+
+app.use("/api/mentor", contentRoutes);
+app.use("/api/mentor", mentorRoutes);
+app.use("/api/v1/mentor", mentorHiringRoutes); // <-- Added from intern code
+
+app.use("/api/v1/company", companyProfileRoutes);
+app.use("/api/v1/company", companyRoutes); // <-- Added from intern code
+app.use("/api/v1/company/interviews", interviewRoutes); // <-- Added from intern code
+app.use("/api/v1/company/training", trainingRoutes);
+app.use("/api/v1/company/jobs", collegeJobsRoutes);
+app.use("/api/v1/company/assessments", companyAssessmentRoutes);
+
+app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/students", studentRoutes);
+
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
-app.use("/api/v1/company/jobs", collegeJobsRoutes);
+
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
-app.use("/api/v1/company/assessments", companyAssessmentRoutes);
-app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
 
 app.get("/", (req, res) => {
@@ -111,6 +124,7 @@ app.get("/", (req, res) => {
   });
 });
 
+// Error middleware should be placed after all routes
 app.use(errorMiddleware);
 
 connectDB()
