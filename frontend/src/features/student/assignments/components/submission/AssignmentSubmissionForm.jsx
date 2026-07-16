@@ -2,6 +2,7 @@ import { useState } from "react";
 import { validateSubmission } from "../../validations/assignmentValidation";
 import UploadAssignment from "./UploadAssignment";
 import ErrorState from "../common/ErrorState";
+import { CheckCircle2, Upload, Loader2 } from "lucide-react";
 
 const AssignmentSubmissionForm = ({
   assignment,
@@ -17,7 +18,11 @@ const AssignmentSubmissionForm = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const validationErrors = validateSubmission({ notes, file });
+
+    const validationErrors = validateSubmission({
+      notes,
+      file,
+    });
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -31,70 +36,119 @@ const AssignmentSubmissionForm = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 flex flex-col gap-5"
+      className="rounded-3xl border border-gray-200 bg-white shadow-sm overflow-hidden"
     >
-      <h3 className="text-base font-bold text-gray-800">
-        Submit Assignment
-        {assignment?.title && (
-          <span className="block text-xs font-normal text-gray-400 mt-0.5">
-            {assignment.title}
-          </span>
-        )}
-      </h3>
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-gray-100 px-7 py-5">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
+            <Upload className="h-6 w-6 text-blue-600" />
+          </div>
 
-      {submissionError && <ErrorState message={submissionError} />}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gray-400">
+              Assignment Submission
+            </p>
 
-      {submissionMessage && (
-        <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm font-medium px-4 py-3 rounded-xl">
-          ✓ {submissionMessage}
+            <h2 className="mt-1 text-xl font-bold text-gray-900">
+              Submit Assignment
+            </h2>
+
+            {assignment?.title && (
+              <p className="mt-1 text-sm text-gray-500">
+                {assignment.title}
+              </p>
+            )}
+          </div>
         </div>
-      )}
+      </div>
 
-      {/* Notes */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-          Submission Notes <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={4}
-          placeholder="Describe your submission, approach, or any notes for the instructor..."
-          className={`text-sm text-gray-700 bg-white border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder:text-gray-400 transition-shadow ${
-            errors.notes ? "border-red-300" : "border-gray-200"
-          }`}
-        />
-        {errors.notes && (
-          <p className="text-xs text-red-500">{errors.notes}</p>
+      {/* Body */}
+      <div className="space-y-6 p-7">
+
+        {submissionError && (
+          <ErrorState message={submissionError} />
         )}
-      </div>
 
-      {/* File Upload */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-          File Upload <span className="text-red-500">*</span>
-        </label>
-        <UploadAssignment file={file} onFileChange={setFile} error={errors.file} />
-      </div>
+        {submissionMessage && (
+          <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+            {submissionMessage}
+          </div>
+        )}
 
-      {/* Actions */}
-      <div className="flex items-center justify-end gap-3 pt-1">
-        {onCancel && (
+        {/* Notes */}
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Submission Notes
+            <span className="text-red-500"> *</span>
+          </label>
+
+          <textarea
+            rows={5}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Describe your submission, implementation details, approach, or notes for the evaluator..."
+            className={`w-full rounded-2xl border bg-white px-4 py-3 text-sm text-gray-700 transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100 ${
+              errors.notes
+                ? "border-red-300"
+                : "border-gray-200"
+            }`}
+          />
+
+          {errors.notes && (
+            <p className="mt-2 text-xs text-red-500">
+              {errors.notes}
+            </p>
+          )}
+        </div>
+
+        {/* Upload */}
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Upload File
+            <span className="text-red-500"> *</span>
+          </label>
+
+          <UploadAssignment
+            file={file}
+            onFileChange={setFile}
+            error={errors.file}
+          />
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end gap-3 border-t border-gray-100 pt-5">
+
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+          )}
+
           <button
-            type="button"
-            onClick={onCancel}
-            className="text-sm font-semibold text-gray-500 hover:text-gray-700 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+            type="submit"
+            disabled={loading}
+            className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Cancel
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4" />
+                Submit Assignment
+              </>
+            )}
           </button>
-        )}
-        <button
-          type="submit"
-          disabled={loading}
-          className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          {loading ? "Submitting..." : "Submit"}
-        </button>
+
+        </div>
       </div>
     </form>
   );

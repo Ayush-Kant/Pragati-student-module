@@ -1,17 +1,35 @@
 import { formatDate, getStatusColor } from "../../utils/assignmentHelpers";
 import EmptyState from "../common/EmptyState";
 import SectionHeader from "../common/SectionHeader";
+import { History, FileText, CheckCircle2, Clock3, AlertTriangle } from "lucide-react";
+
+const statusDotColor = (status) => {
+  if (status === "Submitted") return "bg-emerald-400";
+  if (status === "Late") return "bg-red-400";
+  return "bg-blue-400";
+};
+
+const statusIcon = (status) => {
+  if (status === "Submitted") return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />;
+  if (status === "Late") return <AlertTriangle className="w-3.5 h-3.5 text-red-500" />;
+  return <Clock3 className="w-3.5 h-3.5 text-blue-500" />;
+};
 
 const SubmissionHistory = ({ history = [] }) => (
   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
     <SectionHeader
-      title="Submission History"
+      title={
+        <div className="flex items-center gap-2">
+          <History className="w-5 h-5 text-gray-500" />
+          <span>Submission History</span>
+        </div>
+      }
       subtitle={`${history.length} attempt${history.length !== 1 ? "s" : ""}`}
     />
 
     {history.length === 0 ? (
       <EmptyState
-        icon="🕐"
+        icon={<History className="w-8 h-8 text-gray-400" />}
         title="No submissions yet"
         description="Your submission attempts will appear here."
       />
@@ -19,40 +37,42 @@ const SubmissionHistory = ({ history = [] }) => (
       <div className="flex flex-col gap-0">
         {history.map((entry, index) => (
           <div key={entry.id ?? index} className="flex items-start gap-3 pb-4 last:pb-0">
-            {/* Timeline line */}
-            <div className="flex flex-col items-center shrink-0">
-              <div className="w-2.5 h-2.5 rounded-full bg-blue-400 mt-1.5" />
+            {/* Timeline connector */}
+            <div className="flex flex-col items-center shrink-0 pt-1">
+              <div className={`w-2.5 h-2.5 rounded-full mt-0.5 ${statusDotColor(entry.status)}`} />
               {index < history.length - 1 && (
-                <div className="w-px flex-1 bg-gray-100 mt-1 min-h-[24px]" />
+                <div className="w-px flex-1 bg-gray-100 mt-1.5 min-h-[24px]" />
               )}
             </div>
 
             {/* Content */}
-            <div className="flex-1 min-w-0 pb-4 last:pb-0">
-              <div className="flex items-center justify-between gap-2 mb-0.5">
+            <div className="flex-1 min-w-0 bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
+              <div className="flex items-center justify-between gap-2 mb-1">
                 <p className="text-sm font-semibold text-gray-800">
                   Attempt #{index + 1}
                 </p>
                 <span
-                  className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getStatusColor(
+                  className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${getStatusColor(
                     entry.status
                   )}`}
                 >
+                  {statusIcon(entry.status)}
                   {entry.status}
                 </span>
               </div>
               {entry.submittedAt && (
-                <p className="text-xs text-gray-400">
-                  {formatDate(entry.submittedAt)}
-                </p>
+                <p className="text-xs text-gray-400">{formatDate(entry.submittedAt)}</p>
               )}
               {entry.fileName && (
-                <p className="text-xs text-gray-500 mt-1 truncate">
-                  📄 {entry.fileName}
+                <p className="text-xs text-gray-600 mt-1.5 flex items-center gap-1.5 font-medium">
+                  <FileText className="w-3.5 h-3.5 text-gray-400" />
+                  {entry.fileName}
                 </p>
               )}
               {entry.notes && (
-                <p className="text-xs text-gray-500 mt-1 italic">{entry.notes}</p>
+                <p className="text-xs text-gray-500 mt-1 italic leading-relaxed">
+                  "{entry.notes}"
+                </p>
               )}
             </div>
           </div>

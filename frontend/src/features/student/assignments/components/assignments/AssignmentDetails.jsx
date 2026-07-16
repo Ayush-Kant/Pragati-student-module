@@ -1,11 +1,26 @@
-import { formatDate, calculateDaysLeft, getStatusColor } from "../../utils/assignmentHelpers";
+import {
+  formatDate,
+  calculateDaysLeft,
+  getStatusColor,
+} from "../../utils/assignmentHelpers";
+import {
+  BookOpen,
+  CalendarDays,
+  Clock3,
+  Award,
+  FileText,
+} from "lucide-react";
 
-const DetailRow = ({ label, value }) => (
-  <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
-    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide w-28 shrink-0 pt-0.5">
+const MetaItem = ({ icon: Icon, label, children }) => (
+  <div className="flex flex-col gap-2">
+    <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-gray-400">
+      <Icon className="w-4 h-4 text-blue-500" />
       {label}
-    </span>
-    <span className="text-sm text-gray-700">{value}</span>
+    </div>
+
+    <div className="text-sm font-semibold text-gray-800">
+      {children}
+    </div>
   </div>
 );
 
@@ -15,63 +30,112 @@ const AssignmentDetails = ({ assignment }) => {
   const daysLeft = calculateDaysLeft(assignment.dueDate);
   const isOverdue = daysLeft !== null && daysLeft < 0;
 
+  const urgencyLabel = isOverdue
+    ? `${Math.abs(daysLeft)} days overdue`
+    : daysLeft === 0
+    ? "Due today"
+    : daysLeft !== null
+    ? `${daysLeft} days remaining`
+    : "N/A";
+
+  const urgencyColor = isOverdue
+    ? "bg-red-50 text-red-600 border border-red-200"
+    : daysLeft !== null && daysLeft <= 3
+    ? "bg-amber-50 text-amber-700 border border-amber-200"
+    : "bg-blue-50 text-blue-700 border border-blue-200";
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
-      <div className="flex items-start justify-between gap-3 mb-5">
-        <h2 className="text-base font-bold text-gray-800">{assignment.title}</h2>
-        <span
-          className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${getStatusColor(
-            assignment.status
-          )}`}
-        >
-          {assignment.status}
-        </span>
+    <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+
+      {/* ================= HERO ================= */}
+
+      <div className="border-t-4 border-blue-600 bg-white px-8 py-8">
+
+        <div className="flex items-start justify-between gap-6">
+
+          {/* Left */}
+
+          <div className="flex items-start gap-5 flex-1">
+
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-300/40">
+              <BookOpen className="h-8 w-8 text-white" />
+            </div>
+
+            <div className="flex-1">
+
+              <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">
+                {assignment.subject}
+              </span>
+
+              <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900">
+                {assignment.title}
+              </h1>
+
+              {assignment.description && (
+                <p className="mt-4 max-w-3xl text-sm leading-7 text-gray-600">
+                  {assignment.description}
+                </p>
+              )}
+            </div>
+
+          </div>
+
+          {/* Status */}
+
+          <span
+            className={`shrink-0 rounded-xl px-4 py-2 text-sm font-semibold shadow-sm ${getStatusColor(
+              assignment.status
+            )}`}
+          >
+            {assignment.status}
+          </span>
+
+        </div>
+
       </div>
 
-      <div className="divide-y divide-gray-100">
-        <DetailRow label="Subject" value={assignment.subject} />
-        <DetailRow label="Due Date" value={formatDate(assignment.dueDate)} />
-        <DetailRow
-          label="Days Left"
-          value={
-            daysLeft !== null ? (
-              <span
-                className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                  isOverdue
-                    ? "bg-red-100 text-red-600"
-                    : daysLeft <= 3
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-gray-100 text-gray-500"
-                }`}
-              >
-                {isOverdue
-                  ? `${Math.abs(daysLeft)} days overdue`
-                  : daysLeft === 0
-                  ? "Due today"
-                  : `${daysLeft} days remaining`}
-              </span>
-            ) : (
-              "N/A"
-            )
-          }
-        />
-        <DetailRow label="Max Marks" value={`${assignment.marks} marks`} />
-        <DetailRow
-          label="Submission"
-          value={
+      {/* ================= METADATA ================= */}
+
+      <div className="grid grid-cols-2 gap-5 border-t border-gray-100 bg-gray-50 p-8 sm:grid-cols-4">
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <MetaItem icon={CalendarDays} label="Due Date">
+            {formatDate(assignment.dueDate)}
+          </MetaItem>
+        </div>
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <MetaItem icon={Clock3} label="Deadline">
             <span
-              className={`text-xs font-semibold px-2.5 py-1 rounded-full ${getStatusColor(
+              className={`inline-flex rounded-lg px-3 py-1 text-xs font-semibold ${urgencyColor}`}
+            >
+              {urgencyLabel}
+            </span>
+          </MetaItem>
+        </div>
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <MetaItem icon={Award} label="Maximum Marks">
+            <span className="text-xl font-bold text-gray-900">
+              {assignment.marks}
+            </span>
+          </MetaItem>
+        </div>
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <MetaItem icon={FileText} label="Submission">
+            <span
+              className={`inline-flex rounded-lg px-3 py-1 text-xs font-semibold ${getStatusColor(
                 assignment.submissionStatus
               )}`}
             >
               {assignment.submissionStatus}
             </span>
-          }
-        />
-        {assignment.description && (
-          <DetailRow label="Description" value={assignment.description} />
-        )}
+          </MetaItem>
+        </div>
+
       </div>
+
     </div>
   );
 };
