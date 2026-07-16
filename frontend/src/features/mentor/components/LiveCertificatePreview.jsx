@@ -109,7 +109,7 @@ const LiveCertificatePreview = ({ data }) => {
           </h2>
 
           <p className="mb-5 text-lg italic text-gray-500">
-            This certificate is proudly presented to
+            This is to certify that
           </p>
 
           <h2

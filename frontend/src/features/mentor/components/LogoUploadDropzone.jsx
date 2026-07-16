@@ -8,18 +8,13 @@ const ALLOWED_TYPES = [
   "image/jpeg",
   "image/jpg",
   "image/svg+xml",
-  "image/webp"
+  "image/webp",
 ];
 
-const LogoUploadDropzone = ({
-  watch,
-  setValue,
-  errors,
-}) => {
+const LogoUploadDropzone = ({ watch, setValue, errors }) => {
   const inputRef = useRef(null);
 
   const [uploading, setUploading] = useState(false);
-
   const [uploadError, setUploadError] = useState("");
 
   const logo = watch("logo");
@@ -41,15 +36,16 @@ const LogoUploadDropzone = ({
 
     try {
       setUploading(true);
-const response = await uploadLogo(file);
 
-const logoUrl = `http://localhost:5000${response.url}`;
+      const response = await uploadLogo(file);
 
-setValue("logo", {
-  url: logoUrl,
-  preview: logoUrl,
-  fileName: file.name,
-});
+      const logoUrl = `http://localhost:5000${response.url}`;
+
+      setValue("logo", {
+        url: logoUrl,
+        preview: logoUrl,
+        fileName: file.name,
+      });
     } catch (err) {
       console.error(err);
       setUploadError("Failed to upload logo.");
@@ -64,7 +60,6 @@ setValue("logo", {
 
   const onDrop = (e) => {
     e.preventDefault();
-
     handleFile(e.dataTransfer.files[0]);
   };
 
@@ -74,62 +69,62 @@ setValue("logo", {
         onClick={() => inputRef.current.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={onDrop}
-        className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:bg-gray-50 transition"
+        className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:bg-gray-50 transition min-h-[220px] flex items-center justify-center"
       >
         {uploading ? (
-          <p className="text-blue-600 font-medium">
-            Uploading...
-          </p>
+          <p className="text-blue-600 font-medium">Uploading...</p>
+        ) : logo?.url ? (
+          <div className="flex flex-col items-center gap-4">
+            <img
+              src={logo.preview || logo.url}
+              alt="Logo"
+              className="w-28 h-28 object-contain border rounded-lg p-2 bg-white"
+            />
+
+            <div>
+              <p className="font-medium text-gray-800">{logo.fileName}</p>
+            </div>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setValue("logo", null);
+
+                if (inputRef.current) {
+                  inputRef.current.value = "";
+                }
+              }}
+              className="text-red-500 hover:text-red-700 text-sm font-medium"
+            >
+              Remove
+            </button>
+          </div>
         ) : (
-          <>
-            <p className="font-medium">
+          <div>
+            <p className="font-medium text-lg">Upload Logo</p>
+
+            <p className="mt-2">
               Click to upload or drag & drop
             </p>
 
             <p className="text-sm text-gray-500 mt-2">
               PNG, JPG or SVG (Max 2 MB)
             </p>
-          </>
+          </div>
         )}
 
         <input
           ref={inputRef}
           type="file"
-          accept=".png,.jpg,.jpeg,.svg"
+          accept=".png,.jpg,.jpeg,.svg,.webp"
           className="hidden"
           onChange={onInputChange}
         />
       </div>
 
-      {logo?.url && (
-  <div className="border rounded-lg p-3 flex items-center gap-3">
-
-    <img
-      src={logo.preview || logo.url}
-      alt="Logo"
-      className="w-14 h-14 object-contain border rounded"
-    />
-
-    <div className="flex-1">
-      <p className="font-medium">
-        {logo.fileName}
-      </p>
-    </div>
-
-    <button
-      type="button"
-      onClick={() => setValue("logo", null)}
-      className="text-red-500 text-sm"
-    >
-      Remove
-    </button>
-
-  </div>
-)}
       {uploadError && (
-        <p className="text-red-500 text-sm">
-          {uploadError}
-        </p>
+        <p className="text-red-500 text-sm">{uploadError}</p>
       )}
 
       {errors.logo && (
