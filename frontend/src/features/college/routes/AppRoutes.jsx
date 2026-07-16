@@ -43,7 +43,6 @@ import CollegeProfilePage from "../profile/pages/CollegeProfilePage";
 import OrganizationProfile from "../profile/pages/AddCollegeProfile";
 import StudentDatabasePage from "../students/pages/StudentDatabasePage";
 import CompanyJobPostingsPage from "../company-job-postings/pages/CompanyJobPostingsPage";
-import StudentProfilePage from "../student-profile/pages/StudentProfilePage";
 import DepartmentsPage from "../departments/pages/DepartmentsPage";
 import PlacementDrivesPage from "../placement-drives/pages/PlacementDrivesPage";
 import ReportsPage from "../reports/pages/ReportsPage";
@@ -100,11 +99,6 @@ const collegeRoute = (
         element={<CompanyJobPostingsPage />}
       />
 
-      {/* Student Database */}
-      <Route path="student" element={<StudentDatabasePage />} />
-      <Route path="student-profile" element={<StudentProfilePage />} />
-      <Route path="student-profile/:id" element={<StudentProfilePage />} />
-      <Route path="student-performance" element={<StudentProfilePage />} />
       <Route path="companies" element={<CompanyJobPostingsPage />} />
       {/* Placement Drives */}
       <Route
