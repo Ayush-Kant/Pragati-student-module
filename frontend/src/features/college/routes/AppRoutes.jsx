@@ -13,9 +13,9 @@ import PlacementDrivesPage from "../placement-drives/pages/PlacementDrivesPage";
 const collegeRoute = (
   <Route element={<PrivateRoute />}>
     <Route element={<RoleRoute allowedRoles={['college']} />}>
-      <Route path="add-profile" element={<OrganizationProfile />} />
       <Route path="college" element={<CollegeLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="add-profile" element={<OrganizationProfile />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="student" element={<StudentDatabasePage />} />
         <Route path="profile" element={<CollegeProfilePage />} />

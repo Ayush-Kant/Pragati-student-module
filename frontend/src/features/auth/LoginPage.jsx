@@ -114,7 +114,7 @@ const AuthPage = () => {
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
         login(result.role, result.token);
         if (result.role === 'college' && !profileData?.id) {
-          navigate(`/add-profile`);
+          navigate(`/college/add-profile`);
         } else {
           navigate(getRedirectPath(result.role));
         }

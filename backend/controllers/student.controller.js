@@ -1,11 +1,13 @@
 import * as studentService from '../services/student.service.js';
 import { validateStudent, validateAcademicDetails, validateSkill, validateRequestBody } from '../validators/student.validator.js';
 import { pool } from '../config/db.js';
+import { resolveUserIntId } from '../utils/userResolver.js';
 
 // Helper: get college details for the logged-in user
 const getCollegeDetails = async (userId) => {
   try {
-    const res = await pool.query('SELECT id, name FROM colleges WHERE user_id = $1', [userId]);
+    const intUserId = await resolveUserIntId(userId);
+    const res = await pool.query('SELECT id, name FROM colleges WHERE user_id = $1', [intUserId]);
     return res.rows[0] || null;
   } catch {
     return null;
