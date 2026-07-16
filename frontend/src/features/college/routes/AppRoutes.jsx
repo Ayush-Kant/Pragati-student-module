@@ -46,6 +46,7 @@ import CompanyJobPostingsPage from "../company-job-postings/pages/CompanyJobPost
 import StudentProfilePage from "../student-profile/pages/StudentProfilePage";
 import DepartmentsPage from "../departments/pages/DepartmentsPage";
 import PlacementDrivesPage from "../placement-drives/pages/PlacementDrivesPage";
+import ReportsPage from "../reports/pages/ReportsPage";
 
 const collegeRoute = (
   <>
@@ -109,6 +110,12 @@ const collegeRoute = (
       <Route
         path="drives"
         element={<PlacementDrivesPage />}
+      />
+
+      {/* Reports */}
+      <Route
+        path="reports"
+        element={<ReportsPage />}
       />
     </Route>
   </>
