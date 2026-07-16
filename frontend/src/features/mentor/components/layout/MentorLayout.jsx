@@ -1,9 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import {
   LayoutDashboard,
-  LineChart,
+  Users,
+  CalendarDays,
+  ClipboardList,
+  ListTodo,
+  MonitorCheck,
+  BarChart3,
+  FileBarChart,
   Settings,
   Search,
   Bell,
@@ -61,7 +67,7 @@ export default function MentorLayout() {
     },
     {
       name: "Projects",
-      path: "/mentor/projects/create",
+      path: "/mentor/project-analytics",
       icon: <Briefcase className="w-5 h-5" />,
     },
     {
@@ -75,9 +81,9 @@ export default function MentorLayout() {
       icon: <Database className="w-5 h-5" />,
     },
     {
-      name: "Attempt History",
-      path: "/mentor/question-bank/attempts",
-      icon: <History className="w-5 h-5" />,
+      name: "Submission Monitoring",
+      path: "/mentor/submission-monitoring",
+      icon: <MonitorCheck className="w-5 h-5" />,
     },
     {
       name: "Challenge Creator",
