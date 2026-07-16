@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from "@sequelize/core";
 import sequelize from "../../config/sequelize.js";
 import Training from "./Training.js";
 import Student from "./Student.js";
@@ -78,11 +78,20 @@ TrainingProgress.init(
         }
       },
     },
-  }
+  },
 );
 
-TrainingProgress.belongsTo(Training, { foreignKey: "trainingId", as: "training" });
-TrainingProgress.belongsTo(Student, { foreignKey: "candidateId", as: "candidate" });
-Training.hasMany(TrainingProgress, { foreignKey: "trainingId", as: "progressList" });
+TrainingProgress.belongsTo(Training, {
+  foreignKey: "trainingId",
+  as: "training",
+});
+TrainingProgress.belongsTo(Student, {
+  foreignKey: "candidateId",
+  as: "candidate",
+});
+Training.hasMany(TrainingProgress, {
+  foreignKey: "trainingId",
+  as: "progressList",
+});
 
 export default TrainingProgress;

@@ -16,15 +16,16 @@ import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
 
+
 function App() {
+
   return (
     <AuthProvider>
       <Toaster />
       <Routes>
-        
         <Route path="/" element={<Navigate to="/login" replace />} />
         
-        {/* ── Auth Routes ────────────────────────────────────────── */}
+        {/* ── Auth Routes ── */}
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
 
@@ -32,22 +33,17 @@ function App() {
         {mentorRoute}
 
         {/* ── Admin ─────────────────────────────────────────────────── */}
-       
         {AdminRoute}
 
         {/* ── Student ───────────────────────────────────────────────── */}
         {StudentRoutes}
 
-      {/* Collge */}
+        {/* ── College ── */}
+        {collegeRoute}
 
-      {collegeRoute}
+        {/* ── Company ── */}
+        {CompanyRoute}
 
-
-  {/* Company */}
-
-      {CompanyRoute}
-
-      
         {/* Public certificate verification */}
         <Route path='/verify/:code' element={<VerificationPage />} />
 

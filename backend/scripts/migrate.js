@@ -15,26 +15,33 @@ const migrationsDir = path.join(__dirname, "../migrations");
 const migrationFiles = [
   "001_create_users_mentors.sql",
   "002_create_content_tables.sql",
-  "003_create_admin_dashboard.sql",
-  "004_create_college_management.sql",
-  "004_create_notifications.sql",
   "005_create_company_management.sql",
-  "005_create_company_tables.sql",
-  "005_create_recruitment_drives.sql",
+  "004_create_college_management.sql",
   "005_create_student_management.sql",
+  "005_create_recruitment_drives.sql",
+  "005_create_company_tables.sql",
+  "003_create_admin_dashboard.sql",
+  "004_create_notifications.sql",
   "006_create_assessments.sql",
   "006_create_college_profiles.sql",
   "006_create_dashboard_support.sql",
-  "006_create_question_bank.sql",
   "006_create_training_coordination.sql",
-  "007_offers_hiring_tables.sql",
-  "006_update_interviews_table.sql",
+  "006_create_mentor_management.sql",
+  "006_create_question_bank.sql",
   "007_create_dashboard_tables.sql",
-  "006_create_reports_analytics_tables.sql",
-  "008_create_coding_challenges.sql",
+  "007_offers_hiring_tables.sql",
   "008_create_notifications.sql",
   "010_create_disputes.sql",
   "Students.sql",
+  "006_update_interviews_table.sql",
+  "008_create_coding_challenges.sql",
+  "009_create_college_department_courses.sql",
+  "009_create_reports_analytics_tables.sql",
+  "011_create_job_posting_tables.sql",
+  "012_create_jobs_table.sql",
+  "019_create_notifications.sql",
+  "college.department.course.seeddata.sql",
+  "student_module.sql"
 ];
 
 async function runMigrationsFresh() {
@@ -239,6 +246,7 @@ async function runMigrations() {
     console.error(error);
 
     throw error;
+
   } finally {
     client.release();
   }

@@ -18,18 +18,27 @@ import adminCompanyRoutes from "./routes/admin.company.routes.js";
 
 // Standard & Role-Specific Routes
 import authRouter from "./routes/auth.routes.js";
+import studentRoutes from "./routes/student.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
-import companyRoutes from "./routes/admin.company.routes.js";
+import collegeProfileRoutes from "./routes/collage.profile.routes.js";
 import companyProfileRoutes from "./modules/company/routes/companyProfile.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import questionBankRouter from "./routes/questionBank.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
+import collegeJobsRoutes from "./routes/college.jobs.routes.js";
+import departmentRoutes from "./routes/college.department.routes.js";
+import courseRoutes from "./routes/college.course.routes.js";
+import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 
+// company Assessment route
+import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
+
 dotenv.config();
 
 console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
@@ -37,22 +46,32 @@ console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(express.json());
+app.use(errorMiddleware);
+
 app.use(
   cors({
     origin: (origin, callback) => {
       if (
         !origin ||
         origin.startsWith("http://localhost:") ||
-        origin.startsWith("http://127.0.0.1:")
+        origin.startsWith("http://127.0.0.1:") ||
+        origin.startsWith("http://localhost")
       ) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"), false);
+        const clientUrl = process.env.CLIENT_URL;
+        if (clientUrl && origin === clientUrl) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"), false);
+        }
       }
     },
     credentials: true,
   }),
 );
+
 app.use(express.json());
 
 // Routes
@@ -72,8 +91,16 @@ app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/company", companyProfileRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/student/notifications", notificationRoutes);
-app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
+app.use("/api/students", studentRoutes);
+app.use("/api/college/profile", collegeProfileRoutes);
+app.use("/api/college/dashboard", collegeDashboardRoutes);
+app.use("/api/v1/company/jobs", collegeJobsRoutes);
+app.use("/api/departments/statistics", departmentStatisticsRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/v1/company/assessments", companyAssessmentRoutes);
+app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 
 app.get("/", (req, res) => {
   res.json({
@@ -91,4 +118,5 @@ connectDB()
   })
   .catch((err) => {
     console.error("❌ PostgreSQL connection failed:", err.message);
+    process.exit(1);
   });

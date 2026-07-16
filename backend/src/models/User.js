@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from "@sequelize/core";
 import sequelize from "../../config/sequelize.js";
 
 class User extends Model {}
@@ -29,7 +29,7 @@ User.init(
     tableName: "users",
     underscored: true,
     timestamps: false,
-  }
+  },
 );
 
 export default User;

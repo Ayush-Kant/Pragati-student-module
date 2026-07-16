@@ -376,7 +376,7 @@ export const getCandidates = async (driveId, { stage, page = 1, limit = 20 }) =>
   const dataResult = await pool.query(
   `SELECT
       sdp.student_id,
-      s.name AS full_name,
+      s.name,
       s.college,
       sdp.current_stage,
       sdp.assessment_score,
@@ -392,7 +392,7 @@ export const getCandidates = async (driveId, { stage, page = 1, limit = 20 }) =>
   return {
    candidates: dataResult.rows.map((row) => ({
   studentId: `stu_${row.student_id}`,
-  name: row.full_name,
+  name: row.name,
   college: row.college,
   currentStage: row.current_stage,
   assessmentScore: row.assessment_score !== null ? Number(row.assessment_score) : null,

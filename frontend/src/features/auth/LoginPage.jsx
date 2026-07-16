@@ -5,6 +5,7 @@ import manager from "./images/managers.png";
 import mentor from "./images/mentor.png";
 import { loginApi } from './services/auth.services';
 import { useAuth } from '../../context/AuthContext';
+import { getProfile } from '../college/services/collegeService';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const AuthPage = () => {
   const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, isAuthenticated, userRole } = useAuth();
+  const [profileData, setProfileData] = useState({});
 
   const getRedirectPath = (role) => (role === 'admin' ? '/admin' : `/${role}/dashboard`);
 
@@ -64,6 +66,7 @@ const AuthPage = () => {
   ];
 
   useEffect(() => {
+    fetchProfile();
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev === slidesData.length - 1 ? 0 : prev + 1));
     }, 3500);
@@ -71,6 +74,17 @@ const AuthPage = () => {
   }, [slidesData.length]);
 
   const current = slidesData[currentSlide];
+
+    const fetchProfile = async () => {
+     try {
+        const result = await getProfile();
+        if(result.success){
+          setProfileData(result.data);
+        }
+      } catch (err) {
+        console.error('Login error:', err);
+      }
+     };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -110,7 +124,11 @@ const AuthPage = () => {
       if (result.success) {
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
         login(result.role, result.token);
-        navigate(getRedirectPath(result.role));
+        if (result.role === 'college' && !profileData?.id) {
+          navigate(`/add-profile`);
+        } else {
+          navigate(getRedirectPath(result.role));
+        }
       } else {
         setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
       }
