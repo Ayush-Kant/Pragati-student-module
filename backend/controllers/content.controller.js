@@ -54,7 +54,12 @@ export const getCourses = async (req, res) => {
     const userId = req.user.userId;
     const { status, driveId } = req.query;
 
-    const result = await getCoursesService({ userId, status, driveId });
+    const result = await getCoursesService({
+      userId,
+      userRole: req.user.role,
+      status,
+      driveId,
+    });
 
     if (result && result.status === "FORBIDDEN") {
       return res.status(403).json({

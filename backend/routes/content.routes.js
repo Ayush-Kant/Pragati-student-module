@@ -18,9 +18,9 @@ import {
 
 const router = express.Router();
 
-// All routes protected — mentor only
+// All routes protected — mentor and admin only
 router.use(authMiddleware);
-router.use(roleMiddleware("mentor"));
+router.use(roleMiddleware("mentor", "admin"));
 
 // Courses
 router.post("/courses", validateCreateCourse, createCourse);
