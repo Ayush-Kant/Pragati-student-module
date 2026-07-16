@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { getProfile } from "../services/collegeService";
 
-import CollegeNavbar from "../navbar/components/Navbar";
+import CollegeNavbar from "../navbar/components/navbar";
 import CollegeSidebar from "../components/CollegeSidebar";
 import MobileSidebar from "../dashboard/components/layout/MobileSidebar";
 import CollegeFooter from "../components/CollegeFooter";
@@ -51,9 +51,7 @@ const CollegeLayout = () => {
   return (
     <div
       className={`min-h-screen transition-all duration-300 ${
-        darkMode
-          ? "bg-slate-900 text-white"
-          : "bg-slate-100 text-black"
+        darkMode ? "bg-slate-900 text-white" : "bg-slate-100 text-black"
       }`}
     >
       {/* Navbar */}

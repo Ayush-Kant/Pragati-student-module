@@ -1,4 +1,4 @@
-// ProfilePage.jsx
+// ProfilePage.jsx (merged)
 import { useState } from "react";
 import ProfileEditForm from "../../components/profile/ProfileEditForm";
 

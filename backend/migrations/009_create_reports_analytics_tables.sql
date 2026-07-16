@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS skill_demand_metrics (
     demand_count INTEGER DEFAULT 0,
     supply_count INTEGER DEFAULT 0,
     gap_index NUMERIC(6, 2),
-    trend VARCHAR(20) CHECK (trend IN ('INCREASING', 'STABLE', 'DECREASING'))
+    trend VARCHAR(50) CHECK (trend IN ('INCREASING', 'STABLE', 'DECREASING'))
 );
 
 CREATE TABLE IF NOT EXISTS analytics_cache (

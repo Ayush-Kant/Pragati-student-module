@@ -2,10 +2,10 @@
 
 import * as service from '../services/company.service.js';
 
-import {sendApprovalEmail} from '../services/company.email.service.js';
-import {sendRejectionEmail} from '../services/company.email.service.js';
-import {sendSuspensionEmail} from '../services/company.email.service.js';
-import {sendReinstatementEmail} from '../services/company.email.service.js';
+import {sendApprovalEmail} from '../services/admin.company.email.service.js';
+import {sendRejectionEmail} from '../services/admin.company.email.service.js';
+import {sendSuspensionEmail} from '../services/admin.company.email.service.js';
+import {sendReinstatementEmail} from '../services/admin.company.email.service.js';
 
 const getAllCompanies = async (req, res) => {
     try {

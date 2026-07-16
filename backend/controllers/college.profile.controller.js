@@ -1,11 +1,13 @@
 import { response } from "express";
 import {createProfile, getProfile, updateProfile} from "../services/college.profile.service.js";
+import { resolveUserIntId } from "../utils/userResolver.js";
 
 
 export const getCollegeProfile = async (req, res, next) => {
   try {
     const userId = req.user.userId;
-    const profile = await getProfile(userId);
+    const intUserId = await resolveUserIntId(userId);
+    const profile = await getProfile(intUserId);
 
     if (!profile) {
       return res.status(404).json({
@@ -27,8 +29,9 @@ export const getCollegeProfile = async (req, res, next) => {
 export const updateCollegeProfile = async (req, res, next) => {
   try {
     const userId = req.user.userId;
+    const intUserId = await resolveUserIntId(userId);
     const updateData = req.body;
-    const updatedProfile = await updateProfile(userId, updateData);
+    const updatedProfile = await updateProfile(intUserId, updateData);
 
     if (!updatedProfile) {
       return res.status(404).json({
@@ -53,7 +56,8 @@ export const createCollegeProfile = async (req, res, next) => {
   try {
     const createData = req.body;
     const userId = req.user.userId;
-    createData.user_id = userId;
+    const intUserId = await resolveUserIntId(userId);
+    createData.user_id = intUserId;
 
     const newProfile = await createProfile(createData);
 

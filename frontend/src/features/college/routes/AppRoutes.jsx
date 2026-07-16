@@ -35,7 +35,8 @@
 
 
 import { Navigate, Route } from "react-router-dom";
-
+import PrivateRoute from "../../../routes/PrivateRoute";
+import RoleRoute from "../../../routes/RoleRoute";
 import CollegeLayout from "../layouts/CollegeLayout";
 
 import DashboardPage from "../dashboard/pages/DashboardPage";
@@ -49,76 +50,34 @@ import PlacementDrivesPage from "../placement-drives/pages/PlacementDrivesPage";
 import ReportsPage from "../reports/pages/ReportsPage";
 
 const collegeRoute = (
-  <>
-    {/* College Layout */}
-    <Route
-      path="college"
-      element={<CollegeLayout />}
-    >
-      <Route
-        path="add-profile"
-        element={<OrganizationProfile />}
-      />
-      <Route
-        index
-        element={<Navigate to="dashboard" replace />}
-      />
+  <Route element={<PrivateRoute />}>
+    <Route element={<RoleRoute allowedRoles={['college']} />}>
+      <Route path="college" element={<CollegeLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        
+        <Route path="add-profile" element={<OrganizationProfile />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="profile" element={<CollegeProfilePage />} />
+        <Route path="update-profile" element={<OrganizationProfile />} />
+        
+        <Route path="departments" element={<DepartmentsPage />} />
+        
+        <Route path="student" element={<StudentDatabasePage />} />
+        <Route path="student-profile" element={<StudentProfilePage />} />
+        <Route path="student-profile/:id" element={<StudentProfilePage />} />
+        <Route path="student-performance" element={<StudentProfilePage />} />
+        
+        <Route path="company-job-postings" element={<CompanyJobPostingsPage />} />
+        <Route path="companies" element={<CompanyJobPostingsPage />} />
+        
+        <Route path="drives" element={<PlacementDrivesPage />} />
+        <Route path="reports" element={<ReportsPage />} />
 
-      {/* Dashboard */}
-      <Route
-        path="dashboard"
-        element={<DashboardPage />}
-      />
-
-      {/* Profile */}
-      <Route
-        path="profile"
-        element={<CollegeProfilePage />}
-      />
-
-      <Route
-        path="update-profile"
-        element={<OrganizationProfile />}
-      />
-
-      <Route path="dashboard" element={<DashboardPage />} />
-      <Route path="departments" element={<DepartmentsPage />} />
-
-      <Route path="student" element={<StudentDatabasePage />} />
-      <Route path="profile" element={<CollegeProfilePage />} />
-      <Route path="update-profile" element={<OrganizationProfile />} />
-
-      {/* Students */}
-      <Route
-        path="student"
-        element={<StudentDatabasePage />}
-      />
-
-      {/* Companies */}
-      <Route
-        path="companies"
-        element={<CompanyJobPostingsPage />}
-      />
-
-      {/* Student Database */}
-      <Route path="student" element={<StudentDatabasePage />} />
-      <Route path="student-profile" element={<StudentProfilePage />} />
-      <Route path="student-profile/:id" element={<StudentProfilePage />} />
-      <Route path="student-performance" element={<StudentProfilePage />} />
-      <Route path="companies" element={<CompanyJobPostingsPage />} />
-      {/* Placement Drives */}
-      <Route
-        path="drives"
-        element={<PlacementDrivesPage />}
-      />
-
-      {/* Reports */}
-      <Route
-        path="reports"
-        element={<ReportsPage />}
-      />
+        {/* Render a blank page with sidebar/footer if page is not created yet */}
+        <Route path="*" element={<div className="min-h-[400px]" />} />
+      </Route>
     </Route>
-  </>
+  </Route>
 );
 
 export default collegeRoute;
