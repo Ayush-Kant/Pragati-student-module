@@ -5,9 +5,11 @@ const NotFoundPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, userRole } = useAuth();
 
+  const getRedirectPath = (role) => (role === 'admin' ? '/admin' : `/${role}/dashboard`);
+
   const handleRedirect = () => {
     if (isAuthenticated && userRole) {
-      navigate(`/${userRole}/dashboard`, { replace: true });
+      navigate(getRedirectPath(userRole), { replace: true });
     } else {
       navigate("/login", { replace: true });
     }

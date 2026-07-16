@@ -4,18 +4,12 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- Companies Table
 -- =====================================
 
-CREATE TABLE IF NOT EXISTS companies (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    name VARCHAR(255) NOT NULL,
-    website VARCHAR(255),
-    industry VARCHAR(100),
-    size VARCHAR(50),
-    description TEXT,
-    logo_url TEXT,
-    verification_status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- companies table moved to 003_create_admin_dashboard.sql
+
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS website VARCHAR(255);
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS logo_url TEXT;
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS verification_status VARCHAR(50) DEFAULT 'pending';
 
 -- =====================================
 -- Company Team Members Table
