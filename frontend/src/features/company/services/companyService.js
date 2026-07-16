@@ -19,9 +19,7 @@ API.interceptors.request.use((config) => {
 /* Dashboard Stats */
 
 export const getDashboardStats = async () => {
-  const response = await API.get(
-    "/dashboard/stats"
-  );
+  const response = await API.get("/dashboard/stats");
 
   return response.data;
 };
@@ -29,9 +27,7 @@ export const getDashboardStats = async () => {
 /* Funnel Data */
 
 export const getFunnelData = async () => {
-  const response = await API.get(
-    "/dashboard/funnel"
-  );
+  const response = await API.get("/dashboard/funnel");
 
   return response.data;
 };
@@ -39,9 +35,7 @@ export const getFunnelData = async () => {
 /* College Stats */
 
 export const getCollegeStats = async () => {
-  const response = await API.get(
-    "/dashboard/college-stats"
-  );
+  const response = await API.get("/dashboard/college-stats");
 
   return response.data;
 };
@@ -49,9 +43,7 @@ export const getCollegeStats = async () => {
 /* Activity Feed */
 
 export const getActivityFeed = async () => {
-  const response = await API.get(
-    "/dashboard/activity"
-  );
+  const response = await API.get("/dashboard/activity");
 
   return response.data;
 };
@@ -64,13 +56,8 @@ export const getCompanySettings = async () => {
   return response.data;
 };
 
-export const updateCompanySettings = async (
-  settingsData
-) => {
-  const response = await API.put(
-    "/settings",
-    settingsData
-  );
+export const updateCompanySettings = async (settingsData) => {
+  const response = await API.put("/settings", settingsData);
 
   return response.data;
 };
@@ -80,15 +67,11 @@ export const uploadCompanyLogo = async (file) => {
 
   formData.append("logo", file);
 
-  const response = await API.post(
-    "/logo",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
+  const response = await API.post("/logo", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   return response.data;
 };
