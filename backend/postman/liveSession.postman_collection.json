@@ -1,0 +1,235 @@
+{
+  "info": {
+    "name": "Pragati Live Sessions API",
+    "description": "Collection for student live session endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": "YOUR_JWT_TOKEN"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get all sessions",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions"]
+        }
+      }
+    },
+    {
+      "name": "Get session by id",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "1"]
+        }
+      }
+    },
+    {
+      "name": "Join session",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/1/join",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "1", "join"]
+        }
+      }
+    },
+    {
+      "name": "Leave session",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/1/leave",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "1", "leave"]
+        }
+      }
+    },
+    {
+      "name": "Get attendance",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/attendance",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "attendance"]
+        }
+      }
+    },
+    {
+      "name": "Mark attendance",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Present\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/1/attendance",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "1", "attendance"]
+        }
+      }
+    },
+    {
+      "name": "Update attendance",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Absent\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/1/attendance",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "1", "attendance"]
+        }
+      }
+    },
+    {
+      "name": "Get recordings",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/recordings",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "recordings"]
+        }
+      }
+    },
+    {
+      "name": "Get recording by id",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/recordings/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "recordings", "1"]
+        }
+      }
+    },
+    {
+      "name": "Get participants",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/1/participants",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "1", "participants"]
+        }
+      }
+    },
+    {
+      "name": "Add participant",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"studentId\": 101\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/1/participants",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "1", "participants"]
+        }
+      }
+    },
+    {
+      "name": "Remove participant",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/1/participants/101",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "1", "participants", "101"]
+        }
+      }
+    },
+    {
+      "name": "Get schedules",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/schedules",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "schedules"]
+        }
+      }
+    },
+    {
+      "name": "Get upcoming sessions",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/student/live-sessions/upcoming",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "student", "live-sessions", "upcoming"]
+        }
+      }
+    }
+  ]
+}

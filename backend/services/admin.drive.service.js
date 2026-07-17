@@ -246,7 +246,7 @@ export const advanceDrive = async (id, adminId) => {
            status = $2,
            updated_at = NOW()
        WHERE id = $3`,
-      [nextStage, isFinal ? 'completed' : 'active', id]
+      [nextStage, isFinal ? 'closed' : 'active', id]
     );
 
     await client.query('COMMIT');
@@ -291,7 +291,7 @@ export const freezeDrive = async (id, adminId) => {
 
     const updateResult = await client.query(
       `UPDATE recruitment_drives
-       SET frozen = TRUE, status = 'frozen', frozen_at = NOW(), frozen_by = $1, updated_at = NOW()
+       SET frozen = TRUE, status = 'active', frozen_at = NOW(), frozen_by = $1, updated_at = NOW()
        WHERE id = $2
        RETURNING frozen_at`,
       [frozenByIntId, id]
@@ -376,7 +376,7 @@ export const getCandidates = async (driveId, { stage, page = 1, limit = 20 }) =>
   const dataResult = await pool.query(
   `SELECT
       sdp.student_id,
-      s.full_name,
+      s.name,
       s.college,
       sdp.current_stage,
       sdp.assessment_score,
@@ -392,7 +392,7 @@ export const getCandidates = async (driveId, { stage, page = 1, limit = 20 }) =>
   return {
    candidates: dataResult.rows.map((row) => ({
   studentId: `stu_${row.student_id}`,
-  name: row.full_name,
+  name: row.name,
   college: row.college,
   currentStage: row.current_stage,
   assessmentScore: row.assessment_score !== null ? Number(row.assessment_score) : null,
