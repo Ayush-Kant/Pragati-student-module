@@ -1,40 +1,9 @@
 import express from "express";
+import connectDB from "./config/db.js";
+import studentProfileRouter from "./src/routes/index.js";
+import errorHandler from "./src/middleware/errorHandler.js";
 import cors from "cors";
 import dotenv from "dotenv";
-
-import { connectDB } from "./config/db.js";
-
-// Admin Routes
-import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
-import adminCollegeRoutes from "./routes/admin.college.routes.js";
-import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
-import adminDriveRoutes from "./routes/admin.drive.routes.js";
-import adminNotificationRoutes from "./routes/admin.notification.routes.js";
-import adminDisputeRoutes from "./routes/admin.dispute.routes.js";
-
-// Standard & Role-Specific Routes
-import authRouter from "./routes/auth.routes.js";
-import contentRoutes from "./routes/content.routes.js";
-import notificationRoutes from "./routes/notification.routes.js";
-import companyRoutes from "./routes/company.routes.js";
-import companyProfileRoutes from "./modules/company/routes/companyProfile.routes.js";
-import interviewRoutes from "./routes/interview.routes.js";
-import questionBankRouter from "./routes/questionBank.routes.js";
-import mentorRoutes from "./routes/mentor.routes.js";
-import trainingRoutes from "./routes/trainingRoutes.js";
-import dashboardRoutes from "./routes/dashboardRoutes.js";
-
-// Live Sessions Routes
-import liveSessionRoutes from "./src/routes/liveSessionRoutes.js";
-import initializeLiveSessionModule from "./src/database/migrations/liveSessionSchema.js";
-
-// Middleware
-import errorMiddleware from "./middleware/errorMiddleware.js";
-dotenv.config();
-
-console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
-
-const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(
@@ -72,7 +41,7 @@ app.use("/api/v1/company", companyProfileRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
-app.use("/api/v1/admin/notifications", adminNotificationRoutes);
+
 
 app.get("/", (req, res) => {
   res.json({
@@ -80,21 +49,16 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use(errorMiddleware);
+// ── Student Profile Module Routes ─────────────────────────────────────────────
+app.use(studentProfileRouter);
 
-connectDB()
-  .then(async () => {
-    try {
-      await initializeLiveSessionModule();
-      console.log("✅ Live session module initialized");
-    } catch (error) {
-      console.error("⚠️ Live session module initialization failed:", error.message);
-    }
+// ── Global Error Handler (must be last) ──────────────────────────────────────
+app.use(errorHandler);
 
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on PORT : ${PORT}`);
-    });
-  })
-  .catch((err) => {
+app.listen(PORT, () => {
+    console.log(`✅ Server running on PORT : ${PORT}`);
+});
+
+connectDB(process.env.POSTGRESQL_URI).catch((err) => {
     console.error("❌ PostgreSQL connection failed:", err.message);
   });
