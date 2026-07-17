@@ -3,8 +3,12 @@ import { X } from 'lucide-react';
 
 const defaultDriveForm = {
   driveName: '',
-  college: '',
-  date: '',
+  department: 'Engineering',
+  requiredSkills: 'React, Node.js',
+  salaryPackage: '8 LPA',
+  workMode: 'Hybrid',
+  location: 'Pune',
+  deadline: '',
   description: '',
 };
 
@@ -38,7 +42,16 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
   const handlePublish = () => {
     if (!form.driveName.trim()) return;
 
-    onCreate?.(form);
+    onCreate?.({
+      jobTitle: form.driveName,
+      department: form.department,
+      requiredSkills: form.requiredSkills.split(',').map(s => s.trim()),
+      salaryPackage: form.salaryPackage,
+      workMode: form.workMode,
+      location: form.location,
+      deadline: form.deadline || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      description: form.description
+    });
     setForm(defaultDriveForm);
     onClose();
   };
@@ -108,162 +121,117 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
 
           {/* Form Content */}
           <div className="p-6 space-y-5">
-          {/* Drive Name */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Drive Name</label>
-            <input
-              name="driveName"
-              type="text"
-              placeholder="e.g., Senior Software Engineer Drive"
-              value={form.driveName}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
-            />
-          </div>
-
-          {/* College */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">College</label>
-            <select
-              name="college"
-              value={form.college}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm appearance-none"
-            >
-              <option value="">Select college</option>
-              <option>IIT Hyderabad</option>
-              <option>NIT Warangal</option>
-              <option>VIT Chennai</option>
-              <option>SRM University</option>
-              <option>JNTU Hyderabad</option>
-            </select>
-          </div>
-
-          {/* Required Skills */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Required Skills</label>
-            <input
-              type="text"
-              placeholder="React, Node.js, MongoDB"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
-            />
-          </div>
-
-          {/* Mini Info Cards 1 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-5">
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
-              <p className="text-xs font-medium text-blue-500">
-                Candidates
-              </p>
-              <h3 className="text-2xl font-bold text-blue-700 mt-1">
-                245
-              </h3>
+            {/* Drive Name */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Drive Name / Job Title</label>
+              <input
+                name="driveName"
+                type="text"
+                placeholder="e.g., Senior Software Engineer Drive"
+                value={form.driveName}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
             </div>
-            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
-              <p className="text-xs font-medium text-emerald-500">
-                Active
-              </p>
-              <h3 className="text-2xl font-bold text-emerald-700 mt-1">
-                Live
-              </h3>
+
+            {/* Department */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Department</label>
+              <input
+                name="department"
+                type="text"
+                placeholder="e.g., Engineering"
+                value={form.department}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
             </div>
-          </div>
 
-          {/* Salary Package */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Salary Package</label>
-            <input
-              type="text"
-              placeholder="₹12-15 LPA"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
-            />
-          </div>
-
-          {/* Work Mode */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Work Mode</label>
-            <div className="space-y-2">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="radio" name="workMode" value="remote" defaultChecked className="w-4 h-4" />
-                <span className="text-sm text-gray-700">Remote</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="radio" name="workMode" value="onsite" className="w-4 h-4" />
-                <span className="text-sm text-gray-700">On-site</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="radio" name="workMode" value="hybrid" className="w-4 h-4" />
-                <span className="text-sm text-gray-700">Hybrid</span>
-              </label>
+            {/* Required Skills */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Required Skills (comma-separated)</label>
+              <input
+                name="requiredSkills"
+                type="text"
+                placeholder="React, Node.js, MongoDB"
+                value={form.requiredSkills}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
             </div>
-          </div>
 
-          {/* Job Location */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Job Location</label>
-            <div className="flex items-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-600">
-              <span className="text-lg">📍</span>
-              <span>Bangalore, India</span>
+            {/* Salary Package */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Salary Package</label>
+              <input
+                name="salaryPackage"
+                type="text"
+                placeholder="₹12-15 LPA"
+                value={form.salaryPackage}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
             </div>
-          </div>
 
-          {/* Eligibility */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Eligibility</label>
-            <input
-              type="text"
-              placeholder="B.Tech/M.Tech, 2024-2026 batch"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
-            />
-          </div>
-
-          {/* Mini Info Cards 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-5">
-            <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4">
-              <p className="text-xs font-medium text-purple-500">
-                Interviews
-              </p>
-              <h3 className="text-2xl font-bold text-purple-700 mt-1">
-                148
-              </h3>
+            {/* Work Mode */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Work Mode</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="workMode" value="Remote" checked={form.workMode === 'Remote'} onChange={handleChange} className="w-4 h-4" />
+                  <span className="text-sm text-gray-700">Remote</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="workMode" value="Onsite" checked={form.workMode === 'Onsite'} onChange={handleChange} className="w-4 h-4" />
+                  <span className="text-sm text-gray-700">On-site</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="workMode" value="Hybrid" checked={form.workMode === 'Hybrid'} onChange={handleChange} className="w-4 h-4" />
+                  <span className="text-sm text-gray-700">Hybrid</span>
+                </label>
+              </div>
             </div>
-            <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4">
-              <p className="text-xs font-medium text-orange-500">
-                Success
-              </p>
-              <h3 className="text-2xl font-bold text-orange-700 mt-1">
-                78%
-              </h3>
+
+            {/* Job Location */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Job Location</label>
+              <input
+                name="location"
+                type="text"
+                placeholder="e.g., Pune"
+                value={form.location}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
             </div>
-          </div>
 
-          {/* Date */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Date</label>
-            <input
-              name="date"
-              type="date"
-              value={form.date}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
-            />
-          </div>
+            {/* Deadline */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Hiring Deadline</label>
+              <input
+                name="deadline"
+                type="date"
+                value={form.deadline}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
+            </div>
 
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-            <textarea
-              name="description"
-              placeholder="Describe the role, responsibilities, and requirements..."
-              rows="6"
-              value={form.description}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm resize-none"
-            />
-          </div>
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+              <textarea
+                name="description"
+                placeholder="Describe the role, responsibilities, and requirements..."
+                rows="6"
+                value={form.description}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm resize-none"
+              />
+            </div>
 
-          {/* Extra space for sticky buttons */}
-          <div className="h-24" />
+            {/* Extra space for sticky buttons */}
+            <div className="h-24" />
           </div>
         </div>
 
@@ -273,7 +241,7 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
             onClick={handleClose}
             className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
           >
-            Save Draft
+            Cancel
           </button>
           <button
             onClick={handlePublish}

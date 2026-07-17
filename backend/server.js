@@ -27,6 +27,7 @@ import companyProfileRoutes from "./modules/company/routes/companyProfile.routes
 import companyCandidateRoutes from "./modules/company/routes/companyCandidate.routes.js";
 import companyDashboardRoutes from "./modules/company/routes/companyDashboard.routes.js";
 import companyReportsRoutes from "./modules/company/routes/companyReports.routes.js";
+import companyDrivesRoutes from "./modules/company/routes/companyDrives.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import questionBankRouter from "./routes/questionBank.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
@@ -97,6 +98,7 @@ app.use("/api/v1/company", companyProfileRoutes);
 app.use("/api/v1/company/candidates", companyCandidateRoutes);
 app.use("/api/v1/company/dashboard", companyDashboardRoutes);
 app.use("/api/v1/company/reports", companyReportsRoutes);
+app.use("/api/v1/company/drives", companyDrivesRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
