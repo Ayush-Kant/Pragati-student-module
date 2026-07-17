@@ -16,105 +16,26 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import "./../styles/interviews.css";
-
-/* 
-   Static mock data
-*/
-const MOCK_INTERVIEWS = [
-  {
-    id: 1,
-    candidate: "Rahul Patil",
-    initials: "RP",
-    avatarClass: "avatar-rp",
-    interviewer: "Priya Sharma",
-    date: "May 15, 2026",
-    time: "10:00 AM",
-    round: "Technical Round 1",
-    roundType: "technical",
-    status: "Scheduled",
-  },
-  {
-    id: 2,
-    candidate: "Sneha Reddy",
-    initials: "SR",
-    avatarClass: "avatar-sr",
-    interviewer: "Vikram Singh",
-    date: "May 15, 2026",
-    time: "02:00 PM",
-    round: "Technical Round 2",
-    roundType: "technical",
-    status: "Scheduled",
-  },
-  {
-    id: 3,
-    candidate: "Amit Kumar",
-    initials: "AK",
-    avatarClass: "avatar-ak",
-    interviewer: "Anjali Desai",
-    date: "May 16, 2026",
-    time: "11:00 AM",
-    round: "HR Round",
-    roundType: "hr",
-    status: "Scheduled",
-  },
-  {
-    id: 4,
-    candidate: "Priya Sharma",
-    initials: "PS",
-    avatarClass: "avatar-ps",
-    interviewer: "Meera Iyer",
-    date: "May 16, 2026",
-    time: "03:30 PM",
-    round: "Technical Round 1",
-    roundType: "technical",
-    status: "Completed",
-  },
-  {
-    id: 5,
-    candidate: "Ravi Patel",
-    initials: "RP",
-    avatarClass: "avatar-rv",
-    interviewer: "Priya Sharma",
-    date: "May 17, 2026",
-    time: "09:00 AM",
-    round: "Final Round",
-    roundType: "final",
-    status: "Scheduled",
-  },
-];
-
-const CANDIDATES = [
-  "Rahul Patil - Software Engineer",
-  "Sneha Reddy - Data Analyst",
-  "Amit Kumar - Backend Developer",
-  "Priya Sharma - Product Manager",
-  "Ravi Patel - DevOps Engineer",
-];
-
-const INTERVIEWERS = [
-  "Priya Sharma - Tech Lead",
-  "Vikram Singh - Engineering Manager",
-  "Anjali Desai - HR Manager",
-  "Meera Iyer - Senior Engineer",
-];
+import { useCompanyInterviews } from "../hooks/useCompanyInterviews";
+import { useCandidates } from "../candidates/hooks/useCandidates";
 
 const ROUND_TYPES = [
   "Technical Round 1",
   "Technical Round 2",
   "HR Round",
-  "Final Round",
+  "Managerial Round",
 ];
 
-const STATUS_FILTERS = ["Scheduled", "Completed"];
+const STATUS_FILTERS = ["Scheduled", "Completed", "No Show"];
 const RESULT_OPTIONS = ["Pass", "Fail"];
 
 /* ─────────────────────────────────────────────
    Schedule Interview Modal
 ───────────────────────────────────────────── */
-const ScheduleModal = ({ onClose, onSubmit }) => {
+const ScheduleModal = ({ onClose, onSubmit, candidatesList }) => {
   const [form, setForm] = useState({
     candidate: "",
-    interviewer: "",
+    interviewer: "Priya Sharma",
     date: "",
     time: "",
     roundType: "Technical Round 1",
@@ -128,6 +49,10 @@ const ScheduleModal = ({ onClose, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!form.candidate) {
+      toast.error("Please select a candidate");
+      return;
+    }
     onSubmit(form);
     onClose();
   };
@@ -167,9 +92,11 @@ const ScheduleModal = ({ onClose, onSubmit }) => {
                   onChange={handleChange}
                   required
                 >
-                  <option value="" disabled>Select a candidate…</option>
-                  {CANDIDATES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                  <option value="">Select a candidate…</option>
+                  {candidatesList.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} - {c.college || 'College'} ({c.status || 'Active'})
+                    </option>
                   ))}
                 </select>
                 <FiChevronDown size={16} className="chevron-icon" />
@@ -179,23 +106,15 @@ const ScheduleModal = ({ onClose, onSubmit }) => {
             {/* Interviewer */}
             <div className="form-group">
               <label htmlFor="interviewer">Interviewer</label>
-              <div className="select-wrap">
-                <FiUser size={16} className="select-icon" />
-                <select
-                  id="interviewer"
-                  name="interviewer"
-                  className="form-control"
-                  value={form.interviewer}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="" disabled>Select an interviewer…</option>
-                  {INTERVIEWERS.map((i) => (
-                    <option key={i} value={i}>{i}</option>
-                  ))}
-                </select>
-                <FiChevronDown size={16} className="chevron-icon" />
-              </div>
+              <input
+                id="interviewer"
+                name="interviewer"
+                className="form-control"
+                value={form.interviewer}
+                onChange={handleChange}
+                placeholder="e.g. Priya Sharma"
+                required
+              />
             </div>
 
             {/* Date + Time */}
@@ -255,7 +174,7 @@ const ScheduleModal = ({ onClose, onSubmit }) => {
 
             {/* Meeting Link */}
             <div className="form-group">
-              <label htmlFor="meetingLink">Meeting Link</label>
+              <label htmlFor="meetingLink">Meeting Link (Optional)</label>
               <div className="input-wrap">
                 <FiVideo size={16} className="input-icon" />
                 <input
@@ -263,7 +182,7 @@ const ScheduleModal = ({ onClose, onSubmit }) => {
                   type="url"
                   name="meetingLink"
                   className="form-control"
-                  placeholder="https://meet.google.com/..."
+                  placeholder="https://meet.google.com/abc-defg-hij"
                   value={form.meetingLink}
                   onChange={handleChange}
                 />
@@ -277,7 +196,8 @@ const ScheduleModal = ({ onClose, onSubmit }) => {
                 id="notes"
                 name="notes"
                 className="form-control textarea"
-                placeholder="Add any special instructions or notes..."
+                rows={3}
+                placeholder="Topics to cover or additional details"
                 value={form.notes}
                 onChange={handleChange}
               />
@@ -286,12 +206,8 @@ const ScheduleModal = ({ onClose, onSubmit }) => {
 
           {/* Footer */}
           <div className="modal-footer">
-            <button type="button" className="btn-cancel" onClick={onClose}>
-              Cancel
-            </button>
-            <button type="submit" className="btn-submit">
-              Schedule Interview
-            </button>
+            <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn-submit">Schedule</button>
           </div>
         </form>
       </div>
@@ -303,86 +219,21 @@ const ScheduleModal = ({ onClose, onSubmit }) => {
    Edit Interview Modal
 ───────────────────────────────────────────── */
 const EditInterviewModal = ({ interview, onClose, onSave }) => {
-  // Convert display date ("May 15, 2026") → YYYY-MM-DD for the date input
-  const toInputDate = (displayDate) => {
-    try {
-      const d = new Date(displayDate + " 00:00:00");
-      if (isNaN(d)) return "";
-      return d.toISOString().slice(0, 10);
-    } catch {
-      return "";
-    }
-  };
-
-  // Convert display time ("10:00 AM") → HH:MM for the time input
-  const toInputTime = (displayTime) => {
-    try {
-      const [timePart, meridiem] = displayTime.split(" ");
-      let [h, m] = timePart.split(":").map(Number);
-      if (meridiem === "PM" && h !== 12) h += 12;
-      if (meridiem === "AM" && h === 12) h = 0;
-      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-    } catch {
-      return "";
-    }
-  };
-
   const [form, setForm] = useState({
-    candidate: interview.candidate || "",
-    interviewer: interview.interviewer || "",
-    date: toInputDate(interview.date),
-    time: toInputTime(interview.time),
-    roundType: interview.round || ROUND_TYPES[0],
-    status: interview.status || "Scheduled",
+    date: interview.date || "",
+    time: interview.time || "",
+    round: interview.round || "Technical Round 1",
   });
-  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
-  };
-
-  const validate = () => {
-    const errs = {};
-    if (!form.candidate.trim()) errs.candidate = "Candidate name is required";
-    if (!form.interviewer.trim()) errs.interviewer = "Interviewer is required";
-    if (!form.date) errs.date = "Date is required";
-    if (!form.time) errs.time = "Time is required";
-    if (!form.roundType) errs.roundType = "Round type is required";
-    if (!form.status) errs.status = "Status is required";
-    return errs;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-
-    const dateObj = new Date(form.date + "T00:00:00");
-    const dateStr = dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-
-    const [h, m] = form.time.split(":").map(Number);
-    const ampm = h >= 12 ? "PM" : "AM";
-    const hour12 = h % 12 || 12;
-    const timeStr = `${hour12}:${String(m).padStart(2, "0")} ${ampm}`;
-
-    const roundTypeMap = {
-      "Technical Round 1": "technical",
-      "Technical Round 2": "technical",
-      "HR Round": "hr",
-      "Final Round": "final",
-    };
-
-    onSave({
-      candidate: form.candidate.trim(),
-      interviewer: form.interviewer.trim(),
-      date: dateStr,
-      time: timeStr,
-      round: form.roundType,
-      roundType: roundTypeMap[form.roundType] || "technical",
-      status: form.status,
-    });
+    onSave(form);
+    onClose();
   };
 
   useEffect(() => {
@@ -400,69 +251,61 @@ const EditInterviewModal = ({ interview, onClose, onSave }) => {
             <FiX size={20} />
           </button>
         </div>
+
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
-
             <div className="form-group">
-              <label htmlFor="edit-candidate">Candidate Name</label>
-              <div className="input-wrap">
-                <FiUser size={16} className="input-icon" />
-                <input id="edit-candidate" type="text" name="candidate" className="form-control" value={form.candidate} onChange={handleChange} placeholder="e.g. Rahul Patil" />
-              </div>
-              {errors.candidate && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.candidate}</p>}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="edit-interviewer">Interviewer</label>
-              <div className="input-wrap">
-                <FiUser size={16} className="input-icon" />
-                <input id="edit-interviewer" type="text" name="interviewer" className="form-control" value={form.interviewer} onChange={handleChange} placeholder="e.g. Priya Sharma" />
-              </div>
-              {errors.interviewer && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.interviewer}</p>}
+              <label>Candidate</label>
+              <input className="form-control" value={interview.candidate} disabled />
             </div>
 
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="edit-date">Date</label>
-                <div className="input-wrap">
-                  <FiCalendar size={16} className="input-icon" />
-                  <input id="edit-date" type="date" name="date" className="form-control" value={form.date} onChange={handleChange} />
-                </div>
-                {errors.date && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.date}</p>}
+                <input
+                  id="edit-date"
+                  type="date"
+                  name="date"
+                  className="form-control"
+                  value={form.date}
+                  onChange={handleChange}
+                  required
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="edit-time">Time</label>
-                <div className="input-wrap">
-                  <FiClock size={16} className="input-icon" />
-                  <input id="edit-time" type="time" name="time" className="form-control" value={form.time} onChange={handleChange} />
-                </div>
-                {errors.time && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.time}</p>}
+                <input
+                  id="edit-time"
+                  type="time"
+                  name="time"
+                  className="form-control"
+                  value={form.time}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="edit-roundType">Round Type</label>
+              <label htmlFor="edit-round">Round</label>
               <div className="select-wrap">
-                <select id="edit-roundType" name="roundType" className="form-control" style={{ paddingLeft: "14px" }} value={form.roundType} onChange={handleChange}>
-                  {ROUND_TYPES.map((r) => <option key={r} value={r}>{r}</option>)}
+                <select
+                  id="edit-round"
+                  name="round"
+                  className="form-control"
+                  style={{ paddingLeft: "14px" }}
+                  value={form.round}
+                  onChange={handleChange}
+                >
+                  {ROUND_TYPES.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
                 </select>
                 <FiChevronDown size={16} className="chevron-icon" />
               </div>
-              {errors.roundType && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.roundType}</p>}
             </div>
-
-            <div className="form-group">
-              <label htmlFor="edit-status">Status</label>
-              <div className="select-wrap">
-                <select id="edit-status" name="status" className="form-control" style={{ paddingLeft: "14px" }} value={form.status} onChange={handleChange}>
-                  {STATUS_FILTERS.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-                <FiChevronDown size={16} className="chevron-icon" />
-              </div>
-              {errors.status && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{errors.status}</p>}
-            </div>
-
           </div>
+
           <div className="modal-footer">
             <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
             <button type="submit" className="btn-submit">Save Changes</button>
@@ -473,16 +316,17 @@ const EditInterviewModal = ({ interview, onClose, onSave }) => {
   );
 };
 
-/* 
-   Feedback Modal
- */
+/* ─────────────────────────────────────────────
+   Feedback & Result Modal
+───────────────────────────────────────────── */
 const FeedbackModal = ({ interview, onClose, onSave }) => {
   const [form, setForm] = useState({
     result: interview.result || RESULT_OPTIONS[0],
-    rating: interview.rating || 4,
-    strengths: interview.feedback?.strengths || "",
-    improvements: interview.feedback?.improvements || "",
-    comments: interview.feedback?.comments || "",
+    rating: 4,
+    strengths: "",
+    improvements: "",
+    comments: "",
+    attendance: "present"
   });
 
   const handleChange = (e) => {
@@ -506,7 +350,7 @@ const FeedbackModal = ({ interview, onClose, onSave }) => {
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal-box" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
         <div className="modal-header">
-          <h2 id="feedback-modal-title">Interview Feedback</h2>
+          <h2 id="feedback-modal-title">Interview Feedback & Result</h2>
           <button className="modal-close" onClick={onClose} aria-label="Close modal">
             <FiX size={20} />
           </button>
@@ -528,7 +372,20 @@ const FeedbackModal = ({ interview, onClose, onSave }) => {
             </div>
 
             <div className="form-group">
-              <label>Result</label>
+              <label>Attendance</label>
+              <select
+                name="attendance"
+                className="form-control"
+                value={form.attendance}
+                onChange={handleChange}
+              >
+                <option value="present">Present</option>
+                <option value="absent">Absent / No Show</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Result Decision</label>
               <div className="feedback-chips">
                 {RESULT_OPTIONS.map((option) => (
                   <label key={option} className={`feedback-chip ${form.result === option ? "active" : ""}`}>
@@ -570,7 +427,7 @@ const FeedbackModal = ({ interview, onClose, onSave }) => {
                 id="strengths"
                 name="strengths"
                 className="form-control textarea"
-                rows={3}
+                rows={2}
                 placeholder="Key strengths observed during the interview"
                 value={form.strengths}
                 onChange={handleChange}
@@ -583,7 +440,7 @@ const FeedbackModal = ({ interview, onClose, onSave }) => {
                 id="improvements"
                 name="improvements"
                 className="form-control textarea"
-                rows={3}
+                rows={2}
                 placeholder="Areas the candidate should improve"
                 value={form.improvements}
                 onChange={handleChange}
@@ -591,12 +448,12 @@ const FeedbackModal = ({ interview, onClose, onSave }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="comments">Comments</label>
+              <label htmlFor="comments">Additional Comments</label>
               <textarea
                 id="comments"
                 name="comments"
                 className="form-control textarea"
-                rows={4}
+                rows={3}
                 placeholder="Additional feedback or candidate recommendation"
                 value={form.comments}
                 onChange={handleChange}
@@ -606,7 +463,7 @@ const FeedbackModal = ({ interview, onClose, onSave }) => {
 
           <div className="modal-footer">
             <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn-submit">Save Feedback</button>
+            <button type="submit" className="btn-submit">Submit Results</button>
           </div>
         </form>
       </div>
@@ -636,17 +493,8 @@ const ActionsCell = ({ onEdit, onDelete, onFeedback }) => {
       </button>
       {open && (
         <div className="action-dropdown">
-          <button onClick={() => { onEdit(); setOpen(false); }}>
-            <FiEdit2 size={14} /> Edit
-          </button>
           <button onClick={() => { onFeedback(); setOpen(false); }}>
-            <FiUser size={14} /> Feedback
-          </button>
-          <button
-            className="danger"
-            onClick={() => { onDelete(); setOpen(false); }}
-          >
-            <FiTrash2 size={14} /> Delete
+            <FiUser size={14} /> Submit Feedback
           </button>
         </div>
       )}
@@ -709,7 +557,7 @@ const InterviewsTable = ({ interviews, onEdit, onDelete, onFeedback }) => (
 
             {/* Status */}
             <td>
-              <span className={`status-badge ${row.status.toLowerCase()}`}>
+              <span className={`status-badge ${row.status.toLowerCase().replace(' ', '-')}`}>
                 {row.status}
               </span>
             </td>
@@ -743,7 +591,21 @@ const InterviewPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const shouldOpenScheduleInterview = Boolean(location.state?.openScheduleInterview);
-  const [interviews, setInterviews] = useState(MOCK_INTERVIEWS);
+
+  const {
+    interviews,
+    loading: loadingInterviews,
+    error: errorInterviews,
+    scheduleInterview,
+    submitFeedback,
+    updateResult
+  } = useCompanyInterviews();
+
+  const {
+    candidates: candidatesList,
+    loading: loadingCandidates
+  } = useCandidates();
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [roundFilter, setRoundFilter] = useState("");
@@ -756,26 +618,21 @@ const InterviewPage = () => {
     setFeedbackInterview(interview);
   };
 
-  const handleSaveFeedback = (feedback) => {
-    setInterviews((prev) =>
-      prev.map((i) =>
-        i.id === feedbackInterview.id
-          ? {
-              ...i,
-              result: feedback.result,
-              rating: feedback.rating,
-              feedback: {
-                strengths: feedback.strengths,
-                improvements: feedback.improvements,
-                comments: feedback.comments,
-              },
-              status: i.status === "Scheduled" ? "Completed" : i.status,
-            }
-          : i
-      )
-    );
-    toast.success("Interview feedback saved");
-    setFeedbackInterview(null);
+  const handleSaveFeedback = async (feedback) => {
+    try {
+      // 1. Submit feedback comments text
+      const commentsText = `Strengths: ${feedback.strengths || "N/A"}. Improvements: ${feedback.improvements || "N/A"}. Notes: ${feedback.comments || "N/A"}. Rating: ${feedback.rating}/5.`;
+      await submitFeedback(feedbackInterview.id, commentsText);
+
+      // 2. Mark pass/fail result
+      const uppercaseResult = feedback.result === "Pass" ? "PASS" : "FAIL";
+      await updateResult(feedbackInterview.id, uppercaseResult, feedback.attendance);
+
+      toast.success("Interview feedback and results updated successfully");
+      setFeedbackInterview(null);
+    } catch (err) {
+      toast.error("Failed to save feedback");
+    }
   };
 
   useEffect(() => {
@@ -800,72 +657,54 @@ const InterviewPage = () => {
     return matchesSearch && matchesStatus && matchesRound;
   });
 
-  /* Add new interview from modal */
-  const handleSchedule = (form) => {
-    const namePart = form.candidate.split(" - ")[0] || form.candidate;
-    const initials = namePart
-      .split(" ")
-      .slice(0, 2)
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase();
-
-    const roundTypeMap = {
-      "Technical Round 1": "technical",
-      "Technical Round 2": "technical",
-      "HR Round": "hr",
-      "Final Round": "final",
-    };
-
-    const dateObj = form.date ? new Date(form.date + "T00:00:00") : new Date();
-    const dateStr = dateObj.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-
-    const [h, m] = (form.time || "00:00").split(":");
-    const hour = parseInt(h, 10);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const hour12 = hour % 12 || 12;
-    const timeStr = `${hour12}:${m} ${ampm}`;
-
-    setInterviews((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        candidate: namePart,
-        initials,
-        avatarClass: "avatar-default",
-        interviewer: form.interviewer.split(" - ")[0] || form.interviewer,
-        date: dateStr,
-        time: timeStr,
+  const handleSchedule = async (form) => {
+    try {
+      await scheduleInterview({
+        candidateId: parseInt(form.candidate, 10),
         round: form.roundType,
-        roundType: roundTypeMap[form.roundType] || "technical",
-        status: "Scheduled",
-      },
-    ]);
-    toast.success("Interview scheduled successfully");
+        date: form.date,
+        time: form.time,
+        meetingLink: form.meetingLink,
+        notes: form.notes
+      });
+      toast.success("Interview scheduled successfully");
+    } catch (err) {
+      toast.error("Failed to schedule interview");
+    }
   };
 
-  const handleDelete = (id) => {
-    setInterviews((prev) => prev.filter((i) => i.id !== id));
+  const handleDelete = () => {
+    // Disabled in actual backend as there is no DELETE route specified
+    toast.error("Interview deletion is not supported");
   };
 
-  const handleEdit = (interview) => {
-    setEditingInterview(interview);
+  const handleEdit = () => {
+    toast.error("Interview edit is not supported");
   };
 
-  const handleSaveEdit = (updatedFields) => {
-    setInterviews((prev) =>
-      prev.map((i) => (i.id === editingInterview.id ? { ...i, ...updatedFields } : i))
-    );
-    toast.success("Interview updated successfully");
+  const handleSaveEdit = () => {
     setEditingInterview(null);
   };
 
+  if (loadingInterviews) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin inline-block"></div>
+          <p className="text-gray-600 mt-4 font-semibold">Loading interviews...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="interviews-page">
+      {errorInterviews && (
+        <div className="mx-8 my-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg text-red-700 text-sm font-medium">
+          {errorInterviews}
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="interviews-header">
         <div className="interviews-header-text">
@@ -977,11 +816,16 @@ const InterviewPage = () => {
 
         {/* Table */}
         {filtered.length > 0 ? (
-          <InterviewsTable interviews={filtered} onEdit={handleEdit} onDelete={handleDelete} onFeedback={handleOpenFeedback} />
+          <InterviewsTable
+            interviews={filtered}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onFeedback={handleOpenFeedback}
+          />
         ) : (
           <div style={{ padding: "48px 24px", textAlign: "center", color: "#9ca3af" }}>
             <FiCalendar size={36} style={{ marginBottom: 12, opacity: 0.4 }} />
-            <p style={{ fontSize: 15 }}>No interviews found</p>
+            <p style={{ fontSize: 15 }}>No interviews scheduled</p>
           </div>
         )}
       </div>
@@ -989,6 +833,7 @@ const InterviewPage = () => {
       {/* Schedule Modal */}
       {showModal && (
         <ScheduleModal
+          candidatesList={candidatesList}
           onClose={() => setShowModal(false)}
           onSubmit={handleSchedule}
         />
