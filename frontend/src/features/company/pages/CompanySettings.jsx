@@ -124,7 +124,7 @@ const CompanySettings = () => {
       setIsSaving(true);
       setErrorBanner(null);
       await updateCompanySettings(data);
-      setIsDirty(false);
+      reset(data);
       toast.success(
         "Company settings saved successfully"
       );
