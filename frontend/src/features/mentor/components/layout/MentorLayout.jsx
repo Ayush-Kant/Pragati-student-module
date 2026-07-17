@@ -151,7 +151,7 @@ export default function MentorLayout() {
   });
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans m-0 p-0 box-border">
+    <div className="flex h-screen overflow-hidden bg-slate-50 font-sans m-0 p-0 box-border">
       {/* 1. FIXED LEFT SIDEBAR */}
       <aside className="fixed left-0 top-0 z-30 flex h-screen w-[260px] flex-col border-r border-slate-200 bg-white">
         {/* Logo - Sticky at the top */}
@@ -210,9 +210,9 @@ export default function MentorLayout() {
       </aside>
 
       {/* 2. RIGHT SIDE CONTENT CANVAS */}
-      <div className="ml-[260px] flex min-w-0 flex-1 flex-col">
+      <div className="ml-[260px] flex min-w-0 flex-1 flex-col overflow-y-auto">
         {/* Top Header Navigation Bar */}
-        <header className="sticky top-0 z-20 flex h-[70px] items-center justify-between border-b border-slate-200 bg-white px-6">
+        <header className="sticky top-0 z-20 flex h-35 items-center justify-between border-b border-slate-200 bg-white p-3">
           {/* Search */}
           <div className="relative w-[320px]">
             <input
@@ -226,7 +226,7 @@ export default function MentorLayout() {
           </div>
 
           {/* User Profile */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 shrink-0">
             <button className="text-slate-500 hover:text-slate-700 transition-colors">
               <Bell className="h-5 w-5" />
             </button>
