@@ -30,7 +30,7 @@ const ModuleCard = ({
                     </button>
 
                     <button
-                        onClick={() => onDelete?.(module)}
+                        onClick={() => onDelete?.(module.id)}
                         className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer"
                     >
                         <Trash2 size={16} />

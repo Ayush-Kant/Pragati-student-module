@@ -135,149 +135,124 @@ export const exportStudents = async (params = {}) => {
   }
 };
 
-const STORAGE_KEY = "trainingPrograms";
+const mockPrograms = [
+  {
+    id: "course_201",
+    title: "MERN Full Stack",
+    targetRole: "Web Developer",
+    mentor: {
+      id: "mentor_001",
+      name: "Rohit Sharma",
+    },
+    modulesCount: 8,
+    enrollment: 48,
+    completionRate: "78%",
+    status: "active",
+  },
+];
+
+const USE_MOCK_LMS = true;
 
 export const adminService = {
+
+  async getTrainingAnalytics(programId) {
+    const response = await API.get(
+      `/api/v1/admin/courses/${programId}/analytics`,
+      getConfig(),
+    );
+
+    return response.data;
+  },
+
+  async createTrainingProgram(payload) {
+    const response = await API.post(
+      "/api/v1/admin/courses",
+      payload,
+      getConfig(),
+    );
+
+    return response.data;
+  },
+
+  async getTrainingPrograms() {
+    if (USE_MOCK_LMS) {
+      return {
+        courses: mockPrograms,
+        total: mockPrograms.length,
+        page: 1,
+        limit: 20,
+      };
+    }
+
+    const response = await API.get("/api/v1/admin/courses", getConfig());
+    return response.data;
+  },
+
   async getTrainingProgramById(programId) {
-    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-    const program = programs.find((item) => item.id === programId);
-
-    return {
-      data: program || null,
-    };
-  },
-
-  async updateTrainingProgram(updatedProgram) {
-    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-    const updatedPrograms = programs.map((program) =>
-      program.id === updatedProgram.id ? updatedProgram : program,
+    const response = await API.get(
+      `/api/v1/admin/courses/${programId}`,
+      getConfig(),
     );
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
-
-    return {
-      success: true,
-      data: updatedProgram,
-    };
+    return response.data;
   },
 
-  async assignMentor(programId, mentor) {
-    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-    const updatedPrograms = programs.map((program) =>
-      program.id === programId
-        ? {
-            ...program,
-            mentor,
-          }
-        : program,
+  async updateTrainingProgram(programId, payload) {
+    const response = await API.put(
+      `/api/v1/admin/courses/${programId}`,
+      payload,
+      getConfig(),
     );
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
+    return response.data;
+  },
 
-    return {
-      success: true,
-    };
+  async assignMentor(programId, mentorId) {
+    const response = await API.patch(
+      `/api/v1/admin/courses/${programId}/assign-mentor`,
+      { mentorId },
+      getConfig(),
+    );
+
+    return response.data;
   },
 
   async archiveTrainingProgram(programId) {
-    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-    const updatedPrograms = programs.map((program) =>
-      program.id === programId
-        ? {
-            ...program,
-            status: "archived",
-          }
-        : program,
+    const response = await API.delete(
+      `/api/v1/admin/courses/${programId}`,
+      getConfig(),
     );
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
-
-    return {
-      success: true,
-    };
+    return response.data;
   },
 
   async addModule(programId, moduleData) {
-    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const response = await API.post(
+      `/api/v1/admin/courses/${programId}/modules`,
+      moduleData,
+      getConfig(),
+    );
 
-    const updatedPrograms = programs.map((program) => {
-      if (program.id !== programId) return program;
-
-      const modules = program.modules || [];
-
-      return {
-        ...program,
-
-        modules: [
-          ...modules,
-
-          {
-            id: `module_${Date.now()}`,
-            ...moduleData,
-          },
-        ],
-
-        modulesCount: modules.length + 1,
-      };
-    });
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
-
-    return {
-      success: true,
-    };
+    return response.data;
   },
 
-  async updateModule(programId, updatedModule) {
-    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  async updateModule(programId, moduleId, payload) {
+    const response = await API.put(
+      `/api/v1/admin/courses/${programId}/modules/${moduleId}`,
+      payload,
+      getConfig(),
+    );
 
-    const updatedPrograms = programs.map((program) => {
-      if (program.id !== programId) return program;
-
-      return {
-        ...program,
-
-        modules: (program.modules || []).map((module) =>
-          module.id === updatedModule.id ? updatedModule : module,
-        ),
-      };
-    });
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
-
-    return {
-      success: true,
-    };
+    return response.data;
   },
 
   async deleteModule(programId, moduleId) {
-    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const response = await API.delete(
+      `/api/v1/admin/courses/${programId}/modules/${moduleId}`,
+      getConfig(),
+    );
 
-    const updatedPrograms = programs.map((program) => {
-      if (program.id !== programId) return program;
-
-      const modules = (program.modules || []).filter(
-        (module) => module.id !== moduleId,
-      );
-
-      return {
-        ...program,
-
-        modules,
-
-        modulesCount: modules.length,
-      };
-    });
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
-
-    return {
-      success: true,
-    };
+    return response.data;
   },
 };
 
