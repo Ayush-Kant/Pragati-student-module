@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { X, Loader2, Award, Calendar, CheckCircle2, BookOpen, User, Users, AlertCircle, Edit, Star } from 'lucide-react';
+import { X, Loader2, Award, Calendar, CheckCircle2, BookOpen, User, Users, AlertCircle, Edit, Star, Clock } from 'lucide-react';
 import { TrainingHeader } from '../components/TrainingHeader';
 import { TrainingAnalyticsCards } from '../components/TrainingAnalyticsCards';
 import { TrainingFilters } from '../components/TrainingFilters';
@@ -9,6 +9,11 @@ import { TrainingStatusBadge } from '../components/TrainingStatusBadge';
 import api from '../../../../services/api';
 import "../../styles/companyDashboard.css";
 
+
+const toTitleCase = (str) => {
+  if (!str) return 'Active';
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
 
 const normalize = (p) => {
   const mentorName = p.mentor && typeof p.mentor === 'object' ? p.mentor.name : (typeof p.mentor === 'string' ? p.mentor : '');
@@ -22,7 +27,7 @@ const normalize = (p) => {
     students:       p.candidatesEnrolled ?? p.studentCount ?? 0,
     completion:     p.completionPercentage != null ? `${p.completionPercentage}%` : '—',
     attendance:     p.attendancePercentage  != null ? `${p.attendancePercentage}%`  : '—',
-    status:         p.status ?? 'Active',
+    status:         p.status ? toTitleCase(p.status) : 'Active',
   };
 };
 

@@ -1,4 +1,5 @@
 import api from '../../../services/api';
+import toast from 'react-hot-toast';
 
 export const reportsService = {
   getKPIs: async () => {
@@ -44,7 +45,7 @@ export const reportsService = {
   exportPerformanceReport: async () => {
     try {
       const response = await api.get('/v1/company/reports/export', { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(response.data);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'college_performance_report.csv');
@@ -52,8 +53,10 @@ export const reportsService = {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
+      toast.success('Performance report CSV downloaded successfully!');
     } catch (error) {
       console.error('Error exporting performance report:', error);
+      toast.error('Failed to export performance report CSV');
       throw error;
     }
   }

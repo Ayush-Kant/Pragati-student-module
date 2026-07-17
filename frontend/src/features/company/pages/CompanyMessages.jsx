@@ -36,7 +36,7 @@ const previewData = {
 
 const CompanyMessages = () => {
   const [recipientGroup, setRecipientGroup] = useState('all');
-  const [channels, setChannels] = useState({ email: true, sms: false, inApp: false });
+  const [channels, setChannels] = useState({ email: true, sms: false, inApp: true });
   const [templateKey, setTemplateKey] = useState('custom');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');

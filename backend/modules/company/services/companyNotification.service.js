@@ -100,7 +100,8 @@ export const sendNotification = async (companyId, intUserId, payload) => {
       await sendGeneralEmail(c.email, title, message);
     }
     
-    if (channels.includes('inApp') && c.userId) {
+    // Always insert into student notifications table so sent messages are reflected on the student portal
+    if (c.userId) {
       await pool.query(
         `INSERT INTO notifications (student_auth_user_id, user_id, title, message, type)
          VALUES ($1, $2, $3, $4, 'info')`,
