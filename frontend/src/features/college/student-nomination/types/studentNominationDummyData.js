@@ -42,7 +42,7 @@ export const eligibleStudents = [
     department: "Mechanical",
     cgpa: 6.85,
     company: "Infosys",
-    status: "Not Eligible"
+    status: "Eligible"
   },
   {
     id: 6,
@@ -114,7 +114,7 @@ export const eligibleStudents = [
     department: "Mechanical",
     cgpa: 6.70,
     company: "L&T",
-    status: "Not Eligible"
+    status: "Eligible"
   },
   {
     id: 14,
@@ -168,7 +168,7 @@ export const eligibleStudents = [
     department: "Civil",
     cgpa: 6.90,
     company: "L&T",
-    status: "Not Eligible"
+    status: "Eligible"
   },
   {
     id: 20,
@@ -213,7 +213,7 @@ export const eligibleStudents = [
     department: "Mechanical",
     cgpa: 6.45,
     company: "Tata Motors",
-    status: "Not Eligible"
+    status: "Eligible"
   },
   {
     id: 25,
@@ -321,7 +321,7 @@ export const eligibleStudents = [
     department: "Electrical",
     cgpa: 6.92,
     company: "ABB",
-    status: "Not Eligible"
+    status: "Eligible"
   },
   {
     id: 37,
@@ -393,7 +393,7 @@ export const eligibleStudents = [
     department: "Electrical",
     cgpa: 6.68,
     company: "Siemens",
-    status: "Not Eligible"
+    status: "Eligible"
   },
   {
     id: 45,
@@ -893,6 +893,7 @@ export const shortlistedStudents = [
     package: "₹32 LPA",
     shortlistedDate: "12 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 2,
@@ -902,6 +903,7 @@ export const shortlistedStudents = [
     package: "₹28 LPA",
     shortlistedDate: "13 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 3,
@@ -911,6 +913,7 @@ export const shortlistedStudents = [
     package: "₹30 LPA",
     shortlistedDate: "13 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 4,
@@ -920,6 +923,7 @@ export const shortlistedStudents = [
     package: "₹9 LPA",
     shortlistedDate: "14 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 5,
@@ -929,6 +933,7 @@ export const shortlistedStudents = [
     package: "₹7.2 LPA",
     shortlistedDate: "14 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 6,
@@ -938,6 +943,7 @@ export const shortlistedStudents = [
     package: "₹24 LPA",
     shortlistedDate: "15 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 7,
@@ -947,6 +953,7 @@ export const shortlistedStudents = [
     package: "₹26 LPA",
     shortlistedDate: "15 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 8,
@@ -956,6 +963,7 @@ export const shortlistedStudents = [
     package: "₹27 LPA",
     shortlistedDate: "16 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 9,
@@ -965,6 +973,7 @@ export const shortlistedStudents = [
     package: "₹10 LPA",
     shortlistedDate: "16 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 10,
@@ -974,6 +983,7 @@ export const shortlistedStudents = [
     package: "₹29 LPA",
     shortlistedDate: "17 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 11,
@@ -983,6 +993,7 @@ export const shortlistedStudents = [
     package: "₹8.5 LPA",
     shortlistedDate: "17 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 12,
@@ -992,6 +1003,7 @@ export const shortlistedStudents = [
     package: "₹7.8 LPA",
     shortlistedDate: "18 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 13,
@@ -1001,6 +1013,7 @@ export const shortlistedStudents = [
     package: "₹25 LPA",
     shortlistedDate: "18 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 14,
@@ -1010,6 +1023,7 @@ export const shortlistedStudents = [
     package: "₹31 LPA",
     shortlistedDate: "19 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 15,
@@ -1019,6 +1033,7 @@ export const shortlistedStudents = [
     package: "₹8.2 LPA",
     shortlistedDate: "19 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 16,
@@ -1028,6 +1043,7 @@ export const shortlistedStudents = [
     package: "₹22 LPA",
     shortlistedDate: "20 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 17,
@@ -1037,6 +1053,7 @@ export const shortlistedStudents = [
     package: "₹24 LPA",
     shortlistedDate: "20 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 18,
@@ -1046,6 +1063,7 @@ export const shortlistedStudents = [
     package: "₹30 LPA",
     shortlistedDate: "21 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 19,
@@ -1055,6 +1073,7 @@ export const shortlistedStudents = [
     package: "₹26 LPA",
     shortlistedDate: "21 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 20,
@@ -1064,6 +1083,7 @@ export const shortlistedStudents = [
     package: "₹18 LPA",
     shortlistedDate: "22 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 21,
@@ -1073,6 +1093,7 @@ export const shortlistedStudents = [
     package: "₹17 LPA",
     shortlistedDate: "22 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 22,
@@ -1082,6 +1103,8 @@ export const shortlistedStudents = [
     package: "₹27 LPA",
     shortlistedDate: "23 Jul 2026",
     status: "Shortlisted",
+    selected: false,
+    
   },
   {
     id: 23,
@@ -1091,6 +1114,7 @@ export const shortlistedStudents = [
     package: "₹33 LPA",
     shortlistedDate: "23 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
   {
     id: 24,
@@ -1100,6 +1124,7 @@ export const shortlistedStudents = [
     package: "₹29 LPA",
     shortlistedDate: "24 Jul 2026",
     status: "Shortlisted",
+    selected: false,
   },
   {
     id: 25,
@@ -1109,6 +1134,7 @@ export const shortlistedStudents = [
     package: "₹25 LPA",
     shortlistedDate: "24 Jul 2026",
     status: "Shortlisted",
+    selected: true,
   },
 ];
 

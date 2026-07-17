@@ -11,6 +11,7 @@ const NominationTable = ({
   isDetailOpen,
   setSelectedStudent,
   setIsDetailOpen,
+  onNominate,
 }) => {
   const { darkMode } = useOutletContext();
 
@@ -203,6 +204,8 @@ const NominationTable = ({
                     </button>
 
                     <button
+                      onClick={() => onNominate(student)}
+                      title="Nominate Student"
                       className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
                         darkMode
                           ? "bg-blue-600 text-white hover:bg-blue-500"
@@ -264,6 +267,8 @@ const NominationTable = ({
                     </button>
 
                     <button
+                      onClick={() => onNominate(student)}
+                      title="Nominate Student"
                       className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
                         darkMode
                           ? "bg-blue-600 text-white hover:bg-blue-500"

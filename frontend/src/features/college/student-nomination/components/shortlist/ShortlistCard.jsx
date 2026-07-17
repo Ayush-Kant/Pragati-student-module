@@ -1,4 +1,9 @@
-import { Building2, Briefcase, IndianRupee } from "lucide-react";
+import {
+  Building2,
+  Briefcase,
+  IndianRupee,
+  CircleCheckBig,
+} from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 
 import StatusBadge from "../common/StatusBadge";
@@ -29,12 +34,26 @@ const ShortlistCard = ({ student, variant = "dashboard" }) => {
   if (variant === "compact") {
     return (
       <div
-        className={`group cursor-pointer rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
+        className={`relative group cursor-pointer rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
           darkMode
             ? "border-slate-700/60 bg-[#151D30] hover:border-slate-500"
             : "border-slate-200 bg-white hover:border-blue-300"
         }`}
       >
+        {/* Selected Badge */}
+
+        {student?.selected && (
+          <div
+            className={`absolute right-4 top-4 flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold ${
+              darkMode
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                : "border-emerald-200 bg-emerald-50 text-emerald-700"
+            }`}
+          >
+            <CircleCheckBig size={14} strokeWidth={2.4} />
+            <span>Selected</span>
+          </div>
+        )}
         {/* Student */}
 
         <h3

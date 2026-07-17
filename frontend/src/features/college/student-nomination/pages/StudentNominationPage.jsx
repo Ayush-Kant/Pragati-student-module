@@ -10,6 +10,7 @@ import StatusFilter from "../components/filters/StatusFilter";
 import NominationDetails from "../components/nomination/NominationDetails";
 import NominationStatistics from "../components/nomination/NominationStatistics";
 import NominationTable from "../components/nomination/NominationTable";
+import StudentNominationForm from "../components/forms/StudentNominationForm";
 
 import ShortlistedStudents from "../components/shortlist/ShortlistedStudents";
 
@@ -29,6 +30,10 @@ const StudentNominationPage = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [showNominationForm, setShowNominationForm] = useState(false);
+
+  const [nominatingStudent, setNominatingStudent] = useState(null);
 
   const ITEMS_PER_PAGE = 8;
 
@@ -88,49 +93,62 @@ const StudentNominationPage = () => {
             Table + Details
       ========================== */}
 
-      <div className="flex h-167 gap-4">
-        {/* Table */}
+      {showNominationForm ? (
+        <StudentNominationForm
+          student={nominatingStudent}
+          onClose={() => {
+            setShowNominationForm(false);
+            setNominatingStudent(null);
+          }}
+        />
+      ) : (
+        <div className="flex h-167 gap-4">
+          {/* Table */}
 
-        <div className="flex min-w-0 h-full flex-1 flex-col">
-          {activeTab === "eligible" ? (
-            <NominationTable
-              students={currentStudents}
-              totalStudents={totalStudents}
-              selectedStudent={selectedStudent}
-              isDetailOpen={isDetailOpen}
-              setSelectedStudent={setSelectedStudent}
-              setIsDetailOpen={setIsDetailOpen}
+          <div className="flex min-w-0 h-full flex-1 flex-col">
+            {activeTab === "eligible" ? (
+              <NominationTable
+                students={currentStudents}
+                totalStudents={totalStudents}
+                selectedStudent={selectedStudent}
+                isDetailOpen={isDetailOpen}
+                setSelectedStudent={setSelectedStudent}
+                setIsDetailOpen={setIsDetailOpen}
+                onNominate={(student) => {
+                  setNominatingStudent(student);
+                  setShowNominationForm(true);
+                }}
+              />
+            ) : (
+              <NominatedTable
+                students={currentStudents}
+                totalStudents={totalStudents}
+                selectedStudent={selectedStudent}
+                isDetailOpen={isDetailOpen}
+                setSelectedStudent={setSelectedStudent}
+                setIsDetailOpen={setIsDetailOpen}
+              />
+            )}
+          </div>
+
+          {/* Details Drawer */}
+
+          <div
+            className={`h-full overflow-hidden transition-all duration-300 ease-in-out ${
+              isDetailOpen ? "h-full w-[520px] shrink-0" : "w-0"
+            }`}
+          >
+            <NominationDetails
+              student={selectedStudent}
+              isOpen={isDetailOpen}
+              onClose={() => {
+                setSelectedStudent(null);
+                setIsDetailOpen(false);
+              }}
             />
-          ) : (
-            <NominatedTable
-              students={currentStudents}
-              totalStudents={totalStudents}
-              selectedStudent={selectedStudent}
-              isDetailOpen={isDetailOpen}
-              setSelectedStudent={setSelectedStudent}
-              setIsDetailOpen={setIsDetailOpen}
-            />
-          )}
+          </div>
         </div>
-
-        {/* Details Drawer */}
-
-        <div
-          className={`h-full overflow-hidden transition-all duration-300 ease-in-out ${
-            isDetailOpen ? "h-full w-[520px] shrink-0" : "w-0"
-          }`}
-        >
-          <NominationDetails
-            student={selectedStudent}
-            isOpen={isDetailOpen}
-            onClose={() => {
-              setSelectedStudent(null);
-              setIsDetailOpen(false);
-            }}
-          />
-        </div>
-      </div>
-
+      )}
       {/* =========================
             Pagination
       ========================== */}
