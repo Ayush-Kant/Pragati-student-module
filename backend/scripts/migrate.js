@@ -44,6 +44,7 @@ const migrationFiles = [
   "college.department.course.seeddata.sql",
   "student_module.sql",
   "020_update_student_drive_progress.sql",
+  "021_update_interviews_table.sql",
 ];
 
 async function runMigrationsFresh() {

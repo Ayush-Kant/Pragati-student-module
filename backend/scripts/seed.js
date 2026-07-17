@@ -135,6 +135,12 @@ async function seedData() {
       ('tp6', 't4', 3, 100, 78, 7.5, 3, 'COMPLETED');
     `);
 
+    console.log("Inserting mock interviews...");
+    await client.query(`
+      INSERT INTO interviews (id, application_id, interviewer_id, meeting_link, result, attendance, scheduled_at, interview_type) VALUES
+      (1, 3, 1, 'https://meet.google.com/abc-defg-hij', 'PENDING', 'pending', NOW() + INTERVAL '1 day', 'Technical Interview');
+    `);
+
     console.log("Resetting primary key sequences...");
     await client.query(`
       SELECT setval('auth_users_id_seq', COALESCE((SELECT MAX(id) FROM auth_users), 1));
@@ -144,6 +150,7 @@ async function seedData() {
       SELECT setval('recruitment_drives_id_seq', COALESCE((SELECT MAX(id) FROM recruitment_drives), 1));
       SELECT setval('students_id_seq', COALESCE((SELECT MAX(id) FROM students), 1));
       SELECT setval('student_drive_progress_id_seq', COALESCE((SELECT MAX(id) FROM student_drive_progress), 1));
+      SELECT setval('interviews_id_seq', COALESCE((SELECT MAX(id) FROM interviews), 1));
     `);
 
     await client.query("COMMIT");
