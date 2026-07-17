@@ -1,5 +1,5 @@
 import { pool } from '../../../config/db.js';
-import { sendInterviewScheduledEmail, sendInterviewResultEmail } from '../../company/services/email.service.js';
+import { sendInterviewScheduledEmail, sendInterviewResultEmail } from '../../../src/modules/company/services/email.service.js';
 
 export const listInterviews = async (companyId) => {
   const query = `
