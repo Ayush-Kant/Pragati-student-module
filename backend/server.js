@@ -17,6 +17,7 @@ import interviewRoutes from "./routes/interview.routes.js";
 import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
 
 import collegeJobsRoutes from "./routes/college.jobs.routes.js";
+import collegeReportsGenerationRoutes from "./routes/collegeReportsGeneration.routes.js";
 
 import studentRoutes from "./routes/student.routes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
@@ -54,6 +55,7 @@ app.use("/api/v1/company/interviews", interviewRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
+app.use("/api/reports", collegeReportsGenerationRoutes);
 app.use("/api/students", studentRoutes);
 
 connectDB(process.env.POSTGRESQL_URI).then(() => {
