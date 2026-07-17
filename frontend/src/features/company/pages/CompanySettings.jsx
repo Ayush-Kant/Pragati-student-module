@@ -12,6 +12,7 @@ import {
   FiBriefcase,
 } from "react-icons/fi";
 import { FaBuilding } from "react-icons/fa";
+import { UserPlus, UserX, ToggleLeft, ToggleRight, Edit2, X } from "lucide-react";
 import "./../styles/companySettings.css";
 import {
   companySettingsSchema,
@@ -21,6 +22,10 @@ import {
   getCompanySettings,
   updateCompanySettings,
   uploadCompanyLogo,
+  getCompanyTeam,
+  addCompanyTeamMember,
+  updateCompanyTeamMember,
+  deleteCompanyTeamMember,
 } from "../services/companyService";
 
 const CompanySettings = () => {
@@ -30,6 +35,17 @@ const CompanySettings = () => {
     useState(false);
   const [logoPreview, setLogoPreview] = useState(null);
   const [errorBanner, setErrorBanner] = useState(null);
+
+  const [activeTab, setActiveTab] = useState("profile"); // 'profile' | 'team'
+  const [team, setTeam] = useState([]);
+  const [loadingTeam, setLoadingTeam] = useState(true);
+  const [showTeamModal, setShowTeamModal] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
+  const [teamForm, setTeamForm] = useState({
+    name: "",
+    email: "",
+    role: "Recruiter"
+  });
 
   const {
     control,
@@ -139,11 +155,108 @@ const CompanySettings = () => {
     }
   };
 
+  const fetchTeam = async () => {
+    try {
+      setLoadingTeam(true);
+      const res = await getCompanyTeam();
+      setTeam(res.data || []);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load team members");
+    } finally {
+      setLoadingTeam(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "team") {
+      fetchTeam();
+    }
+  }, [activeTab]);
+
+  const handleTeamFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingMember) {
+        await updateCompanyTeamMember(editingMember.id, {
+          role: teamForm.role,
+          is_active: editingMember.is_active
+        });
+        toast.success("Recruiter role updated successfully!");
+      } else {
+        await addCompanyTeamMember({
+          full_name: teamForm.name,
+          email: teamForm.email,
+          role: teamForm.role
+        });
+        toast.success("Recruiter added successfully!");
+      }
+      setShowTeamModal(false);
+      setEditingMember(null);
+      fetchTeam();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to save team member");
+    }
+  };
+
+  const handleToggleActive = async (member) => {
+    try {
+      await updateCompanyTeamMember(member.id, {
+        role: member.role,
+        is_active: !member.is_active
+      });
+      toast.success("Recruiter status updated!");
+      fetchTeam();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update status");
+    }
+  };
+
+  const handleDeleteMember = async (id) => {
+    if (!window.confirm("Are you sure you want to remove this recruiter?")) return;
+    try {
+      await deleteCompanyTeamMember(id);
+      toast.success("Recruiter removed from team");
+      fetchTeam();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove recruiter");
+    }
+  };
+
   return (
     <div className="company-settings">
       <div className="settings-header">
         <h1>Company Settings</h1>
         <p>Manage your company profile and preferences</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-gray-200 mb-6 gap-6 text-sm font-semibold">
+        <button
+          type="button"
+          onClick={() => setActiveTab("profile")}
+          className={`pb-3 px-1 transition-all ${
+            activeTab === "profile" 
+              ? "text-blue-600 border-b-2 border-blue-600 font-bold" 
+              : "text-gray-400 hover:text-gray-600"
+          } cursor-pointer`}
+        >
+          Company Profile
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("team")}
+          className={`pb-3 px-1 transition-all ${
+            activeTab === "team" 
+              ? "text-blue-600 border-b-2 border-blue-600 font-bold" 
+              : "text-gray-400 hover:text-gray-600"
+          } cursor-pointer`}
+        >
+          Team Management
+        </button>
       </div>
 
       {/* Error Banner */}
