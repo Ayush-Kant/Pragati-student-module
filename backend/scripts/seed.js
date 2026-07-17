@@ -101,10 +101,18 @@ async function seedData() {
 
     console.log("Inserting mock students...");
     await client.query(`
-      INSERT INTO students (id, name, email, phone, gpa, skills, enrollment_year, status, profile_verified) VALUES
-      (1, 'Rahul Sharma', 'rahul@test.com', '+91 98765 43210', 8.5, ARRAY['MERN', 'Node.js'], 2023, 'verified', true),
-      (2, 'Priya Patel', 'priya@test.com', '+91 98765 43211', 9.1, ARRAY['Python', 'AI'], 2022, 'verified', true),
-      (3, 'Arjun Kumar', 'arjun@test.com', '+91 98765 43212', 7.8, ARRAY['Java', 'Spring Boot'], 2023, 'verified', true);
+      INSERT INTO students (id, name, email, phone, gpa, skills, enrollment_year, status, profile_verified, college, resume_url, graduation_year) VALUES
+      (1, 'Rahul Sharma', 'rahul@test.com', '+91 98765 43210', 8.5, ARRAY['MERN', 'Node.js'], 2023, 'verified', true, 'IIT Bombay', 'rahul_patil_resume.pdf', 2026),
+      (2, 'Priya Patel', 'priya@test.com', '+91 98765 43211', 9.1, ARRAY['Python', 'AI'], 2022, 'verified', true, 'IIT Delhi', 'priya_sharma_resume.pdf', 2026),
+      (3, 'Arjun Kumar', 'arjun@test.com', '+91 98765 43212', 7.8, ARRAY['Java', 'Spring Boot'], 2023, 'verified', true, 'BITS Pilani', 'amit_kumar_resume.pdf', 2026);
+    `);
+
+    console.log("Inserting student drive progress...");
+    await client.query(`
+      INSERT INTO student_drive_progress (id, student_id, drive_id, current_stage, stage, company_id, assessment_score, training_completion, notes, interview_feedback) VALUES
+      (1, 1, 2, 'shortlist', 'Shortlisted', 2, 92.00, 90.00, 'Strong technical skills with excellent problem-solving abilities. Demonstrated good communication and teamwork during the interview. Highly recommended for the next round.', 'Excellent performance in technical round.'),
+      (2, 2, 2, 'screening', 'Assessment', 2, 88.00, 50.00, 'Awaiting assessment completion. Initial aptitude scores look promising.', 'Pending screening results.'),
+      (3, 3, 2, 'interviews', 'Interview', 2, 85.00, 0.00, 'Interview scheduled for next week. Candidate shows good leadership potential.', 'Scheduled for final HR round.');
     `);
 
     console.log("Inserting training programs...");
@@ -135,6 +143,7 @@ async function seedData() {
       SELECT setval('companies_id_seq', COALESCE((SELECT MAX(id) FROM companies), 1));
       SELECT setval('recruitment_drives_id_seq', COALESCE((SELECT MAX(id) FROM recruitment_drives), 1));
       SELECT setval('students_id_seq', COALESCE((SELECT MAX(id) FROM students), 1));
+      SELECT setval('student_drive_progress_id_seq', COALESCE((SELECT MAX(id) FROM student_drive_progress), 1));
     `);
 
     await client.query("COMMIT");
