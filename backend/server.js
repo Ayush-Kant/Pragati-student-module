@@ -31,7 +31,7 @@ import companyDrivesRoutes from "./modules/company/routes/companyDrives.routes.j
 import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 import companyInterviewRoutes from "./modules/company/routes/companyInterview.routes.js";
 import companyNotificationRoutes from "./modules/company/routes/companyNotification.routes.js";
-import companyOfferRoutes from "./modules/offers/routes/offer.routes.js";
+import companyOfferRoutes from "./modules/company/routes/companyOffer.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import questionBankRouter from "./routes/questionBank.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";

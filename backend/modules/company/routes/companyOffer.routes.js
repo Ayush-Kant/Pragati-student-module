@@ -1,7 +1,7 @@
 import express from "express";
 import authMiddleware from "../../../middleware/authMiddleware.js";
 import roleMiddleware from "../../../middleware/roleMiddleware.js";
-import * as offerController from "../controllers/offer.controller.js";
+import * as offerController from "../controllers/companyOffer.controller.js";
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 import { pool } from '../../../config/db.js';
 import { resolveUserIntId } from '../../../utils/userResolver.js';
-import * as offerService from "../services/offer.service.js";
+import * as offerService from "../services/companyOffer.service.js";
 
 const getCompanyId = async (req) => {
   const userId = req.user.userId;

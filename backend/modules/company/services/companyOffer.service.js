@@ -1,4 +1,4 @@
-import * as offerRepository from "../repositories/offer.repository.js";
+import * as offerRepository from "../repositories/companyOffer.repository.js";
 
 export const createOffer = async (companyId, payload) => {
   return await offerRepository.createOffer(companyId, payload);
