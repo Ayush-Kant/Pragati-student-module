@@ -35,6 +35,10 @@ import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
+import certificatesRouter from "./routes/certificates.routes.js";
+import badgesRouter from "./routes/badges.routes.js";
+import { getStudentBadgesController } from "./controllers/badges.controller.js";
+import authMiddleware from "./middleware/authMiddleware.js";
 
 // --- Intern Features ---
 // import companyRoutes from "./routes/company.routes.js";
@@ -114,6 +118,14 @@ app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
+
+app.use("/api/v1/certificates", certificatesRouter);
+app.use("/api/v1/badges", badgesRouter);
+app.get(
+  "/api/v1/students/:id/badges",
+  authMiddleware,
+  getStudentBadgesController,
+);
 
 app.get("/", (req, res) => {
   res.json({
