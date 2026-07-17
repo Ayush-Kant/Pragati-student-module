@@ -1,21 +1,21 @@
 import * as offerRepository from "../repositories/offer.repository.js";
 
-export const createOffer = async (payload) => {
-  return await offerRepository.createOffer(payload);
+export const createOffer = async (companyId, payload) => {
+  return await offerRepository.createOffer(companyId, payload);
 };
 
-export const getOffers = async () => {
-  return await offerRepository.getAllOffers();
+export const getOffers = async (companyId) => {
+  return await offerRepository.getAllOffers(companyId);
 };
 
-export const getOfferById = async (id) => {
-  return await offerRepository.getOfferById(id);
+export const getOfferById = async (id, companyId) => {
+  return await offerRepository.getOfferById(id, companyId);
 };
 
-export const updateOfferStatus = async (id, status) => {
-  return await offerRepository.updateOfferStatus(id, status);
+export const updateOfferStatus = async (id, status, companyId) => {
+  return await offerRepository.updateOfferStatus(id, status, companyId);
 };
 
-export const deleteOffer = async (id) => {
-  return await offerRepository.deleteOffer(id);
+export const deleteOffer = async (id, companyId) => {
+  return await offerRepository.deleteOffer(id, companyId);
 };
