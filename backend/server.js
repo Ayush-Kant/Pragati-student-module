@@ -27,6 +27,9 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
+
+// Live Sessions Routes
+app.use("/api/student/live-sessions", liveSessionRoutes);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
