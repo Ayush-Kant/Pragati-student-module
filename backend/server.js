@@ -36,11 +36,8 @@ import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
 
-// Company Assessment route
-import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
-
 // --- Intern Features ---
-import companyRoutes from "./routes/company.routes.js";
+// import companyRoutes from "./routes/company.routes.js";
 import mentorHiringRoutes from "./routes/mentorHiring.routes.js";
 // -----------------------
 
@@ -101,7 +98,7 @@ app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/mentor", mentorHiringRoutes); // <-- Added from intern code
 
 app.use("/api/v1/company", companyProfileRoutes);
-app.use("/api/v1/company", companyRoutes); // <-- Added from intern code
+// app.use("/api/v1/company", companyRoutes); // <-- Added from intern code
 app.use("/api/v1/company/interviews", interviewRoutes); // <-- Added from intern code
 app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/v1/company/jobs", collegeJobsRoutes);
