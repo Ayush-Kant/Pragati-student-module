@@ -111,7 +111,7 @@ CREATE INDEX IF NOT EXISTS idx_courses_mentor_id ON courses(mentor_id);
 -- Departments Management Schema
 CREATE TABLE IF NOT EXISTS departments (
     dept_id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
     courses TEXT[],
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -124,6 +124,7 @@ INSERT INTO departments (name, courses) VALUES
 ('Computer Science', '{"DSA", "DBMS", "OS"}'),
 ('Information Technology', '{"CN", "Web Dev", "Software Engineering"}'),
 ('Electronics and Communication', '{"Signals", "Microprocessors", "Communication Systems"}'),
-('Mechanical Engineering', '{"Thermodynamics", "Fluid Mechanics", "Machine Design"}');
+('Mechanical Engineering', '{"Thermodynamics", "Fluid Mechanics", "Machine Design"}')
+ON CONFLICT (name) DO NOTHING;
 CREATE INDEX IF NOT EXISTS idx_student_social_links_student_id
     ON student_social_links(student_id);

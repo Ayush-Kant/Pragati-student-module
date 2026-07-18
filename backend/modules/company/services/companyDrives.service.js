@@ -26,9 +26,9 @@ export const listCompanyDrives = async (companyId) => {
 export const createCompanyDrive = async (companyId, driveData) => {
   const query = `
     INSERT INTO recruitment_drives (
-      company_id, job_title, department, required_skills, salary_package, work_mode, location, deadline
+      company_id, title, job_title, department, required_skills, salary_package, work_mode, location, deadline
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    VALUES ($1, $2, $2, $3, $4, $5, $6, $7, $8)
     RETURNING id::text AS "driveId"
   `;
   const result = await pool.query(query, [
@@ -70,6 +70,7 @@ export const updateCompanyDrive = async (companyId, driveId, driveData) => {
   const query = `
     UPDATE recruitment_drives
     SET 
+      title = COALESCE($3, title),
       job_title = COALESCE($3, job_title),
       department = COALESCE($4, department),
       required_skills = COALESCE($5, required_skills),

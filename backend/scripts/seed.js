@@ -92,9 +92,9 @@ async function seedData() {
 
     console.log("Inserting recruitment drives...");
     const driveResult = await client.query(`
-      INSERT INTO recruitment_drives (id, title, company_id, mentor_id, status) VALUES 
-      (1, 'Summer Internship Drive 2026', 1, 1, 'active'),
-      (2, 'Tech Trainee Hiring 2026', 2, 1, 'active')
+      INSERT INTO recruitment_drives (id, title, job_title, company_id, mentor_id, status) VALUES 
+      (1, 'Summer Internship Drive 2026', 'Summer Internship Drive 2026', 1, 1, 'active'),
+      (2, 'Tech Trainee Hiring 2026', 'Tech Trainee Hiring 2026', 2, 1, 'active')
       RETURNING id, title;
     `);
     const drive = driveResult.rows[0];
