@@ -1,0 +1,371 @@
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { Mail, Users, Send, CheckSquare, Square } from 'lucide-react';
+import "../styles/companyDashboard.css";
+
+const templates = {
+  custom: {
+    subject: "",
+    message: ""
+  },
+  interview: {
+    subject: "Interview Invitation - {company_name}",
+    message: "Dear {candidate_name},\n\nWe are pleased to invite you for an interview for the {position} position. Your interview is scheduled for {interview_date}.\n\nPlease let us know if this time works for you.\n\nBest regards,\n{company_name}"
+  },
+  reminder: {
+    subject: "Pending Assessment Reminder - {company_name}",
+    message: "Dear {candidate_name},\n\nThis is a reminder to complete your pending assessment for the {position} position. Please complete it before the deadline.\n\nBest regards,\n{company_name}"
+  },
+  offer: {
+    subject: "Job Offer: {position} - {company_name}",
+    message: "Dear {candidate_name},\n\nCongratulations! We are thrilled to offer you the position of {position} at {company_name}.\n\nPlease find the detailed offer letter attached. We look forward to having you on board!\n\nBest regards,\n{company_name}"
+  },
+  rejection: {
+    subject: "Application Update - {company_name}",
+    message: "Dear {candidate_name},\n\nThank you for your interest in the {position} position at {company_name}. After careful consideration, we regret to inform you that we will not be moving forward with your application.\n\nWe wish you all the best in your future endeavors.\n\nBest regards,\n{company_name}"
+  }
+};
+
+const recipientCounts = {
+  all: 245,
+  shortlisted: 48,
+  interview: 18,
+  offer: 5,
+  custom: 1
+};
+
+const previewData = {
+  candidate_name: "Rahul Patil",
+  interview_date: "May 15, 2026",
+  position: "Software Engineer",
+  company_name: "Your Company"
+};
+
+const CompanyMessages = () => {
+  const [recipientGroup, setRecipientGroup] = useState('all');
+  const [channels, setChannels] = useState({ email: true, sms: false, inApp: false });
+  const [templateKey, setTemplateKey] = useState('custom');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+
+  const handleTemplateChange = (e) => {
+    const key = e.target.value;
+    setTemplateKey(key);
+    const selected = templates[key];
+    if (selected) {
+      setSubject(selected.subject);
+      setMessage(selected.message);
+    }
+  };
+
+  const handleToolbarClick = (action) => {
+    const textarea = document.getElementById('message-textarea');
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selectedText = text.substring(start, end);
+
+    let replacement = "";
+    switch (action) {
+      case 'bold':
+        replacement = `**${selectedText || 'text'}**`;
+        break;
+      case 'italic':
+        replacement = `*${selectedText || 'text'}*`;
+        break;
+      case 'underline':
+        replacement = `<u>${selectedText || 'text'}</u>`;
+        break;
+      case 'link':
+        replacement = `[${selectedText || 'Link Text'}](url)`;
+        break;
+      case 'list':
+        replacement = `\n- ${selectedText || 'Item'}`;
+        break;
+      default:
+        return;
+    }
+
+    const updatedText = text.substring(0, start) + replacement + text.substring(end);
+    setMessage(updatedText);
+    
+    // Focus back and restore selection cursor location
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + replacement.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 50);
+  };
+
+  const handleSend = async () => {
+    const activeChannels = Object.keys(channels).filter(k => channels[k]);
+    if (activeChannels.length === 0) {
+      toast.error("Please select at least one transmission channel (Email, SMS, or In-App).");
+      return;
+    }
+
+    if (!subject.trim() && channels.email) {
+      toast.error("Please enter a subject line for your email.");
+      return;
+    }
+
+    if (!message.trim()) {
+      toast.error("Please compose a message before sending.");
+      return;
+    }
+
+    setIsSending(true);
+
+    // Mock network latency for premium feel
+    setTimeout(() => {
+      setIsSending(false);
+      const count = recipientCounts[recipientGroup];
+      const channelNames = activeChannels.map(c => c === 'inApp' ? 'In-App' : c.toUpperCase()).join(" & ");
+      toast.success(`Successfully sent notification to ${count} recipients via ${channelNames}!`);
+      
+      // Reset form
+      setSubject('');
+      setMessage('');
+      setTemplateKey('custom');
+    }, 1500);
+  };
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-3xl font-black text-slate-800 tracking-tight">Communication Center</h1>
+        <p className="text-sm font-semibold text-slate-400 mt-1">Send notifications and messages to candidates</p>
+      </div>
+
+      <div className="bg-white rounded-[24px] border border-slate-100 p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
+        {/* Recipients */}
+        <div className="space-y-2">
+          <label className="block text-sm font-bold text-slate-700">Recipients</label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+              <Users size={18} />
+            </span>
+            <select
+              value={recipientGroup}
+              onChange={(e) => setRecipientGroup(e.target.value)}
+              className="block w-full pl-12 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
+            >
+              <option value="all">All Candidates</option>
+              <option value="shortlisted">Shortlisted Candidates</option>
+              <option value="interview">Interview Scheduled</option>
+              <option value="offer">Offer Accepted</option>
+              <option value="custom">Custom Selection</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Send Via & Template Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Send Via Checkboxes */}
+          <div className="space-y-3">
+            <label className="block text-sm font-bold text-slate-700">Send Via</label>
+            <div className="flex flex-wrap items-center gap-6 mt-1">
+              <button
+                type="button"
+                onClick={() => setChannels(prev => ({ ...prev, email: !prev.email }))}
+                className="flex items-center gap-2 text-sm font-semibold text-slate-600 focus:outline-none"
+              >
+                {channels.email ? (
+                  <span className="text-blue-500"><CheckSquare size={20} fill="#eff6ff" /></span>
+                ) : (
+                  <span className="text-slate-300"><Square size={20} /></span>
+                )}
+                Email
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setChannels(prev => ({ ...prev, sms: !prev.sms }))}
+                className="flex items-center gap-2 text-sm font-semibold text-slate-600 focus:outline-none"
+              >
+                {channels.sms ? (
+                  <span className="text-blue-500"><CheckSquare size={20} fill="#eff6ff" /></span>
+                ) : (
+                  <span className="text-slate-300"><Square size={20} /></span>
+                )}
+                SMS
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setChannels(prev => ({ ...prev, inApp: !prev.inApp }))}
+                className="flex items-center gap-2 text-sm font-semibold text-slate-600 focus:outline-none"
+              >
+                {channels.inApp ? (
+                  <span className="text-blue-500"><CheckSquare size={20} fill="#eff6ff" /></span>
+                ) : (
+                  <span className="text-slate-300"><Square size={20} /></span>
+                )}
+                In-App
+              </button>
+            </div>
+          </div>
+
+          {/* Template Dropdown */}
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-700">Template</label>
+            <div className="relative">
+              <select
+                value={templateKey}
+                onChange={handleTemplateChange}
+                className="block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
+              >
+                <option value="custom">Custom Message</option>
+                <option value="interview">Interview Invitation</option>
+                <option value="reminder">Assessment Reminder</option>
+                <option value="offer">Offer Letter</option>
+                <option value="rejection">Rejection Notice</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Subject Line */}
+        <div className="space-y-2">
+          <label className="block text-sm font-bold text-slate-700">Subject</label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+              <Mail size={16} />
+            </span>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Enter email subject..."
+              className="block w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Message Editor */}
+        <div className="space-y-2">
+          <label className="block text-sm font-bold text-slate-700">Message</label>
+          <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            {/* Editor Toolbar */}
+            <div className="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center gap-4 flex-wrap">
+              <button
+                type="button"
+                onClick={() => handleToolbarClick('bold')}
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors px-2 py-1 rounded hover:bg-slate-200"
+                title="Bold"
+              >
+                B
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToolbarClick('italic')}
+                className="text-xs font-bold italic text-slate-500 hover:text-slate-800 transition-colors px-2 py-1 rounded hover:bg-slate-200"
+                title="Italic"
+              >
+                I
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToolbarClick('underline')}
+                className="text-xs font-bold underline text-slate-500 hover:text-slate-800 transition-colors px-2 py-1 rounded hover:bg-slate-200"
+                title="Underline"
+              >
+                U
+              </button>
+              <div className="h-4 w-px bg-slate-300" />
+              <button
+                type="button"
+                onClick={() => handleToolbarClick('link')}
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1 px-2 py-1 rounded hover:bg-slate-200"
+                title="Link"
+              >
+                Link
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToolbarClick('list')}
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1 px-2 py-1 rounded hover:bg-slate-200"
+                title="List"
+              >
+                List
+              </button>
+            </div>
+
+            {/* Textarea */}
+            <textarea
+              id="message-textarea"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Compose your message here...&#10;&#10;You can use the following placeholders:&#10;{candidate_name}, {position}, {interview_date}, {company_name}"
+              rows={8}
+              className="block w-full p-4 bg-white border-0 text-slate-700 placeholder-slate-400 font-medium focus:outline-none focus:ring-0 text-sm leading-relaxed"
+            />
+          </div>
+        </div>
+
+        {/* Preview Variables */}
+        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 space-y-3">
+          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Preview Variables</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+              <code className="bg-slate-200/60 px-2 py-1 rounded text-slate-600 font-mono text-xs font-medium">&#123;candidate_name&#125;</code>
+              <span className="text-slate-400 font-normal">→</span>
+              <span>{previewData.candidate_name}</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+              <code className="bg-slate-200/60 px-2 py-1 rounded text-slate-600 font-mono text-xs font-medium">&#123;position&#125;</code>
+              <span className="text-slate-400 font-normal">→</span>
+              <span>{previewData.position}</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+              <code className="bg-slate-200/60 px-2 py-1 rounded text-slate-600 font-mono text-xs font-medium">&#123;interview_date&#125;</code>
+              <span className="text-slate-400 font-normal">→</span>
+              <span>{previewData.interview_date}</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+              <code className="bg-slate-200/60 px-2 py-1 rounded text-slate-600 font-mono text-xs font-medium">&#123;company_name&#125;</code>
+              <span className="text-slate-400 font-normal">→</span>
+              <span>{previewData.company_name}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
+          <p className="text-sm font-semibold text-slate-500">
+            {recipientCounts[recipientGroup]} recipients will receive this notification
+          </p>
+
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={isSending}
+            className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3 bg-[#06b6d4] hover:bg-[#0891b2] active:scale-95 transition-all text-white text-sm font-bold rounded-xl shadow-lg shadow-cyan-500/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed animate-fade-in"
+          >
+            {isSending ? (
+              <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+            ) : (
+              <Send size={15} />
+            )}
+            {isSending ? "Sending..." : "Send Notification"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CompanyMessages;
