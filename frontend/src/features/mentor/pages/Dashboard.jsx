@@ -1,5 +1,6 @@
 // MentorDashboard.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import useMentorDashboard from "../hooks/useMentorDashboard";
 import StatsRow from "../components/StatsRow";
 import UpcomingSessionsList from "../components/UpcomingSessionsList";
@@ -21,6 +22,7 @@ const PIE_COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444"];
 const BAR_COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
 const MentorDashboard = () => {
+  const navigate = useNavigate();
   const { data, loading, error } = useMentorDashboard();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
@@ -154,20 +156,21 @@ const MentorDashboard = () => {
         </div>
 
         {[
-          { label: "Dashboard", icon: "🏠" },
-          { label: "My Mentees", icon: "👥" },
-          { label: "Sessions", icon: "📅" },
-          { label: "Assessments", icon: "📋" },
-          { label: "Tasks & Assignments", icon: "✅" },
-          { label: "Reports & Analytics", icon: "📊" },
-          { label: "Resources", icon: "📚" },
-          { label: "Calendar", icon: "🗓️" },
-          { label: "Messages", icon: "💬" },
-          { label: "Notifications", icon: "🔔" },
-          { label: "Settings", icon: "⚙️" },
+          { label: "Dashboard", icon: "🏠", path: "/mentor/dashboard" },
+          { label: "My Mentees", icon: "👥", path: "/mentor/mentees" },
+          { label: "Sessions", icon: "📅", path: "/mentor/slots" },
+          { label: "Assessments", icon: "📋", path: "/mentor/assessments" },
+          { label: "Tasks & Assignments", icon: "✅", path: "/mentor/tasks" },
+          { label: "Reports & Analytics", icon: "📊", path: "/mentor/export-report" },
+          { label: "Resources", icon: "📚", path: "#" },
+          { label: "Calendar", icon: "🗓️", path: "/mentor/slots" },
+          { label: "Messages", icon: "💬", path: "/mentor/discussion-forum" },
+          { label: "Notifications", icon: "🔔", path: "/mentor/notifications" },
+          { label: "Settings", icon: "⚙️", path: "#" },
         ].map((item, i) => (
           <div
             key={i}
+            onClick={() => { if (item.path !== "#") navigate(item.path); }}
             style={{
               padding: "8px 10px",
               borderRadius: "8px",
@@ -278,7 +281,10 @@ const MentorDashboard = () => {
             />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div style={{ position: "relative" }}>
+            <div 
+              onClick={() => navigate("/mentor/notifications")}
+              style={{ position: "relative", cursor: "pointer" }}
+            >
               <div
                 style={{
                   width: "30px",

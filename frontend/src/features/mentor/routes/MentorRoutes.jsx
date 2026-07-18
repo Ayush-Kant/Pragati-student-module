@@ -13,8 +13,12 @@ import QuestionBankPage from "../pages/QuestionBankPage";
 import CreateQuestionPage from "../pages/CreateQuestionPage";
 import EditQuestionPage from "../pages/EditQuestionPage";
 import QuestionPreviewPage from "../pages/QuestionPreviewPage";
-import QuizBuilderPage from "../pages/QuizBuilderPage";
+import QuestionBankPageQuizBuilder from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
+
+import NotificationsPage from "../pages/NotificationsPage";
+import DiscussionForumPage from "../pages/DiscussionForumPage";
+import SlotsCalendarPage from "../pages/SlotsCalendarPage";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
@@ -33,8 +37,12 @@ const mentorRoute = (
         <Route path="question-bank/create" element={<CreateQuestionPage />} />
         <Route path="question-bank/edit/:id" element={<EditQuestionPage />} />
         <Route path="question-bank/preview/:id" element={<QuestionPreviewPage />} />
-        <Route path="question-bank/quiz-builder" element={<QuizBuilderPage />} />
+        <Route path="question-bank/quiz-builder" element={<QuestionBankPageQuizBuilder />} />
         <Route path="question-bank/attempts" element={<AttemptHistoryPage />} />
+
+        <Route path="notifications" element={<NotificationsPage />} />
+        <Route path="discussion-forum" element={<DiscussionForumPage />} />
+        <Route path="slots" element={<SlotsCalendarPage />} />
       </Route>
     </Route>
   </Route>

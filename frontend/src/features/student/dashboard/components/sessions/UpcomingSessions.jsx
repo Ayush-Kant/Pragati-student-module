@@ -25,7 +25,7 @@ export default function UpcomingSessions() {
 
 
       <h2 className="text-xl font-bold text-gray-800 mb-5">
-        Upcoming Sessions
+        Upcoming Slots
       </h2>
 
 

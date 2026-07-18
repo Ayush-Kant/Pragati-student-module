@@ -13,6 +13,7 @@ import {
   Bell,
   HelpCircle,
   Briefcase,
+  MessageSquare,
 } from "lucide-react";
 
 export default function MentorLayout() {
@@ -38,8 +39,18 @@ export default function MentorLayout() {
     },
     {
       name: "Sessions",
-      path: "/mentor/sessions",
+      path: "/mentor/slots",
       icon: <CalendarDays className="w-5 h-5" />,
+    },
+    {
+      name: "Discussion Forum",
+      path: "/mentor/discussion-forum",
+      icon: <MessageSquare className="w-5 h-5" />,
+    },
+    {
+      name: "Notifications",
+      path: "/mentor/notifications",
+      icon: <Bell className="w-5 h-5" />,
     },
     {
       name: "Assessments",
@@ -200,9 +211,9 @@ export default function MentorLayout() {
                 padding: "12px 14px",
                 borderRadius: "10px",
                 cursor: "pointer",
-                backgroundColor: item.active ? "#f0f9ff" : "transparent",
-                color: item.active ? "#0284c7" : "#64748b",
-                fontWeight: item.active ? "600" : "500",
+                backgroundColor: isItemActive(item) ? "#f0f9ff" : "transparent",
+                color: isItemActive(item) ? "#0284c7" : "#64748b",
+                fontWeight: isItemActive(item) ? "600" : "500",
                 fontSize: "14px",
                 transition: "all 0.2s",
               }}
@@ -318,7 +329,10 @@ export default function MentorLayout() {
 
           {/* User Profile */}
           <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-            <span style={{ cursor: "pointer", color: "#64748b" }}>
+            <span 
+              onClick={() => navigate("/mentor/notifications")}
+              style={{ cursor: "pointer", color: "#64748b" }}
+            >
               <Bell className="w-5 h-5" />
             </span>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
