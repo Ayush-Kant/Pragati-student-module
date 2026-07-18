@@ -9,7 +9,7 @@ import ShortlistedTab from "../components/ShortlistedTab";
 
 export default function HiringPipelinePage() {
   const pipeline = useHiringPipeline();
-
+  const [selectedDrive, setSelectedDrive] = useState("Full Stack Internship");
   const [activeTab, setActiveTab] = useState("drive-settings");
 
   if (!pipeline) {
@@ -44,7 +44,6 @@ export default function HiringPipelinePage() {
 
   return (
     <div className="p-6 space-y-6">
-
       {/* Tabs at Top */}
       <PipelineTabsNav
         activeTab={activeTab}
@@ -53,36 +52,75 @@ export default function HiringPipelinePage() {
 
       {/* Dynamic Header */}
       <div className="flex items-start justify-between">
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold">
+              {pageContent[activeTab].title}
+            </h1>
 
-        <div>
-          <h1 className="text-3xl font-bold">
-            {pageContent[activeTab].title}
-          </h1>
+            {activeTab === "drive-settings" && (
+              <select
+  value={selectedDrive}
+  onChange={(e) => setSelectedDrive(e.target.value)}
+  className="
+    h-10
+    rounded-md
+    border
+    border-gray-300
+    bg-white
+    px-3
+    text-sm
+    shadow-sm
+    focus:outline-none
+    focus:ring-2
+    focus:ring-blue-500
+  "
+>
+  <option value="Full Stack Internship">Full Stack Internship</option>
+  <option value="Frontend Internship">Frontend Internship</option>
+  <option value="Backend Internship">Backend Internship</option>
+</select>
+            )}
+          </div>
 
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500">
             {pageContent[activeTab].description}
           </p>
         </div>
 
-        {activeTab === "hiring-content" && (
+        {activeTab === "drive-settings" && (
           <button
             className="
-              px-6
-              py-3
-              rounded-lg
+              h-10
+              px-5
+              rounded-md
               bg-blue-600
               text-white
+              text-sm
               font-medium
-              shadow-sm
               hover:bg-blue-700
-              transition
-              duration-200
             "
           >
             Save Configuration
           </button>
         )}
 
+        {activeTab === "hiring-content" && (
+          <button
+            className="
+              h-10
+              px-5
+              rounded-md
+              bg-blue-600
+              text-white
+              text-sm
+              font-medium
+              hover:bg-blue-700
+            "
+          >
+            Save Configuration
+          </button>
+        )}
       </div>
 
       {/* Drive Settings */}
@@ -108,7 +146,6 @@ export default function HiringPipelinePage() {
           data={pipeline.shortlistedCandidates}
         />
       )}
-
     </div>
   );
 }
