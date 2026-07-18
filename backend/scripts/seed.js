@@ -141,6 +141,12 @@ async function seedData() {
       (1, 3, 1, 'https://meet.google.com/abc-defg-hij', 'PENDING', 'pending', NOW() + INTERVAL '1 day', 'Technical Interview');
     `);
 
+    console.log("Inserting mock offers...");
+    await client.query(`
+      INSERT INTO offers (id, drive_id, student_id, offer_letter_number, package, joining_date, offer_status) VALUES
+      (1, 2, 1, 'OFFER-1784311066131', '10 LPA', CURRENT_DATE + INTERVAL '30 days', 'ACCEPTED');
+    `);
+
     console.log("Resetting primary key sequences...");
     await client.query(`
       SELECT setval('auth_users_id_seq', COALESCE((SELECT MAX(id) FROM auth_users), 1));
@@ -151,6 +157,7 @@ async function seedData() {
       SELECT setval('students_id_seq', COALESCE((SELECT MAX(id) FROM students), 1));
       SELECT setval('student_drive_progress_id_seq', COALESCE((SELECT MAX(id) FROM student_drive_progress), 1));
       SELECT setval('interviews_id_seq', COALESCE((SELECT MAX(id) FROM interviews), 1));
+      SELECT setval('offers_id_seq', COALESCE((SELECT MAX(id) FROM offers), 1));
     `);
 
     await client.query("COMMIT");

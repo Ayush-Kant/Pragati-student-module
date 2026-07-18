@@ -176,13 +176,13 @@ const CompanyMessages = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-0 md:p-6 max-w-7xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-black text-slate-800 tracking-tight">Communication Center</h1>
         <p className="text-sm font-semibold text-slate-400 mt-1">Send notifications and messages to candidates</p>
       </div>
 
-      <div className="bg-white rounded-[24px] border border-slate-100 p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
+      <div className="bg-white rounded-[24px] border border-slate-100 p-4 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
         {/* Recipients */}
         <div className="space-y-2">
           <label className="block text-sm font-bold text-slate-700">Recipients</label>
@@ -462,7 +462,7 @@ const CompanyMessages = () => {
       </div>
 
       {/* Notification Log History */}
-      <div className="bg-white rounded-[24px] border border-slate-100 p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
+      <div className="bg-white rounded-[24px] border border-slate-100 p-4 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
         <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
           <History className="text-blue-500 w-5 h-5" />
           <h2 className="text-lg font-bold text-slate-800">Notification Dispatch History</h2>
