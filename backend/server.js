@@ -28,11 +28,14 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import liveSessionRoutes from "./src/routes/liveSessionRoutes.js";
 import initializeLiveSessionModule from "./src/database/migrations/liveSessionSchema.js";
 
+// Student Module Routes
+import studentAssessmentRoutes from "./src/modules/student/assessments-quizzes/routes/assessments.routes.js";
+
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
 dotenv.config();
 
-console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
+// NOTE: POSTGRESQL_URI is intentionally not logged — it contains credentials.
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -61,6 +64,9 @@ app.use("/api/student/dashboard", dashboardRoutes);
 
 // Live Sessions Routes
 app.use("/api/student/live-sessions", liveSessionRoutes);
+
+// Student Module Routes
+app.use("/api/student/assessments", studentAssessmentRoutes);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
