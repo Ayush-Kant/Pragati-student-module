@@ -3,7 +3,7 @@
 -- ============================================================
 CREATE TABLE IF NOT EXISTS trainings (
   training_id VARCHAR(255) PRIMARY KEY,
-  company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
   description TEXT,
   duration INT NOT NULL,

@@ -6,7 +6,7 @@
 -- TABLE: recruitment_drives
 CREATE TABLE IF NOT EXISTS recruitment_drives (
   id                   SERIAL PRIMARY KEY,
-  company_id           INTEGER NOT NULL REFERENCES companies(id),
+  company_id           UUID NOT NULL REFERENCES companies(id),
   title                VARCHAR(255) NOT NULL,
   created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
