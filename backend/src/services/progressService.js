@@ -1,8 +1,34 @@
+<<<<<<< HEAD
 // Merged progressService: combines training progress APIs with learning dashboard
 // Keep both simple model delegations and the richer dashboard aggregation
 
 import { pool } from '../../config/db.js';
 import * as progressModel from "../models/progressModel.js";
+=======
+// ─────────────────────────────────────────────────────────────
+//  progressService.js
+//  Combined Learning Engine & Training Progress Service
+//
+//  Responsibilities
+//  ────────────────
+//  • mod-4-training: getCourseProgress, updateCourseProgress, getLearningStatistics
+//  • student-team:   aggregateLearningDashboard + learning engine (parallel queries)
+//  • Progress Aggregation         — per-lesson, per-module, per-course
+//  • Continue Learning Engine     — most-recently-accessed in-progress lessons
+//  • Course Completion Logic      — via learningUtils calculators
+//  • Learning Serialization       — safe, client-ready payload
+//  • Dashboard Aggregation        — fully assembled learning dashboard
+// ─────────────────────────────────────────────────────────────
+
+import { pool } from '../../config/db.js';
+import * as progressModel from "../models/progressModel.js";
+import {
+    calculateWatchPercentage,
+    calculateModuleProgress,
+    calculateCourseProgress,
+    calculateContinueLearning,
+    serializeLearningData,
+>>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 } from '../utils/learningUtils.js';
 
 // ---------------- Internal DB helpers (used by the dashboard engine) ----------------
@@ -256,34 +282,107 @@ const aggregateLearningDashboard = async (requestingUserId) => {
 
     const continueLearning = calculateContinueLearning(courseTree, progressMap);
 
+<<<<<<< HEAD
     const totalCourses = coursesWithProgress.length;
     const totalCompleted = coursesWithProgress.filter((c) => c.progress.total > 0 && c.progress.completed === c.progress.total).length;
     const overallLessonsCompleted = coursesWithProgress.reduce((sum, c) => sum + c.progress.completed, 0);
     const overallLessonsTotal = coursesWithProgress.reduce((sum, c) => sum + c.progress.total, 0);
     const overallPercentage = overallLessonsTotal > 0 ? Number(((overallLessonsCompleted / overallLessonsTotal) * 100).toFixed(1)) : 0;
+=======
+    // ── 7. Summary stats ──────────────────────────────────────
+    const totalCourses = coursesWithProgress.length;
+    const totalCompleted = coursesWithProgress.filter(
+        (c) => c.progress.total > 0 && c.progress.completed === c.progress.total
+    ).length;
+    const overallLessonsCompleted = coursesWithProgress.reduce(
+        (sum, c) => sum + c.progress.completed, 0
+    );
+    const overallLessonsTotal = coursesWithProgress.reduce(
+        (sum, c) => sum + c.progress.total, 0
+    );
+    const overallPercentage = overallLessonsTotal > 0
+        ? Number(((overallLessonsCompleted / overallLessonsTotal) * 100).toFixed(1))
+        : 0;
+>>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 
     return {
         courses: serializeLearningData(coursesWithProgress),
         continueLearning: serializeLearningData(continueLearning),
+<<<<<<< HEAD
         summary: serializeLearningData({ totalCourses, totalCompleted, overallPercentage }),
+=======
+        summary: serializeLearningData({
+            totalCourses,
+            totalCompleted,
+            overallPercentage,
+        }),
+>>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
         generatedAt: new Date().toISOString(),
     };
 };
 
+<<<<<<< HEAD
 // ---------------- Training module simple delegations ----------------
+=======
+// ─── Training Module APIs (mod-4-training-learning) ──────────
+
+/**
+ * getCourseProgress
+ * -----------------
+ * Fetches progress data for a specific student's training courses.
+ *
+ * @param {number|string} studentId - Student identifier.
+ * @returns {Promise<Object[]>} Course progress rows.
+ */
+>>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 export const getCourseProgress = async (studentId) => {
     return await progressModel.getCourseProgress(studentId);
 };
 
+<<<<<<< HEAD
 export const updateCourseProgress = async (studentId, courseId, progress) => {
     if (!studentId) throw new Error('Student authentication required');
     return await progressModel.updateCourseProgress(studentId, courseId, Number(progress));
 };
 
+=======
+/**
+ * updateCourseProgress
+ * --------------------
+ * Updates the progress percentage for a student's course enrollment.
+ *
+ * @param {number|string} studentId - Student identifier.
+ * @param {number} courseId - Course identifier.
+ * @param {number} progress - Progress percentage (0-100).
+ * @returns {Promise<Object>} Updated progress row.
+ * @throws {Error} If studentId is missing.
+ */
+export const updateCourseProgress = async (studentId, courseId, progress) => {
+    if (!studentId) {
+        throw new Error("Student authentication required");
+    }
+
+    return await progressModel.updateCourseProgress(studentId, courseId, Number(progress));
+};
+
+/**
+ * getLearningStatistics
+ * ----------------------
+ * Aggregates learning statistics for a student across all courses.
+ *
+ * @param {number|string} studentId - Student identifier.
+ * @returns {Promise<Object>} Learning statistics summary.
+ */
+>>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 export const getLearningStatistics = async (studentId) => {
     return await progressModel.getLearningStatistics(studentId);
 };
 
+<<<<<<< HEAD
+=======
+// ─── Dashboard API (student-team) ──────────────────────────
+
+>>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 export {
     aggregateLearningDashboard,
     calculateWatchPercentage,
@@ -292,4 +391,7 @@ export {
     calculateContinueLearning,
     serializeLearningData,
 };
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)

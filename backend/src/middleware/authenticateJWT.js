@@ -1,5 +1,7 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
+// authenticateJWT
+// Verifies Bearer token and attaches normalized `req.user` on success.
 const authenticateJWT = (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
@@ -12,9 +14,15 @@ const authenticateJWT = (req, res, next) => {
 
         const token = authHeader.split(" ")[1];
 
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        req.user = decoded;
+        // Normalize payload into req.user
+        req.user = {
+            userId: decoded.userId ?? decoded.uuid_id ?? decoded.sub,
+            email: decoded.email,
+            role: decoded.role,
+        };
 
         next();
     } catch (error) {

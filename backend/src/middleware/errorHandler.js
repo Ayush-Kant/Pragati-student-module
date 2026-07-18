@@ -1,13 +1,18 @@
-// Simple error handler
-export const errorHandler = (err, req, res, next) => {
-    console.error("Error occurred:", err);
+// errorHandler: global Express error handler
+function errorHandler(err, req, res, next) {
+    console.error('Unhandled error:', err);
 
     const status = err.status || 500;
-
-    res.status(status).json({
+    const payload = {
         success: false,
-        message: err.message || "Internal Server Error",
-    });
-};
+        message: err.message || 'Internal Server Error',
+    };
+
+    if (process.env.NODE_ENV !== 'production' && err.stack) {
+        payload.stack = err.stack;
+    }
+
+    res.status(status).json(payload);
+}
 
 export default errorHandler;
