@@ -44,4 +44,5 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
+export { authenticateJWT };
 export default authenticateJWT;
