@@ -1,34 +1,17 @@
-<<<<<<< HEAD
-// Merged progressService: combines training progress APIs with learning dashboard
-// Keep both simple model delegations and the richer dashboard aggregation
-
+// progressService.js
+// Combined Learning Engine & Training Progress Service
+// Responsibilities:
+//   • mod-4-training: getCourseProgress, updateCourseProgress, getLearningStatistics
+//   • student-team: aggregateLearningDashboard + learning engine
+//   • Progress aggregation, continue learning, course completion, serialization
 import { pool } from '../../config/db.js';
-import * as progressModel from "../models/progressModel.js";
-=======
-// ─────────────────────────────────────────────────────────────
-//  progressService.js
-//  Combined Learning Engine & Training Progress Service
-//
-//  Responsibilities
-//  ────────────────
-//  • mod-4-training: getCourseProgress, updateCourseProgress, getLearningStatistics
-//  • student-team:   aggregateLearningDashboard + learning engine (parallel queries)
-//  • Progress Aggregation         — per-lesson, per-module, per-course
-//  • Continue Learning Engine     — most-recently-accessed in-progress lessons
-//  • Course Completion Logic      — via learningUtils calculators
-//  • Learning Serialization       — safe, client-ready payload
-//  • Dashboard Aggregation        — fully assembled learning dashboard
-// ─────────────────────────────────────────────────────────────
-
-import { pool } from '../../config/db.js';
-import * as progressModel from "../models/progressModel.js";
+import * as progressModel from '../models/progressModel.js';
 import {
     calculateWatchPercentage,
     calculateModuleProgress,
     calculateCourseProgress,
     calculateContinueLearning,
     serializeLearningData,
->>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 } from '../utils/learningUtils.js';
 
 // ---------------- Internal DB helpers (used by the dashboard engine) ----------------
@@ -46,20 +29,10 @@ const _resolveStudentId = async (uuidId) => {
             `
             SELECT
                 s.id        AS "studentId",
-<<<<<<< HEAD
                 COALESCE(u.full_name, s.full_name) AS "fullName"
             FROM auth_users au
             JOIN users u ON u.auth_user_id = au.id
             LEFT JOIN students s ON s.email = au.email
-=======
-                s.full_name AS "fullName"
-            FROM auth_users au
-            -- Link auth identity to the profile record via auth_user_id
-            JOIN users u ON u.auth_user_id = au.id
-            -- Link profile to the students record via the shared UNIQUE email
-            -- (students has no user_id FK; email is the reliable common key)
-            JOIN students s ON s.email = au.email
->>>>>>> c0602cc0 (fix progressService.js)
             WHERE au.uuid_id = $1
             `,
             [uuidId]
@@ -88,27 +61,26 @@ const _fetchEnrolledCourses = async (studentId) => {
               AND c.status = 'published'
             ORDER BY sce.enrolled_at DESC
             `,
-                const _resolveStudentId = async (uuidId) => {
-            try {
-                const result = await pool.query(
-                    `
-                            SELECT
-                                s.id        AS "studentId",
-                                COALESCE(u.full_name, s.full_name) AS "fullName"
-                            FROM auth_users au
-                            JOIN users u ON u.auth_user_id = au.id
-                            LEFT JOIN students s ON s.email = au.email
-                            WHERE au.uuid_id = $1
-                            `,
-                    [uuidId]
-                );
+            [studentId]
+        );
 
-                return result.rows[0] ?? null;
-            } catch (err) {
-                console.error('[progressService] _resolveStudentId failed:', err);
-                throw err;
-            }
-        };
+        return result.rows;
+    } catch (err) {
+        console.error('[progressService] _fetchEnrolledCourses failed:', err);
+        throw err;
+    }
+};
+
+const _fetchLessonProgress = async (studentId) => {
+    try {
+        const result = await pool.query(
+            `
+            SELECT
+                slp.lesson_id     AS "lessonId",
+                slp.watch_seconds AS "watchSeconds",
+                slp.status,
+                slp.updated_at    AS "updatedAt"
+            FROM student_lesson_progress slp
             WHERE slp.student_id = $1
             `,
             [studentId]
@@ -127,16 +99,16 @@ const _fetchCourseStructure = async (courseIds) => {
     try {
         const result = await pool.query(
             `
-        SELECT
-        c.id                AS "courseId",
-            m.id                AS "moduleId",
+            SELECT
+                c.id                AS "courseId",
+                m.id                AS "moduleId",
                 m.title             AS "moduleTitle",
-                    m.order_index       AS "moduleOrder",
-                        l.id                AS "lessonId",
-                            l.title             AS "lessonTitle",
-                                l.content_type      AS "contentType",
-                                    l.duration_seconds  AS "durationSeconds",
-                                        l.order_index       AS "lessonOrder"
+                m.order_index       AS "moduleOrder",
+                l.id                AS "lessonId",
+                l.title             AS "lessonTitle",
+                l.content_type      AS "contentType",
+                l.duration_seconds  AS "durationSeconds",
+                l.order_index       AS "lessonOrder"
             FROM courses c
             JOIN modules m ON m.course_id = c.id
             LEFT JOIN lessons l ON l.module_id = m.id
@@ -199,8 +171,6 @@ const _buildCourseTree = (flatRows, enrolledCourses) => {
 
 // ---------------- Public APIs ----------------
 
-<<<<<<< HEAD
-=======
 /**
  * aggregateLearningDashboard
  * --------------------------
@@ -211,18 +181,15 @@ const _buildCourseTree = (flatRows, enrolledCourses) => {
  * @param {string} requestingUserId - UUID of the logged-in student
  *        (`auth_users.uuid_id`).
  * @returns {Promise<Object>} Serialized learning dashboard object.
- *
- * @throws {Error} If the requesting user does not exist or has no
- *         student profile.
+ * @throws {Error} If the requesting user does not exist or has no student profile.
  */
->>>>>>> c0602cc0 (fix progressService.js)
 const aggregateLearningDashboard = async (requestingUserId) => {
     if (!requestingUserId || typeof requestingUserId !== 'string') {
         throw new Error('aggregateLearningDashboard requires a valid requestingUserId (non-empty string).');
     }
 
     const student = await _resolveStudentId(requestingUserId);
-    if (!student) throw new Error(`Student profile not found for userId: ${ requestingUserId } `);
+    if (!student) throw new Error(`Student profile not found for userId: ${requestingUserId}`);
     const { studentId } = student;
 
     const enrolledCourses = await _fetchEnrolledCourses(studentId);
@@ -282,49 +249,35 @@ const aggregateLearningDashboard = async (requestingUserId) => {
 
     const continueLearning = calculateContinueLearning(courseTree, progressMap);
 
-<<<<<<< HEAD
-    const totalCourses = coursesWithProgress.length;
-    const totalCompleted = coursesWithProgress.filter((c) => c.progress.total > 0 && c.progress.completed === c.progress.total).length;
-    const overallLessonsCompleted = coursesWithProgress.reduce((sum, c) => sum + c.progress.completed, 0);
-    const overallLessonsTotal = coursesWithProgress.reduce((sum, c) => sum + c.progress.total, 0);
-    const overallPercentage = overallLessonsTotal > 0 ? Number(((overallLessonsCompleted / overallLessonsTotal) * 100).toFixed(1)) : 0;
-=======
-    // ── 7. Summary stats ──────────────────────────────────────
     const totalCourses = coursesWithProgress.length;
     const totalCompleted = coursesWithProgress.filter(
         (c) => c.progress.total > 0 && c.progress.completed === c.progress.total
     ).length;
     const overallLessonsCompleted = coursesWithProgress.reduce(
-        (sum, c) => sum + c.progress.completed, 0
+        (sum, c) => sum + c.progress.completed,
+        0,
     );
     const overallLessonsTotal = coursesWithProgress.reduce(
-        (sum, c) => sum + c.progress.total, 0
+        (sum, c) => sum + c.progress.total,
+        0,
     );
     const overallPercentage = overallLessonsTotal > 0
         ? Number(((overallLessonsCompleted / overallLessonsTotal) * 100).toFixed(1))
         : 0;
->>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 
     return {
         courses: serializeLearningData(coursesWithProgress),
         continueLearning: serializeLearningData(continueLearning),
-<<<<<<< HEAD
-        summary: serializeLearningData({ totalCourses, totalCompleted, overallPercentage }),
-=======
         summary: serializeLearningData({
             totalCourses,
             totalCompleted,
             overallPercentage,
         }),
->>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
         generatedAt: new Date().toISOString(),
     };
 };
 
-<<<<<<< HEAD
 // ---------------- Training module simple delegations ----------------
-=======
-// ─── Training Module APIs (mod-4-training-learning) ──────────
 
 /**
  * getCourseProgress
@@ -334,55 +287,19 @@ const aggregateLearningDashboard = async (requestingUserId) => {
  * @param {number|string} studentId - Student identifier.
  * @returns {Promise<Object[]>} Course progress rows.
  */
->>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 export const getCourseProgress = async (studentId) => {
     return await progressModel.getCourseProgress(studentId);
 };
 
-<<<<<<< HEAD
 export const updateCourseProgress = async (studentId, courseId, progress) => {
     if (!studentId) throw new Error('Student authentication required');
     return await progressModel.updateCourseProgress(studentId, courseId, Number(progress));
 };
 
-=======
-/**
- * updateCourseProgress
- * --------------------
- * Updates the progress percentage for a student's course enrollment.
- *
- * @param {number|string} studentId - Student identifier.
- * @param {number} courseId - Course identifier.
- * @param {number} progress - Progress percentage (0-100).
- * @returns {Promise<Object>} Updated progress row.
- * @throws {Error} If studentId is missing.
- */
-export const updateCourseProgress = async (studentId, courseId, progress) => {
-    if (!studentId) {
-        throw new Error("Student authentication required");
-    }
-
-    return await progressModel.updateCourseProgress(studentId, courseId, Number(progress));
-};
-
-/**
- * getLearningStatistics
- * ----------------------
- * Aggregates learning statistics for a student across all courses.
- *
- * @param {number|string} studentId - Student identifier.
- * @returns {Promise<Object>} Learning statistics summary.
- */
->>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 export const getLearningStatistics = async (studentId) => {
     return await progressModel.getLearningStatistics(studentId);
 };
 
-<<<<<<< HEAD
-=======
-// ─── Dashboard API (student-team) ──────────────────────────
-
->>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
 export {
     aggregateLearningDashboard,
     calculateWatchPercentage,
@@ -391,7 +308,3 @@ export {
     calculateContinueLearning,
     serializeLearningData,
 };
-<<<<<<< HEAD
-
-=======
->>>>>>> 4932a8bc (Resolve merge conflicts: combine training & learning (mod-4) with student-team implementations)
