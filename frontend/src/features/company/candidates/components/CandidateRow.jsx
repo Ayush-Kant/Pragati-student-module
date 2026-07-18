@@ -13,7 +13,7 @@ const getAvatarBgColor = (avatar) => {
   return "#3b82f6"; // default blue
 };
 
-export const CandidateRow = ({ candidate, onSelect, onEdit }) => {
+export const CandidateRow = ({ candidate, onSelect, onEdit, isSelected, onToggleSelect }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -32,8 +32,20 @@ export const CandidateRow = ({ candidate, onSelect, onEdit }) => {
   return (
     <tr 
       onClick={() => onSelect(candidate)}
-      className="border-b border-gray-100 hover:bg-blue-50/50 cursor-pointer transition-colors duration-200"
+      className={`border-b border-gray-100 transition-colors duration-200 cursor-pointer ${
+        isSelected ? 'bg-blue-50/70 hover:bg-blue-50' : 'hover:bg-blue-50/50'
+      }`}
     >
+      {/* Checkbox */}
+      <td className="px-6 py-5" onClick={(e) => e.stopPropagation()}>
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={() => onToggleSelect(candidate.id)}
+          className="h-5 w-5 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+        />
+      </td>
+
       {/* Candidate Info */}
       <td className="px-6 py-5">
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>

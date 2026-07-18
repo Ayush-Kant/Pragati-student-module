@@ -18,6 +18,12 @@ ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS min_gpa NUMERIC(3,1);
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS required_skills TEXT[];
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS max_openings INTEGER NOT NULL DEFAULT 1;
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS application_deadline TIMESTAMPTZ;
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS job_title VARCHAR(255);
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS department VARCHAR(100);
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS salary_package VARCHAR(100);
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS work_mode VARCHAR(50) DEFAULT 'Onsite';
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS location VARCHAR(255);
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS deadline TIMESTAMPTZ;
 -- NOTE: assigned_test_id intentionally has no FK to assessments(id) — that table
 -- does not exist yet on develop as of this PR. Add the FK constraint once the
 -- assessments module lands: ALTER TABLE recruitment_drives ADD CONSTRAINT

@@ -116,6 +116,27 @@ export class TrainingController {
       });
     }
   }
+
+  static async getMentors(req, res) {
+    try {
+      const result = await pool.query(
+        `SELECT id AS "mentorId", name, email 
+         FROM mentors 
+         WHERE is_active = true 
+         ORDER BY name ASC`
+      );
+      return res.status(200).json({
+        success: true,
+        data: result.rows,
+      });
+    } catch (error) {
+      console.error("Error in getMentors:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error fetching mentors list",
+      });
+    }
+  }
 }
 
 export default TrainingController;
