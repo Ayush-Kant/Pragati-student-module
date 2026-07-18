@@ -1,8 +1,26 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { ActivityProvider } from './context/ActivityContext';
-import { Search, Bell, MessageSquare, ChevronDown, Home, Users, Calendar, ClipboardList, BookOpen, PlayCircle, Activity, BarChart2, Folder, Settings, HelpCircle, Menu, X } from 'lucide-react';
-
+import {
+  Search,
+  Bell,
+  MessageSquare,
+  ChevronDown,
+  Home,
+  Users,
+  Calendar,
+  ClipboardList,
+  BookOpen,
+  PlayCircle,
+  Activity,
+  BarChart2,
+  Folder,
+  Settings,
+  HelpCircle,
+  Menu,
+  X,
+  GitBranch,
+} from 'lucide-react';
 const MentorNavbar = ({ onToggleMobile }) => (
 
   <header className="flex items-center justify-between px-4 md:px-6 py-3 bg-white border-b border-gray-200">
@@ -64,7 +82,14 @@ const MENTOR_NAV_ITEMS = [
   { name: 'Calendar', icon: <Calendar className="w-5 h-5" />, path: '/mentor/calendar' },
   { name: 'Messages', icon: <MessageSquare className="w-5 h-5" />, path: '/mentor/messages' },
   { name: 'Notifications', icon: <Bell className="w-5 h-5" />, path: '/mentor/notifications' },
-  { name: 'Settings', icon: <Settings className="w-5 h-5" />, path: '/mentor/settings' },
+
+{
+  name: 'Hiring Pipeline',
+  icon: <GitBranch className="w-5 h-5" />,
+  path: '/mentor/hiring-pipeline',
+},
+
+{ name: 'Settings', icon: <Settings className="w-5 h-5" />, path: '/mentor/settings' },
 ];
 
 const MentorSidebar = () => {

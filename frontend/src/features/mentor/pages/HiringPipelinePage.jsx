@@ -18,15 +18,39 @@ export default function HiringPipelinePage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">
-          Hiring Pipeline
-        </h1>
+      <div className="flex items-start justify-between">
 
-        <p className="text-gray-500">
-          Configure and manage hiring pipeline.
-        </p>
-      </div>
+  <div>
+
+    <h1 className="text-3xl font-bold">
+      Hiring Pipeline
+    </h1>
+
+    <p className="text-gray-500 mt-1">
+      Configure and manage hiring pipeline.
+    </p>
+
+  </div>
+
+  {activeTab === "hiring-content" && (
+  <button
+    className="
+      px-6
+      py-3
+      rounded-lg
+      bg-blue-600
+      text-white
+      font-medium
+      shadow-sm
+      hover:bg-blue-700
+      transition
+      duration-200
+    "
+  >
+    Save Configuration
+  </button>
+)}
+</div>
 
       <PipelineTabsNav
         activeTab={activeTab}

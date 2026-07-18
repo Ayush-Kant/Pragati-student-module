@@ -13,8 +13,8 @@ import {
   Bell,
   HelpCircle,
   Briefcase,
+  GitBranch,
 } from "lucide-react";
-
 export default function MentorLayout() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,10 +57,16 @@ export default function MentorLayout() {
       icon: <LineChart className="w-5 h-5" />,
     },
     {
+  name: "Hiring Pipeline",
+  path: "/mentor/hiring-pipeline",
+  icon: <GitBranch className="w-5 h-5" />,
+},
+    {
       name: "Settings",
       path: "/mentor/settings",
       icon: <Settings className="w-5 h-5" />,
     },
+    
   ];
 
   const isItemActive = (item) => {
@@ -196,13 +202,17 @@ export default function MentorLayout() {
             flex: 1,
           }}
         >
-          {menuItems.map((item, idx) => (
-            <div
-              key={idx}
-              onClick={() => {
-                console.log("Clicked:", item);
-                navigate(item.path);
-              }}
+          {menuItems.map((item, idx) => {
+
+  const active = isItemActive(item);
+
+  return (
+    <div
+      key={idx}
+      onClick={() => {
+        console.log("Clicked:", item);
+        navigate(item.path);
+      }}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -210,9 +220,11 @@ export default function MentorLayout() {
                 padding: "12px 14px",
                 borderRadius: "10px",
                 cursor: "pointer",
-                backgroundColor: item.active ? "#f0f9ff" : "transparent",
-                color: item.active ? "#0284c7" : "#64748b",
-                fontWeight: item.active ? "600" : "500",
+                backgroundColor: active ? "#f0f9ff" : "transparent",
+
+color: active ? "#0284c7" : "#64748b",
+
+fontWeight: active ? "600" : "500",
                 fontSize: "14px",
                 transition: "all 0.2s",
               }}
@@ -220,7 +232,8 @@ export default function MentorLayout() {
               {item.icon}
               {item.name}
             </div>
-          ))}
+          );
+})}
         </div>
 
         {/* Support Vector Box */}

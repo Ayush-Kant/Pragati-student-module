@@ -1,9 +1,28 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
 
 export default function HiringContentTab({ data }) {
-  const [courses] = useState(data.courses);
-  const [projects] = useState(data.projects);
+  const [courses, setCourses] = useState(data.courses);
+  const [projects, setProjects] = useState(data.projects);
+
+  const toggleCourse = (id) => {
+    setCourses((prev) =>
+      prev.map((course) =>
+        course.id === id
+          ? { ...course, required: !course.required }
+          : course
+      )
+    );
+  };
+
+  const toggleProject = (id) => {
+    setProjects((prev) =>
+      prev.map((project) =>
+        project.id === id
+          ? { ...project, required: !project.required }
+          : project
+      )
+    );
+  };
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
@@ -15,7 +34,6 @@ export default function HiringContentTab({ data }) {
         <div className="flex justify-between items-center mb-5">
 
           <div>
-
             <h2 className="text-lg font-semibold">
               Required Courses
             </h2>
@@ -23,13 +41,7 @@ export default function HiringContentTab({ data }) {
             <p className="text-gray-500 text-sm">
               Courses students must complete.
             </p>
-
           </div>
-
-          <button className="border rounded-lg px-3 py-2 flex items-center gap-2 hover:bg-gray-100">
-            <Plus size={16} />
-            Add Course
-          </button>
 
         </div>
 
@@ -39,7 +51,7 @@ export default function HiringContentTab({ data }) {
 
             <div
               key={course.id}
-              className="border rounded-lg p-3 flex justify-between items-center"
+              className="border rounded-lg p-4 flex justify-between items-center"
             >
 
               <div>
@@ -54,15 +66,28 @@ export default function HiringContentTab({ data }) {
 
               </div>
 
-              <span
-                className={`text-xs px-3 py-1 rounded-full ${
-                  course.required
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-              >
-                {course.required ? "Required" : "Optional"}
-              </span>
+             <label className="cursor-pointer">
+
+  <input
+    type="checkbox"
+    checked={course.required}
+    onChange={() => toggleCourse(course.id)}
+    className="hidden"
+  />
+
+  <div
+    className={`relative w-12 h-7 rounded-full transition-all duration-300 ${
+      course.required ? "bg-blue-600" : "bg-gray-300"
+    }`}
+  >
+    <div
+      className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all duration-300 ${
+        course.required ? "left-6" : "left-1"
+      }`}
+    />
+  </div>
+
+</label>
 
             </div>
 
@@ -81,7 +106,7 @@ export default function HiringContentTab({ data }) {
           <div>
 
             <h2 className="text-lg font-semibold">
-              Required Projects
+              Practical Projects
             </h2>
 
             <p className="text-gray-500 text-sm">
@@ -89,11 +114,6 @@ export default function HiringContentTab({ data }) {
             </p>
 
           </div>
-
-          <button className="border rounded-lg px-3 py-2 flex items-center gap-2 hover:bg-gray-100">
-            <Plus size={16} />
-            Add Project
-          </button>
 
         </div>
 
@@ -103,7 +123,7 @@ export default function HiringContentTab({ data }) {
 
             <div
               key={project.id}
-              className="border rounded-lg p-3 flex justify-between items-center"
+              className="border rounded-lg p-4 flex justify-between items-center"
             >
 
               <div>
@@ -117,17 +137,28 @@ export default function HiringContentTab({ data }) {
                 </p>
 
               </div>
+              <label className="cursor-pointer">
 
-              <span
-                className={`text-xs px-3 py-1 rounded-full ${
-                  project.required
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-              >
-                {project.required ? "Required" : "Optional"}
-              </span>
+  <input
+    type="checkbox"
+    checked={project.required}
+    onChange={() => toggleProject(project.id)}
+    className="hidden"
+  />
 
+  <div
+    className={`relative w-12 h-7 rounded-full transition-all duration-300 ${
+      project.required ? "bg-blue-600" : "bg-gray-300"
+    }`}
+  >
+    <div
+      className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all duration-300 ${
+        project.required ? "left-6" : "left-1"
+      }`}
+    />
+  </div>
+
+</label>
             </div>
 
           ))}
