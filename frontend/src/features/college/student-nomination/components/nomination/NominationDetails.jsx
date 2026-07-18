@@ -3,6 +3,7 @@ import { X, CircleUserRound } from "lucide-react";
 
 import StatusBadge from "../common/StatusBadge";
 import NominationStatus from "./NominationStatus";
+import { formatPackage, getStudentName } from "../../utils/studentNominationHelpers";
 
 const NominationDetails = ({ student, isOpen, onClose }) => {
   const { darkMode } = useOutletContext();
@@ -65,7 +66,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
           />
 
           <h2 className="mt-4 text-xl font-semibold text-center">
-            {student.name || student.student}
+            {getStudentName(student)}
           </h2>
 
           <p
@@ -126,7 +127,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
               <span className="text-slate-500">Package</span>
 
               <span className="font-medium text-right">
-                {student.package || "--"}
+                {formatPackage(student.package)}
               </span>
             </div>
 

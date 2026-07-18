@@ -2,7 +2,7 @@ import { useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import { UserPlus } from "lucide-react";
 
-const StudentNominationForm = ({ student, onClose }) => {
+const StudentNominationForm = ({ student, onClose, onSave }) => {
   const { darkMode } = useOutletContext();
 
   /* =====================================
@@ -15,6 +15,43 @@ const StudentNominationForm = ({ student, onClose }) => {
     package: "",
     remarks: "",
   });
+
+  /* =====================================
+      NOMINATE STUDENT
+===================================== */
+
+  const handleNominate = () => {
+  /* Basic Validation */
+
+  if (
+    !formData.company.trim() ||
+    !formData.role.trim() ||
+    !formData.package.trim()
+  ) {
+    alert("Please fill Company, Role and Package before nominating.");
+    return;
+  }
+
+  const newNomination = {
+    ...selectedStudent,
+
+    company: formData.company,
+
+    role: formData.role,
+
+    package: `₹${formData.package} LPA`,
+
+    remarks: formData.remarks,
+
+    status: "Nominated",
+  };
+
+  if (onSave) {
+    onSave(newNomination);
+  }
+
+  onClose();
+};
 
   /* =====================================
       SELECTED STUDENT
@@ -245,12 +282,12 @@ const StudentNominationForm = ({ student, onClose }) => {
             {/* Package */}
 
             <div>
-              <label className="mb-2 block text-sm font-medium">
-                Package (LPA)
-              </label>
+              <label className="mb-2 block text-sm font-medium">Package</label>
 
               <input
-                type="text"
+                type="number"
+                min="0"
+                step="0.1"
                 value={formData.package}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -258,7 +295,7 @@ const StudentNominationForm = ({ student, onClose }) => {
                     package: e.target.value,
                   }))
                 }
-                placeholder="12 LPA"
+                placeholder="12"
                 className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
                   darkMode
                     ? "border-slate-700 bg-slate-800 focus:border-blue-500"
@@ -334,7 +371,7 @@ const StudentNominationForm = ({ student, onClose }) => {
           <button
             type="button"
             className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700"
-            onClick={() => console.log(formData)}
+            onClick={handleNominate}
           >
             Nominate Student
           </button>

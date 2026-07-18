@@ -5,7 +5,7 @@ import {
   CircleCheckBig,
 } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
-
+import { formatPackage } from "../../utils/studentNominationHelpers";
 import StatusBadge from "../common/StatusBadge";
 
 const ShortlistCard = ({ student, variant = "dashboard" }) => {
@@ -21,7 +21,7 @@ const ShortlistCard = ({ student, variant = "dashboard" }) => {
 
   const role = student?.role || "--";
 
-  const packageValue = student?.package || "--";
+  const packageValue = formatPackage(student.package);
 
   const shortlistedDate = student?.shortlistedDate || "--";
 

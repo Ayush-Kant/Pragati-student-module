@@ -16,11 +16,17 @@ import ShortlistedStudents from "../components/shortlist/ShortlistedStudents";
 
 import NominationTabs from "../components/nomination/NominationTabs";
 import NominatedTable from "../components/nomination/NominatedTable";
+import EditNominationForm from "../components/forms/EditNominationForm";
+import RemoveNominationModal from "../components/forms/RemoveNominationModal";
 
 import {
   eligibleStudents,
   nominatedStudents,
 } from "../types/studentNominationDummyData";
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import EmptyState from "../components/common/EmptyState";
+import ErrorState from "../components/common/ErrorState";
+import NominationCard from "../components/nomination/NominationCard";
 
 const StudentNominationPage = () => {
   const [activeTab, setActiveTab] = useState("eligible");
@@ -35,6 +41,18 @@ const StudentNominationPage = () => {
 
   const [nominatingStudent, setNominatingStudent] = useState(null);
 
+  const [showEditForm, setShowEditForm] = useState(false);
+
+  const [editingStudent, setEditingStudent] = useState(null);
+
+  const [nominatedData, setNominatedData] = useState(nominatedStudents);
+
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+
+  const [removingStudent, setRemovingStudent] = useState(null);
+
+  const [eligibleData, setEligibleData] = useState(eligibleStudents);
+
   const ITEMS_PER_PAGE = 8;
 
   const handleTabChange = (tab) => {
@@ -46,8 +64,7 @@ const StudentNominationPage = () => {
     setIsDetailOpen(false);
   };
 
-  const students =
-    activeTab === "eligible" ? eligibleStudents : nominatedStudents;
+  const students = activeTab === "eligible" ? eligibleData : nominatedData;
 
   const totalStudents = students.length;
 
@@ -69,8 +86,8 @@ const StudentNominationPage = () => {
       <NominationTabs
         activeTab={activeTab}
         setActiveTab={handleTabChange}
-        eligibleCount={eligibleStudents.length}
-        nominatedCount={nominatedStudents.length}
+        eligibleCount={eligibleData.length}
+        nominatedCount={nominatedData.length}
       />
       {/* =========================
             Filters
@@ -100,6 +117,85 @@ const StudentNominationPage = () => {
             setShowNominationForm(false);
             setNominatingStudent(null);
           }}
+          onSave={(newNomination) => {
+            /* Remove from Eligible */
+
+            setEligibleData((prev) =>
+              prev.filter((student) => student.id !== newNomination.id),
+            );
+
+            /* Add to Nominated */
+
+            setNominatedData((prev) => [newNomination, ...prev]);
+
+            /* Close Form */
+
+            setShowNominationForm(false);
+
+            setNominatingStudent(null);
+          }}
+        />
+      ) : showEditForm ? (
+        <EditNominationForm
+          student={editingStudent}
+          onClose={() => {
+            setShowEditForm(false);
+            setEditingStudent(null);
+          }}
+          onSave={(updatedNomination) => {
+            setNominatedData((prev) =>
+              prev.map((student) =>
+                student.id === updatedNomination.id
+                  ? updatedNomination
+                  : student,
+              ),
+            );
+
+            setEditingStudent(updatedNomination);
+          }}
+        />
+      ) : showRemoveModal ? (
+        <RemoveNominationModal
+          student={removingStudent}
+          onClose={() => {
+            setShowRemoveModal(false);
+            setRemovingStudent(null);
+          }}
+          onRemove={(updatedStudent) => {
+            /* Remove student from nominated list */
+
+            setNominatedData((prev) =>
+              prev.filter((student) => student.id !== updatedStudent.id),
+            );
+
+            /* Reset nomination fields */
+
+            const eligibleStudent = {
+              ...updatedStudent,
+
+              company: "--",
+
+              role: "--",
+
+              package: "--",
+
+              remarks: "",
+
+              shortlistedDate: "--",
+
+              status: "Eligible",
+            };
+
+            /* Add back to eligible list */
+
+            setEligibleData((prev) => [...prev, eligibleStudent]);
+
+            /* Close modal */
+
+            setShowRemoveModal(false);
+
+            setRemovingStudent(null);
+          }}
         />
       ) : (
         <div className="flex h-167 gap-4">
@@ -127,6 +223,14 @@ const StudentNominationPage = () => {
                 isDetailOpen={isDetailOpen}
                 setSelectedStudent={setSelectedStudent}
                 setIsDetailOpen={setIsDetailOpen}
+                onEditNomination={(student) => {
+                  setEditingStudent(student);
+                  setShowEditForm(true);
+                }}
+                onRemoveNomination={(student) => {
+                  setRemovingStudent(student);
+                  setShowRemoveModal(true);
+                }}
               />
             )}
           </div>
@@ -164,6 +268,61 @@ const StudentNominationPage = () => {
       ========================== */}
 
       <ShortlistedStudents />
+
+      <LoadingSpinner />
+      <EmptyState />
+      <ErrorState />
+      
+      <NominationCard
+  students={currentStudents}
+  selectedStudent={selectedStudent}
+  isDetailOpen={isDetailOpen}
+  onViewStudent={(student) => {
+    setSelectedStudent(student);
+    setIsDetailOpen(true);
+  }}
+  onEditNomination={(student) => {
+    setEditingStudent(student);
+    setShowEditForm(true);
+  }}
+  onRemoveNomination={(student) => {
+    setRemovingStudent(student);
+    setShowRemoveModal(true);
+  }}
+  onReNominate={(student) => {
+    console.log("Re-Nominate", student);
+  }}
+  onMarkSelected={(student) => {
+    console.log("Mark Selected", student);
+  }}
+  getStudentActions={(student) => {
+    switch (student.status) {
+      case "Waiting":
+        return {
+          canEdit: true,
+          canRemove: true,
+        };
+
+      case "Rejected":
+        return {
+          canReNominate: true,
+        };
+
+      case "Shortlisted":
+        return {
+          canMarkSelected: true,
+        };
+
+      case "Selected":
+        return {
+          isSelected: true,
+        };
+
+      default:
+        return {};
+    }
+  }}
+/>
     </div>
   );
 };

@@ -1,5 +1,12 @@
 import { useOutletContext } from "react-router-dom";
-import { Eye, Pencil, Trash2, RotateCcw, CircleUserRound } from "lucide-react";
+import {
+  Eye,
+  Pencil,
+  Trash2,
+  RotateCcw,
+  CircleUserRound,
+  BadgeCheck,
+} from "lucide-react";
 
 import StatusBadge from "../common/StatusBadge";
 import { statusStyles } from "../../constants/studentNominationConstants";
@@ -14,6 +21,7 @@ const NominatedTable = ({
   onEditNomination,
   onRemoveNomination,
   onReNominate,
+  onMarkSelected,
 }) => {
   const { darkMode } = useOutletContext();
 
@@ -48,11 +56,29 @@ const NominatedTable = ({
         };
 
       case "Shortlisted":
+        return {
+          canEdit: false,
+          canRemove: false,
+          canReNominate: false,
+          canMarkSelected: true,
+        };
+
+      case "Selected":
+        return {
+          canEdit: false,
+          canRemove: false,
+          canReNominate: false,
+          canMarkSelected: false,
+          isSelected: true,
+        };
+
       default:
         return {
           canEdit: false,
           canRemove: false,
           canReNominate: false,
+          canMarkSelected: false,
+          isSelected: false,
         };
     }
   };
@@ -62,8 +88,8 @@ const NominatedTable = ({
   --------------------------------------------------------- */
 
   const fullGrid = "grid grid-cols-[2.2fr_1.1fr_1.8fr_1.4fr_1.1fr_1.4fr_2.0fr]";
-  const compactGrid = "grid grid-cols-[2.8fr_1.3fr_1.9fr]"; 
-    /* --------------------------------------------------------
+  const compactGrid = "grid grid-cols-[2.8fr_1.3fr_1.9fr]";
+  /* --------------------------------------------------------
       COMMON CLASSES
   --------------------------------------------------------- */
 
@@ -236,52 +262,86 @@ const NominatedTable = ({
                       <Eye size={17} strokeWidth={2} />
                     </button>
 
-                    {/* Edit / Re-Nominate */}
+                    {/* Shortlisted -> Mark as Selected */}
 
-                    {actions.canEdit ? (
-                      <button
-                        onClick={() => onEditNomination?.(student)}
-                        title="Edit Nomination"
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
+                    {actions.canMarkSelected ? (
+                      <>
+                        <button
+                          onClick={() => onMarkSelected?.(student)}
+                          title="Mark as Selected"
+                          className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
+                            darkMode
+                              ? "bg-emerald-600 text-white hover:bg-emerald-500"
+                              : "bg-emerald-500 text-white hover:bg-emerald-600"
+                          }`}
+                        >
+                          <BadgeCheck size={18} strokeWidth={2} />
+                        </button>
+
+                        {/* Empty placeholder to preserve layout */}
+                        <div className="h-10 w-10" />
+                      </>
+                    ) : actions.isSelected ? (
+                      <div
+                        title="Selected"
+                        className={`flex h-10 w-10 items-center justify-center rounded-xl ${
                           darkMode
-                            ? "bg-amber-600 text-white hover:bg-amber-500"
-                            : "bg-amber-500 text-white hover:bg-amber-600"
+                            ? "bg-emerald-500/20 text-emerald-400"
+                            : "bg-emerald-100 text-emerald-700"
                         }`}
                       >
-                        <Pencil size={17} strokeWidth={2} />
-                      </button>
-                    ) : actions.canReNominate ? (
-                      <button
-                        onClick={() => onReNominate?.(student)}
-                        title="Re-Nominate"
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
-                          darkMode
-                            ? "bg-emerald-600 text-white hover:bg-emerald-500"
-                            : "bg-emerald-500 text-white hover:bg-emerald-600"
-                        }`}
-                      >
-                        <RotateCcw size={17} strokeWidth={2} />
-                      </button>
+                        <BadgeCheck size={18} strokeWidth={2} />
+                      </div>
                     ) : (
-                      <div className="h-10 w-10" />
-                    )}
+                      <>
+                        {/* Edit / Re-Nominate */}
 
-                    {/* Remove */}
+                        {actions.canEdit ? (
+                          <button
+                            onClick={() => onEditNomination?.(student)}
+                            title="Edit Nomination"
+                            className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
+                              darkMode
+                                ? "bg-amber-600 text-white hover:bg-amber-500"
+                                : "bg-amber-500 text-white hover:bg-amber-600"
+                            }`}
+                          >
+                            <Pencil size={17} strokeWidth={2} />
+                          </button>
+                        ) : actions.canReNominate ? (
+                          <button
+                            onClick={() => onReNominate?.(student)}
+                            title="Re-Nominate"
+                            className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
+                              darkMode
+                                ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                                : "bg-indigo-500 text-white hover:bg-indigo-600"
+                            }`}
+                          >
+                            <RotateCcw size={17} strokeWidth={2} />
+                          </button>
+                        ) : (
+                          <div className="h-10 w-10" />
+                        )}
 
-                    {actions.canRemove ? (
-                      <button
-                        onClick={() => onRemoveNomination?.(student)}
-                        title="Remove Nomination"
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
-                          darkMode
-                            ? "bg-red-600 text-white hover:bg-red-500"
-                            : "bg-red-500 text-white hover:bg-red-600"
-                        }`}
-                      >
-                        <Trash2 size={17} strokeWidth={2} />
-                      </button>
-                    ) : (
-                      <div className="h-10 w-10" />
+                        {/* Remove */}
+
+                        {actions.canRemove ? (
+                          <button
+                            onClick={() => onRemoveNomination?.(student)}
+                            title="Remove Nomination"
+                            className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
+                              darkMode
+                                ? "bg-red-600 text-white hover:bg-red-500"
+                                : "bg-red-500 text-white hover:bg-red-600"
+                            }`}
+                          >
+                            <Trash2 size={17} strokeWidth={2} />
+                          </button>
+                        ) : (
+                          <div className="h-10 w-10" />
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -331,15 +391,38 @@ const NominatedTable = ({
                             : "bg-blue-500 text-white"
                           : darkMode
                             ? "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            : "bg-slate-200 text-slate-600 hover:bg-slate-300"
                       }`}
                     >
                       <Eye size={17} strokeWidth={2} />
                     </button>
 
-                    {/* Edit / Re-Nominate */}
+                    {/* Secondary Action */}
 
-                    {actions.canEdit ? (
+                    {actions.canMarkSelected ? (
+                      <button
+                        onClick={() => onMarkSelected?.(student)}
+                        title="Mark as Selected"
+                        className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
+                          darkMode
+                            ? "bg-emerald-600 text-white hover:bg-emerald-500"
+                            : "bg-emerald-500 text-white hover:bg-emerald-600"
+                        }`}
+                      >
+                        <BadgeCheck size={18} strokeWidth={2} />
+                      </button>
+                    ) : actions.isSelected ? (
+                      <div
+                        title="Selected"
+                        className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                          darkMode
+                            ? "bg-emerald-500/20 text-emerald-400"
+                            : "bg-emerald-100 text-emerald-700"
+                        }`}
+                      >
+                        <BadgeCheck size={18} strokeWidth={2} />
+                      </div>
+                    ) : actions.canEdit ? (
                       <button
                         onClick={() => onEditNomination?.(student)}
                         title="Edit Nomination"
@@ -357,8 +440,8 @@ const NominatedTable = ({
                         title="Re-Nominate"
                         className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
                           darkMode
-                            ? "bg-emerald-600 text-white hover:bg-emerald-500"
-                            : "bg-emerald-500 text-white hover:bg-emerald-600"
+                            ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                            : "bg-indigo-500 text-white hover:bg-indigo-600"
                         }`}
                       >
                         <RotateCcw size={17} strokeWidth={2} />
