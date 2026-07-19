@@ -585,38 +585,35 @@
 
 // export default AdminSidebar;
 import {
-  FaHome,
-  FaBuilding,
-  FaSchool,
-  FaUsers,
-  FaUserTie,
-  FaClipboardList,
-  FaBook,
-  FaRocket,
-  FaBell,
-  FaGavel,
-   FaTimes,
-} from "react-icons/fa";
+  RiDashboardFill,
+  RiBuilding2Fill,
+  RiGraduationCapFill,
+  RiTeamFill,
+  RiUserStarFill,
+  RiFileList3Fill,
+  RiBook2Fill,
+  RiRocket2Fill,
+  RiNotification3Fill,
+  RiAuctionFill,
+  RiCloseLine,
+} from "react-icons/ri";
 
 import { NavLink } from "react-router-dom";
-
 import logo from "../../../assets/logo.png";
 
 function AdminSidebar({
   openSidebar,
   setOpenSidebar,
-  darkMode,
 }) {
-
   const menuSections = [
-
     {
       heading: "Overview",
       items: [
         {
           title: "Dashboard",
           path: "/admin",
-          icon: <FaHome />,
+          icon: <RiDashboardFill />,
+          color: "bg-[#19c79a]",
         },
       ],
     },
@@ -627,22 +624,28 @@ function AdminSidebar({
         {
           title: "Companies",
           path: "/admin/companies",
-          icon: <FaBuilding />,
+          icon: <RiBuilding2Fill />,
+          color: "bg-[#ff6b35]",
+         
         },
         {
           title: "Colleges",
           path: "/admin/colleges",
-          icon: <FaSchool />,
+          icon: <RiGraduationCapFill />,
+          color: "bg-[#f4a300]",
+          
         },
         {
           title: "Students",
           path: "/admin/students",
-          icon: <FaUsers />,
+          icon: <RiTeamFill />,
+          color: "bg-[#8b5cf6]",
         },
         {
           title: "Mentors",
           path: "/admin/mentors",
-          icon: <FaUserTie />,
+          icon: <RiUserStarFill />,
+          color: "bg-[#0284c7]",
         },
       ],
     },
@@ -653,12 +656,14 @@ function AdminSidebar({
         {
           title: "Assessments",
           path: "/admin/assesments",
-          icon: <FaClipboardList />,
+          icon: <RiFileList3Fill />,
+          color: "bg-[#0f2857]",
         },
         {
-          title: "Training LMS",
+          title: "Training (LMS)",
           path: "/admin/training",
-          icon: <FaBook />,
+          icon: <RiBook2Fill />,
+          color: "bg-[#06b6d4]",
         },
       ],
     },
@@ -669,7 +674,8 @@ function AdminSidebar({
         {
           title: "Drives",
           path: "/admin/drives",
-          icon: <FaRocket />,
+          icon: <RiRocket2Fill />,
+          color: "bg-[#ff4d4f]",
         },
       ],
     },
@@ -680,130 +686,151 @@ function AdminSidebar({
         {
           title: "Notifications",
           path: "/admin/notification",
-          icon: <FaBell />,
+          icon: <RiNotification3Fill />,
+          color: "bg-[#ec4899]",
         },
         {
           title: "Disputes",
           path: "/admin/disputes",
-          icon: <FaGavel />,
+          icon: <RiAuctionFill />,
+          color: "bg-[#6366f1]",
         },
       ],
     },
-
   ];
 
   return (
     <aside
-    
       className={`
-        fixed top-0 left-0 z-50 h-screen w-64
-        p-5 overflow-y-auto border-r
+        fixed top-0 left-0 z-50
+        h-screen w-[270px]
+        overflow-y-auto
+        bg-[#f7f7f8]
+        border-r border-gray-200
         transition-all duration-300
 
-        ${
-          darkMode
-            ? "bg-gray-900 border-gray-700"
-            : "bg-white border-gray-200"
-        }
-
         ${openSidebar ? "translate-x-0" : "-translate-x-full"}
-
         md:translate-x-0
       `}
     >
+      {/* Mobile Close */}
       <button
-  onClick={() => setOpenSidebar(false)}
-  className="
-    md:hidden
-    absolute top-5 right-5
-    text-xl
-    text-gray-500
-  "
->
-  <FaTimes />
-</button>
+        onClick={() => setOpenSidebar(false)}
+        className="
+          md:hidden absolute top-5 right-5
+          text-gray-500 text-2xl
+        "
+      >
+        <RiCloseLine />
+      </button>
 
       {/* Logo */}
-      <div className="flex justify-center mb-6 pt-1">
-
+      <div className="flex justify-start px-5 pt-4 pb-7">
         <img
           src={logo}
           alt="logo"
-          className="h-12 w-auto"
+          className="h-12 object-contain"
         />
-
       </div>
 
-      {/* Sections */}
-      {menuSections.map((section, sectionIndex) => (
+      {/* Menu */}
+      <div className="px-3 pb-10">
+        {menuSections.map((section, sectionIndex) => (
+          <div key={sectionIndex} className="mb-7">
+            {/* Heading */}
+            <h2
+              className="
+                text-[13px]
+                uppercase
+                font-bold
+                tracking-wider
+                text-[#9ca3af]
+                mb-3
+                px-2
+              "
+            >
+              {section.heading}
+            </h2>
 
-        <div key={sectionIndex} className="mb-6">
+            {/* Items */}
+            <div className="flex flex-col gap-1">
+              {section.items.map((item, index) => (
+                <NavLink
+                  key={index}
+                  to={item.path}
+                  end={item.title === "Dashboard"}
+                  onClick={() => setOpenSidebar(false)}
+                  className={({ isActive }) => `
+                    flex items-center justify-between
+                    px-4 py-3
+                    rounded-none
+                    transition-all duration-300
 
-          {/* Heading */}
-          <h2
-            className={`
-              text-xs uppercase font-semibold
-              mb-3 px-2 tracking-wide
+                    ${
+                      isActive
+                        ? "bg-[#dff4fb]"
+                        : "hover:bg-white"
+                    }
+                  `}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <div className="flex items-center gap-4">
+                        {/* Icon */}
+                        <div
+                          className={`
+                            h-9 w-9
+                            rounded-xl
+                            flex items-center justify-center
+                            text-white text-[18px]
+                            ${item.color}
+                          `}
+                        >
+                          {item.icon}
+                        </div>
 
-              ${
-                darkMode
-                  ? "text-gray-500"
-                  : "text-gray-400"
-              }
-            `}
-          >
-            {section.heading}
-          </h2>
+                        {/* Title */}
+                        <span
+                          className={`
+                            text-[17px]
+                            font-medium
+                            ${
+                              isActive
+                                ? "text-[#4b5563]"
+                                : "text-[#4b5563]"
+                            }
+                          `}
+                        >
+                          {item.title}
+                        </span>
+                      </div>
 
-          {/* Items */}
-          <div className="flex flex-col gap-2">
-
-            {section.items.map((item, index) => (
-
-              <NavLink
-                to={item.path}
-                end={item.title === "Dashboard"}
-                key={index}
-
-                onClick={() => setOpenSidebar(false)}
-
-                className={({ isActive }) => `
-                  flex items-center gap-4
-                  px-4 py-3 rounded-xl
-                  transition-all duration-300 text-left
-
-                  ${
-                    isActive
-                      ? darkMode
-                        ? "bg-gray-800 text-sky-400"
-                        : "bg-sky-100 text-sky-600"
-                      : darkMode
-                        ? "text-gray-300 hover:bg-gray-800"
-                        : "text-gray-600 hover:bg-gray-100"
-                  }
-                `}
-              >
-
-                {/* Icon */}
-                <div className="text-lg">
-                  {item.icon}
-                </div>
-
-                {/* Title */}
-                <span className="font-medium text-sm">
-                  {item.title}
-                </span>
-
-              </NavLink>
-
-            ))}
-
+                      {/* Badge */}
+                      {item.badge && (
+                        <div
+                          className="
+                            min-w-[24px]
+                            h-6
+                            px-2
+                            rounded-full
+                            bg-[#ff6b35]
+                            text-white
+                            text-[12px]
+                            font-semibold
+                            flex items-center justify-center
+                          "
+                        >
+                          {item.badge}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
           </div>
-
-        </div>
-
-      ))}
-
+        ))}
+      </div>
     </aside>
   );
 }

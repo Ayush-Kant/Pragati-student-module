@@ -129,6 +129,8 @@
 // }
 
 // export default Navbar;
+
+import { useNavigate } from "react-router-dom";
 import {
   FaBell,
   FaSearch,
@@ -137,13 +139,21 @@ import {
   FaSun,
 } from "react-icons/fa";
 
+
 function AdminNavbar({
   openSidebar,
   setOpenSidebar,
   darkMode,
   setDarkMode,
+  profile
 }) {
-
+  const navigate = useNavigate();
+  const initials =
+    profile?.fullName
+      ?.split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase() || "AD";
   return (
     <header
       className={`
@@ -212,24 +222,25 @@ function AdminNavbar({
       <div className="flex items-center gap-4">
 
         {/* Dark Mode Toggle */}
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className={`
-            text-xl transition
-
-            ${
-              darkMode
-                ? "text-yellow-400"
-                : "text-gray-600"
-            }
-          `}
-        >
-          {darkMode ? <FaSun /> : <FaMoon />}
-        </button>
+        
+           <button
+         onClick={() => setDarkMode(!darkMode)}
+        className={`
+        p-2 rounded-full border transition-all duration-300
+        ${
+         darkMode
+           ? "bg-gray-800 border-gray-600 text-yellow-400"
+           : "bg-white border-gray-300 text-gray-600"
+         }
+       `}
+       >
+        {darkMode ? <FaSun size={16} /> : <FaMoon size={16} />}
+       </button>
+          
 
         {/* Notification */}
-        <button
-          className={`
+        <button 
+        className={`
             relative transition
 
             ${
@@ -250,9 +261,12 @@ function AdminNavbar({
         </button>
 
         {/* Profile */}
-        <div className="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold">
-          AD
-        </div>
+         <div
+  onClick={() => navigate("/admin/profile")}
+  className="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold cursor-pointer"
+>
+  {initials}
+</div>
 
       </div>
     </header>

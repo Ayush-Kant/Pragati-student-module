@@ -1,124 +1,133 @@
-const AdminProfileCard = ({ profile }) => {
+// AdminProfileCard.jsx
+// Sidebar component — has its OWN background colors, no logo
+
+const AdminProfileCard = ({ profile, onEditClick }) => {
+  const initial = profile?.fullName?.charAt(0)?.toUpperCase() || "A";
+
+  const StatBox = ({ icon, label, value, bg, color }) => (
+    <div style={{
+      background: bg, borderRadius: 14, padding: "14px 16px",
+      display: "flex", alignItems: "center", gap: 12,
+    }}>
+      <div style={{
+        width: 38, height: 38, borderRadius: 10, background: color + "22",
+        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0,
+      }}>{icon}</div>
+      <div>
+        <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, textTransform: "uppercase", letterSpacing: .5 }}>{label}</div>
+        <div style={{ fontSize: 13, color: "#1e293b", fontWeight: 700, marginTop: 2 }}>{value || "—"}</div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      <div className="rounded-[32px] bg-white p-6 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-5">
-            <div className="flex h-28 w-28 items-center justify-center rounded-full bg-slate-900 text-3xl font-semibold text-white shadow-lg">
-              {profile.fullName?.charAt(0) || "S"}
-            </div>
-            <div>
-              <h2 className="text-3xl font-semibold text-slate-900">{profile.fullName}</h2>
-              <p className="text-sm text-slate-500 mt-1">Profile last updated recently</p>
-            </div>
-          </div>
-          <div className="rounded-3xl border border-gray-400 bg-slate-50 p-4 text-sm text-slate-700">
-            <div className="font-semibold text-slate-900">Profile Status</div>
-            <div className="mt-3 flex items-center gap-2 text-green-600">
-              <span className="inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
-              Active
-            </div>
-          </div>
+    <div style={{
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      gap: 14,
+      fontFamily: "'Segoe UI', system-ui, sans-serif",
+    }}>
+
+      {/* ── Avatar card ── */}
+      <div style={{
+        background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)",
+        borderRadius: 20, padding: "28px 20px", textAlign: "center",
+        position: "relative", overflow: "hidden",
+      }}>
+        {/* decorative circles */}
+        <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(255,255,255,.06)" }} />
+        <div style={{ position: "absolute", bottom: -30, left: -20, width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,.04)" }} />
+
+        <div style={{
+          width: 80, height: 80, borderRadius: "50%",
+          background: profile?.avatarUrl ? "transparent" : "linear-gradient(135deg,#818cf8,#a78bfa)",
+          margin: "0 auto 12px",
+          border: "3px solid rgba(255,255,255,.25)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 30, fontWeight: 800, color: "#fff", overflow: "hidden",
+          boxShadow: "0 8px 24px rgba(0,0,0,.3)",
+        }}>
+          {profile?.avatarUrl
+            ? <img src={profile.avatarUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" />
+            : initial}
         </div>
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2">
-          <div className="rounded-3xl bg-slate-50 p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Email</p>
-            <p className="mt-3 text-sm font-medium text-slate-900">{profile.email}</p>
-          </div>
-          <div className="rounded-3xl bg-slate-50 p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Phone</p>
-            <p className="mt-3 text-sm font-medium text-slate-900">{profile.contactInfo?.phone || "Not provided"}</p>
-          </div>
-          <div className="rounded-3xl bg-slate-50 p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Location</p>
-            <p className="mt-3 text-sm font-medium text-slate-900">{profile.contactInfo?.timezone || "Not provided"}</p>
-          </div>
-          <div className="rounded-3xl bg-slate-50 p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Member since</p>
-            <p className="mt-3 text-sm font-medium text-slate-900">2026</p>
-          </div>
-        </div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", marginBottom: 4 }}>{profile?.fullName}</div>
+        <div style={{ fontSize: 13, color: "#a5b4fc", marginBottom: 10 }}>{profile?.displayTitle}</div>
 
-        <div className="mt-8 rounded-[32px] border border-gray-400 bg-white p-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-slate-900">About</h3>
-          </div>
-          <p className="mt-4 text-sm leading-7 text-slate-600">
-            {profile.bio || "No bio added"}
-          </p>
-        </div>
-        <div className="mt-8 rounded-[32px] border border-gray-400 bg-white p-6">
-          <h3 className="text-xl font-semibold text-slate-900">Role & Permissions</h3>
+        <span style={{
+          background: "rgba(99,102,241,.35)", color: "#c7d2fe",
+          borderRadius: 99, padding: "4px 14px", fontSize: 11, fontWeight: 700,
+          letterSpacing: .5, textTransform: "uppercase", border: "1px solid rgba(165,180,252,.3)",
+        }}>
+          {profile?.role?.replace("_", " ") || "Admin"}
+        </span>
 
-          <div className="mt-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-              Role
-            </p>
+        {/* Edit button */}
+        <button
+          onClick={onEditClick}
+          style={{
+            marginTop: 16, width: "100%",
+            background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+            border: "none", borderRadius: 10, padding: "10px",
+            color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(99,102,241,.4)",
+            transition: "opacity .15s",
+          }}
+          onMouseEnter={e => e.target.style.opacity = ".85"}
+          onMouseLeave={e => e.target.style.opacity = "1"}
+        >
+          ✏ Edit Profile
+        </button>
+      </div>
 
-            <input
-              type="text"
-              value={profile.role}
-              readOnly
-              className="mt-2 w-full rounded-2xl border border-gray-400 bg-white px-4 py-3 text-sm text-slate-700 outline-none"
-            />
-          </div>
-
-          <div className="mt-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-              Permissions
-            </p>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              {profile.permissions?.map((permission) => (
-                <span
-                  key={permission}
-                  className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-700"
-                >
-                  {permission}
-                </span>
-              ))}
-            </div>
-          </div>
+      {/* ── Contact info ── */}
+      <div style={{ background: "#f0f9ff", borderRadius: 16, padding: 16, border: "1px solid #bae6fd" }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "#0369a1", letterSpacing: .5, marginBottom: 12, textTransform: "uppercase" }}>Contact</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <StatBox icon="✉" label="Email" value={profile?.email} bg="#fff" color="#6366f1" />
+          <StatBox icon="📞" label="Phone" value={profile?.contactInfo?.phone || profile?.phone} bg="#fff" color="#22c55e" />
+          <StatBox icon="🌐" label="Timezone" value={profile?.contactInfo?.timezone} bg="#fff" color="#f59e0b" />
         </div>
       </div>
 
-      <div className="rounded-[32px] bg-white p-6 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-slate-900">Profile Summary</h3>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">Quick view</span>
-        </div>
-        <div className="mt-6 space-y-4">
-          <div className="rounded-3xl border border-gray-400 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Full Name</p>
-            <p className="mt-2 text-sm font-medium text-slate-900">{profile.fullName}</p>
-          </div>
-          <div className="rounded-3xl border border-gray-400 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Email</p>
-            <p className="mt-2 text-sm font-medium text-slate-900">{profile.email}</p>
-          </div>
-          <div className="rounded-3xl border border-gray-400 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Phone</p>
-            <p className="mt-2 text-sm font-medium text-slate-900">{profile.contactInfo?.phone || "Not provided"}</p>
-          </div>
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Location</p>
-            <p className="mt-2 text-sm font-medium text-slate-900">{profile.contactInfo?.timezone || "Not provided"}</p>
-          </div>
-          {profile.socialLinks?.github && (
-            <a href={profile.socialLinks.github} target="_blank" rel="noopener noreferrer" className="block">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">GitHub</p>
-              <p className="mt-1 text-sm font-medium text-blue-600 truncate hover:underline">{profile.socialLinks.github}</p>
-            </a>
-          )}
-          {profile.socialLinks?.linkedin && (
-            <a href={profile.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="block">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">LinkedIn</p>
-              <p className="mt-1 text-sm font-medium text-blue-600 truncate hover:underline">{profile.socialLinks.linkedin}</p>
-            </a>
-          )}
+      {/* ── Role & Permissions ── */}
+      <div style={{ background: "#fdf4ff", borderRadius: 16, padding: 16, border: "1px solid #e9d5ff" }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "#7c3aed", letterSpacing: .5, marginBottom: 12, textTransform: "uppercase" }}>Permissions</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {(profile?.permissions || []).map(p => (
+            <span key={p} style={{
+              background: "#ede9fe", color: "#6d28d9",
+              borderRadius: 99, padding: "4px 10px", fontSize: 11, fontWeight: 600,
+            }}>
+              {p.replace("_", " ")}
+            </span>
+          ))}
         </div>
       </div>
+
+      {/* ── Social links ── */}
+      <div style={{ background: "#f0fdf4", borderRadius: 16, padding: 16, border: "1px solid #bbf7d0" }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "#15803d", letterSpacing: .5, marginBottom: 12, textTransform: "uppercase" }}>Social Links</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {[
+            { icon: "🔗", label: "LinkedIn", val: profile?.socialLinks?.linkedin },
+            { icon: "💻", label: "GitHub", val: profile?.socialLinks?.github },
+          ].map(s => (
+            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 10, background: "#fff", borderRadius: 10, padding: "10px 12px" }}>
+              <span style={{ fontSize: 16 }}>{s.icon}</span>
+              <div>
+                <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{s.label}</div>
+                <div style={{ fontSize: 12, color: s.val ? "#2563eb" : "#cbd5e1", fontWeight: 600 }}>
+                  {s.val || "Not added"}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 };

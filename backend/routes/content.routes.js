@@ -1,6 +1,7 @@
-import express from 'express';
-import authMiddleware from '../middleware/authMiddleware.js';
-import roleMiddleware from '../middleware/roleMiddleware.js';
+import express from "express";
+import authMiddleware from "../middleware/authMiddleware.js";
+import roleMiddleware from "../middleware/roleMiddleware.js";
+
 import {
   createCourse,
   getCourses,
@@ -15,35 +16,49 @@ import {
   checkLessonAccess,
   addResource,
   deleteResource,
-} from '../controllers/content.controller.js';
+} from "../controllers/content.controller.js";
+
+import {
+  validateCreateCourse,
+  validateUpdateCourse,
+  validateAddModule,
+} from "../validators/content.validator.js";
 
 const router = express.Router();
 
+// Apply global authentication to all routes below
 router.use(authMiddleware);
 
-// This route is intentionally auth-only because your task says to test it with a student token.
-router.get('/lessons/:lessonId/check-access', checkLessonAccess);
+// ==========================================
+// Student-Accessible Routes (Auth-Only)
+// ==========================================
+// This route is intentionally auth-only because it needs to be tested with a student token.
+router.get("/lessons/:lessonId/check-access", checkLessonAccess);
 
-router.use(roleMiddleware('mentor'));
+// ==========================================
+// Protected Routes (Mentor / Admin Only)
+// ==========================================
+// Apply role middleware for all subsequent routes
+router.use(roleMiddleware("mentor", "admin"));
 
 // Courses
-router.post('/courses', createCourse);
-router.get('/courses', getCourses);
-router.get('/courses/:courseId', getCourseById);
-router.patch('/courses/:courseId', updateCourse);
-router.delete('/courses/:courseId', deleteCourse);
+router.post("/courses", validateCreateCourse, createCourse);
+router.get("/courses", getCourses);
+router.get("/courses/:courseId", getCourseById);
+router.patch("/courses/:courseId", validateUpdateCourse, updateCourse);
+router.delete("/courses/:courseId", deleteCourse);
 
 // Modules
-router.post('/courses/:courseId/modules', addModule);
-router.delete('/modules/:moduleId', deleteModule);
+router.post("/courses/:courseId/modules", validateAddModule, addModule);
+router.delete("/modules/:moduleId", deleteModule);
 
 // Lessons
-router.put('/modules/:moduleId/reorder', reorderLessons);
-router.post('/modules/:moduleId/lessons', addLesson);
-router.patch('/lessons/:lessonId', updateLesson);
+router.put("/modules/:moduleId/reorder", reorderLessons);
+router.post("/modules/:moduleId/lessons", addLesson);
+router.patch("/lessons/:lessonId", updateLesson);
 
 // Resources
-router.post('/resources', addResource);
-router.delete('/resources/:resourceId', deleteResource);
+router.post("/resources", addResource);
+router.delete("/resources/:resourceId", deleteResource);
 
 export default router;

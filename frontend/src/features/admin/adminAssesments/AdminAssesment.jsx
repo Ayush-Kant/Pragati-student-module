@@ -1,11 +1,7 @@
-import React from 'react'
+import AssessmentManagement from "../pages/AssessmentManagement";
 
 const AdminAssesment = () => {
-  return (
-    <div>
-      Admin Assesments
-    </div>
-  )
-}
+  return <AssessmentManagement />;
+};
 
-export default AdminAssesment
+export default AdminAssesment;

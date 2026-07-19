@@ -5,7 +5,29 @@ export const useAdminProfile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     // FETCH PROFILE
-    const fetchProfile = async () => {
+   
+
+    // UPDATE PROFILE
+    const saveProfile = async (updatedData) => {
+        try {
+            // simulate API delay
+            await new Promise((resolve) =>
+                setTimeout(resolve, 1000)
+            );
+            // update local frontend state
+            setProfile(updatedData);
+            return {
+                success: true,
+            };
+        } catch (err) {
+            return {
+                success: false,
+                error: "Failed to update profile",
+            };
+        }
+    };
+    useEffect(() => {
+         const fetchProfile = async () => {
         try {
             setLoading(true);
             //   const data = await getAdminProfile();
@@ -36,27 +58,6 @@ export const useAdminProfile = () => {
             setLoading(false);
         }
     };
-
-    // UPDATE PROFILE
-    const saveProfile = async (updatedData) => {
-        try {
-            // simulate API delay
-            await new Promise((resolve) =>
-                setTimeout(resolve, 1000)
-            );
-            // update local frontend state
-            setProfile(updatedData);
-            return {
-                success: true,
-            };
-        } catch (err) {
-            return {
-                success: false,
-                error: "Failed to update profile",
-            };
-        }
-    };
-    useEffect(() => {
         fetchProfile();
     }, []);
     return {

@@ -1,11 +1,6 @@
-import React from 'react'
+import React from "react";
+import NotificationCenter from "../pages/NotificationCenter";
 
-const AdminNotifications = () => {
-  return (
-    <div>
-      Admin Notifications
-    </div>
-  )
+export default function AdminNotifications() {
+  return <NotificationCenter />;
 }
-
-export default AdminNotifications
