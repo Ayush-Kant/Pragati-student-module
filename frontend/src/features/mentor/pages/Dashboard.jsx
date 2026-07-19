@@ -22,6 +22,14 @@ const BAR_COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
 const MentorDashboard = () => {
   const { data, loading, error } = useMentorDashboard();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
+
+  React.useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (loading)
     return (
@@ -456,175 +464,22 @@ const MentorDashboard = () => {
                 ↑ +8% improvement from last month
               </p>
             </div>
-          </div>
-        </div>
 
-        <UpcomingSessionsList sessions={data?.upcomingSessions} />
-        <NotificationsFeed notifications={data?.recentNotifications} />
+            <TopStudentsLeaderboard students={data?.topStudents} />
+          </div>
+
+          {/* Bottom padding for mobile */}
+          <div style={{ height: "20px" }} />
+        </div>
       </div>
-
-      {/* Bottom Row */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "12px",
-        }}
-      >
-        {/* Mentees by Domain */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: "12px",
-            padding: "12px",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "8px",
-            }}
-          >
-            <p
-              style={{
-                fontSize: "12px",
-                fontWeight: "600",
-                color: "#1F2937",
-                margin: 0,
-              }}
-            >
-              Mentees by Domain
-            </p>
-            <span
-              style={{ fontSize: "10px", color: "#4F46E5", cursor: "pointer" }}
-            >
-              View Report
-            </span>
-          </div>
-          <ResponsiveContainer width="100%" height={130}>
-            <BarChart
-              data={data?.menteesByDomain}
-              layout="vertical"
-              margin={{ left: 0, right: 10 }}
-            >
-              <XAxis type="number" hide />
-              <YAxis
-                type="category"
-                dataKey="domain"
-                tick={{ fontSize: 9 }}
-                width={100}
-              />
-              <Bar dataKey="count" radius={4}>
-                {data?.menteesByDomain?.map((entry, index) => (
-                  <Cell
-                    key={index}
-                    fill={BAR_COLORS[index % BAR_COLORS.length]}
-                  />
-                ))}
-              </Bar>
-              <Tooltip />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Job Readiness Score */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: "12px",
-            padding: "12px",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              marginBottom: "4px",
-            }}
-          >
-            <p
-              style={{
-                fontSize: "12px",
-                fontWeight: "600",
-                color: "#1F2937",
-                margin: 0,
-              }}
-            >
-              Job Readiness Score
-            </p>
-            <span
-              style={{ fontSize: "10px", color: "#4F46E5", cursor: "pointer" }}
-            >
-              View Analytics
-            </span>
-          </div>
-          <PieChart width={140} height={80}>
-            <Pie
-              data={[
-                { value: data?.jobReadinessScore },
-                { value: 100 - (data?.jobReadinessScore ?? 0) },
-              ]}
-              cx={65}
-              cy={70}
-              innerRadius={45}
-              outerRadius={60}
-              startAngle={180}
-              endAngle={0}
-              dataKey="value"
-            >
-              <Cell fill="#10B981" />
-              <Cell fill="#E5E7EB" />
-            </Pie>
-          </PieChart>
-          <p
-            style={{
-              fontSize: "28px",
-              fontWeight: "800",
-              color: "#1F2937",
-              margin: "4px 0 0",
-            }}
-          >
-            {data?.jobReadinessScore}%
-          </p>
-          <p
-            style={{
-              fontSize: "11px",
-              color: "#10B981",
-              margin: 0,
-              fontWeight: "600",
-            }}
-          >
-            Good
-          </p>
-          <p
-            style={{
-              fontSize: "10px",
-              color: "#6B7280",
-              margin: "4px 0 0",
-              textAlign: "center",
-            }}
-          >
-            Your mentees' average job readiness score.
-          </p>
-          <p style={{ fontSize: "10px", color: "#10B981", margin: "2px 0 0" }}>
-            ↑ +8% improvement from last month
-          </p>
-        </div>
-
-        <TopStudentsLeaderboard students={data?.topStudents} />
-      </div>
-
-      <div style={{ height: "20px" }} />
 
       <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+          .sidebar { position: fixed !important; }
+        }
       `}</style>
     </div>
   );
