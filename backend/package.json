@@ -15,6 +15,7 @@
         "@sequelize/postgres": "^7.0.0-alpha.48",
         "bcrypt": "^6.0.0",
         "cors": "^2.8.6",
+        "curl": "^0.1.4",
         "dns": "^0.1.2",
         "dotenv": "^17.4.2",
         "express": "^5.2.1",
@@ -23,6 +24,7 @@
         "node-pg": "^1.0.1",
         "pg": "^8.21.0",
         "resend": "^6.12.3",
+        "sequelize": "^3.35.1",
         "uuid": "^9.0.1"
     },
     "devDependencies": {

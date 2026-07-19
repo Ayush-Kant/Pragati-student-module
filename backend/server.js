@@ -1,8 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-
-import { connectDB } from './config/db.js';
+import connectDB from './config/db.js';
 
 // Student training / learning routes
 import studentTrainingRoutes from './src/routes/trainingRoutes.js';
