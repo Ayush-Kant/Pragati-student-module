@@ -10,13 +10,14 @@ import {
   Bell,
   HelpCircle,
   Briefcase,
+  MessageSquare,
   BookOpen,
   Activity,
   Database,
   FlaskConical,
-  History,
   Users,
   LogOut,
+  CalendarDays,
 } from "lucide-react";
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -53,7 +54,7 @@ export default function MentorLayout() {
     {
       name: "Mentees",
       path: "/mentor/mentees",
-      icon: <Users className="w-5, h-5" />,
+      icon: <Users className="w-5 h-5" />,
     },
     {
       name: "Courses",
@@ -69,6 +70,21 @@ export default function MentorLayout() {
       name: "Activities",
       path: "/mentor/activities",
       icon: <Activity className="w-5 h-5" />,
+    },
+    {
+      name: "Sessions",
+      path: "/mentor/slots",
+      icon: <CalendarDays className="w-5 h-5" />,
+    },
+    {
+      name: "Discussion Forum",
+      path: "/mentor/discussion-forum",
+      icon: <MessageSquare className="w-5 h-5" />,
+    },
+    {
+      name: "Notifications",
+      path: "/mentor/notifications",
+      icon: <Bell className="w-5 h-5" />,
     },
     {
       name: "Question Bank",
@@ -95,7 +111,6 @@ export default function MentorLayout() {
       path: "/mentor/settings",
       icon: <Settings className="w-5 h-5" />,
     },
-    // You can add as many items here as you want; the sidebar will now scroll!
   ];
 
   const isItemActive = (item) => {
@@ -227,7 +242,10 @@ export default function MentorLayout() {
 
           {/* User Profile */}
           <div className="flex items-center gap-6 shrink-0">
-            <button className="text-slate-500 hover:text-slate-700 transition-colors">
+            <button
+              onClick={() => navigate("/mentor/notifications")}
+              className="text-slate-500 hover:text-slate-700 transition-colors"
+            >
               <Bell className="h-5 w-5" />
             </button>
 

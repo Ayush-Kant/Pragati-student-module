@@ -1,5 +1,6 @@
 // MentorDashboard.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import useMentorDashboard from "../hooks/useMentorDashboard";
 import StatsRow from "../components/StatsRow";
 import UpcomingSessionsList from "../components/UpcomingSessionsList";
@@ -21,6 +22,7 @@ const PIE_COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444"];
 const BAR_COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
 const MentorDashboard = () => {
+  const navigate = useNavigate();
   const { data, loading, error } = useMentorDashboard();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);

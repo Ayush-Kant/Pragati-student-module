@@ -23,13 +23,17 @@ import QuestionBankPage from "../pages/QuestionBankPage";
 import CreateQuestionPage from "../pages/CreateQuestionPage";
 import EditQuestionPage from "../pages/EditQuestionPage";
 import QuestionPreviewPage from "../pages/QuestionPreviewPage";
-import QuizBuilderPage from "../pages/QuizBuilderPage";
+import QuestionBankPageQuizBuilder from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
 import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
 import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage.jsx";
 import SubmissionMonitoringPage from "../pages/SubmissionMonitoringPage";
 import ReviewGradingPage from "../pages/ReviewGradingPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
+
+import NotificationsPage from "../pages/NotificationsPage";
+import DiscussionForumPage from "../pages/DiscussionForumPage";
+import SlotsCalendarPage from "../pages/SlotsCalendarPage";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
@@ -69,9 +73,13 @@ const mentorRoute = (
         />
         <Route
           path="question-bank/quiz-builder"
-          element={<QuizBuilderPage />}
+          element={<QuestionBankPageQuizBuilder />}
         />
         <Route path="question-bank/attempts" element={<AttemptHistoryPage />} />
+
+        <Route path="notifications" element={<NotificationsPage />} />
+        <Route path="discussion-forum" element={<DiscussionForumPage />} />
+        <Route path="slots" element={<SlotsCalendarPage />} />
       </Route>
 
       {/* Onboarding pages use their own OnboardingLayout — no MentorLayout */}
