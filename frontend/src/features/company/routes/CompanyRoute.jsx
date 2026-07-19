@@ -28,11 +28,10 @@ const CompanyRoute = (
         <Route path="offers" element={<Offers />} />
         <Route path="reports" element={<Reports />} />
         <Route path="settings" element={<CompanySettings />} />
+        <Route path="add" element={<CompanyDashboard />} />
       </Route>
     </Route>
   </Route>
 );
 
 export default CompanyRoute;
-
-

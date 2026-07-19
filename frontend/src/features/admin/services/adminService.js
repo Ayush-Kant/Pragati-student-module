@@ -44,9 +44,7 @@ export const updateAdminProfile = async (profileData) => {
 
 export const getStudentById = async (id) => {
   try {
-    const response = await API.get(
-      `/api/v1/admin/students/${id}`
-    );
+    const response = await API.get(`/api/v1/admin/students/${id}`);
 
     return response.data;
   } catch (error) {
@@ -56,9 +54,7 @@ export const getStudentById = async (id) => {
 
 export const getStudentProgress = async (id) => {
   try {
-    const response = await API.get(
-      `/api/v1/admin/students/${id}/progress`
-    );
+    const response = await API.get(`/api/v1/admin/students/${id}/progress`);
 
     return response.data;
   } catch (error) {
@@ -68,10 +64,7 @@ export const getStudentProgress = async (id) => {
 
 export const getStudents = async (params = {}) => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/students",
-      { params }
-    );
+    const response = await API.get("/api/v1/admin/students", { params });
     return response.data;
   } catch (error) {
     console.error("Error fetching students:", error);
@@ -82,7 +75,7 @@ export const getStudents = async (params = {}) => {
 export const verifyStudent = async (studentId) => {
   try {
     const response = await API.patch(
-      `/api/v1/admin/students/${studentId}/verify`
+      `/api/v1/admin/students/${studentId}/verify`,
     );
     return response.data;
   } catch (error) {
@@ -95,7 +88,7 @@ export const blockStudent = async (studentId, reason) => {
   try {
     const response = await API.patch(
       `/api/v1/admin/students/${studentId}/block`,
-      { reason }
+      { reason },
     );
     return response.data;
   } catch (error) {
@@ -107,7 +100,7 @@ export const blockStudent = async (studentId, reason) => {
 export const unblockStudent = async (studentId) => {
   try {
     const response = await API.patch(
-      `/api/v1/admin/students/${studentId}/unblock`
+      `/api/v1/admin/students/${studentId}/unblock`,
     );
     return response.data;
   } catch (error) {
@@ -119,7 +112,7 @@ export const unblockStudent = async (studentId) => {
 export const resetStudentPassword = async (studentId) => {
   try {
     const response = await API.post(
-      `/api/v1/admin/students/${studentId}/reset-pw`
+      `/api/v1/admin/students/${studentId}/reset-pw`,
     );
     return response.data;
   } catch (error) {
@@ -130,13 +123,10 @@ export const resetStudentPassword = async (studentId) => {
 
 export const exportStudents = async (params = {}) => {
   try {
-    const response = await API.get(
-      "/api/v1/admin/students/export",
-      {
-        params,
-        responseType: "blob",
-      }
-    );
+    const response = await API.get("/api/v1/admin/students/export", {
+      params,
+      responseType: "blob",
+    });
 
     return response.data;
   } catch (error) {
@@ -148,245 +138,148 @@ export const exportStudents = async (params = {}) => {
 const STORAGE_KEY = "trainingPrograms";
 
 export const adminService = {
-
   async getTrainingProgramById(programId) {
+    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    const programs =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      ) || [];
-
-    const program =
-      programs.find(
-        (item) => item.id === programId
-      );
+    const program = programs.find((item) => item.id === programId);
 
     return {
-      data:
-        program || null,
+      data: program || null,
     };
-
   },
 
   async updateTrainingProgram(updatedProgram) {
+    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    const programs =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      ) || [];
-
-    const updatedPrograms =
-      programs.map((program) =>
-        program.id === updatedProgram.id
-          ? updatedProgram
-          : program
-      );
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updatedPrograms)
+    const updatedPrograms = programs.map((program) =>
+      program.id === updatedProgram.id ? updatedProgram : program,
     );
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
 
     return {
       success: true,
       data: updatedProgram,
     };
-
   },
 
   async assignMentor(programId, mentor) {
+    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    const programs =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      ) || [];
-
-    const updatedPrograms =
-      programs.map((program) =>
-
-        program.id === programId
-          ? {
-              ...program,
-              mentor,
-            }
-          : program
-
-      );
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updatedPrograms)
+    const updatedPrograms = programs.map((program) =>
+      program.id === programId
+        ? {
+            ...program,
+            mentor,
+          }
+        : program,
     );
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
 
     return {
       success: true,
     };
-
   },
 
   async archiveTrainingProgram(programId) {
+    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    const programs =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      ) || [];
-
-    const updatedPrograms =
-      programs.map((program) =>
-
-        program.id === programId
-          ? {
-              ...program,
-              status: "archived",
-            }
-          : program
-
-      );
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updatedPrograms)
+    const updatedPrograms = programs.map((program) =>
+      program.id === programId
+        ? {
+            ...program,
+            status: "archived",
+          }
+        : program,
     );
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
 
     return {
       success: true,
     };
-
   },
 
   async addModule(programId, moduleData) {
+    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    const programs =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      ) || [];
+    const updatedPrograms = programs.map((program) => {
+      if (program.id !== programId) return program;
 
-    const updatedPrograms =
-      programs.map((program) => {
+      const modules = program.modules || [];
 
-        if (program.id !== programId)
-          return program;
+      return {
+        ...program,
 
-        const modules =
-          program.modules || [];
+        modules: [
+          ...modules,
 
-        return {
+          {
+            id: `module_${Date.now()}`,
+            ...moduleData,
+          },
+        ],
 
-          ...program,
+        modulesCount: modules.length + 1,
+      };
+    });
 
-          modules: [
-
-            ...modules,
-
-            {
-              id: `module_${Date.now()}`,
-              ...moduleData,
-            },
-
-          ],
-
-          modulesCount:
-            modules.length + 1,
-
-        };
-
-      });
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updatedPrograms)
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
 
     return {
       success: true,
     };
-
   },
 
   async updateModule(programId, updatedModule) {
+    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    const programs =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      ) || [];
+    const updatedPrograms = programs.map((program) => {
+      if (program.id !== programId) return program;
 
-    const updatedPrograms =
-      programs.map((program) => {
+      return {
+        ...program,
 
-        if (program.id !== programId)
-          return program;
+        modules: (program.modules || []).map((module) =>
+          module.id === updatedModule.id ? updatedModule : module,
+        ),
+      };
+    });
 
-        return {
-
-          ...program,
-
-          modules:
-            (program.modules || []).map(
-              (module) =>
-
-                module.id === updatedModule.id
-                  ? updatedModule
-                  : module
-
-            ),
-
-        };
-
-      });
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updatedPrograms)
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
 
     return {
       success: true,
     };
-
   },
 
   async deleteModule(programId, moduleId) {
+    const programs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    const programs =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      ) || [];
+    const updatedPrograms = programs.map((program) => {
+      if (program.id !== programId) return program;
 
-    const updatedPrograms =
-      programs.map((program) => {
+      const modules = (program.modules || []).filter(
+        (module) => module.id !== moduleId,
+      );
 
-        if (program.id !== programId)
-          return program;
+      return {
+        ...program,
 
-        const modules =
-          (program.modules || []).filter(
-            (module) =>
-              module.id !== moduleId
-          );
+        modules,
 
-        return {
+        modulesCount: modules.length,
+      };
+    });
 
-          ...program,
-
-          modules,
-
-          modulesCount:
-            modules.length,
-
-        };
-
-      });
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updatedPrograms)
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
 
     return {
       success: true,
     };
-
-  },};
+  },
+};
 
 //For college needing recruitment
 export const getNeedsRecruitment = async () => {
@@ -456,17 +349,26 @@ export const fetchDashboardFunnel = async () => {
 };
 
 export const fetchCompanyStats = async () => {
-  const response = await API.get("/api/v1/admin/dashboard/company-stats", getConfig());
+  const response = await API.get(
+    "/api/v1/admin/dashboard/company-stats",
+    getConfig(),
+  );
   return response.data;
 };
 
 export const fetchCollegePerformance = async () => {
-  const response = await API.get("/api/v1/admin/dashboard/college-performance", getConfig());
+  const response = await API.get(
+    "/api/v1/admin/dashboard/college-performance",
+    getConfig(),
+  );
   return response.data;
 };
 
 export const fetchActivityFeed = async () => {
-  const response = await API.get("/api/v1/admin/dashboard/activity-feed", getConfig());
+  const response = await API.get(
+    "/api/v1/admin/dashboard/activity-feed",
+    getConfig(),
+  );
   return response.data;
 };
 
@@ -983,7 +885,9 @@ export const getMentorPerformance = async (mentorId) => {
   }
 
   try {
-    const response = await API.get(`/api/v1/admin/mentors/${mentorId}/performance`);
+    const response = await API.get(
+      `/api/v1/admin/mentors/${mentorId}/performance`,
+    );
     return response.data;
   } catch (error) {
     return {
@@ -1017,7 +921,7 @@ export const assignMentor = async (mentorId, batchId) => {
   try {
     const response = await API.patch(
       `/api/v1/admin/mentors/${mentorId}/assign`,
-      { batchId }
+      { batchId },
     );
     return response.data;
   } catch (error) {
@@ -1033,7 +937,7 @@ export const replaceMentor = async (mentorId, newMentorId) => {
   try {
     const response = await API.patch(
       `/api/v1/admin/mentors/${mentorId}/replace`,
-      { newMentorId }
+      { newMentorId },
     );
     return response.data;
   } catch (error) {
@@ -1051,5 +955,194 @@ export const deleteMentor = async (mentorId) => {
     return response.data;
   } catch (error) {
     return { success: true, mentorId };
+  }
+};
+/* ===========================================
+   Disputes
+=========================================== */
+
+export const getDisputes = async (params = {}) => {
+  const response = await API.get(
+    "/api/v1/admin/disputes",
+    {
+      ...getConfig(),
+      params,
+    }
+  );
+
+  return response.data;
+};
+
+export const getDisputeById = async (id) => {
+  const response = await API.get(
+    `/api/v1/admin/disputes/${id}`,
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const reviewDispute = async (id) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/review`,
+    {},
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const resolveDispute = async (id, resolution) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/resolve`,
+    { resolution },
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const escalateDispute = async (id, reason) => {
+  const response = await API.patch(
+    `/api/v1/admin/disputes/${id}/escalate`,
+    { reason },
+    getConfig()
+  );
+
+  return response.data;
+};
+
+export const addDisputeNote = async (id, note) => {
+  const response = await API.post(
+    `/api/v1/admin/disputes/${id}/notes`,
+    { note },
+    getConfig()
+  );
+
+  return response.data;
+};
+
+// Mock Notification Data
+
+const mockNotifications = [
+  {
+    id: "notif_501",
+    subject: "MERN Drive Now Open",
+    recipientCount: 1432,
+    status: "sent",
+  },
+];
+
+const mockTemplates = [
+  {
+    id: "tmpl_001",
+    name: "Drive Opening",
+    subject: "New Drive Now Open",
+  },
+];
+
+// =========================
+// Notification APIs
+// =========================
+
+export const sendNotification = async (payload) => {
+  if (USE_MOCK_DATA) {
+    return {
+      success: true,
+      message: "Notification sent successfully",
+      notification: {
+        id: "notif_501",
+        ...payload,
+        status: "sent",
+      },
+    };
+  }
+
+  try {
+    const response = await API.post(
+      "/api/v1/admin/notifications/send",
+      payload,
+      getConfig(),
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const scheduleNotification = async (payload) => {
+  if (USE_MOCK_DATA) {
+    return {
+      success: true,
+      message: "Notification scheduled successfully",
+      notification: {
+        id: "notif_502",
+        ...payload,
+        status: "scheduled",
+      },
+    };
+  }
+
+  try {
+    const response = await API.post(
+      "/api/v1/admin/notifications/schedule",
+      payload,
+      getConfig(),
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getNotificationTemplates = async () => {
+  if (USE_MOCK_DATA) {
+    return {
+      templates: mockTemplates,
+    };
+  }
+
+  try {
+    const response = await API.get(
+      "/api/v1/admin/notifications/templates",
+      getConfig(),
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+
+    return {
+      templates: mockTemplates,
+    };
+  }
+};
+
+export const createNotificationTemplate = async (payload) => {
+  if (USE_MOCK_DATA) {
+    return {
+      success: true,
+      template: {
+        id: `tmpl_${Date.now()}`,
+        ...payload,
+      },
+    };
+  }
+
+  try {
+    const response = await API.post(
+      "/api/v1/admin/notifications/templates",
+      payload,
+      getConfig(),
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };

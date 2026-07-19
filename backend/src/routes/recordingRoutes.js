@@ -1,0 +1,21 @@
+import express from "express";
+import recordingController from "../controllers/recordingController.js";
+import { validateRequest } from "../middleware/validateRequest.js";
+import { validateRecordingId } from "../validators/recordingValidator.js";
+
+const router = express.Router();
+
+router.get(
+  "/",
+  recordingController.getRecordings
+);
+
+
+router.get(
+  "/:id",
+  validateRequest(validateRecordingId, "params"),
+  recordingController.getRecordingById
+);
+
+
+export default router;
