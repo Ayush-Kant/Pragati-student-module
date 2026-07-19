@@ -81,7 +81,7 @@ const MentorDashboard = () => {
     <div
       style={{
         minHeight: "100%",
-        width:"100%",
+        width: "100%",
         background: "#f8f9fc",
         fontFamily: "'Segoe UI', sans-serif",
         position: "relative",
@@ -101,11 +101,7 @@ const MentorDashboard = () => {
       )}
 
       {/* Main Content */}
-      <div
-        style={{ width: "100%"}}
-      >
-
-
+      <div style={{ width: "100%" }}>
         {/* Dashboard Body */}
         <div style={{ flex: 1, overflowY: "auto", padding: "6px 8px" }}>
           {/* Welcome Banner */}

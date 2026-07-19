@@ -97,6 +97,7 @@ app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 
+app.use("/api/mentor/content", contentRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/mentor", mentorHiringRoutes); // <-- Added from intern code

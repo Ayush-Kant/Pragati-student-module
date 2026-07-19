@@ -3,9 +3,17 @@ import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
 import MentorLayout from "../components/layout/MentorLayout";
 import Dashboard from "../pages/Dashboard";
+
+// --- Profile & Onboarding Imports ---
+import MentorProfile from "../pages/MentorProfile";
+import BasicInfo from "../pages/BasicInfo";
+import ProfessionalProfile from "../pages/ProfessionalProfile";
+import ExperienceLinks from "../pages/ExperienceLinks";
+import Availability from "../pages/Availability";
+
+// --- Course & Feature Imports ---
 import Courses from "../../../pages/mentor/CoursesPage";
 import CreateCourse from "../../../pages/mentor/CreateCoursePage";
-
 import ExportReport from "../pages/ExportReport";
 import { ActivityProvider } from "../context/ActivityContext";
 import Activities from "../pages/Activities";
@@ -26,9 +34,11 @@ import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
     <Route element={<RoleRoute allowedRoles={["mentor"]} />}>
+      {/* All mentor pages share MentorLayout (sidebar + topnav) */}
       <Route path="mentor" element={<MentorLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="profile" element={<MentorProfile />} />
         <Route path="courses" element={<Courses />} />
         <Route path="courses/create" element={<CreateCourse />} />
         <Route path="export-report" element={<ExportReport />} />
@@ -63,6 +73,18 @@ const mentorRoute = (
         />
         <Route path="question-bank/attempts" element={<AttemptHistoryPage />} />
       </Route>
+
+      {/* Onboarding pages use their own OnboardingLayout — no MentorLayout */}
+      <Route path="mentor/onboarding/basic-info" element={<BasicInfo />} />
+      <Route
+        path="mentor/onboarding/professional-profile"
+        element={<ProfessionalProfile />}
+      />
+      <Route
+        path="mentor/onboarding/experience-links"
+        element={<ExperienceLinks />}
+      />
+      <Route path="mentor/onboarding/availability" element={<Availability />} />
     </Route>
   </Route>
 );
