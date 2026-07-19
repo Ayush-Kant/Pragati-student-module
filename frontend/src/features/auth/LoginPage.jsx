@@ -5,6 +5,7 @@ import manager from "./images/managers.png";
 import mentor from "./images/mentor.png";
 import { loginApi } from './services/auth.services';
 import { useAuth } from '../../context/AuthContext';
+import { getProfile } from '../college/services/collegeService';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -14,7 +15,16 @@ const AuthPage = () => {
   const [errors, setErrors] = useState({});
   const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, userRole } = useAuth();
+  const [profileData, setProfileData] = useState({});
+
+  const getRedirectPath = (role) => (role === 'admin' ? '/admin' : `/${role}/dashboard`);
+
+  useEffect(() => {
+    if (isAuthenticated && userRole) {
+      navigate(getRedirectPath(userRole));
+    }
+  }, [isAuthenticated, userRole, navigate]);
 
   const slidesData = [
     {
@@ -89,26 +99,34 @@ const AuthPage = () => {
       setSubmitMessage({ type: 'error', text: 'Please fix the highlighted fields.' });
       return;
     }
-
     setIsSubmitting(true);
     setErrors({});
     setSubmitMessage({ type: '', text: '' });
 
-    const result = await loginApi({
-      email: formData.email.trim().toLowerCase(),
-      password: formData.password,
-    });
-     navigate(`/${result.role}/dashboard`);
+    try {
+      const result = await loginApi({
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      });
 
-    setIsSubmitting(false);
-
-    if (result.success) {
-      setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
-      login(result.role, result.token);
-      return;
+      if (result.success) {
+        const userRole = result.user?.role;
+        setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
+        login(result.role, result.token);
+        if (result.role === 'college' && !profileData?.id) {
+          navigate(`/college/add-profile`);
+        } else {
+          navigate(getRedirectPath(result.role));
+        }
+      } else {
+        setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
+      }
+    } catch (err) {
+      setSubmitMessage({ type: 'error', text: 'An unexpected error occurred. Please try again.' });
+      console.error('Login error:', err);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
   };
 
   return (

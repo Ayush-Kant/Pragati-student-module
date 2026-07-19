@@ -7,28 +7,40 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const connectionString = process.env.POSTGRESQL_URI ?? "";
+const connectionString = process.env.POSTGRESQL_URI;
 
-const pgConfig = {
+if (!connectionString) {
+  throw new Error("❌ POSTGRESQL_URI is missing in .env file");
+}
+
+export const pool = new Pool({
   connectionString,
   max: 5,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 15000,
-  ssl: process.env.NODE_ENV === "production"
-    ? { rejectUnauthorized: true }
-    : { rejectUnauthorized: false },
-};
-
-export const pool = new Pool(pgConfig);
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: true }
+      : false,
+});
 
 export const connectDB = async () => {
+  let client;
+
   try {
-    await pool.query("SELECT 1");
-    console.log("✅ PostgreSQL connected");
+    console.log("🔄 Connecting to PostgreSQL...");
+
+    client = await pool.connect();
+
+    await client.query("SELECT NOW()");
+
+    console.log("✅ PostgreSQL connected successfully");
   } catch (error) {
-    console.error("❌ PostgreSQL connection failed:", error.message);
     throw error;
+  } finally {
+    if (client) {
+      client.release();
+    }
   }
 };
-
 export default connectDB;

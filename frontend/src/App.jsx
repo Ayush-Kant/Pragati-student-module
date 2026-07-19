@@ -14,6 +14,7 @@ import mentorRoute from "./features/mentor/routes/MentorRoutes";
 import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
 import MentorLogin from "./features/mentor/pages/MentorLogin";
+import CompanyRoute from "./features/company/routes/CompanyRoute";
 
 function App() {
   return (
@@ -22,26 +23,26 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* ── Auth Routes ────────────────────────────────────────── */}
+        {/* ── Auth Routes ── */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
         {/* ── Mentor ────────────────────────────────────────────────── */}
         {mentorRoute}
+        <Route path="/mentor/login" element={<MentorLogin />} />
+        {/* <Route path="/mentor/*" element={<MentorRoute />} /> */}
 
         {/* ── Admin ─────────────────────────────────────────────────── */}
-
         {AdminRoute}
 
         {/* ── Student ───────────────────────────────────────────────── */}
         {StudentRoutes}
 
-        {/* Collge */}
-
+        {/* ── College ------------------------------------------------- */}
         {collegeRoute}
 
-        <Route path="/mentor/login" element={<MentorLogin />} />
-        {/* <Route path="/mentor/*" element={<MentorRoute />} /> */}
+        {/* ── Company ------------------------------------------------- */}
+        {CompanyRoute}
 
         {/* Public certificate verification */}
         <Route path="/verify/:code" element={<VerificationPage />} />

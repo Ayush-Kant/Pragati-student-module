@@ -18,22 +18,20 @@ export const createCourseService = async ({
       SELECT mentors.id
       FROM mentors
       INNER JOIN users ON users.id = mentors.user_id
-      WHERE users.auth_user_id = $1
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
+      WHERE auth_users.uuid_id = $1
     `;
 
     const driveQuery = `
       SELECT recruitment_drives.id
       FROM recruitment_drives
       INNER JOIN users ON users.id = recruitment_drives.mentor_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE recruitment_drives.id = $1
-        AND users.auth_user_id = $2
+        AND auth_users.uuid_id = $2
     `;
 
-    const [mentorRes, driveRes] = await Promise.all([
-      pool.query(mentorQuery, [userId]),
-      pool.query(driveQuery, [driveId, userId]),
-    ]);
-
+    const mentorRes = await pool.query(mentorQuery, [userId]);
     const mentorId = mentorRes.rows[0]?.id;
 
     if (!mentorId) {
@@ -41,6 +39,8 @@ export const createCourseService = async ({
         status: "FORBIDDEN",
       };
     }
+
+    const driveRes = await pool.query(driveQuery, [driveId, userId]);
 
     if (driveRes.rows.length === 0) {
       return {
@@ -104,17 +104,38 @@ export const createCourseService = async ({
 // ==========================================
 // 2. GET ALL COURSES FOR MENTOR
 // ==========================================
-export const getCoursesService = async ({ userId, status, driveId }) => {
+export const getCoursesService = async ({ userId, userRole, status, driveId }) => {
   try {
     // 1. Resolve mentor existence
     const mentorQuery = `
       SELECT mentors.id
       FROM mentors
       INNER JOIN users ON users.id = mentors.user_id
-      WHERE users.auth_user_id = $1
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
+      WHERE auth_users.uuid_id = $1
     `;
+
     const mentorRes = await pool.query(mentorQuery, [userId]);
     const mentorId = mentorRes.rows[0]?.id;
+
+    if (!mentorId && userRole === "mentor") {
+      // Older mentor accounts may predate mentor-profile provisioning. Create
+      // the missing profile once so a valid mentor can access their courses.
+      await pool.query(
+        `INSERT INTO mentors (user_id)
+         SELECT users.id
+         FROM users
+         INNER JOIN auth_users ON auth_users.id = users.auth_user_id
+         WHERE auth_users.uuid_id = $1
+           AND NOT EXISTS (
+             SELECT 1 FROM mentors WHERE mentors.user_id = users.id
+           )`,
+        [userId],
+      );
+
+      const ensuredMentor = await pool.query(mentorQuery, [userId]);
+      mentorId = ensuredMentor.rows[0]?.id;
+    }
 
     if (!mentorId) {
       return {
@@ -174,13 +195,14 @@ export const getCourseByIdService = async ({ userId, courseId }) => {
         courses.title,
         courses.status,
         courses.skill_tags,
-        users.auth_user_id AS mentor_auth_uid,
+        auth_users.uuid_id AS mentor_auth_uuid,
         modules.id AS module_id,
         modules.title AS module_title,
         modules.order_index
       FROM courses
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       LEFT JOIN modules ON modules.course_id = courses.id
       WHERE courses.id = $1
       ORDER BY modules.order_index ASC
@@ -198,7 +220,7 @@ export const getCourseByIdService = async ({ userId, courseId }) => {
     const firstRow = result.rows[0];
 
     // Check ownership
-    if (String(firstRow.mentor_auth_uid) !== String(userId)) {
+    if (String(firstRow.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         message: "Forbidden",
@@ -248,13 +270,14 @@ export const updateCourseService = async ({
   try {
     // 1. Single roundtrip to fetch existence, ownership and current status
     const checkQuery = `
-      SELECT 
+      SELECT
         courses.id,
         courses.status,
-        users.auth_user_id AS mentor_auth_uid
+        auth_users.uuid_id AS mentor_auth_uuid
       FROM courses
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE courses.id = $1
     `;
 
@@ -270,7 +293,7 @@ export const updateCourseService = async ({
 
     const courseData = checkRes.rows[0];
 
-    if (String(courseData.mentor_auth_uid) !== String(userId)) {
+    if (String(courseData.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         success: false,
@@ -362,12 +385,13 @@ export const deleteCourseService = async ({ courseId, userId }) => {
   try {
     // 1. Single roundtrip to fetch existence, ownership and current status
     const checkQuery = `
-      SELECT 
+      SELECT
         courses.id,
-        users.auth_user_id AS mentor_auth_uid
+        auth_users.uuid_id AS mentor_auth_uuid
       FROM courses
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE courses.id = $1
     `;
 
@@ -383,7 +407,7 @@ export const deleteCourseService = async ({ courseId, userId }) => {
 
     const courseData = checkRes.rows[0];
 
-    if (String(courseData.mentor_auth_uid) !== String(userId)) {
+    if (String(courseData.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         success: false,
@@ -423,12 +447,13 @@ export const createModuleService = async ({
   try {
     // 1. Single roundtrip to fetch existence and ownership of course
     const checkQuery = `
-      SELECT 
+      SELECT
         courses.id,
-        users.auth_user_id AS mentor_auth_uid
+        auth_users.uuid_id AS mentor_auth_uuid
       FROM courses
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE courses.id = $1
     `;
 
@@ -444,7 +469,7 @@ export const createModuleService = async ({
 
     const courseData = checkRes.rows[0];
 
-    if (String(courseData.mentor_auth_uid) !== String(userId)) {
+    if (String(courseData.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         success: false,
@@ -488,13 +513,14 @@ export const deleteModuleService = async ({ moduleId, userId }) => {
   try {
     // 1. Single roundtrip to fetch existence and ownership through module & parent course join
     const checkQuery = `
-      SELECT 
+      SELECT
         modules.id,
-        users.auth_user_id AS mentor_auth_uid
+        auth_users.uuid_id AS mentor_auth_uuid
       FROM modules
       INNER JOIN courses ON courses.id = modules.course_id
       INNER JOIN mentors ON mentors.id = courses.mentor_id
       INNER JOIN users ON users.id = mentors.user_id
+      INNER JOIN auth_users ON auth_users.id = users.auth_user_id
       WHERE modules.id = $1
     `;
 
@@ -510,7 +536,7 @@ export const deleteModuleService = async ({ moduleId, userId }) => {
 
     const moduleData = checkRes.rows[0];
 
-    if (String(moduleData.mentor_auth_uid) !== String(userId)) {
+    if (String(moduleData.mentor_auth_uuid) !== String(userId)) {
       return {
         statusCode: 403,
         success: false,

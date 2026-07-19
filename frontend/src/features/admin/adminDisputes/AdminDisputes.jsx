@@ -1,11 +1,7 @@
-import React from 'react'
+import React from 'react';
+import DisputeManagement from '../pages/DisputeManagement';
 
-const AdminDisputes = () => {
-  return (
-    <div>
-      Admin Disputes
-    </div>
-  )
+export default function () {
+  return <div> <DisputeManagement /></div>;
 }
 
-export default AdminDisputes
