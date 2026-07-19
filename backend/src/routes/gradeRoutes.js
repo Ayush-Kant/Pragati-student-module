@@ -8,8 +8,7 @@ import { authorizeAssignmentAccess } from "../middleware/authorizeAssignmentAcce
 
 const router = express.Router();
 
-router.use(authenticateJWT, authorizeAssignmentAccess);
-router.get("/grades", gradeController.getGrades);
-router.patch("/:id/grade", validateRequest(validateAssignmentParams, "params"), validateRequest(validateGrade, "body"), gradeController.updateGrades);
+router.get("/grades", authenticateJWT, gradeController.getGrades);
+router.patch("/:id/grade", authenticateJWT, authorizeAssignmentAccess, validateRequest(validateAssignmentParams, "params"), validateRequest(validateGrade, "body"), gradeController.updateGrades);
 
 export default router;

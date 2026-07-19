@@ -33,17 +33,41 @@ export const submitAssignment = async (studentId, assignmentId, payload = {}) =>
       status = EXCLUDED.status,
       updated_at = NOW()
     RETURNING id, assignment_id AS "assignmentId", student_id AS "studentId", file_url AS "fileUrl", content, status, submitted_at AS "submittedAt", updated_at AS "updatedAt"
-  `, [assignmentId, studentId, payload.fileUrl || null, payload.content || null, payload.status || "Submitted"]);
+  `, [assignmentId, studentId, payload.fileUrl ?? null, payload.content ?? null, payload.status ?? "Submitted"]);
   return result.rows[0];
 };
 
 export const updateSubmission = async (studentId, assignmentId, payload = {}) => {
+  const updateFields = [];
+  const values = [assignmentId, studentId];
+
+  if (Object.prototype.hasOwnProperty.call(payload, "fileUrl")) {
+    updateFields.push(`file_url = $${values.length + 1}`);
+    values.push(payload.fileUrl ?? null);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, "content")) {
+    updateFields.push(`content = $${values.length + 1}`);
+    values.push(payload.content ?? null);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, "status")) {
+    updateFields.push(`status = $${values.length + 1}`);
+    values.push(payload.status ?? null);
+  }
+
+  if (updateFields.length === 0) {
+    return null;
+  }
+
+  updateFields.push("updated_at = NOW()");
+
   const result = await pool.query(`
     UPDATE assignment_submissions
-    SET file_url = COALESCE($3, file_url), content = COALESCE($4, content), status = COALESCE($5, status), updated_at = NOW()
+    SET ${updateFields.join(", ")}
     WHERE assignment_id = $1 AND student_id = $2
     RETURNING id, assignment_id AS "assignmentId", student_id AS "studentId", file_url AS "fileUrl", content, status, submitted_at AS "submittedAt", updated_at AS "updatedAt"
-  `, [assignmentId, studentId, payload.fileUrl || null, payload.content || null, payload.status || null]);
+  `, values);
   return result.rows[0] || null;
 };
 

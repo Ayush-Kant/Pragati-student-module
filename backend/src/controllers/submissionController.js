@@ -12,6 +12,11 @@ export const submitAssignment = async (req, res, next) => {
 export const updateSubmission = async (req, res, next) => {
   try {
     const submission = await submissionService.updateSubmission(req.user.id, req.validatedParams?.id || req.params.id, req.validatedBody || req.body);
+    if (!submission) {
+      const error = new Error("Submission not found");
+      error.status = 404;
+      throw error;
+    }
     res.status(200).json({ success: true, message: "Submission updated successfully", data: submission });
   } catch (error) {
     next(error);

@@ -22,13 +22,16 @@ const createGradeTable = async () => {
   `);
 };
 
-export const getGrades = async (query = {}) => {
+export const getGrades = async (query = {}, user = {}) => {
+  const assignmentId = query.assignmentId || null;
+  const studentId = user?.role === "student" ? user.id : (query.studentId || null);
   const result = await pool.query(`
     SELECT id, assignment_id AS "assignmentId", student_id AS "studentId", marks, grade, created_at AS "createdAt", updated_at AS "updatedAt"
     FROM assignment_grades
-    WHERE ($1::text IS NULL OR assignment_id = $1::int)
+    WHERE ($1::int IS NULL OR assignment_id = $1::int)
+      AND ($2::int IS NULL OR student_id = $2::int)
     ORDER BY updated_at DESC
-  `, [query.assignmentId || null]);
+  `, [assignmentId, studentId]);
   return result.rows;
 };
 

@@ -8,8 +8,7 @@ import { authorizeAssignmentAccess } from "../middleware/authorizeAssignmentAcce
 
 const router = express.Router();
 
-router.use(authenticateJWT, authorizeAssignmentAccess);
-router.get("/deadlines", deadlineController.getDeadlines);
-router.patch("/:id/deadline", validateRequest(validateAssignmentParams, "params"), validateRequest(validateDeadline, "body"), deadlineController.updateDeadline);
+router.get("/deadlines", authenticateJWT, deadlineController.getDeadlines);
+router.patch("/:id/deadline", authenticateJWT, authorizeAssignmentAccess, validateRequest(validateAssignmentParams, "params"), validateRequest(validateDeadline, "body"), deadlineController.updateDeadline);
 
 export default router;
