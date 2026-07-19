@@ -23,13 +23,20 @@ const useDashboardData = (studentId = DEMO_STUDENT_ID) => {
     try {
       const data = await getDashboardData(studentId);
 
-      setActiveDrive(data.activeDrive);
-      setQuickStats(data.quickStats);
-      setProgressRing(data.progressRing);
-      setUpcomingSessions(data.upcomingSessions);
-      setPendingTasks(data.pendingTasks);
-      setLeaderboard(data.leaderboard);
-      setRecentNotifications(data.recentNotifications);
+      // 💡 FIX: Map incoming API response structures to match UI expectations
+      setActiveDrive(data?.student || null);
+      
+      setQuickStats(data?.statistics || null);
+      
+      setProgressRing(data?.progress || null);
+      
+      setUpcomingSessions(data?.upcomingActivities?.sessions || []);
+      
+      setPendingTasks(data?.upcomingActivities?.tasks || []);
+      
+      setLeaderboard(data?.achievements?.leaderboard || []);
+      
+      setRecentNotifications(data?.notifications || []);
 
       setLoadingState(LOADING_STATES.SUCCESS);
     } catch (err) {

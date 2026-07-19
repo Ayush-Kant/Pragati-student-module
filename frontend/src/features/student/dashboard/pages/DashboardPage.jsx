@@ -2,13 +2,18 @@ import React from "react";
 import useDashboardData from "../hooks/useDashboardData";
 import LeaderboardPreview from "../components/leaderboard/LeaderboardPreview";
 
-// ── Correct Modularity: Import your newly created sub-components ──
-import ActiveDriveCard from "../components/drives/ActiveDriveCard";
-import QuickStats from "../components/stats/QuickStats";
-import ProgressRing from "../components/progress/ProgressRing";
-import UpcomingSessions from "../components/sessions/UpcomingSessions";
-import PendingTasks from "../components/tasks/PendingTasks";
-import NotificationsList from "../components/notifications/NotificationsList";
+// ── Overview Components ──
+import WelcomeBanner from "../components/stats/WelcomeBanner";
+import StatisticsCards from "../components/stats/StatisticsCards";
+import QuickActions from "../components/stats/QuickActions";
+
+// ── Progress & Drives Components ──
+import ActiveDriveCard from "../components/activeDrive/ActiveDriveCard";
+import ProgressOverview from "../components/progress/ProgressOverview";
+
+// ── Activity & Notification Components ──
+import UpcomingActivities from "../components/sessions/UpcomingActivities";
+import NotificationPanel from "../components/notifications/NotificationPanel";
 
 const DashboardPage = () => {
   const {
@@ -29,33 +34,46 @@ const DashboardPage = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
         {/* ── Page Header ── */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
-            <p className="text-sm text-gray-500 mt-1">Your placement journey at a glance</p>
-          </div>
-        </div>
+        <WelcomeBanner />
 
         {/* ── Global Error Banner ── */}
         {error && (
           <div className="mb-5 flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 text-sm font-medium px-4 py-3 rounded-xl">
             <span className="flex items-center gap-2">⚠ {error}</span>
-            <button onClick={refetch} className="text-xs font-semibold underline hover:text-red-800 transition-colors">Retry</button>
+            <button onClick={refetch} className="text-xs font-semibold underline hover:text-red-800 transition-colors">
+              Retry
+            </button>
           </div>
         )}
 
-        {/* ── Top Row (Metrics & Progress) ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
-          <ActiveDriveCard data={activeDrive} loading={loading} />
-          <QuickStats data={quickStats} loading={loading} />
-          <ProgressRing data={progressRing} loading={loading} />
+        {/* ── Top Metrics Row ── */}
+        <StatisticsCards data={quickStats} loading={loading} />
+
+        {/* ── Placement Drives & Quick Actions ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+          <div className="lg:col-span-2">
+            <ActiveDriveCard data={activeDrive} loading={loading} />
+          </div>
+          <div className="lg:col-span-1">
+            <QuickActions />
+          </div>
         </div>
 
-        {/* ── Middle Row (Schedules & Deliverables) ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
-          <UpcomingSessions data={upcomingSessions} loading={loading} />
-          <PendingTasks data={pendingTasks} loading={loading} />
-          <NotificationsList data={recentNotifications} loading={loading} />
+        {/* ── Progress Metrics Section ── */}
+        <ProgressOverview data={progressRing} loading={loading} />
+
+        {/* ── Middle Row (Schedules, Deliverables & Logs) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+          <div className="lg:col-span-2">
+            <UpcomingActivities 
+              sessions={upcomingSessions} 
+              tasks={pendingTasks} 
+              loading={loading} 
+            />
+          </div>
+          <div className="lg:col-span-1">
+            <NotificationPanel data={recentNotifications} loading={loading} />
+          </div>
         </div>
 
         {/* ── Bottom Row (Leaderboard Evaluation) ── */}
