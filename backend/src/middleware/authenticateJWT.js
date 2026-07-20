@@ -1,32 +1,68 @@
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+// ─────────────────────────────────────────────────────────────────────────────
+//  authenticateJWT.js
+//  Middleware: verifies the JWT Bearer token on every protected route.
+//
+//  On success: attaches req.user = { userId, email, role } and calls next().
+//  On failure: returns 401 Unauthorized.
+//
+//  JWT payload shape (set by auth.controller.js):
+//    { userId: string (uuid_id), email: string, role: string }
+// ─────────────────────────────────────────────────────────────────────────────
 
-dotenv.config();
+import jwt from 'jsonwebtoken';
 
-export const authenticateJWT = (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
+/**
+ * authenticateJWT
+ * ────────────────
+ * Express middleware that validates the Authorization header.
+ *
+ * Expected header format:
+ *   Authorization: Bearer <token>
+ */
+const authenticateJWT = (req, res, next) => {
+    const authHeader = req.headers['authorization'] ?? req.headers['Authorization'];
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ success: false, message: "No token provided" });
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({
+            success: false,
+            message: 'Authentication required. Please provide a valid Bearer token.',
+        });
     }
 
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = {
-      ...decoded,
-      id: decoded.id ?? decoded.userId ?? decoded.sub ?? null,
-    };
-    next();
-  } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ success: false, message: "Token expired" });
+    const token = authHeader.slice(7).trim();
+
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: 'Authentication token is missing.',
+        });
     }
-    if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({ success: false, message: "Invalid token" });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        req.user = {
+            ...decoded,
+            id: decoded.id ?? decoded.userId ?? decoded.sub ?? null,
+            userId: decoded.userId ?? decoded.id ?? decoded.sub ?? null,
+            email: decoded.email,
+            role: decoded.role,
+        };
+
+        next();
+    } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                success: false,
+                message: 'Session expired. Please log in again.',
+            });
+        }
+
+        return res.status(401).json({
+            success: false,
+            message: 'Invalid authentication token.',
+        });
     }
-    return res.status(401).json({ success: false, message: "Unauthorized" });
-  }
 };
 
 export default authenticateJWT;

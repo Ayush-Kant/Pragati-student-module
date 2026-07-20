@@ -31,6 +31,8 @@ import deadlineRoutes from "./src/routes/deadlineRoutes.js";
 import initializeLiveSessionModule from "./src/database/migrations/liveSessionSchema.js";
 import initializeAssignmentModule from "./src/database/migrations/assignmentSchema.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
+import studentProfileRouter from "./src/routes/index.js";
+import errorHandler from "./src/middleware/errorHandler.js";
 
 dotenv.config();
 
@@ -94,6 +96,10 @@ app.get("/", (req, res) => {
   });
 });
 
+// ── Student Profile Module Routes ─────────────────────────────────────────────
+app.use(studentProfileRouter);
+
+// ── Global Error Handler (must be last) ──────────────────────────────────────
 app.use(errorMiddleware);
 
 connectDB()

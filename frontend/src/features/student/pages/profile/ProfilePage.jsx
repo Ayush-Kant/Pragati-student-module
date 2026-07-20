@@ -2,6 +2,7 @@ import { useState } from "react";
 import ProfileEditForm from "../../components/profile/ProfileEditForm";
 import ProjectCard from "../../components/profile/ProjectCard";
 
+// Basic URL validation used for social links
 const validateSocialLinks = (links = {}) => {
   const errors = {};
   const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
@@ -55,7 +56,7 @@ const SKILL_ICONS = {
   React: { bg: "bg-blue-50", text: "text-blue-600", icon: "⚛️" },
   "Node.js": { bg: "bg-green-50", text: "text-green-600", icon: "🟢" },
   Python: { bg: "bg-yellow-50", text: "text-yellow-600", icon: "🐍" },
-  SQL: { bg: "bg-gray-100", text: "text-gray-700", icon: "𗄞" },
+  SQL: { bg: "bg-gray-100", text: "text-gray-700", icon: "🗄️" },
   Git: { bg: "bg-red-50", text: "text-red-600", icon: "🔀" },
   default: { bg: "bg-gray-50", text: "text-gray-600", icon: "💡" },
 };
@@ -164,6 +165,7 @@ const ProfilePage = () => {
         </div>
 
         {!isEditing && (
+<<<<<<< HEAD
           <>
             <div className="relative bg-white rounded-2xl border border-gray-100 shadow-sm px-4 sm:px-8 py-5 sm:py-7 mb-5 overflow-hidden">
               <div className="absolute right-0 top-0 w-48 h-full overflow-hidden pointer-events-none">
@@ -197,6 +199,27 @@ const ProfilePage = () => {
                   <InfoField label="Department" value={profile.department} />
                   <InfoField label="Batch" value={profile.batch} />
                   <InfoField label="CGPA" value={profile.cgpa} />
+=======
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div className="lg:col-span-2 bg-white rounded-2xl border p-6">
+              <h3 className="font-bold mb-5">Personal Information</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <InfoField label="Email" value={profile.email} />
+                <InfoField label="Phone" value={profile.phone} />
+                <InfoField label="City" value={profile.city} />
+                <InfoField label="Department" value={profile.department} />
+                <InfoField label="Batch" value={profile.batch} />
+                <InfoField label="CGPA" value={profile.cgpa} />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border p-6">
+              <div className="flex items-center gap-5 mb-4">
+                <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold">{initials}</div>
+                <div>
+                  <h2 className="text-xl font-bold">{profile.name}</h2>
+                  <p className="text-sm text-gray-500">{profile.department}</p>
+>>>>>>> origin/student-team
                 </div>
               </div>
 
