@@ -27,8 +27,8 @@ END $$;
 -- Dummy data so assign-test can be tested end to end.
 INSERT INTO assessments (title, type, difficulty, time_limit_minutes, total_marks)
 VALUES
-  ('MERN Stack Screening Test', 'mcq', 'medium', 45, 100),
-  ('DSA Coding Round', 'coding', 'hard', 60, 100)
+  ('MERN Stack Screening Test', 'MCQ', 'Medium', 45, 100),
+  ('DSA Coding Round', 'Coding', 'Hard', 60, 100)
 ON CONFLICT DO NOTHING;
 
 -- Dummy course data so assign-course's success path can also be tested

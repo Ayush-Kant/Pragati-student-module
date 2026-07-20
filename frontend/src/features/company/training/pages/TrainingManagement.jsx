@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, Award, Calendar, CheckCircle2, BookOpen, User, Users, AlertCircle, Edit, Star, Clock } from 'lucide-react';
 import { TrainingHeader } from '../components/TrainingHeader';
 import { TrainingAnalyticsCards } from '../components/TrainingAnalyticsCards';
 import { TrainingFilters } from '../components/TrainingFilters';
@@ -10,19 +10,26 @@ import api from '../../../../services/api';
 import "../../styles/companyDashboard.css";
 
 
-// PRD returns: { trainingId, title, mentor, status, completionPercentage, attendancePercentage, studentCount }
-const normalize = (p) => ({
-  id:             p.trainingId,
-  program:        p.title,
-  mentor:         p.mentor ?? '—',
-  mentorInitials: (p.mentor ?? '')
-                    .split(' ').slice(0, 2)
-                    .map(w => w[0]?.toUpperCase() ?? '').join(''),
-  students:       p.studentCount ?? 0,
-  completion:     p.completionPercentage != null ? `${p.completionPercentage}%` : '—',
-  attendance:     p.attendancePercentage  != null ? `${p.attendancePercentage}%`  : '—',
-  status:         p.status ?? 'Active',
-});
+const toTitleCase = (str) => {
+  if (!str) return 'Active';
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
+const normalize = (p) => {
+  const mentorName = p.mentor && typeof p.mentor === 'object' ? p.mentor.name : (typeof p.mentor === 'string' ? p.mentor : '');
+  return {
+    id:             p.trainingId,
+    program:        p.title,
+    mentor:         mentorName || '—',
+    mentorInitials: mentorName
+                      ? mentorName.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('')
+                      : '—',
+    students:       p.candidatesEnrolled ?? p.studentCount ?? 0,
+    completion:     p.completionPercentage != null ? `${p.completionPercentage}%` : '—',
+    attendance:     p.attendancePercentage  != null ? `${p.attendancePercentage}%`  : '—',
+    status:         p.status ? toTitleCase(p.status) : 'Active',
+  };
+};
 
 export const TrainingManagement = () => {
   const [trainingData, setTrainingData] = useState([]);
@@ -120,6 +127,21 @@ export const TrainingManagement = () => {
     setSelectedProgram(prev => ({ ...prev, students: newStudentList.length }));
   };
 
+  const handleMentorAssigned = (programId, mentorName) => {
+    setTrainingData(prev =>
+      prev.map(p => p.id === programId
+        ? {
+            ...p,
+            mentor: mentorName,
+            mentorInitials: mentorName !== '—'
+              ? mentorName.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('')
+              : '—'
+          }
+        : p
+      )
+    );
+  };
+
   //Loading state
   if (loading) {
     return (
@@ -166,7 +188,7 @@ export const TrainingManagement = () => {
       </div>
 
       {activeModal === 'view' && selectedProgram && (
-        <ViewProgramModal program={selectedProgram} onClose={closeModal} />
+        <ViewProgramModal program={selectedProgram} onClose={closeModal} onMentorAssigned={handleMentorAssigned} />
       )}
       {activeModal === 'edit' && selectedProgram && (
         <EditProgramModal
@@ -194,9 +216,9 @@ export const TrainingManagement = () => {
 };
 
 /* ─── Shared modal shell ──────────────────────────────────────────────────── */
-const ModalShell = ({ title, subtitle, onClose, children, footer }) => (
+const ModalShell = ({ title, subtitle, onClose, children, footer, maxWidth = 'max-w-2xl' }) => (
   <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-    <div className="responsive-modal-panel relative bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
+    <div className={`responsive-modal-panel relative bg-white rounded-2xl shadow-xl w-full ${maxWidth} mx-4 max-h-[85vh] overflow-y-auto`}>
       <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
         <div>
           <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
@@ -218,28 +240,86 @@ const ModalShell = ({ title, subtitle, onClose, children, footer }) => (
 
 /* ─── View Program Modal ─────────────────────────────────────────────────────
    PRD: GET /api/v1/company/training/:id                                         */
-const ViewProgramModal = ({ program, onClose }) => {
-  const [detail, setDetail]   = useState(null);
+const ViewProgramModal = ({ program, onClose, onMentorAssigned }) => {
+  const [detail, setDetail] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
+  const [mentorsList, setMentorsList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [assigning, setAssigning] = useState(false);
+  const [selectedMentorId, setSelectedMentorId] = useState("");
+  const [showMentorDropdown, setShowMentorDropdown] = useState(false);
 
   useEffect(() => {
-    const fetchDetail = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get(`/api/v1/company/training/${program.id}`);
-        setDetail(res.data.data);
-      } catch {
-        toast.error('Failed to load program details');
+        setLoading(true);
+        const [detailRes, analyticsRes, mentorsRes] = await Promise.all([
+          api.get(`/v1/company/training/${program.id}`),
+          api.get(`/v1/company/training/${program.id}/progress`),
+          api.get("/v1/company/training/mentors").catch(() => ({ data: { data: [] } }))
+        ]);
+        setDetail(detailRes.data.data);
+        setAnalytics(analyticsRes.data.data);
+        setMentorsList(mentorsRes.data?.data || []);
+        if (detailRes.data.data?.mentor?.mentorId) {
+          setSelectedMentorId(detailRes.data.data.mentor.mentorId);
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load training details");
       } finally {
         setLoading(false);
       }
     };
-    fetchDetail();
+    fetchData();
   }, [program.id]);
+
+  const handleAssignMentor = async () => {
+    if (!selectedMentorId) {
+      toast.error("Please select a mentor first");
+      return;
+    }
+    try {
+      setAssigning(true);
+      await api.patch(`/v1/company/training/${program.id}/assign-mentor`, {
+        mentorId: selectedMentorId
+      });
+      const selectedMentor = mentorsList.find(m => String(m.mentorId) === String(selectedMentorId));
+      const mentorName = selectedMentor ? selectedMentor.name : "—";
+      
+      setDetail(prev => ({
+        ...prev,
+        mentor: selectedMentor 
+          ? { mentorId: selectedMentor.mentorId, name: selectedMentor.name, email: selectedMentor.email }
+          : null
+      }));
+      
+      onMentorAssigned(program.id, mentorName);
+      toast.success("Mentor assigned successfully");
+      setShowMentorDropdown(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to assign mentor");
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "—";
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+  };
 
   return (
     <ModalShell
-      title="Program Details"
+      title="Program Coordination Dashboard"
+      subtitle={`${detail?.title ?? program.program} · Training Analytics & Mentor Sync`}
       onClose={onClose}
+      maxWidth="max-w-4xl"
       footer={
         <button onClick={onClose} className="px-6 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition">
           Close
@@ -247,26 +327,265 @@ const ViewProgramModal = ({ program, onClose }) => {
       }
     >
       {loading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        <div className="flex justify-center py-16">
+          <Loader2 className="w-10 h-10 animate-spin text-gray-400" />
         </div>
       ) : (
-        <div className="space-y-5">
-          {[
-            ['Program Name', detail?.title         ?? program.program],
-            ['Mentor',       detail?.mentor         ?? program.mentor],
-            ['Students',     detail?.studentCount   ?? program.students],
-            ['Completion',   detail?.completionPercentage != null ? `${detail.completionPercentage}%` : program.completion],
-            ['Attendance',   detail?.attendancePercentage != null ? `${detail.attendancePercentage}%` : program.attendance],
-          ].map(([label, value]) => (
-            <div key={label}>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{label}</p>
-              <p className="text-gray-800 font-medium text-[15px]">{value}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left Column: Basic Details & Mentor Assignment */}
+          <div className="space-y-6">
+            <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100 space-y-4">
+              <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <BookOpen size={16} className="text-blue-500" />
+                Program Information
+              </h4>
+              
+              <div>
+                <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Program Title</p>
+                <p className="text-gray-800 font-semibold text-[15px]">{detail?.title ?? program.program}</p>
+              </div>
+
+              {detail?.description && (
+                <div>
+                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Description</p>
+                  <p className="text-gray-600 text-sm">{detail.description}</p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Duration</p>
+                  <p className="text-gray-800 font-medium text-sm flex items-center gap-1.5">
+                    <Clock size={14} className="text-gray-400" />
+                    {detail?.duration ? `${detail.duration} weeks` : "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Status</p>
+                  <div className="mt-1">
+                    <TrainingStatusBadge status={detail?.status ?? program.status} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Start Date</p>
+                  <p className="text-gray-800 font-medium text-sm flex items-center gap-1.5">
+                    <Calendar size={14} className="text-gray-400" />
+                    {formatDate(detail?.startDate)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">End Date</p>
+                  <p className="text-gray-800 font-medium text-sm flex items-center gap-1.5">
+                    <Calendar size={14} className="text-gray-400" />
+                    {formatDate(detail?.endDate)}
+                  </p>
+                </div>
+              </div>
             </div>
-          ))}
-          <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Status</p>
-            <TrainingStatusBadge status={detail?.status ?? program.status} />
+
+            {/* Mentor Coordination Section */}
+            <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100 space-y-4">
+              <div className="flex justify-between items-center">
+                <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                  <User size={16} className="text-blue-500" />
+                  Mentor Alignment
+                </h4>
+                {!showMentorDropdown && (
+                  <button
+                    onClick={() => setShowMentorDropdown(true)}
+                    className="text-xs text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                  >
+                    <Edit size={12} />
+                    Change Mentor
+                  </button>
+                )}
+              </div>
+
+              {showMentorDropdown ? (
+                <div className="space-y-3 bg-white p-4 rounded-xl border border-gray-200">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Select Active Mentor</label>
+                    <select
+                      value={selectedMentorId}
+                      onChange={(e) => setSelectedMentorId(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">-- Choose Mentor --</option>
+                      {mentorsList.map((m) => (
+                        <option key={m.mentorId} value={m.mentorId}>
+                          {m.name} ({m.email})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex justify-end gap-2 pt-1">
+                    <button
+                      onClick={() => setShowMentorDropdown(false)}
+                      className="px-3.5 py-1.5 border border-gray-200 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-50 transition"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAssignMentor}
+                      disabled={assigning}
+                      className="px-3.5 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-1"
+                    >
+                      {assigning && <Loader2 size={12} className="animate-spin" />}
+                      Save Assignment
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+                    {detail?.mentor?.name
+                      ? detail.mentor.name.split(" ").slice(0, 2).map(w => w[0]?.toUpperCase()).join("")
+                      : "—"}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">{detail?.mentor?.name ?? "No mentor assigned yet"}</p>
+                    {detail?.mentor?.email && (
+                      <p className="text-xs text-gray-400">{detail.mentor.email}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Performance Analytics & Progress */}
+          <div className="space-y-6">
+            <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100 space-y-5">
+              <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                <Users size={16} className="text-blue-500" />
+                Candidate Analytics
+              </h4>
+
+              {/* Completion Progress */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-semibold">
+                  <span className="text-gray-400 uppercase tracking-wider">Completion Rate</span>
+                  <span className="text-blue-600 font-bold">{analytics?.completionPercentage ?? 0}%</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-500" 
+                    style={{ width: `${analytics?.completionPercentage ?? 0}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Attendance Progress */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-semibold">
+                  <span className="text-gray-400 uppercase tracking-wider">Attendance Rate</span>
+                  <span className="text-indigo-600 font-bold">{analytics?.attendanceRate ?? 0}%</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div 
+                    className="bg-indigo-500 h-2 rounded-full transition-all duration-500" 
+                    style={{ width: `${analytics?.attendanceRate ?? 0}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Assignment Submissions */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-semibold">
+                  <span className="text-gray-400 uppercase tracking-wider">Assignment Submissions</span>
+                  <span className="text-purple-600 font-bold">
+                    {analytics?.assignmentSubmissions?.completed ?? 0} Completed
+                  </span>
+                </div>
+                <div className="flex h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                  {((analytics?.assignmentSubmissions?.completed ?? 0) + (analytics?.assignmentSubmissions?.pending ?? 0)) > 0 ? (
+                    <>
+                      <div 
+                        className="bg-purple-500 h-full" 
+                        style={{ width: `${((analytics?.assignmentSubmissions?.completed ?? 0) / ((analytics?.assignmentSubmissions?.completed ?? 0) + (analytics?.assignmentSubmissions?.pending ?? 0))) * 100}%` }}
+                      ></div>
+                      <div 
+                        className="bg-amber-400 h-full" 
+                        style={{ width: `${((analytics?.assignmentSubmissions?.pending ?? 0) / ((analytics?.assignmentSubmissions?.completed ?? 0) + (analytics?.assignmentSubmissions?.pending ?? 0))) * 100}%` }}
+                      ></div>
+                    </>
+                  ) : (
+                    <div className="bg-gray-200 w-full h-full"></div>
+                  )}
+                </div>
+                <div className="flex gap-4 text-[10px] text-gray-400 font-medium">
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>Completed ({analytics?.assignmentSubmissions?.completed ?? 0})</span>
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>Pending ({analytics?.assignmentSubmissions?.pending ?? 0})</span>
+                </div>
+              </div>
+
+              {/* Engagement & Performance Ratings */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-white rounded-xl border border-gray-100 space-y-1">
+                  <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Engagement Rating</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xl font-bold text-gray-800">{analytics?.engagementScore ?? "0.0"}</span>
+                    <div className="flex text-amber-400">
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <Star 
+                          key={i} 
+                          size={13} 
+                          fill={i < Math.round(analytics?.engagementScore ?? 0) ? "currentColor" : "none"} 
+                          stroke="currentColor" 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-white rounded-xl border border-gray-100 space-y-1">
+                  <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Perf Rating (Avg)</span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-xl font-bold text-gray-800">{analytics?.performanceMetrics?.average ?? 0}</span>
+                    <div className="text-[9px] text-gray-400 flex gap-2 font-bold uppercase">
+                      <div>
+                        <span className="text-green-600 block">{analytics?.performanceMetrics?.highest ?? 0}</span>
+                        <span>High</span>
+                      </div>
+                      <div>
+                        <span className="text-red-500 block">{analytics?.performanceMetrics?.lowest ?? 0}</span>
+                        <span>Low</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Readiness Evaluation indicator */}
+              {analytics?.completionPercentage >= 75 ? (
+                <div className="p-4 bg-emerald-50 text-emerald-800 rounded-xl flex items-center gap-3 border border-emerald-100">
+                  <Award className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold">High Hiring Readiness</p>
+                    <p className="text-xs text-emerald-600">Students have achieved a readiness evaluation score &gt; 75%.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 bg-amber-50 text-amber-800 rounded-xl flex items-center gap-3 border border-amber-100">
+                  <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold">Training In Progress</p>
+                    <p className="text-xs text-amber-600">Completion score is {analytics?.completionPercentage ?? 0}%. Target is 75% before final interviews.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Mentor feedback */}
+              <div className="p-4 bg-white border border-dashed border-gray-200 rounded-xl space-y-1.5">
+                <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Latest Mentor Feedback</span>
+                <p className="text-sm text-gray-600 italic">
+                  {analytics?.mentorFeedback ? `"${analytics.mentorFeedback}"` : "No qualitative feedback submitted by mentor yet."}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}

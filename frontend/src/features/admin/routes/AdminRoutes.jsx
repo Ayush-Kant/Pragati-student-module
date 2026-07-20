@@ -3,79 +3,43 @@ import AdminLayout from "../adminLayout";
 import AdminDashboard from "../adminDashboard/AdminDashboard";
 import AdminCompanies from "../adminCompanies/AdminCompanies";
 import AdminCollege from "../adminColleges/AdminCollege";
+import StudentDetail from "../pages/StudentDetail";
 import CollegeDetail from "../pages/CollegeDetail";
 import AdminStudent from "../adminStudents/AdminStudent";
 import AdminMentors from "../adminMentors/AdminMentors";
 import AdminTraining from "../adminTraining/AdminTraining";
 import AdminDrives from "../adminDrives/AdminDrives";
+import DriveDetail from "../pages/DriveDetail";
 import AdminNotifications from "../adminNotifications/AdminNotifications";
 import AdminDisputes from "../adminDisputes/AdminDisputes";
 import AdminAssesment from "../adminAssesments/AdminAssesment";
 import AdminProfile from "../pages/AdminProfile";
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
-
 import CompanyDetail from "../pages/CompanyDetail";
 import ActiveDrives from "../pages/ActiveDrives";
 import CompanyRankings from "../pages/CompanyRankings";
-import MentorDetail from "../pages/MentorDetail";
-import DriveDetail from "../pages/DriveDetail";
-import AssessmentDetail from "../pages/AssessmentDetail";
-import PublishAssessmentModal from "../components/PublishAssessmentModal";
-import QuestionFormPage from "../components/QuestionFormPage";
-import AssignAssessmentModal from "../components/AssignAssessmentModal";
-import AssessmentQuestionList from "../components/AssessmentQuestionList";
 
-const adminRoutes = (
-  <Route path="admin" element={<AdminLayout />}>
-    <Route index element={<AdminDashboard />} />
-    <Route path="dashboard" element={<AdminDashboard />} />
-    <Route path="profile" element={<AdminProfile />} />
-
-    <Route path="companies" element={<AdminCompanies />} />
-    <Route path="colleges" element={<AdminCollege />} />
-    <Route path="colleges/:id" element={<CollegeDetail />} />
-
-    <Route path="students" element={<AdminStudent />} />
-    <Route path="mentors" element={<AdminMentors />} />
-
-    <Route path="assesments" element={<AdminAssesment />} />
-    <Route path="assessments/:id" element={<AssessmentDetail />} />
-    <Route
-      path="assessments/:id/questions"
-      element={<QuestionFormPage />}
-    />
-    <Route
-      path="assessments/:id/publish"
-      element={<PublishAssessmentModal />}
-    />
-    <Route
-      path="assessments/:id/assign"
-      element={<AssignAssessmentModal />}
-    />
-    <Route
-      path="assessments/:id/questions/:qid"
-      element={<AssessmentQuestionList />}
-    />
-
-    <Route path="training" element={<AdminTraining />} />
-
-    <Route path="drives" element={<AdminDrives />} />
-    <Route path="drives/:id" element={<DriveDetail />} />
-
-    <Route path="notification" element={<AdminNotifications />} />
-    <Route path="disputes" element={<AdminDisputes />} />
-  </Route>
-);
-
-const AdminRoute = import.meta.env.DEV ? (
-  adminRoutes
-) : (
-  <Route element={<PrivateRoute />}>
-    <Route element={<RoleRoute allowedRoles={["admin"]} />}>
-      {adminRoutes}
-    </Route>
-  </Route>
-);
+const AdminRoute = (
+      <Route path="admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path='profile' element={<AdminProfile />} />
+        <Route path='companies' element={<AdminCompanies />} />
+        <Route path="companies/rankings" element={<CompanyRankings />} />
+        <Route path="companies/:id" element={<CompanyDetail />} />
+        <Route path="companies/active-drives" element={<ActiveDrives />} />
+        <Route path='colleges' element={<AdminCollege />} />
+        <Route path='colleges/:id' element={<CollegeDetail />} />
+        <Route path='students' element={<AdminStudent />} />
+        <Route path='students/:id' element={<StudentDetail />} />    
+        <Route path='mentors' element={<AdminMentors />} />
+        <Route path='assesments' element={<AdminAssesment />} />
+        <Route path='training' element={<AdminTraining />} />
+        <Route path='drives' element={<AdminDrives />} />
+        <Route path='drives/:id' element={<DriveDetail />} />
+        <Route path='notification' element={<AdminNotifications />} />
+        <Route path='disputes' element={<AdminDisputes />} />
+      </Route>
+)
 
 export default AdminRoute;

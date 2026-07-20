@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import bcrypt from "bcrypt";
 
 async function seedData() {
   const client = await pool.connect();
@@ -8,9 +9,6 @@ async function seedData() {
     console.log("Clearing existing data...");
     await client.query(`
       TRUNCATE TABLE 
-        mentor_feedback,
-        training_progress,
-        trainings,
         admin_audit_log,
         student_drive_progress, 
         recruitment_drives, 
@@ -22,9 +20,17 @@ async function seedData() {
         users, 
         auth_users,
         students,
+        trainings,
+        training_progress,
+        mentor_feedback,
         dashboard_stats,
         dashboard_activities,
-        dashboard_reports
+        dashboard_reports,
+        live_sessions,
+        session_attendance,
+        session_participants,
+        session_recordings,
+        session_schedules
       RESTART IDENTITY CASCADE;
     `);
 
@@ -49,87 +55,117 @@ async function seedData() {
     `);
 
     console.log("Inserting auth_users...");
-    // 1. Mentor
-    await client.query(`
-      INSERT INTO auth_users (id, uuid_id, email, password_hash, role) VALUES 
-      (1, 'uuid-mentor-1', 'mentor@example.com', '$2b$10$wEdbVskJ22j29f8f292jf2', 'mentor')
-    `);
-    // 2. Company Representative User
-    await client.query(`
-      INSERT INTO auth_users (id, uuid_id, email, password_hash, role) VALUES 
-      (2, 'uuid-company-1', 'hr@google.com', '$2b$10$wEdbVskJ22j29f8f292jf2', 'company')
-    `);
-    // 3. Student User
-    await client.query(`
-      INSERT INTO auth_users (id, uuid_id, email, password_hash, role) VALUES 
-      (3, 'uuid-student-1', 'student@example.com', '$2b$10$wEdbVskJ22j29f8f292jf2', 'student')
-    `);
+    const passwordHash = await bcrypt.hash("Password123", 10);
+    const authUserResult = await client.query(`
+      INSERT INTO auth_users (id, email, password_hash, role) VALUES 
+      (1, 'mentor@example.com', $1, 'mentor'),
+      (2, 'company@gmail.com', $1, 'company')
+      RETURNING id, email, role;
+    `, [passwordHash]);
+    const authUser = authUserResult.rows[0];
 
     console.log("Inserting users...");
-    await client.query(`
+    const userResult = await client.query(`
       INSERT INTO users (id, full_name, auth_user_id, email, role) VALUES 
-      (1, 'John Doe', 1, 'mentor@example.com', 'mentor')
+      (1, 'John Doe', 1, 'mentor@example.com', 'mentor'),
+      (2, 'Company Admin', 2, 'company@gmail.com', 'company')
+      RETURNING id, full_name, role;
     `);
-    await client.query(`
-      INSERT INTO users (id, full_name, auth_user_id, email, role) VALUES 
-      (2, 'Google HR Officer', 2, 'hr@google.com', 'company')
-    `);
-    await client.query(`
-      INSERT INTO users (id, full_name, auth_user_id, email, role) VALUES 
-      (3, 'Alice Smith', 3, 'student@example.com', 'student')
-    `);
+    const user = userResult.rows[0];
 
     console.log("Inserting mentors...");
-    await client.query(`
+    const mentorResult = await client.query(`
       INSERT INTO mentors (id, user_id, bio, expertise_tags, verified, status) VALUES 
       (1, 1, 'Frontend Development Expert', ARRAY['MERN', 'React', 'Node.js'], true, 'approved')
+      RETURNING id;
     `);
+    const mentor = mentorResult.rows[0];
 
     console.log("Inserting companies...");
-    await client.query(`
-      INSERT INTO companies (id, user_id, name, email, status) VALUES 
-      (1, 2, 'Google', 'hr@google.com', 'approved')
+    const companyResult = await client.query(`
+      INSERT INTO companies (id, user_id, name, email) VALUES 
+      (1, null, 'Google', 'google@example.com'),
+      (2, 2, 'Company Corporate', 'company@gmail.com')
+      RETURNING id;
     `);
-
-    console.log("Inserting students...");
-    await client.query(`
-      INSERT INTO students (id, full_name, email, phone) VALUES 
-      (1, 'Alice Smith', 'student@example.com', '1234567890')
-    `);
+    const company = companyResult.rows[0];
 
     console.log("Inserting recruitment drives...");
+    const driveResult = await client.query(`
+      INSERT INTO recruitment_drives (id, title, job_title, company_id, mentor_id, status) VALUES 
+      (1, 'Summer Internship Drive 2026', 'Summer Internship Drive 2026', 1, 1, 'active'),
+      (2, 'Tech Trainee Hiring 2026', 'Tech Trainee Hiring 2026', 2, 1, 'active')
+      RETURNING id, title;
+    `);
+    const drive = driveResult.rows[0];
+
+    console.log("Inserting mock students...");
     await client.query(`
-      INSERT INTO recruitment_drives (id, title, company_id, mentor_id, status) VALUES 
-      (1, 'Summer Internship Drive 2026', 1, 1, 'active')
+      INSERT INTO students (id, name, email, phone, gpa, skills, enrollment_year, status, profile_verified, college, resume_url, graduation_year) VALUES
+      (1, 'Rahul Sharma', 'rahul@test.com', '+91 98765 43210', 8.5, ARRAY['MERN', 'Node.js'], 2023, 'verified', true, 'IIT Bombay', 'rahul_patil_resume.pdf', 2026),
+      (2, 'Priya Patel', 'priya@test.com', '+91 98765 43211', 9.1, ARRAY['Python', 'AI'], 2022, 'verified', true, 'IIT Delhi', 'priya_sharma_resume.pdf', 2026),
+      (3, 'Arjun Kumar', 'arjun@test.com', '+91 98765 43212', 7.8, ARRAY['Java', 'Spring Boot'], 2023, 'verified', true, 'BITS Pilani', 'amit_kumar_resume.pdf', 2026);
     `);
 
-    console.log("Inserting trainings...");
+    console.log("Inserting student drive progress...");
     await client.query(`
-      INSERT INTO trainings (training_id, company_id, title, description, duration, start_date, end_date, mentor_id, curriculum, status) VALUES 
-      ('T101', 1, 'React Bootcamp', 'Complete React training covering fundamentals, hooks, and context API', 30, '2026-05-15 00:00:00', '2026-06-15 00:00:00', 1, '["React Basics", "Components & Props", "State & Lifecycle", "Hooks", "Context API"]'::jsonb, 'ACTIVE'),
-      ('T102', 1, 'Node.js Advanced', 'Advanced backend course with Node.js and Express', 30, '2026-06-01 00:00:00', '2026-07-01 00:00:00', null, '["Event Loop", "Streams", "Express Routing", "Sequelize ORM"]'::jsonb, 'ACTIVE')
+      INSERT INTO student_drive_progress (id, student_id, drive_id, current_stage, stage, company_id, assessment_score, training_completion, notes, interview_feedback) VALUES
+      (1, 1, 2, 'shortlist', 'Shortlisted', 2, 92.00, 90.00, 'Strong technical skills with excellent problem-solving abilities. Demonstrated good communication and teamwork during the interview. Highly recommended for the next round.', 'Excellent performance in technical round.'),
+      (2, 2, 2, 'screening', 'Assessment', 2, 88.00, 50.00, 'Awaiting assessment completion. Initial aptitude scores look promising.', 'Pending screening results.'),
+      (3, 3, 2, 'interviews', 'Interview', 2, 85.00, 0.00, 'Interview scheduled for next week. Candidate shows good leadership potential.', 'Scheduled for final HR round.');
+    `);
+
+    console.log("Inserting training programs...");
+    await client.query(`
+      INSERT INTO trainings (training_id, company_id, title, description, duration, start_date, end_date, mentor_id, status) VALUES 
+      ('t1', 1, 'Full Stack Web Development', 'Deep dive into React, Node.js and PostgreSQL', 12, NOW() - INTERVAL '1 month', NOW() + INTERVAL '2 months', 1, 'ACTIVE'),
+      ('t2', 1, 'Cloud Architecture & DevOps', 'AWS, Docker, Kubernetes and CI/CD pipelines', 8, NOW() - INTERVAL '2 months', NOW() - INTERVAL '1 week', 1, 'COMPLETED'),
+      ('t3', 2, 'Full Stack Web Development', 'Deep dive into React, Node.js and PostgreSQL', 12, NOW() - INTERVAL '1 month', NOW() + INTERVAL '2 months', 1, 'ACTIVE'),
+      ('t4', 2, 'Cloud Architecture & DevOps', 'AWS, Docker, Kubernetes and CI/CD pipelines', 8, NOW() - INTERVAL '2 months', NOW() - INTERVAL '1 week', 1, 'COMPLETED');
     `);
 
     console.log("Inserting training progress...");
     await client.query(`
-      INSERT INTO training_progress (progress_id, training_id, candidate_id, attendance, assignment_score, engagement_score, performance_rating, readiness_score, completion_date, status) VALUES 
-      ('TP101', 'T101', 1, 90, 85, 4.5, 4, 87, null, 'IN_PROGRESS')
+      INSERT INTO training_progress (progress_id, training_id, candidate_id, attendance, assignment_score, engagement_score, performance_rating, status) VALUES 
+      ('tp1', 't1', 1, 90, 85, 8.2, 4, 'IN_PROGRESS'),
+      ('tp2', 't1', 2, 95, 92, 9.0, 5, 'IN_PROGRESS'),
+      ('tp3', 't2', 3, 100, 78, 7.5, 3, 'COMPLETED'),
+      ('tp4', 't3', 1, 90, 85, 8.2, 4, 'IN_PROGRESS'),
+      ('tp5', 't3', 2, 95, 92, 9.0, 5, 'IN_PROGRESS'),
+      ('tp6', 't4', 3, 100, 78, 7.5, 3, 'COMPLETED');
     `);
 
-    console.log("Inserting mentor feedback...");
+    console.log("Inserting mock interviews...");
     await client.query(`
-      INSERT INTO mentor_feedback (feedback_id, training_id, mentor_id, candidate_id, feedback, rating) VALUES 
-      ('MF101', 'T101', 1, 1, 'Good progress overall, candidate is grasping concepts well', 4)
+      INSERT INTO interviews (id, application_id, interviewer_id, meeting_link, result, attendance, scheduled_at, interview_type) VALUES
+      (1, 3, 1, 'https://meet.google.com/abc-defg-hij', 'PENDING', 'pending', NOW() + INTERVAL '1 day', 'Technical Interview');
+    `);
+
+    console.log("Inserting mock offers...");
+    await client.query(`
+      INSERT INTO offers (id, drive_id, student_id, offer_letter_number, package, joining_date, offer_status) VALUES
+      (1, 2, 1, 'OFFER-1784311066131', '10 LPA', CURRENT_DATE + INTERVAL '30 days', 'ACCEPTED');
+    `);
+
+    console.log("Resetting primary key sequences...");
+    await client.query(`
+      SELECT setval('auth_users_id_seq', COALESCE((SELECT MAX(id) FROM auth_users), 1));
+      SELECT setval('users_id_seq', COALESCE((SELECT MAX(id) FROM users), 1));
+      SELECT setval('mentors_id_seq', COALESCE((SELECT MAX(id) FROM mentors), 1));
+      SELECT setval('companies_id_seq', COALESCE((SELECT MAX(id) FROM companies), 1));
+      SELECT setval('recruitment_drives_id_seq', COALESCE((SELECT MAX(id) FROM recruitment_drives), 1));
+      SELECT setval('students_id_seq', COALESCE((SELECT MAX(id) FROM students), 1));
+      SELECT setval('student_drive_progress_id_seq', COALESCE((SELECT MAX(id) FROM student_drive_progress), 1));
+      SELECT setval('interviews_id_seq', COALESCE((SELECT MAX(id) FROM interviews), 1));
+      SELECT setval('offers_id_seq', COALESCE((SELECT MAX(id) FROM offers), 1));
     `);
 
     await client.query("COMMIT");
     console.log("Seed completed successfully!");
-    console.log(`Test Mentor Auth User ID: 1`);
-    console.log(`Test Mentor ID: 1`);
-    console.log(`Test Company Representative User ID: 2`);
-    console.log(`Test Company ID: 1`);
-    console.log(`Test Student Candidate ID: 1`);
-    console.log(`Test Training ID: T101, T102`);
+    console.log(`Test Mentor Auth User ID: ${authUser.id}`);
+    console.log(`Test Mentor User ID: ${user.id}`);
+    console.log(`Test Mentor ID: ${mentor.id}`);
+    console.log(`Test Drive ID: ${drive.id}`);
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Error seeding data:", error);

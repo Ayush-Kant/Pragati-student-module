@@ -17,12 +17,18 @@ const CandidateManagement = () => {
     updateFilter,
     updateCandidateStatus,
     updateCandidate,
+    exportCandidates,
+    resetFilters,
+    bulkShortlistCandidates,
+    bulkRejectCandidates,
+    bulkMoveCandidatesStage,
     getUniqueValues
   } = useCandidates();
 
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Edit modal state
   const [editingCandidate, setEditingCandidate] = useState(null);
@@ -44,6 +50,9 @@ const CandidateManagement = () => {
       if (selectedCandidate?.id === candidateId) {
         setSelectedCandidate(prev => ({ ...prev, status: 'Shortlisted' }));
       }
+      toast.success('Candidate shortlisted successfully');
+    } catch (err) {
+      toast.error('Failed to shortlist candidate');
     } finally {
       setIsUpdating(false);
     }
@@ -56,6 +65,9 @@ const CandidateManagement = () => {
       if (selectedCandidate?.id === candidateId) {
         setSelectedCandidate(prev => ({ ...prev, status: 'Rejected' }));
       }
+      toast.success('Candidate rejected successfully');
+    } catch (err) {
+      toast.error('Failed to reject candidate');
     } finally {
       setIsUpdating(false);
     }
@@ -66,51 +78,146 @@ const CandidateManagement = () => {
     setEditingCandidate(candidate);
   };
 
-  const handleSaveEdit = (updatedFields) => {
-    updateCandidate(editingCandidate.id, updatedFields);
-    toast.success('Candidate updated successfully');
-    setEditingCandidate(null);
+  const handleSaveEdit = async (updatedFields) => {
+    try {
+      setIsUpdating(true);
+      await updateCandidate(editingCandidate.id, updatedFields);
+      toast.success('Candidate updated successfully');
+      setEditingCandidate(null);
+    } catch (err) {
+      toast.error('Failed to update candidate');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // Selection handlers
+  const handleToggleSelect = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleSelectAll = () => {
+    const visibleIds = candidates.map(c => c.id);
+    const isAllSelected = visibleIds.length > 0 && visibleIds.every(id => selectedIds.includes(id));
+    if (isAllSelected) {
+      setSelectedIds(prev => prev.filter(id => !visibleIds.includes(id)));
+    } else {
+      setSelectedIds(prev => [...new Set([...prev, ...visibleIds])]);
+    }
+  };
+
+  // Bulk action handlers
+  const handleBulkShortlist = async () => {
+    if (selectedIds.length === 0) return;
+    try {
+      setIsUpdating(true);
+      await bulkShortlistCandidates(selectedIds);
+      toast.success(`${selectedIds.length} candidate(s) shortlisted successfully`);
+      setSelectedIds([]);
+    } catch (err) {
+      toast.error('Bulk shortlist failed');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedIds.length === 0) return;
+    try {
+      setIsUpdating(true);
+      await bulkRejectCandidates(selectedIds);
+      toast.success(`${selectedIds.length} candidate(s) rejected successfully`);
+      setSelectedIds([]);
+    } catch (err) {
+      toast.error('Bulk rejection failed');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleBulkMoveStage = async (stageName) => {
+    if (selectedIds.length === 0) return;
+    try {
+      setIsUpdating(true);
+      await bulkMoveCandidatesStage(selectedIds, stageName);
+      toast.success(`${selectedIds.length} candidate(s) stage updated to ${stageName}`);
+      setSelectedIds([]);
+    } catch (err) {
+      toast.error('Bulk stage update failed');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
     <div>
       <div className="w-full">
-        {/* Header */}
-        <CandidateHeader />
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Main Candidate Table Area */}
+          <div className="flex-1 min-w-0 w-full">
+            {/* Header */}
+            <CandidateHeader />
 
-        {/* Filters */}
-        <CandidateFilters
-          filters={filters}
-          updateFilter={updateFilter}
-          getUniqueValues={getUniqueValues}
-          allCandidates={allCandidates}
-        />
+            {/* Filters */}
+            <CandidateFilters
+              filters={filters}
+              updateFilter={updateFilter}
+              getUniqueValues={getUniqueValues}
+              allCandidates={allCandidates}
+              exportCandidates={exportCandidates}
+              resetFilters={resetFilters}
+            />
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm">
-            <p className="text-red-700 text-sm font-medium">{error}</p>
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm">
+                <p className="text-red-700 text-sm font-medium">{error}</p>
+              </div>
+            )}
+
+            {/* Table */}
+            <CandidateTable
+              candidates={candidates}
+              loading={loading}
+              onSelectCandidate={handleSelectCandidate}
+              onMenuClick={handleSelectCandidate}
+              onEdit={handleOpenEdit}
+              selectedIds={selectedIds}
+              onToggleSelect={handleToggleSelect}
+              onToggleSelectAll={handleToggleSelectAll}
+            />
           </div>
-        )}
 
-        {/* Table */}
-        <CandidateTable
-          candidates={candidates}
-          loading={loading}
-          onSelectCandidate={handleSelectCandidate}
-          onMenuClick={handleSelectCandidate}
-          onEdit={handleOpenEdit}
-        />
+          {/* Inline Candidate Profile Details card (Desktop - lg and above) */}
+          {isDrawerOpen && selectedCandidate && (
+            <div className="hidden lg:block w-[420px] shrink-0 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden sticky top-[90px]">
+              <CandidateDrawer
+                isOpen={isDrawerOpen}
+                candidate={selectedCandidate}
+                onClose={handleCloseDrawer}
+                onShortlist={handleShortlist}
+                onReject={handleReject}
+                isUpdating={isUpdating}
+                inline={true}
+              />
+            </div>
+          )}
+        </div>
 
-        {/* Drawer */}
-        <CandidateDrawer
-          isOpen={isDrawerOpen}
-          candidate={selectedCandidate}
-          onClose={handleCloseDrawer}
-          onShortlist={handleShortlist}
-          onReject={handleReject}
-          isUpdating={isUpdating}
-        />
+        {/* Floating Backdrop drawer fallback (Mobile / Tablet - under lg size) */}
+        <div className="block lg:hidden">
+          <CandidateDrawer
+            isOpen={isDrawerOpen}
+            candidate={selectedCandidate}
+            onClose={handleCloseDrawer}
+            onShortlist={handleShortlist}
+            onReject={handleReject}
+            isUpdating={isUpdating}
+            inline={false}
+          />
+        </div>
 
         {/* Edit Candidate Modal */}
         {editingCandidate && (
@@ -119,6 +226,58 @@ const CandidateManagement = () => {
             onClose={() => setEditingCandidate(null)}
             onSave={handleSaveEdit}
           />
+        )}
+
+        {/* Bulk Action Sticky Bar */}
+        {selectedIds.length > 0 && (
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 border border-gray-800 text-white rounded-2xl px-6 py-4 shadow-2xl z-50 flex items-center gap-6 animate-slideUp">
+            <span className="text-sm font-semibold tracking-wide text-gray-300">
+              {selectedIds.length} candidate(s) selected
+            </span>
+            <div className="h-6 w-px bg-gray-800"></div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleBulkShortlist}
+                disabled={isUpdating}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-md"
+              >
+                Shortlist
+              </button>
+              <button
+                onClick={handleBulkReject}
+                disabled={isUpdating}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-md"
+              >
+                Reject
+              </button>
+              <div className="relative group">
+                <button
+                  disabled={isUpdating}
+                  className="px-4 py-2 bg-gray-800 hover:bg-gray-750 disabled:opacity-50 text-xs font-bold uppercase tracking-wider rounded-xl transition border border-gray-700"
+                >
+                  Move Stage ▾
+                </button>
+                <div className="absolute bottom-full mb-2 right-0 hidden group-hover:block bg-gray-850 border border-gray-700 rounded-xl shadow-xl overflow-hidden min-w-[140px] z-50 text-gray-200">
+                  {['Assessment', 'Interview'].map(stageName => (
+                    <button
+                      key={stageName}
+                      type="button"
+                      onClick={() => handleBulkMoveStage(stageName)}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-800 text-xs font-semibold"
+                    >
+                      {stageName}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedIds([])}
+              className="text-xs text-gray-400 hover:text-white transition ml-2 font-medium"
+            >
+              Cancel
+            </button>
+          </div>
         )}
       </div>
     </div>

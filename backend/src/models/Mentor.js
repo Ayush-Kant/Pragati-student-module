@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from "@sequelize/core";
 import sequelize from "../../config/sequelize.js";
 import User from "./User.js";
 
@@ -34,7 +34,7 @@ Mentor.init(
     tableName: "mentors",
     underscored: true,
     timestamps: false,
-  }
+  },
 );
 
 Mentor.belongsTo(User, { foreignKey: "userId", as: "user" });

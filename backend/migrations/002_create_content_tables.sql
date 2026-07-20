@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS courses (
   id           SERIAL PRIMARY KEY,
   mentor_id    INTEGER NOT NULL REFERENCES mentors(id) ON DELETE CASCADE,
-  drive_id     INTEGER REFERENCES recruitment_drives(id) ON DELETE SET NULL,
+  drive_id     INTEGER,
   title        VARCHAR(255) NOT NULL,
   description  TEXT,
   skill_tags   TEXT[],
@@ -30,3 +30,6 @@ CREATE INDEX IF NOT EXISTS idx_courses_skill_tags
 
 CREATE INDEX IF NOT EXISTS idx_modules_course_id
   ON modules(course_id);
+
+-- Add deferred circular references after both tables are created
+

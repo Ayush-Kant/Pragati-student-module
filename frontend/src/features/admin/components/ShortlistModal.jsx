@@ -63,7 +63,7 @@ const ShortlistModal = ({ open, onClose, driveId, refreshCandidates }) => {
 
       handleClose();
     } catch (error) {
-      console.error(error);
+      
 
       toast.error("Failed to shortlist candidates");
     } finally {

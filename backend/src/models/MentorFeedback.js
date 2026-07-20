@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from "@sequelize/core";
 import sequelize from "../../config/sequelize.js";
 import Training from "./Training.js";
 import Mentor from "./Mentor.js";
@@ -67,12 +67,21 @@ MentorFeedback.init(
         }
       },
     },
-  }
+  },
 );
 
-MentorFeedback.belongsTo(Training, { foreignKey: "trainingId", as: "training" });
+MentorFeedback.belongsTo(Training, {
+  foreignKey: "trainingId",
+  as: "training",
+});
 MentorFeedback.belongsTo(Mentor, { foreignKey: "mentorId", as: "mentor" });
-MentorFeedback.belongsTo(Student, { foreignKey: "candidateId", as: "candidate" });
-Training.hasMany(MentorFeedback, { foreignKey: "trainingId", as: "feedbackList" });
+MentorFeedback.belongsTo(Student, {
+  foreignKey: "candidateId",
+  as: "candidate",
+});
+Training.hasMany(MentorFeedback, {
+  foreignKey: "trainingId",
+  as: "feedbackList",
+});
 
 export default MentorFeedback;
