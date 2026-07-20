@@ -96,11 +96,22 @@ export const gradeAnswer = (question, answer) => {
  * Uses server-side `Date.now()` — not client-supplied time — so students
  * cannot manipulate the clock to bypass the timer.
  *
+ * Callers are expected to have already confirmed timeLimitMinutes is a positive
+ * finite number before invoking this function. Passing a non-finite value will
+ * throw rather than silently returning false (which would bypass the timer).
+ *
  * @param {string|Date} startedAt        — When the attempt was started (DB timestamp)
- * @param {number}      timeLimitMinutes — Assessment time limit in minutes
+ * @param {number}      timeLimitMinutes — Assessment time limit in minutes (> 0, finite)
  * @returns {boolean}
+ * @throws {TypeError} if timeLimitMinutes is not a positive finite number
  */
 export const isTimeLimitExceeded = (startedAt, timeLimitMinutes) => {
+  if (!Number.isFinite(timeLimitMinutes) || timeLimitMinutes <= 0) {
+    throw new TypeError(
+      `isTimeLimitExceeded: timeLimitMinutes must be a positive finite number, got ${timeLimitMinutes}`
+    );
+  }
   const elapsedMs = Date.now() - new Date(startedAt).getTime();
   return elapsedMs > timeLimitMinutes * 60 * 1_000;
 };
+

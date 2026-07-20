@@ -345,9 +345,14 @@ export const submitAnswers = async (attemptId, scoredAnswers) => {
     );
 
     if (update.rows.length === 0) {
-      throw new Error(
-        "Attempt is no longer in STARTED state — possible duplicate submission."
+      // Throw a sentinel error that submitAttempt() in the service can catch and
+      // re-throw as a typed DUPLICATE_SUBMISSION business error. Using a plain
+      // Error + .code keeps this layer dependency-free (no constants import loop).
+      const dupErr = new Error(
+        `submitAnswers: attempt ${attemptId} is no longer in STARTED state — duplicate submission rejected.`
       );
+      dupErr.code = "DUPLICATE_SUBMISSION_SIGNAL";
+      throw dupErr;
     }
 
     await client.query("COMMIT");

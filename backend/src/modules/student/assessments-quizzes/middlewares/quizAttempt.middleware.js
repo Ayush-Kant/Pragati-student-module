@@ -8,13 +8,14 @@
  * On success, attaches:
  *   req.attempt — { id, status, started_at } — consumed by validateTimer
  *
- * Error responses:
+ * Error responses use { success, message, errorCode } — consistent with all
+ * module middleware.
  *   409 — no STARTED attempt (student must call /start first)
  *   500 — misconfigured middleware chain or unexpected repository error
  */
 
 import * as AssessmentsRepository from "../repositories/assessments.repository.js";
-import { ATTEMPT_STATUS, HTTP_MESSAGES } from "../constants/assessments.constants.js";
+import { ATTEMPT_STATUS, HTTP_MESSAGES, ERROR_CODES } from "../constants/assessments.constants.js";
 
 export const ensureAttemptStarted = async (req, res, next) => {
   try {
@@ -23,9 +24,14 @@ export const ensureAttemptStarted = async (req, res, next) => {
     if (!req.studentId || !req.assessmentId) {
       console.error(
         "ensureAttemptStarted: req.studentId or req.assessmentId missing — " +
+        `studentId=${req.studentId} assessmentId=${req.assessmentId} — ` +
         "ensure ensureAssessmentAssigned runs before this middleware."
       );
-      return res.status(500).json({ error: HTTP_MESSAGES.INTERNAL_ERROR });
+      return res.status(500).json({
+        success:   false,
+        message:   HTTP_MESSAGES.INTERNAL_ERROR,
+        errorCode: ERROR_CODES.INTERNAL_ERROR,
+      });
     }
 
     const attempt = await AssessmentsRepository.getActiveAttempt(
@@ -35,7 +41,9 @@ export const ensureAttemptStarted = async (req, res, next) => {
 
     if (!attempt || attempt.status !== ATTEMPT_STATUS.STARTED) {
       return res.status(409).json({
-        error: "No active attempt found. Please start the assessment first.",
+        success:   false,
+        message:   "No active attempt found. Please start the assessment first.",
+        errorCode: ERROR_CODES.NO_ACTIVE_ATTEMPT,
       });
     }
 
@@ -44,6 +52,11 @@ export const ensureAttemptStarted = async (req, res, next) => {
     next();
   } catch (error) {
     console.error("ensureAttemptStarted error:", error);
-    return res.status(500).json({ error: HTTP_MESSAGES.INTERNAL_ERROR });
+    return res.status(500).json({
+      success:   false,
+      message:   HTTP_MESSAGES.INTERNAL_ERROR,
+      errorCode: ERROR_CODES.INTERNAL_ERROR,
+    });
   }
 };
+

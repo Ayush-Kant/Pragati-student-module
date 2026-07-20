@@ -54,9 +54,13 @@ export const GRADING_STATUS = Object.freeze({
  * to produce safe, stable HTTP responses without leaking internals.
  */
 export const ERROR_CODES = Object.freeze({
-  ASSESSMENT_NOT_ACTIVE: "ASSESSMENT_NOT_ACTIVE",
-  ASSESSMENT_NOT_FOUND:  "ASSESSMENT_NOT_FOUND",
-  ATTEMPT_NOT_FOUND:     "ATTEMPT_NOT_FOUND",
+  ASSESSMENT_NOT_ACTIVE:  "ASSESSMENT_NOT_ACTIVE",
+  ASSESSMENT_NOT_FOUND:   "ASSESSMENT_NOT_FOUND",
+  ATTEMPT_NOT_FOUND:      "ATTEMPT_NOT_FOUND",
+  TIME_LIMIT_EXCEEDED:    "TIME_LIMIT_EXCEEDED",
+  DUPLICATE_SUBMISSION:   "DUPLICATE_SUBMISSION",
+  NO_ACTIVE_ATTEMPT:      "NO_ACTIVE_ATTEMPT",
+  INTERNAL_ERROR:         "INTERNAL_ERROR",
 });
 
 // ─── Validation limits ────────────────────────────────────────────────────────
@@ -78,4 +82,6 @@ export const HTTP_MESSAGES = Object.freeze({
   RESULT_NOT_FOUND:      "Assessment result not found.",
   ATTEMPT_NOT_FOUND:     "No active assessment attempt found.",
   ASSESSMENT_NOT_ACTIVE: "Assessment is not active.",
+  TIME_LIMIT_EXCEEDED:   "The time limit for this assessment has been exceeded.",
+  DUPLICATE_SUBMISSION:  "This assessment has already been submitted.",
 });

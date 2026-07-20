@@ -37,7 +37,7 @@ class StudentAssessmentService {
    * Return every active assessment assigned to the student's recruitment drive.
    * The repository query is drive-scoped — students only see their own assessments.
    *
-   * @param {number} studentId
+   * @param {number} studentId — users.id from JWT
    * @returns {Promise<object[]>}
    */
   async getAssignedAssessments(studentId) {
@@ -77,7 +77,7 @@ class StudentAssessmentService {
    * assessment is active. The status check here is defense-in-depth in case the
    * assessment is deactivated between the middleware check and this call.
    *
-   * @param {number} studentId
+   * @param {number} studentId    — users.id from JWT
    * @param {number} assessmentId
    * @returns {Promise<object>}
    */
@@ -107,9 +107,14 @@ class StudentAssessmentService {
    *  4. getQuestionsForGrading scopes to assessmentId — prevents question-ID forgery.
    *  5. submitAnswers runs INSERT + score UPDATE + status UPDATE in one transaction.
    *
-   * @param {number}   studentId
+   * The repository signals a duplicate submission by throwing an error with
+   * code = "DUPLICATE_SUBMISSION_SIGNAL". This service catches that sentinel and
+   * re-throws it as the correct business error so the controller can respond
+   * with 409 without reading raw error.message strings.
+   *
+   * @param {number}   studentId    — users.id from JWT
    * @param {number}   assessmentId
-   * @param {object[]} answers        — validated by Joi, non-empty array
+   * @param {object[]} answers      — validated by Joi, non-empty array
    * @returns {Promise<{ message: string }>}
    */
   async submitAttempt(studentId, assessmentId, answers) {
@@ -133,8 +138,27 @@ class StudentAssessmentService {
       return { ...answer, isCorrect, marksObtained, gradingStatus };
     });
 
-    // Bulk INSERT + score recalculation + status transition in one transaction.
-    await AssessmentsRepository.submitAnswers(attempt.id, scoredAnswers);
+    try {
+      // Bulk INSERT + score recalculation + status transition in one transaction.
+      await AssessmentsRepository.submitAnswers(attempt.id, scoredAnswers);
+    } catch (err) {
+      // Repository signals a duplicate submission via a sentinel code rather
+      // than a raw message string. Re-throw as a proper business error.
+      if (err.code === "DUPLICATE_SUBMISSION_SIGNAL") {
+        throw businessError(
+          ERROR_CODES.DUPLICATE_SUBMISSION,
+          "Assessment has already been submitted."
+        );
+      }
+      // Unexpected DB / system error — log with context, then re-throw so the
+      // controller's catch block emits a 500 without leaking internals.
+      console.error(
+        "submitAttempt: unexpected error during submitAnswers " +
+        `[studentId=${studentId} assessmentId=${assessmentId} attemptId=${attempt.id}]:`,
+        err
+      );
+      throw err;
+    }
 
     return { message: "Assessment submitted successfully." };
   }
@@ -145,7 +169,7 @@ class StudentAssessmentService {
    * Only SUBMITTED attempts are returned — students cannot retrieve a null-score
    * in-progress attempt through this endpoint.
    *
-   * @param {number} studentId
+   * @param {number} studentId    — users.id from JWT
    * @param {number} assessmentId
    * @returns {Promise<object|null>}
    */

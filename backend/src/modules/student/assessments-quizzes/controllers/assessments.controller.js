@@ -21,6 +21,9 @@
  *                  verified token payload). If absent the token is malformed.
  *   req.studentId / req.assessmentId — set by ensureAssessmentAssigned; the
  *                  controller reads these rather than re-parsing params.
+ *
+ * Error responses use { success, message, errorCode } throughout — consistent
+ * with all middleware in this module.
  */
 
 import StudentAssessmentService from "../services/assessments.service.js";
@@ -31,8 +34,6 @@ import { ERROR_CODES, HTTP_MESSAGES }                     from "../constants/ass
 
 // ─── Response helpers ─────────────────────────────────────────────────────────
 
-const INTERNAL_ERROR = { error: HTTP_MESSAGES.INTERNAL_ERROR };
-
 /**
  * Map a typed business error code to the appropriate HTTP response.
  * Controllers never read error.message to avoid leaking service internals.
@@ -40,11 +41,29 @@ const INTERNAL_ERROR = { error: HTTP_MESSAGES.INTERNAL_ERROR };
 const handleBusinessError = (res, error) => {
   switch (error.code) {
     case ERROR_CODES.ASSESSMENT_NOT_FOUND:
-      return res.status(404).json({ error: HTTP_MESSAGES.ASSESSMENT_NOT_FOUND });
+      return res.status(404).json({
+        success:   false,
+        message:   HTTP_MESSAGES.ASSESSMENT_NOT_FOUND,
+        errorCode: ERROR_CODES.ASSESSMENT_NOT_FOUND,
+      });
     case ERROR_CODES.ASSESSMENT_NOT_ACTIVE:
-      return res.status(409).json({ error: HTTP_MESSAGES.ASSESSMENT_NOT_ACTIVE });
+      return res.status(409).json({
+        success:   false,
+        message:   HTTP_MESSAGES.ASSESSMENT_NOT_ACTIVE,
+        errorCode: ERROR_CODES.ASSESSMENT_NOT_ACTIVE,
+      });
     case ERROR_CODES.ATTEMPT_NOT_FOUND:
-      return res.status(404).json({ error: HTTP_MESSAGES.ATTEMPT_NOT_FOUND });
+      return res.status(404).json({
+        success:   false,
+        message:   HTTP_MESSAGES.ATTEMPT_NOT_FOUND,
+        errorCode: ERROR_CODES.ATTEMPT_NOT_FOUND,
+      });
+    case ERROR_CODES.DUPLICATE_SUBMISSION:
+      return res.status(409).json({
+        success:   false,
+        message:   HTTP_MESSAGES.DUPLICATE_SUBMISSION,
+        errorCode: ERROR_CODES.DUPLICATE_SUBMISSION,
+      });
     default:
       return null; // caller must emit a 500
   }
@@ -61,14 +80,22 @@ export const getAssessments = async (req, res) => {
     // req.user.id — the only canonical JWT identifier. No fallback chain.
     const studentId = req.user.id;
     if (!studentId) {
-      return res.status(401).json({ error: HTTP_MESSAGES.UNAUTHORIZED });
+      return res.status(401).json({
+        success:   false,
+        message:   HTTP_MESSAGES.UNAUTHORIZED,
+        errorCode: ERROR_CODES.INTERNAL_ERROR,
+      });
     }
 
     const rows = await StudentAssessmentService.getAssignedAssessments(studentId);
     return res.status(200).json(rows.map(toAssessmentListItemDTO));
   } catch (error) {
-    console.error("getAssessments error:", error);
-    return res.status(500).json(INTERNAL_ERROR);
+    console.error("getAssessments error [userId=%s]:", req.user?.id, error);
+    return res.status(500).json({
+      success:   false,
+      message:   HTTP_MESSAGES.INTERNAL_ERROR,
+      errorCode: ERROR_CODES.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -81,12 +108,23 @@ export const getAssessment = async (req, res) => {
   try {
     const data = await StudentAssessmentService.getAssessmentDetails(req.assessmentId);
     if (!data) {
-      return res.status(404).json({ error: HTTP_MESSAGES.ASSESSMENT_NOT_FOUND });
+      return res.status(404).json({
+        success:   false,
+        message:   HTTP_MESSAGES.ASSESSMENT_NOT_FOUND,
+        errorCode: ERROR_CODES.ASSESSMENT_NOT_FOUND,
+      });
     }
     return res.status(200).json(toAssessmentDetailDTO(data));
   } catch (error) {
-    console.error("getAssessment error:", error);
-    return res.status(500).json(INTERNAL_ERROR);
+    console.error(
+      "getAssessment error [userId=%s assessmentId=%s]:",
+      req.studentId, req.assessmentId, error
+    );
+    return res.status(500).json({
+      success:   false,
+      message:   HTTP_MESSAGES.INTERNAL_ERROR,
+      errorCode: ERROR_CODES.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -100,10 +138,17 @@ export const startAssessment = async (req, res) => {
     const data = await StudentAssessmentService.startAttempt(req.studentId, req.assessmentId);
     return res.status(201).json(toAttemptStartDTO(data));
   } catch (error) {
-    console.error("startAssessment error:", error);
+    console.error(
+      "startAssessment error [userId=%s assessmentId=%s]:",
+      req.studentId, req.assessmentId, error
+    );
     const businessResponse = handleBusinessError(res, error);
     if (businessResponse) return businessResponse;
-    return res.status(500).json(INTERNAL_ERROR);
+    return res.status(500).json({
+      success:   false,
+      message:   HTTP_MESSAGES.INTERNAL_ERROR,
+      errorCode: ERROR_CODES.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -123,10 +168,17 @@ export const submitAssessment = async (req, res) => {
     );
     return res.status(200).json(toSubmitResponseDTO(data));
   } catch (error) {
-    console.error("submitAssessment error:", error);
+    console.error(
+      "submitAssessment error [userId=%s assessmentId=%s]:",
+      req.studentId, req.assessmentId, error
+    );
     const businessResponse = handleBusinessError(res, error);
     if (businessResponse) return businessResponse;
-    return res.status(500).json(INTERNAL_ERROR);
+    return res.status(500).json({
+      success:   false,
+      message:   HTTP_MESSAGES.INTERNAL_ERROR,
+      errorCode: ERROR_CODES.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -139,11 +191,22 @@ export const getResult = async (req, res) => {
   try {
     const data = await StudentAssessmentService.getResult(req.studentId, req.assessmentId);
     if (!data) {
-      return res.status(404).json({ error: HTTP_MESSAGES.RESULT_NOT_FOUND });
+      return res.status(404).json({
+        success:   false,
+        message:   HTTP_MESSAGES.RESULT_NOT_FOUND,
+        errorCode: ERROR_CODES.ATTEMPT_NOT_FOUND,
+      });
     }
     return res.status(200).json(toResultDTO(data));
   } catch (error) {
-    console.error("getResult error:", error);
-    return res.status(500).json(INTERNAL_ERROR);
+    console.error(
+      "getResult error [userId=%s assessmentId=%s]:",
+      req.studentId, req.assessmentId, error
+    );
+    return res.status(500).json({
+      success:   false,
+      message:   HTTP_MESSAGES.INTERNAL_ERROR,
+      errorCode: ERROR_CODES.INTERNAL_ERROR,
+    });
   }
 };
