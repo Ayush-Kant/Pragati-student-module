@@ -1,68 +1,40 @@
+import React from "react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
-import { TriangleAlert } from "lucide-react";
 
-const ErrorState = ({
-  icon: Icon = TriangleAlert,
-  title = "Something went wrong",
-  description = "We couldn't load the requested data. Please try again.",
-  actionLabel = "Try Again",
-  onAction,
-  className = "",
-}) => {
+const ErrorState = ({ message = "An error occurred while handling records.", onRetry }) => {
   const { darkMode } = useOutletContext();
 
   return (
-    <div
-      className={`flex min-h-[320px] flex-col items-center justify-center px-8 text-center ${className}`}
+    <div className={`relative overflow-hidden w-full rounded-3xl border p-12 text-center transition-all duration-300 shadow-md
+      ${darkMode ? "bg-[#151D30] border-slate-700/60 shadow-black/20" : "bg-white border-slate-200 shadow-slate-100/80"}`}
     >
-      {/* Icon */}
+      <div className="absolute top-0 left-0 right-0 h-[5px] bg-gradient-to-r from-blue-600 to-indigo-600" />
 
-      <div
-        className={`flex h-20 w-20 items-center justify-center rounded-full border transition-all duration-300 ${
-          darkMode
-            ? "border-red-900/50 bg-red-950/30"
-            : "border-red-200 bg-red-50"
-        }`}
-      >
-        <Icon
-          size={38}
-          strokeWidth={2}
-          className={
-            darkMode ? "text-red-400" : "text-red-500"
-          }
-        />
+      <div className="relative flex flex-col items-center justify-center max-w-md mx-auto">
+        <div className={`flex h-14 w-14 items-center justify-center rounded-2xl mb-5
+          ${darkMode ? "bg-slate-800 text-blue-400" : "bg-blue-50 text-blue-600"}`}>
+          <AlertCircle size={26} strokeWidth={2.5} />
+        </div>
+        
+        <h3 className={`text-xl font-bold tracking-tight mb-2 ${darkMode ? "text-white" : "text-slate-900"}`}>
+          Something went wrong
+        </h3>
+        <p className={`text-sm font-medium leading-relaxed mb-6 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+          {message}
+        </p>
+        
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="group flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-3 rounded-xl shadow-sm transition-all duration-200 active:scale-[0.98]"
+          >
+            <RefreshCw size={15} className="group-hover:rotate-180 transition-transform duration-500 ease-out" />
+            Reload Records
+          </button>
+        )}
       </div>
-
-      {/* Title */}
-
-      <h2
-        className={`mt-7 text-2xl font-bold ${
-          darkMode ? "text-white" : "text-slate-900"
-        }`}
-      >
-        {title}
-      </h2>
-
-      {/* Description */}
-
-      <p
-        className={`mt-3 max-w-md text-sm leading-7 ${
-          darkMode ? "text-slate-400" : "text-slate-500"
-        }`}
-      >
-        {description}
-      </p>
-
-      {/* Retry Button */}
-
-      {onAction && (
-        <button
-          onClick={onAction}
-          className="mt-8 rounded-xl bg-red-600 px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:bg-red-700"
-        >
-          {actionLabel}
-        </button>
-      )}
     </div>
   );
 };

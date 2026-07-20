@@ -1,68 +1,32 @@
+import React from "react";
+import { Inbox } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
-import { SearchX } from "lucide-react";
 
-const EmptyState = ({
-  icon: Icon = SearchX,
-  title = "No Data Found",
-  description = "There is nothing to display right now.",
-  actionLabel,
-  onAction,
-  className = "",
+const EmptyState = ({ 
+  title = "No Records Found", 
+  description = "Try adjusting your search criteria or filters." 
 }) => {
   const { darkMode } = useOutletContext();
 
   return (
-    <div
-      className={`flex min-h-[320px] flex-col items-center justify-center px-8 text-center ${className}`}
+    <div className={`relative overflow-hidden w-full rounded-3xl border p-12 text-center transition-all duration-300 shadow-md
+      ${darkMode ? "bg-[#151D30] border-slate-700/60 shadow-black/20" : "bg-white border-slate-200 shadow-slate-100/80"}`}
     >
-      {/* Icon */}
+      <div className="absolute top-0 left-0 right-0 h-[5px] bg-gradient-to-r from-blue-600 to-indigo-600" />
 
-      <div
-        className={`flex h-20 w-20 items-center justify-center rounded-full border transition-all duration-300 ${
-          darkMode
-            ? "border-slate-700 bg-slate-800"
-            : "border-slate-300 bg-slate-100"
-        }`}
-      >
-        <Icon
-          size={38}
-          strokeWidth={2}
-          className={
-            darkMode ? "text-slate-400" : "text-slate-500"
-          }
-        />
+      <div className="relative flex flex-col items-center justify-center max-w-md mx-auto">
+        <div className={`flex h-14 w-14 items-center justify-center rounded-2xl mb-5
+          ${darkMode ? "bg-slate-800 text-slate-400" : "bg-slate-50 text-slate-400"}`}>
+          <Inbox size={26} strokeWidth={2} />
+        </div>
+        
+        <h3 className={`text-xl font-bold tracking-tight mb-2 ${darkMode ? "text-white" : "text-slate-900"}`}>
+          {title}
+        </h3>
+        <p className={`text-sm font-medium leading-relaxed max-w-xs ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+          {description}
+        </p>
       </div>
-
-      {/* Title */}
-
-      <h2
-        className={`mt-7 text-2xl font-bold ${
-          darkMode ? "text-white" : "text-slate-900"
-        }`}
-      >
-        {title}
-      </h2>
-
-      {/* Description */}
-
-      <p
-        className={`mt-3 max-w-md text-sm leading-7 ${
-          darkMode ? "text-slate-400" : "text-slate-500"
-        }`}
-      >
-        {description}
-      </p>
-
-      {/* Action */}
-
-      {actionLabel && (
-        <button
-          onClick={onAction}
-          className="mt-8 rounded-xl bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:bg-blue-700"
-        >
-          {actionLabel}
-        </button>
-      )}
     </div>
   );
 };

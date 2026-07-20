@@ -3,14 +3,14 @@
 ===================================== */
 
 export const getInitials = (name = "") => {
-    return name
-        .trim()
-        .split(" ")
-        .filter(Boolean)
-        .map((word) => word[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase();
+  return name
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 };
 
 /* =====================================
@@ -18,22 +18,25 @@ export const getInitials = (name = "") => {
 ===================================== */
 
 export const getTopBorder = (status) => {
-    switch (status) {
-        case "Waiting":
-            return "border-t-4 border-amber-500";
+  switch (status) {
+    case "Eligible":
+      return "border-t-4 border-emerald-500";
 
-        case "Shortlisted":
-            return "border-t-4 border-emerald-500";
+    case "Waiting":
+      return "border-t-4 border-amber-500";
 
-        case "Selected":
-            return "border-t-4 border-blue-500";
+    case "Shortlisted":
+      return "border-t-4 border-violet-500/80";
 
-        case "Rejected":
-            return "border-t-4 border-red-500";
+    case "Nominated":
+      return "border-t-4 border-blue-500";
 
-        default:
-            return "border-t-4 border-slate-500";
-    }
+    case "Rejected":
+      return "border-t-4 border-red-500";
+
+    default:
+      return "border-t-4 border-slate-500";
+  }
 };
 
 /* =====================================
@@ -90,4 +93,4 @@ export const searchStudents = (
 
 // Student Name 
 export const getStudentName = (student) =>
-    student.name || student.student || "--";
+  student.name || student.student || "--";

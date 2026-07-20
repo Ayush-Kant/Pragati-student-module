@@ -46,14 +46,15 @@ const NominationStatistics = () => {
   const { darkMode } = useOutletContext();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+    /* Changed grid-cols-1 to grid-cols-2 for 2x2 grid layout on mobile */
+    <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
 
         return (
           <div
             key={index}
-            className={`group relative overflow-hidden rounded-3xl p-6 min-h-51.25 hover:-translate-y-1 transition-all duration-300 cursor-pointer
+            className={`group relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-6 min-h-[140px] md:min-h-51.25 hover:-translate-y-1 transition-all duration-300 cursor-pointer
             ${
               darkMode
                 ? `
@@ -77,67 +78,59 @@ const NominationStatistics = () => {
             {/* subtle top highlight */}
             <div
               className={`absolute inset-x-0 top-0 h-px ${
-                darkMode
-                  ? "bg-white/10"
-                  : "bg-white"
+                darkMode ? "bg-white/10" : "bg-white"
               }`}
             />
 
             <div className="flex h-full flex-col justify-between">
               {/* Header */}
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-1">
                 <div>
                   <p
-                    className={`text-[11px] uppercase tracking-[0.18em] font-semibold ${
-                      darkMode
-                        ? "text-slate-400"
-                        : "text-slate-500"
+                    className={`text-[9px] md:text-[11px] uppercase tracking-[0.12em] md:tracking-[0.18em] font-semibold line-clamp-1 ${
+                      darkMode ? "text-slate-400" : "text-slate-500"
                     }`}
                   >
                     {stat.title}
                   </p>
                 </div>
 
+                {/* Scaled icon container size for mobile layout */}
                 <div
-                  className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-105 ${stat.iconBg}`}
+                  className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-105 ${stat.iconBg}`}
                 >
+                  {/* Scaled Lucide Icon size using responsive widths */}
                   <Icon
-                    size={24}
                     strokeWidth={2.2}
-                    className={stat.iconColor}
+                    className={`w-4 h-4 md:w-6 md:h-6 ${stat.iconColor}`}
                   />
                 </div>
               </div>
 
-              {/* Bottom */}
-              <div>
+              {/* Bottom content section */}
+              <div className="mt-2 md:mt-0">
+                {/* Scaled value text down on mobile view */}
                 <h2
-                  className={`text-[46px] font-bold leading-none tracking-tight ${
-                    darkMode
-                      ? "text-white"
-                      : "text-slate-900"
+                  className={`text-2xl sm:text-3xl md:text-[46px] font-bold leading-none tracking-tight ${
+                    darkMode ? "text-white" : "text-slate-900"
                   }`}
                 >
                   {stat.value}
                 </h2>
 
-                <div className="mt-6">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-green-500/10 px-4 py-2">
+                {/* Tightened trend metric spacing wrapper */}
+                <div className="mt-2 md:mt-6">
+                  <div className="inline-flex items-center gap-1 md:gap-2 rounded-full bg-green-500/10 px-2.5 py-1 md:px-4 md:py-2">
                     <TrendingUp
-                      size={14}
                       strokeWidth={2.4}
-                      className={
-                        darkMode
-                          ? "text-green-400"
-                          : "text-green-600"
-                      }
+                      className={`w-3 h-3 md:w-3.5 md:h-3.5 ${
+                        darkMode ? "text-green-400" : "text-green-600"
+                      }`}
                     />
 
                     <span
-                      className={`text-xs font-semibold ${
-                        darkMode
-                          ? "text-green-400"
-                          : "text-green-600"
+                      className={`text-[10px] md:text-xs font-semibold whitespace-nowrap ${
+                        darkMode ? "text-green-400" : "text-green-600"
                       }`}
                     >
                       {stat.trend}

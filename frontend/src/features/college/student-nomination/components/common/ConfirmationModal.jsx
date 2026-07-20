@@ -1,3 +1,4 @@
+import React from "react";
 import { useOutletContext } from "react-router-dom";
 import {
   AlertTriangle,
@@ -7,6 +8,9 @@ import {
   X,
 } from "lucide-react";
 
+/**
+ * Mappings for color variations based on the action type.
+ */
 const variants = {
   danger: {
     icon: Trash2,
@@ -14,21 +18,18 @@ const variants = {
     iconColor: "text-red-600",
     confirmBtn: "bg-red-600 hover:bg-red-700 text-white",
   },
-
   warning: {
     icon: AlertTriangle,
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
     confirmBtn: "bg-amber-500 hover:bg-amber-600 text-white",
   },
-
   success: {
     icon: CheckCircle2,
     iconBg: "bg-emerald-100",
     iconColor: "text-emerald-600",
     confirmBtn: "bg-emerald-600 hover:bg-emerald-700 text-white",
   },
-
   info: {
     icon: Info,
     iconBg: "bg-blue-100",
@@ -48,7 +49,10 @@ const ConfirmationModal = ({
   onConfirm,
   onCancel,
 }) => {
-  const { darkMode } = useOutletContext();
+
+  const context = useOutletContext();
+  const darkMode = context?.darkMode ?? false;
+
 
   if (!isOpen) return null;
 
@@ -59,54 +63,37 @@ const ConfirmationModal = ({
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm">
       <div
         className={`w-full max-w-md rounded-3xl border shadow-2xl transition-all duration-300 ${
-          darkMode
-            ? "border-slate-700 bg-[#151D30]"
-            : "border-slate-200 bg-white"
+          darkMode ? "border-slate-700 bg-[#151D30]" : "border-slate-200 bg-white"
         }`}
       >
-        {/* Header */}
-
+        {/* Header Section */}
         <div
           className={`flex items-center justify-between border-b px-6 py-5 ${
             darkMode ? "border-slate-700" : "border-slate-200"
           }`}
         >
           <h2 className="text-xl font-bold">{title}</h2>
-
           <button
             onClick={onCancel}
             className={`rounded-lg p-2 transition ${
-              darkMode
-                ? "hover:bg-slate-800"
-                : "hover:bg-slate-100"
+              darkMode ? "hover:bg-slate-800" : "hover:bg-slate-100"
             }`}
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* Body */}
-
+        {/* Modal Body Info Panel */}
         <div className="flex flex-col items-center px-8 py-8 text-center">
-          <div
-            className={`mb-5 flex h-20 w-20 items-center justify-center rounded-full ${current.iconBg}`}
-          >
+          <div className={`mb-5 flex h-20 w-20 items-center justify-center rounded-full ${current.iconBg}`}>
             <Icon className={current.iconColor} size={36} />
           </div>
-
-          <p
-            className={`text-base leading-7 ${
-              darkMode
-                ? "text-slate-300"
-                : "text-slate-600"
-            }`}
-          >
+          <p className={`text-base leading-7 ${darkMode ? "text-slate-300" : "text-slate-600"}`}>
             {message}
           </p>
         </div>
 
-        {/* Footer */}
-
+        {/* Action Button Controls Footer */}
         <div
           className={`flex justify-end gap-3 border-t px-6 py-5 ${
             darkMode ? "border-slate-700" : "border-slate-200"
@@ -116,9 +103,7 @@ const ConfirmationModal = ({
             onClick={onCancel}
             disabled={loading}
             className={`rounded-xl px-5 py-2.5 font-medium transition ${
-              darkMode
-                ? "bg-slate-800 text-white hover:bg-slate-700"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              darkMode ? "bg-slate-800 text-white hover:bg-slate-700" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
             {cancelText}
