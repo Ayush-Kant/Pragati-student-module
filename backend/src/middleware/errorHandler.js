@@ -14,6 +14,7 @@
  * ─────────────
  * Express 4-argument error handler.
  * Reads err.statusCode if set by service/model layers, defaults to 500.
+ * Also handles err.status for backward compatibility with Projects Backend services.
  *
  * @param {Error}  err
  * @param {object} req
@@ -23,6 +24,7 @@
 const errorHandler = (err, req, res, next) => {
     // Determine appropriate HTTP status code
     const statusCode = err.statusCode
+        || err.status
         || (err.code === '23505' ? 409 : null)  // PostgreSQL unique violation
         || (err.code === '23503' ? 404 : null)  // PostgreSQL foreign key violation
         || 500;
