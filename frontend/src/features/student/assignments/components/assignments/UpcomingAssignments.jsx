@@ -4,13 +4,13 @@ import EmptyState from "../common/EmptyState";
 import SectionHeader from "../common/SectionHeader";
 import { Clock3, PartyPopper } from "lucide-react";
 
-const UpcomingAssignments = ({ assignments = [], onSelect }) => {
+const UpcomingAssignments = ({ assignments = [], onSelect, darkMode = false }) => {
   const upcoming = assignments.filter(
     (a) => a.status === ASSIGNMENT_STATUS.PENDING
   );
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
+    <div className={`rounded-2xl border shadow-sm p-5 sm:p-6 transition-colors ${darkMode ? "bg-slate-900 border-slate-700" : "bg-white border-gray-100"}`}>
       <SectionHeader
         title={
           <div className="flex items-center gap-2">
@@ -19,6 +19,7 @@ const UpcomingAssignments = ({ assignments = [], onSelect }) => {
           </div>
         }
         subtitle={`${upcoming.length} pending`}
+        darkMode={darkMode}
       />
 
       {upcoming.length === 0 ? (
@@ -26,6 +27,7 @@ const UpcomingAssignments = ({ assignments = [], onSelect }) => {
           icon={<PartyPopper className="w-8 h-8 text-emerald-500" />}
           title="All caught up!"
           description="No pending assignments right now."
+          darkMode={darkMode}
         />
       ) : (
         <div className="flex flex-col gap-3">
@@ -34,6 +36,7 @@ const UpcomingAssignments = ({ assignments = [], onSelect }) => {
               key={assignment.id}
               assignment={assignment}
               onClick={onSelect}
+              darkMode={darkMode}
             />
           ))}
         </div>

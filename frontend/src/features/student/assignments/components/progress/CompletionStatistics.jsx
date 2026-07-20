@@ -11,7 +11,7 @@ import {
   Upload,
 } from "lucide-react";
 
-const CompletionStatistics = ({ assignments = [] }) => {
+const CompletionStatistics = ({ assignments = [], darkMode = false }) => {
   const total = assignments.length;
   const completed = assignments.filter(
     (a) => a.status === ASSIGNMENT_STATUS.COMPLETED
@@ -64,10 +64,10 @@ const CompletionStatistics = ({ assignments = [] }) => {
 
   return (
     <div>
-      {/* Section label — Linear/Vercel style above stat grid */}
+      {/* Section label */}
       <div className="flex items-center gap-2 mb-3">
-        <BarChart3 className="w-3.5 h-3.5 text-gray-400" />
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400">
+        <BarChart3 className={`w-3.5 h-3.5 ${darkMode ? "text-slate-600" : "text-gray-400"}`} />
+        <p className={`text-[11px] font-semibold uppercase tracking-widest ${darkMode ? "text-slate-500" : "text-gray-400"}`}>
           Overview
         </p>
       </div>
@@ -83,6 +83,7 @@ const CompletionStatistics = ({ assignments = [] }) => {
             iconBg={stat.iconBg}
             textColor={stat.textColor}
             icon={stat.icon}
+            darkMode={darkMode}
           />
         ))}
       </div>

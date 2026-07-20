@@ -7,7 +7,7 @@ const STATUS_ICONS = {
   Late: <AlertTriangle className="w-4 h-4 text-red-500" />,
 };
 
-const SubmissionStatus = ({ status }) => {
+const SubmissionStatus = ({ status, darkMode = false }) => {
   if (!status) return null;
 
   const icon = STATUS_ICONS[status] ?? <FileText className="w-4 h-4 text-gray-400" />;
@@ -15,9 +15,7 @@ const SubmissionStatus = ({ status }) => {
   return (
     <div className="flex items-center gap-2">
       {icon}
-      <span
-        className={`text-xs font-semibold px-2.5 py-1 rounded-full ${getStatusColor(status)}`}
-      >
+      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${getStatusColor(status)}`}>
         {status}
       </span>
     </div>

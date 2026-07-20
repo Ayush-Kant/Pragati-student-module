@@ -11,6 +11,7 @@ const AssignmentSubmissionForm = ({
   loading = false,
   submissionError = "",
   submissionMessage = "",
+  darkMode = false,
 }) => {
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState(null);
@@ -36,26 +37,26 @@ const AssignmentSubmissionForm = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-3xl border border-gray-200 bg-white shadow-sm overflow-hidden"
+      className={`rounded-3xl border shadow-sm overflow-hidden transition-colors ${darkMode ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"}`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 px-7 py-5">
+      <div className={`flex items-center justify-between border-b px-7 py-5 transition-colors ${darkMode ? "border-slate-700" : "border-gray-100"}`}>
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
+          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${darkMode ? "bg-blue-900/30" : "bg-blue-50"}`}>
             <Upload className="h-6 w-6 text-blue-600" />
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gray-400">
+            <p className={`text-xs font-semibold uppercase tracking-[0.25em] ${darkMode ? "text-slate-500" : "text-gray-400"}`}>
               Assignment Submission
             </p>
 
-            <h2 className="mt-1 text-xl font-bold text-gray-900">
+            <h2 className={`mt-1 text-xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
               Submit Assignment
             </h2>
 
             {assignment?.title && (
-              <p className="mt-1 text-sm text-gray-500">
+              <p className={`mt-1 text-sm ${darkMode ? "text-slate-400" : "text-gray-500"}`}>
                 {assignment.title}
               </p>
             )}
@@ -67,19 +68,23 @@ const AssignmentSubmissionForm = ({
       <div className="space-y-6 p-7">
 
         {submissionError && (
-          <ErrorState message={submissionError} />
+          <ErrorState message={submissionError} darkMode={darkMode} />
         )}
 
         {submissionMessage && (
-          <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+          <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium ${
+            darkMode
+              ? "border-emerald-800 bg-emerald-900/20 text-emerald-400"
+              : "border-emerald-200 bg-emerald-50 text-emerald-700"
+          }`}>
+            <CheckCircle2 className={`h-5 w-5 ${darkMode ? "text-emerald-500" : "text-emerald-500"}`} />
             {submissionMessage}
           </div>
         )}
 
         {/* Notes */}
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <label className={`mb-2 block text-xs font-semibold uppercase tracking-wider ${darkMode ? "text-slate-400" : "text-gray-500"}`}>
             Submission Notes
             <span className="text-red-500"> *</span>
           </label>
@@ -89,10 +94,14 @@ const AssignmentSubmissionForm = ({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Describe your submission, implementation details, approach, or notes for the evaluator..."
-            className={`w-full rounded-2xl border bg-white px-4 py-3 text-sm text-gray-700 transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100 ${
+            className={`w-full rounded-2xl border px-4 py-3 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 ${
               errors.notes
-                ? "border-red-300"
-                : "border-gray-200"
+                ? darkMode
+                  ? "border-red-700 bg-slate-800 text-slate-200 focus:ring-red-900/30"
+                  : "border-red-300 bg-white text-gray-700 focus:ring-blue-100"
+                : darkMode
+                ? "border-slate-600 bg-slate-800 text-slate-200 placeholder:text-slate-500 focus:ring-blue-900/30"
+                : "border-gray-200 bg-white text-gray-700 placeholder:text-gray-400 focus:ring-blue-100"
             }`}
           />
 
@@ -105,7 +114,7 @@ const AssignmentSubmissionForm = ({
 
         {/* Upload */}
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <label className={`mb-2 block text-xs font-semibold uppercase tracking-wider ${darkMode ? "text-slate-400" : "text-gray-500"}`}>
             Upload File
             <span className="text-red-500"> *</span>
           </label>
@@ -114,17 +123,22 @@ const AssignmentSubmissionForm = ({
             file={file}
             onFileChange={setFile}
             error={errors.file}
+            darkMode={darkMode}
           />
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 border-t border-gray-100 pt-5">
+        <div className={`flex justify-end gap-3 border-t pt-5 ${darkMode ? "border-slate-700" : "border-gray-100"}`}>
 
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50"
+              className={`rounded-xl border px-5 py-2.5 text-sm font-semibold transition ${
+                darkMode
+                  ? "border-slate-600 text-slate-300 hover:bg-slate-700"
+                  : "border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
             >
               Cancel
             </button>
