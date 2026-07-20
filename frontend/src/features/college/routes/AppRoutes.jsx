@@ -48,6 +48,7 @@ import StudentProfilePage from "../student-profile/pages/StudentProfilePage";
 import DepartmentsPage from "../departments/pages/DepartmentsPage";
 import PlacementDrivesPage from "../placement-drives/pages/PlacementDrivesPage";
 import ReportsPage from "../reports/pages/ReportsPage";
+import StudentNominationPage from "../student-nomination/pages/StudentNominationPage";
 
 const collegeRoute = (
   <Route element={<PrivateRoute />}>
@@ -67,12 +68,13 @@ const collegeRoute = (
         <Route path="student-profile/:id" element={<StudentProfilePage />} />
         <Route path="student-performance" element={<StudentProfilePage />} />
         
+        <Route path="student-nomination" element={<StudentNominationPage />} />
+        
         <Route path="company-job-postings" element={<CompanyJobPostingsPage />} />
         <Route path="companies" element={<CompanyJobPostingsPage />} />
         
         <Route path="drives" element={<PlacementDrivesPage />} />
         <Route path="reports" element={<ReportsPage />} />
-
         {/* Render a blank page with sidebar/footer if page is not created yet */}
         <Route path="*" element={<div className="min-h-[400px]" />} />
       </Route>
