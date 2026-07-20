@@ -1,4 +1,5 @@
 import { pool } from "../../config/db.js";
+import { resolveAssignmentStudentId } from "../utils/assignmentHelpers.js";
 
 const createFeedbackTable = async () => {
   await pool.query(`
@@ -19,7 +20,8 @@ const createFeedbackTable = async () => {
 };
 
 export const getFeedback = async (assignmentId, user = {}) => {
-  const studentId = user.role === "student" ? user.id : null;
+  const resolvedStudentId = await resolveAssignmentStudentId(user, null);
+  const studentId = user?.role === "student" ? resolvedStudentId : null;
   const result = await pool.query(`
     SELECT id, assignment_id AS "assignmentId", student_id AS "studentId", submission_id AS "submissionId", remarks, grade, created_at AS "createdAt"
     FROM assignment_feedback
@@ -30,7 +32,7 @@ export const getFeedback = async (assignmentId, user = {}) => {
 };
 
 export const addFeedback = async (assignmentId, payload = {}, user = {}) => {
-  const studentId = payload.studentId ?? user.id;
+  const studentId = await resolveAssignmentStudentId(user, payload.studentId ?? null);
   const submissionId = payload.submissionId ?? null;
   const result = await pool.query(`
     INSERT INTO assignment_feedback (assignment_id, student_id, submission_id, remarks, grade)

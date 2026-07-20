@@ -1,4 +1,5 @@
 import { pool } from "../../config/db.js";
+import { resolveAssignmentStudentId } from "../utils/assignmentHelpers.js";
 
 const createGradeTable = async () => {
   await pool.query(`
@@ -24,7 +25,8 @@ const createGradeTable = async () => {
 
 export const getGrades = async (query = {}, user = {}) => {
   const assignmentId = query.assignmentId || null;
-  const studentId = user?.role === "student" ? user.id : (query.studentId || null);
+  const resolvedStudentId = await resolveAssignmentStudentId(user, query.studentId ?? null);
+  const studentId = user?.role === "student" ? resolvedStudentId : (query.studentId ? resolvedStudentId : null);
   const result = await pool.query(`
     SELECT id, assignment_id AS "assignmentId", student_id AS "studentId", marks, grade, created_at AS "createdAt", updated_at AS "updatedAt"
     FROM assignment_grades
@@ -36,7 +38,9 @@ export const getGrades = async (query = {}, user = {}) => {
 };
 
 export const updateGrades = async (assignmentId, payload = {}, user = {}) => {
-  if (!payload.studentId) {
+  const studentId = await resolveAssignmentStudentId(user, payload.studentId ?? null);
+
+  if (!studentId) {
     const error = new Error("studentId is required");
     error.status = 400;
     throw error;
@@ -50,7 +54,7 @@ export const updateGrades = async (assignmentId, payload = {}, user = {}) => {
       grade = EXCLUDED.grade,
       updated_at = NOW()
     RETURNING id, assignment_id AS "assignmentId", student_id AS "studentId", marks, grade, created_at AS "createdAt", updated_at AS "updatedAt"
-  `, [assignmentId, payload.studentId, payload.marks || 0, payload.grade || "N/A"]);
+  `, [assignmentId, studentId, payload.marks || 0, payload.grade || "N/A"]);
   return result.rows[0];
 };
 
