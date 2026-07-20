@@ -35,6 +35,7 @@ import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import NotificationsPage from "../pages/NotificationsPage";
 import DiscussionForumPage from "../pages/DiscussionForumPage";
 import SlotsCalendarPage from "../pages/SlotsCalendarPage";
+import SettingsPage from "../../../pages/mentor/SettingsPage";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
