@@ -247,7 +247,6 @@ async function runMigrations() {
     console.error(error);
 
     throw error;
-
   } finally {
     client.release();
   }

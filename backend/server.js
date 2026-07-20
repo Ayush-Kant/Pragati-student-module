@@ -38,12 +38,13 @@ import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
-
-// Company Assessment route
-import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
+import certificatesRouter from "./routes/certificates.routes.js";
+import badgesRouter from "./routes/badges.routes.js";
+import { getStudentBadgesController } from "./controllers/badges.controller.js";
+import authMiddleware from "./middleware/authMiddleware.js";
 
 // --- Intern Features ---
-import companyRoutes from "./routes/company.routes.js";
+// import companyRoutes from "./routes/company.routes.js";
 import mentorHiringRoutes from "./routes/mentorHiring.routes.js";
 // -----------------------
 
@@ -108,12 +109,13 @@ app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1/skills", skillsRoutes);
 
 
+app.use("/api/mentor/content", contentRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/mentor", mentorHiringRoutes); // <-- Added from intern code
 
 app.use("/api/v1/company", companyProfileRoutes);
-app.use("/api/v1/company", companyRoutes); // <-- Added from intern code
+// app.use("/api/v1/company", companyRoutes); // <-- Added from intern code
 app.use("/api/v1/company/interviews", interviewRoutes); // <-- Added from intern code
 app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/v1/company/jobs", collegeJobsRoutes);
@@ -129,6 +131,14 @@ app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
+
+app.use("/api/v1/certificates", certificatesRouter);
+app.use("/api/v1/badges", badgesRouter);
+app.get(
+  "/api/v1/students/:id/badges",
+  authMiddleware,
+  getStudentBadgesController,
+);
 
 app.get("/", (req, res) => {
   res.json({

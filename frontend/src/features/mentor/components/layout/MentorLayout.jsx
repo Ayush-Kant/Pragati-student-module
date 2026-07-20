@@ -10,13 +10,14 @@ import {
   Bell,
   HelpCircle,
   Briefcase,
+  MessageSquare,
   BookOpen,
   Activity,
   Database,
   FlaskConical,
-  History,
   Users,
   LogOut,
+  CalendarDays,
 } from "lucide-react";
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -53,7 +54,7 @@ export default function MentorLayout() {
     {
       name: "Mentees",
       path: "/mentor/mentees",
-      icon: <Users className="w-5, h-5" />,
+      icon: <Users className="w-5 h-5" />,
     },
     {
       name: "Courses",
@@ -69,6 +70,21 @@ export default function MentorLayout() {
       name: "Activities",
       path: "/mentor/activities",
       icon: <Activity className="w-5 h-5" />,
+    },
+    {
+      name: "Sessions",
+      path: "/mentor/slots",
+      icon: <CalendarDays className="w-5 h-5" />,
+    },
+    {
+      name: "Discussion Forum",
+      path: "/mentor/discussion-forum",
+      icon: <MessageSquare className="w-5 h-5" />,
+    },
+    {
+      name: "Notifications",
+      path: "/mentor/notifications",
+      icon: <Bell className="w-5 h-5" />,
     },
     {
       name: "Question Bank",
@@ -95,7 +111,6 @@ export default function MentorLayout() {
       path: "/mentor/settings",
       icon: <Settings className="w-5 h-5" />,
     },
-    // You can add as many items here as you want; the sidebar will now scroll!
   ];
 
   const isItemActive = (item) => {
@@ -151,7 +166,7 @@ export default function MentorLayout() {
   });
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans m-0 p-0 box-border">
+    <div className="flex h-screen overflow-hidden bg-slate-50 font-sans m-0 p-0 box-border">
       {/* 1. FIXED LEFT SIDEBAR */}
       <aside className="fixed left-0 top-0 z-30 flex h-screen w-[260px] flex-col border-r border-slate-200 bg-white">
         {/* Logo - Sticky at the top */}
@@ -210,9 +225,9 @@ export default function MentorLayout() {
       </aside>
 
       {/* 2. RIGHT SIDE CONTENT CANVAS */}
-      <div className="ml-[260px] flex min-w-0 flex-1 flex-col">
+      <div className="ml-[260px] flex min-w-0 flex-1 flex-col overflow-y-auto">
         {/* Top Header Navigation Bar */}
-        <header className="sticky top-0 z-20 flex h-[70px] items-center justify-between border-b border-slate-200 bg-white px-6">
+        <header className="sticky top-0 z-20 flex h-35 items-center justify-between border-b border-slate-200 bg-white p-3">
           {/* Search */}
           <div className="relative w-[320px]">
             <input
@@ -226,8 +241,11 @@ export default function MentorLayout() {
           </div>
 
           {/* User Profile */}
-          <div className="flex items-center gap-6">
-            <button className="text-slate-500 hover:text-slate-700 transition-colors">
+          <div className="flex items-center gap-6 shrink-0">
+            <button
+              onClick={() => navigate("/mentor/notifications")}
+              className="text-slate-500 hover:text-slate-700 transition-colors"
+            >
               <Bell className="h-5 w-5" />
             </button>
 
