@@ -1,4 +1,5 @@
 import "./../styles/companyDashboard.css";
+import { useCompanyDashboard } from '../hooks/useCompanyDashboard';
 
 import ActivityFeed from "../components/ActivityFeed";
 import QuickActions from "../components/QuickActions";
@@ -8,86 +9,18 @@ import CandidateFunnelChart from "../components/CandidateFunnelChart";
 import CollegeParticipationTable from "../components/CollegeParticipationTable";
 
 const CompanyDashboard = () => {
-  const dummyStats = {
-    activeDrives: 12,
-    applications: 245,
-    interviews: 48,
-    offers: 16,
-    successRate: 82,
-  };
+  const { stats, funnelData, collegeStats, activities, loading, error } = useCompanyDashboard();
 
-  const funnelData = [
-    {
-      stage: "Applied",
-      count: 320,
-    },
-    {
-      stage: "Screened",
-      count: 220,
-    },
-    {
-      stage: "Trained",
-      count: 180,
-    },
-    {
-      stage: "Shortlisted",
-      count: 95,
-    },
-    {
-      stage: "Selected",
-      count: 42,
-    },
-  ];
-
-  const collegeStats = [
-    {
-      name: "IIT Hyderabad",
-      count: 120,
-    },
-    {
-      name: "NIT Warangal",
-      count: 98,
-    },
-    {
-      name: "VIT Chennai",
-      count: 85,
-    },
-    {
-      name: "SRM University",
-      count: 76,
-    },
-    {
-      name: "JNTU Hyderabad",
-      count: 64,
-    },
-  ];
-
-  const activities = [
-  {
-    initials: "RK",
-    message:
-      "Rahul Kumar completed interview round.",
-    time: "2 mins ago",
-  },
-  {
-    initials: "SP",
-    message:
-      "Sneha Patel accepted the offer letter.",
-    time: "10 mins ago",
-  },
-  {
-    initials: "AJ",
-    message:
-      "Aman Jain applied for Frontend Developer role.",
-    time: "25 mins ago",
-  },
-  {
-    initials: "NT",
-    message:
-      "Niharika T scheduled technical interview.",
-    time: "1 hour ago",
-  },
-];
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin inline-block"></div>
+          <p className="text-gray-600 mt-4 font-semibold">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="company-dashboard">
@@ -100,7 +33,13 @@ const CompanyDashboard = () => {
         </p>
       </div>
 
-      <CompanyStatsRow stats={dummyStats} />
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm text-red-700 text-sm font-medium">
+          {error}
+        </div>
+      )}
+
+      <CompanyStatsRow stats={stats} />
 
       <div className="dashboard-grid">
         <CandidateFunnelChart data={funnelData} />
@@ -110,10 +49,10 @@ const CompanyDashboard = () => {
         />
       </div>
       <div className="dashboard-bottom-grid">
-  <ActivityFeed activities={activities} />
+        <ActivityFeed activities={activities} />
 
-  <QuickActions />
-</div>
+        <QuickActions />
+      </div>
     </div>
   );
 };

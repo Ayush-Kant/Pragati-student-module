@@ -1,15 +1,12 @@
-<<<<<<< HEAD
-{}
-=======
 {
-  "name": "coding-challenges-backend",
-  "version": "1.0.0",
-  "description": "Backend module for coding challenges using Node.js, Express.js, and PostgreSQL.",
-  "main": "src/app.js",
+  "name": "pragati-root",
+  "private": true,
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
-    "test": "jest"
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "start:challenges": "node src/app.js",
+    "dev:challenges": "nodemon src/app.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -23,16 +20,5 @@
   "devDependencies": {
     "jest": "^27.0.6",
     "nodemon": "^2.0.7"
-  },
-  "keywords": [
-    "coding",
-    "challenges",
-    "backend",
-    "nodejs",
-    "express",
-    "postgresql"
-  ],
-  "author": "Your Name",
-  "license": "MIT"
+  }
 }
->>>>>>> 61c0bb6dbe72babebc1782d25c04b31425c871d4

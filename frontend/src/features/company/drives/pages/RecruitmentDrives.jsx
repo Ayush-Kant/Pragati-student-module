@@ -7,58 +7,15 @@ import { DriveFilters } from '../components/DriveFilters';
 import { DrivesTable } from '../components/DrivesTable';
 import { CreateDriveDrawer } from '../components/CreateDriveDrawer';
 import { StageBadge } from '../components/StageBadge';
-import { candidateService } from '../../candidates/services/candidateService';
-
-const initialDrivesData = [
-  {
-    id: 1,
-    driveName: 'Software Engineer - 2026',
-    role: 'Software Engineer',
-    candidates: 245,
-    stage: 'Active',
-    deadline: 'Jun 15, 2026',
-  },
-  {
-    id: 2,
-    driveName: 'Data Analyst Drive',
-    role: 'Data Analyst',
-    candidates: 167,
-    stage: 'Assessment',
-    deadline: 'Jun 20, 2026',
-  },
-  {
-    id: 3,
-    driveName: 'Product Manager Hiring',
-    role: 'Product Manager',
-    candidates: 89,
-    stage: 'Interview',
-    deadline: 'Jun 25, 2026',
-  },
-  {
-    id: 4,
-    driveName: 'UI/UX Designer - Campus',
-    role: 'UI/UX Designer',
-    candidates: 134,
-    stage: 'Screening',
-    deadline: 'Jul 1, 2026',
-  },
-  {
-    id: 5,
-    driveName: 'DevOps Engineer',
-    role: 'DevOps Engineer',
-    candidates: 76,
-    stage: 'Active',
-    deadline: 'Jul 5, 2026',
-  },
-];
+import { useCompanyDrives } from '../../hooks/useCompanyDrives';
 
 // Helper to extract year from driveName or deadline
 const getDriveYear = (drive) => {
   const match = drive.driveName.match(/\b(202[4-7])\b/);
   if (match) return match[1];
   
-  if (drive.deadline) {
-    const deadlineMatch = drive.deadline.match(/\b(202[4-7])\b/);
+  if (drive.rawDeadline) {
+    const deadlineMatch = drive.rawDeadline.match(/\b(202[4-7])\b/);
     if (deadlineMatch) return deadlineMatch[1];
   }
   return null;
@@ -69,7 +26,18 @@ export const RecruitmentDrives = () => {
   const navigate = useNavigate();
   const shouldOpenCreateDrive = Boolean(location.state?.openCreateDrive);
   const [isDrawerOpen, setIsDrawerOpen] = useState(shouldOpenCreateDrive);
-  const [drives, setDrives] = useState(initialDrivesData);
+
+  const {
+    drives,
+    loading,
+    error,
+    createDrive,
+    updateDrive,
+    closeDrive,
+    pauseDrive,
+    fetchCandidates
+  } = useCompanyDrives();
+
   const [filters, setFilters] = useState({
     search: '',
     status: '',
@@ -102,31 +70,13 @@ export const RecruitmentDrives = () => {
     return [...new Set(values)].filter(Boolean);
   };
 
-  const formatDeadline = (date) => {
-    if (!date) return 'TBD';
-
-    return new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
-  const handleCreateDrive = (drive) => {
-    setDrives(prev => [
-      ...prev,
-      {
-        id: Date.now(),
-        driveName: drive.driveName,
-        role: drive.college || 'Campus Drive',
-        college: drive.college,
-        candidates: 0,
-        stage: 'Active',
-        deadline: formatDeadline(drive.date),
-        description: drive.description,
-      },
-    ]);
-    toast.success('Drive created successfully');
+  const handleCreateDrive = async (driveData) => {
+    try {
+      await createDrive(driveData);
+      toast.success('Recruitment drive created successfully');
+    } catch (err) {
+      toast.error('Failed to create recruitment drive');
+    }
   };
 
   const filteredDrives = drives.filter(drive => {
@@ -138,10 +88,26 @@ export const RecruitmentDrives = () => {
     return matchSearch && matchStatus && matchDepartment && matchYear;
   });
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin inline-block"></div>
+          <p className="text-gray-600 mt-4 font-semibold">Loading recruitment drives...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-auto">
       <div>
         <DrivesHeader onCreateClick={() => setIsDrawerOpen(true)} />
+        {error && (
+          <div className="mx-8 my-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg text-red-700 text-sm font-medium">
+            {error}
+          </div>
+        )}
         <DriveFilters
           filters={filters}
           updateFilter={updateFilter}
@@ -199,16 +165,26 @@ export const RecruitmentDrives = () => {
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Role / Department</label>
-                  <p className="text-gray-800 font-medium text-[15px]">{selectedDrive.role}</p>
+                  <p className="text-gray-800 font-medium text-[15px]">{selectedDrive.role} / {selectedDrive.department || 'General'}</p>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Candidates</label>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Candidates Registered</label>
                   <p className="text-gray-800 font-medium text-[15px]">{selectedDrive.candidates}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Stage</label>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Salary Package</label>
+                  <p className="text-gray-800 font-medium text-[15px]">{selectedDrive.salaryPackage || 'Not Disclosed'}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Work Mode</label>
+                  <p className="text-gray-800 font-medium text-[15px]">{selectedDrive.workMode} ({selectedDrive.location || 'Bangalore'})</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Status</label>
                   <div className="mt-1">
                     <StageBadge stage={selectedDrive.stage} />
                   </div>
@@ -236,10 +212,22 @@ export const RecruitmentDrives = () => {
         <EditDriveModal
           drive={selectedDrive}
           onClose={() => setActiveModal(null)}
-          onSave={(updatedDrive) => {
-            setDrives(prev => prev.map(d => d.id === updatedDrive.id ? updatedDrive : d));
-            toast.success('Drive updated successfully');
-            setActiveModal(null);
+          onSave={async (updatedDrive) => {
+            try {
+              await updateDrive(selectedDrive.id, {
+                jobTitle: updatedDrive.jobTitle,
+                department: updatedDrive.department,
+                requiredSkills: updatedDrive.requiredSkills,
+                salaryPackage: updatedDrive.salaryPackage,
+                workMode: updatedDrive.workMode,
+                location: updatedDrive.location,
+                deadline: updatedDrive.rawDeadline
+              });
+              toast.success('Drive updated successfully');
+              setActiveModal(null);
+            } catch (err) {
+              toast.error('Failed to update drive');
+            }
           }}
         />
       )}
@@ -248,6 +236,7 @@ export const RecruitmentDrives = () => {
       {activeModal === 'candidates' && selectedDrive && (
         <ViewCandidatesModal
           drive={selectedDrive}
+          fetchCandidates={fetchCandidates}
           onClose={() => setActiveModal(null)}
         />
       )}
@@ -257,10 +246,20 @@ export const RecruitmentDrives = () => {
         <ChangeStageModal
           drive={selectedDrive}
           onClose={() => setActiveModal(null)}
-          onSave={(newStage) => {
-            setDrives(prev => prev.map(d => d.id === selectedDrive.id ? { ...d, stage: newStage } : d));
-            toast.success('Stage updated successfully');
-            setActiveModal(null);
+          onSave={async (newStage) => {
+            try {
+              if (newStage === 'CLOSED') {
+                await closeDrive(selectedDrive.id);
+              } else if (newStage === 'PAUSED') {
+                await pauseDrive(selectedDrive.id);
+              } else {
+                await updateDrive(selectedDrive.id, { status: 'active' });
+              }
+              toast.success('Stage updated successfully');
+              setActiveModal(null);
+            } catch (err) {
+              toast.error('Failed to update stage');
+            }
           }}
         />
       )}
@@ -270,10 +269,14 @@ export const RecruitmentDrives = () => {
         <DeleteConfirmationModal
           drive={selectedDrive}
           onClose={() => setActiveModal(null)}
-          onDelete={() => {
-            setDrives(prev => prev.filter(d => d.id !== selectedDrive.id));
-            toast.success('Drive deleted successfully');
-            setActiveModal(null);
+          onDelete={async () => {
+            try {
+              await closeDrive(selectedDrive.id);
+              toast.success('Drive closed successfully');
+              setActiveModal(null);
+            } catch (err) {
+              toast.error('Failed to close drive');
+            }
           }}
         />
       )}
@@ -283,23 +286,28 @@ export const RecruitmentDrives = () => {
 
 // Edit Drive Modal Component
 const EditDriveModal = ({ drive, onClose, onSave }) => {
-  const [driveName, setDriveName] = useState(drive.driveName);
-  const [role, setRole] = useState(drive.role);
-  const [stage, setStage] = useState(drive.stage);
-  const [deadline, setDeadline] = useState(drive.deadline);
+  const [jobTitle, setJobTitle] = useState(drive.jobTitle);
+  const [department, setDepartment] = useState(drive.department || 'Engineering');
+  const [requiredSkills, setRequiredSkills] = useState(drive.requiredSkills ? drive.requiredSkills.join(', ') : 'React, Node.js');
+  const [salaryPackage, setSalaryPackage] = useState(drive.salaryPackage);
+  const [workMode, setWorkMode] = useState(drive.workMode);
+  const [location, setLocation] = useState(drive.location);
+  const [rawDeadline, setRawDeadline] = useState(drive.rawDeadline);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!driveName.trim() || !role.trim()) {
+    if (!jobTitle.trim()) {
       toast.error('Please fill in all required fields');
       return;
     }
     onSave({
-      ...drive,
-      driveName,
-      role,
-      stage,
-      deadline
+      jobTitle,
+      department,
+      requiredSkills: requiredSkills.split(',').map(s => s.trim()),
+      salaryPackage,
+      workMode,
+      location,
+      rawDeadline
     });
   };
 
@@ -317,54 +325,84 @@ const EditDriveModal = ({ drive, onClose, onSave }) => {
           </button>
         </div>
         
-        <div className="p-8 space-y-5">
-          {/* Drive Name */}
+        <div className="p-8 space-y-5 max-h-[450px] overflow-y-auto">
+          {/* Job Title */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Drive Name</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Drive Name / Job Title</label>
             <input
               type="text"
-              value={driveName}
-              onChange={(e) => setDriveName(e.target.value)}
+              value={jobTitle}
+              onChange={(e) => setJobTitle(e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
               required
             />
           </div>
 
-          {/* Role */}
+          {/* Department */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Role / Department</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Department</label>
             <input
               type="text"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
-              required
             />
           </div>
 
-          {/* Stage */}
+          {/* Required Skills */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Stage</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Required Skills</label>
+            <input
+              type="text"
+              value={requiredSkills}
+              onChange={(e) => setRequiredSkills(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+            />
+          </div>
+
+          {/* Salary Package */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Salary Package</label>
+            <input
+              type="text"
+              value={salaryPackage}
+              onChange={(e) => setSalaryPackage(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+            />
+          </div>
+
+          {/* Work Mode */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Work Mode</label>
             <select
-              value={stage}
-              onChange={(e) => setStage(e.target.value)}
+              value={workMode}
+              onChange={(e) => setWorkMode(e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm bg-white"
             >
-              <option value="Active">Active</option>
-              <option value="Assessment">Assessment</option>
-              <option value="Interview">Interview</option>
-              <option value="Screening">Screening</option>
+              <option value="Remote">Remote</option>
+              <option value="Onsite">Onsite</option>
+              <option value="Hybrid">Hybrid</option>
             </select>
+          </div>
+
+          {/* Job Location */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+            />
           </div>
 
           {/* Deadline */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Deadline</label>
             <input
-              type="text"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              placeholder="e.g. Jun 15, 2026"
+              type="date"
+              value={rawDeadline}
+              onChange={(e) => setRawDeadline(e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
             />
           </div>
@@ -391,26 +429,24 @@ const EditDriveModal = ({ drive, onClose, onSave }) => {
 };
 
 // View Candidates Modal Component
-const ViewCandidatesModal = ({ drive, onClose }) => {
+const ViewCandidatesModal = ({ drive, fetchCandidates, onClose }) => {
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCandidates = async () => {
+    const loadCandidates = async () => {
       try {
         setLoading(true);
-        const all = await candidateService.getAllCandidates();
-        // Match by role
-        const matched = all.filter(c => c.role.toLowerCase() === drive.role.toLowerCase());
-        setCandidates(matched);
+        const data = await fetchCandidates(drive.id);
+        setCandidates(data);
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    fetchCandidates();
-  }, [drive.role]);
+    loadCandidates();
+  }, [drive.id, fetchCandidates]);
 
   return (
     <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -419,7 +455,7 @@ const ViewCandidatesModal = ({ drive, onClose }) => {
           <div>
             <h3 className="text-2xl font-bold text-gray-900">Candidates</h3>
             <p className="text-sm text-gray-500 mt-1">
-              Associated with <span className="font-semibold text-gray-700">{drive.driveName}</span> ({drive.role})
+              Associated with <span className="font-semibold text-gray-700">{drive.driveName}</span>
             </p>
           </div>
           <button
@@ -443,25 +479,15 @@ const ViewCandidatesModal = ({ drive, onClose }) => {
           ) : (
             <div className="space-y-4">
               {candidates.map((c) => (
-                <div key={c.id} className="p-4 border border-gray-100 rounded-2xl flex items-center justify-between hover:bg-gray-50 transition flex-col sm:flex-row gap-4">
+                <div key={c.candidateId} className="p-4 border border-gray-100 rounded-2xl flex items-center justify-between hover:bg-gray-50 transition flex-col sm:flex-row gap-4">
                   <div className="flex items-center gap-4 flex-1">
                     <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold text-lg shrink-0">
-                      {c.avatar || c.name.charAt(0)}
+                      {c.name.charAt(0)}
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-800">{c.name}</h4>
-                      <p className="text-xs text-gray-500">{c.college} • {c.degree || 'B.Tech'}</p>
-                      <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400 flex-wrap">
-                        <span className="flex items-center gap-1"><Mail size={12} /> {c.email}</span>
-                        <span className="flex items-center gap-1"><Phone size={12} /> {c.phone}</span>
-                      </div>
+                      <p className="text-xs text-gray-505 font-medium mt-1">Status: {c.status}</p>
                     </div>
-                  </div>
-                  <div className="text-right shrink-0 flex flex-col justify-center items-end">
-                    <span className="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-lg">
-                      Score: {c.score}%
-                    </span>
-                    <p className="text-xs text-gray-400 mt-2">Status: {c.status}</p>
                   </div>
                 </div>
               ))}
@@ -485,7 +511,7 @@ const ViewCandidatesModal = ({ drive, onClose }) => {
 // Change Stage Modal Component
 const ChangeStageModal = ({ drive, onClose, onSave }) => {
   const [selectedStage, setSelectedStage] = useState(drive.stage);
-  const stages = ['Active', 'Assessment', 'Interview', 'Screening'];
+  const stages = ['ACTIVE', 'PAUSED', 'CLOSED'];
 
   return (
     <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -559,9 +585,9 @@ const DeleteConfirmationModal = ({ drive, onClose, onDelete }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Drive</h3>
-          <p className="text-sm text-gray-500">
-            Are you sure you want to delete this drive?
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Close Drive</h3>
+          <p className="text-sm text-gray-505">
+            Are you sure you want to close this recruitment drive? This will freeze registrations.
           </p>
         </div>
         <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
@@ -575,9 +601,9 @@ const DeleteConfirmationModal = ({ drive, onClose, onDelete }) => {
           <button
             type="button"
             onClick={onDelete}
-            className="px-5 py-2.5 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-700 transition"
+            className="px-5 py-2.5 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-750 transition"
           >
-            Delete
+            Close Drive
           </button>
         </div>
       </div>

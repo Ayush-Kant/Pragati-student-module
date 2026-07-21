@@ -107,6 +107,7 @@ export const register = async (req, res) => {
     const client = await pool.connect();
     let authUserId;
     let userId;
+    let companyId = null;
     try {
       await client.query("BEGIN");
       const user = await client.query(
@@ -124,6 +125,16 @@ export const register = async (req, res) => {
       );
       userId = userResult.rows[0].id;
 
+      if (role === 'company') {
+        const companyResult = await client.query(
+          `INSERT INTO companies (user_id, name, email)
+           VALUES ($1, $2, $3)
+           RETURNING id`,
+          [userId, email.split('@')[0] + ' Corporate', email]
+        );
+        companyId = companyResult.rows[0].id;
+      }
+
       await client.query("COMMIT");
     }
     catch (err) {
@@ -140,6 +151,7 @@ export const register = async (req, res) => {
         authUserId: authUserId,
         email,
         role,
+        companyId,
       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
@@ -160,3 +172,4 @@ export const register = async (req, res) => {
     });
   }
 };
+// reload backend server

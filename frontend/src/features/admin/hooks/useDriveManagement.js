@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getDrives } from "../services/adminService";
 
 export default function useDriveManagement() {
   const [drives, setDrives] = useState([]);
@@ -18,34 +19,7 @@ export default function useDriveManagement() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   // Mock data
-  useEffect(() => {
-    setDrives([
-      {
-        id: "drive_101",
-        title: "MERN Batch 1",
-        company: { name: "TechCorp Ltd" },
-        status: "active",
-        currentStage: "training",
-        candidates: 120,
-      },
-      {
-        id: "drive_102",
-        title: "Java Dev Drive",
-        company: { name: "InfoSys" },
-        status: "active",
-        currentStage: "screening",
-        candidates: 80,
-      },
-      {
-        id: "drive_103",
-        title: "Data Science Drive",
-        company: { name: "Analytics Plus" },
-        status: "frozen",
-        currentStage: "shortlist",
-        candidates: 45,
-      },
-    ]);
-  }, []);
+  
 
   // Debounced Search
   useEffect(() => {
@@ -130,7 +104,9 @@ export default function useDriveManagement() {
       setLoading(true);
       setError("");
 
-      // Future API Integration
+      const response = await getDrives();
+
+      setDrives(response.drives || response);
 
     } catch (err) {
       setError("Unable to fetch drives");
@@ -138,6 +114,10 @@ export default function useDriveManagement() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+  fetchDrives();
+  }, []);
 
   return {
     search,

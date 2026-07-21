@@ -4,42 +4,31 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles --forceExit",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@sequelize/core": "^7.0.0-alpha.48",
+    "@sequelize/postgres": "^7.0.0-alpha.48",
     "bcrypt": "^6.0.0",
+    "bull": "^4.16.5",
     "cors": "^2.8.6",
     "curl": "^0.1.4",
-    "dns": "^0.2.2",
+    "dns": "^0.1.2",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-
-
-    "helmet": "^8.2.0",
     "joi": "^18.2.3",
-
     "jsonwebtoken": "^9.0.3",
     "node-pg": "^1.0.1",
     "pg": "^8.21.0",
+    "pg-format": "^1.0.4",
     "resend": "^6.12.3",
-
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
-
-    "sequelize": "^6.37.8"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.6.0",
-    "jest": "^30.4.2",
-    "prettier": "^3.9.4",
-    "supertest": "^7.2.2"
-
   }
 }

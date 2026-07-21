@@ -15,9 +15,16 @@ router.use(authMiddleware, roleMiddleware("company", "admin"));
 
 // Route registration
 router.get("/", validateGetTrainings, TrainingController.getTrainingPrograms);
+router.get("/mentors", TrainingController.getMentors);
 router.get("/:id", validateIdParam, TrainingController.getTrainingById);
 router.patch(
   "/:id/assign-mentor",
+  validateIdParam,
+  validateAssignMentor,
+  TrainingController.assignMentor
+);
+router.patch(
+  "/:id/assignmentor",
   validateIdParam,
   validateAssignMentor,
   TrainingController.assignMentor
