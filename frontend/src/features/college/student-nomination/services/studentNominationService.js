@@ -1,101 +1,82 @@
-import {
-  eligibleStudents,
-  nominatedStudents,
-  shortlistedStudents,
-} from "../types/studentNominationDummyData";
-
-
-const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const successResponse = (data, message = "Success") => ({
-  success: true,
-  message,
-  data,
-});
-
-const errorResponse = (message) => ({
-  success: false,
-  message,
-});
+import api from "../../../../services/api";
 
 export const getEligibleStudents = async () => {
-  await delay();
-  return successResponse([...eligibleStudents]);
+  try {
+    const response = await api.get('/nominations/eligible');
+    return {
+      success: true,
+      data: response.data?.data || response.data || [],
+    };
+  } catch (error) {
+    console.error("Error fetching eligible students:", error);
+    throw error;
+  }
 };
 
 export const getNominatedStudents = async () => {
-  await delay();
-  return successResponse([...nominatedStudents]);
+  try {
+    const response = await api.get('/nominations');
+    return {
+      success: true,
+      data: response.data?.data || response.data || [],
+    };
+  } catch (error) {
+    console.error("Error fetching nominated students:", error);
+    throw error;
+  }
 };
 
 export const getShortlistedStudents = async () => {
-  await delay();
-  return successResponse([...shortlistedStudents]);
+  try {
+    const response = await api.get('/shortlists');
+    return {
+      success: true,
+      data: response.data?.data || response.data || [],
+    };
+  } catch (error) {
+    console.error("Error fetching shortlisted students:", error);
+    throw error;
+  }
 };
 
-
 export const nominateStudent = async (student) => {
-  await delay(500);
-  if (!student) {
-    return errorResponse("Student data is required.");
+  try {
+    const response = await api.post('/nominations', student);
+    return {
+      success: true,
+      data: response.data?.data || response.data,
+      message: response.data?.message || "Student nominated successfully.",
+    };
+  } catch (error) {
+    console.error("Error nominating student:", error);
+    throw error;
   }
-
-  // Hydrate object structure matching schema requirements
-  const newNomination = {
-    ...student,
-    id: student.id || Date.now(),
-    status: "Waiting",
-    nominatedDate: new Date().toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }),
-    timeline: {
-      nominated: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
-      waiting: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
-      Shortlisted: null,
-      rejected: null,
-    }
-  };
-
-  // Prevent record collisions in working memory context reference arrays
-  const exists = nominatedStudents.some(s => s.id === student.id);
-  if (!exists) {
-    nominatedStudents.push(newNomination);
-  }
-
-  return successResponse(newNomination, "Student nominated successfully.");
 };
 
 export const updateNomination = async (studentId, updatedData) => {
-  await delay(500);
-  const index = nominatedStudents.findIndex((student) => student.id === studentId);
-
-  if (index === -1) {
-    return errorResponse("Student nomination record not found.");
+  try {
+    const response = await api.put(`/nominations/${studentId}`, updatedData);
+    return {
+      success: true,
+      data: response.data?.data || response.data,
+      message: response.data?.message || "Nomination updated successfully.",
+    };
+  } catch (error) {
+    console.error("Error updating nomination:", error);
+    throw error;
   }
-
-  nominatedStudents[index] = {
-    ...nominatedStudents[index],
-    ...updatedData,
-  };
-
-  return successResponse(nominatedStudents[index], "Nomination updated successfully.");
 };
 
-/**
- * Drops candidate assignment allocations
- */
 export const removeNomination = async (studentId) => {
-  await delay(450);
-  const index = nominatedStudents.findIndex((student) => student.id === studentId);
-
-  if (index === -1) {
-    return errorResponse("Student nomination record not found.");
+  try {
+    const response = await api.delete(`/nominations/${studentId}`);
+    return {
+      success: true,
+      data: response.data?.data || response.data,
+      message: response.data?.message || "Nomination removed successfully.",
+    };
+  } catch (error) {
+    console.error("Error removing nomination:", error);
+    throw error;
   }
-
-  const removedStudent = nominatedStudents[index];
-  nominatedStudents.splice(index, 1);
-
-  return successResponse(removedStudent, "Nomination removed successfully.");
 };

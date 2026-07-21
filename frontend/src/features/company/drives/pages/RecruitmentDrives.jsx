@@ -8,49 +8,31 @@ import { DrivesTable } from '../components/DrivesTable';
 import { CreateDriveDrawer } from '../components/CreateDriveDrawer';
 import { StageBadge } from '../components/StageBadge';
 import { candidateService } from '../../candidates/services/candidateService';
+import { placementDriveService } from '../services/placementDriveService';
+import { getCompanySettings } from '../../services/companyService';
 
-const initialDrivesData = [
-  {
-    id: 1,
-    driveName: 'Software Engineer - 2026',
-    role: 'Software Engineer',
-    candidates: 245,
-    stage: 'Active',
-    deadline: 'Jun 15, 2026',
-  },
-  {
-    id: 2,
-    driveName: 'Data Analyst Drive',
-    role: 'Data Analyst',
-    candidates: 167,
-    stage: 'Assessment',
-    deadline: 'Jun 20, 2026',
-  },
-  {
-    id: 3,
-    driveName: 'Product Manager Hiring',
-    role: 'Product Manager',
-    candidates: 89,
-    stage: 'Interview',
-    deadline: 'Jun 25, 2026',
-  },
-  {
-    id: 4,
-    driveName: 'UI/UX Designer - Campus',
-    role: 'UI/UX Designer',
-    candidates: 134,
-    stage: 'Screening',
-    deadline: 'Jul 1, 2026',
-  },
-  {
-    id: 5,
-    driveName: 'DevOps Engineer',
-    role: 'DevOps Engineer',
-    candidates: 76,
-    stage: 'Active',
-    deadline: 'Jul 5, 2026',
-  },
-];
+const mapBackendDriveToUi = (drive) => {
+  const deadlineDate = drive.deadline ? new Date(drive.deadline) : new Date();
+  const driveDate = drive.drive_date ? new Date(drive.drive_date) : new Date();
+
+  return {
+    id: drive.id,
+    driveName: drive.role || 'Placement Drive',
+    role: drive.role || 'Placement Drive',
+    company: drive.company || '',
+    candidates: drive.total_applied || 0,
+    stage: drive.status === "Open" ? "Active" : (drive.status === "Upcoming" ? "Screening" : (drive.status === "Completed" ? "Interview" : drive.status)),
+    deadline: deadlineDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }),
+    description: drive.description || "",
+    rawDeadline: drive.deadline,
+    rawDriveDate: drive.drive_date,
+    package: drive.package || ""
+  };
+};
 
 // Helper to extract year from driveName or deadline
 const getDriveYear = (drive) => {
@@ -69,7 +51,8 @@ export const RecruitmentDrives = () => {
   const navigate = useNavigate();
   const shouldOpenCreateDrive = Boolean(location.state?.openCreateDrive);
   const [isDrawerOpen, setIsDrawerOpen] = useState(shouldOpenCreateDrive);
-  const [drives, setDrives] = useState(initialDrivesData);
+  const [drives, setDrives] = useState([]);
+  const [companyName, setCompanyName] = useState('Pragati Technologies');
   const [filters, setFilters] = useState({
     search: '',
     status: '',
@@ -79,6 +62,34 @@ export const RecruitmentDrives = () => {
 
   const [activeModal, setActiveModal] = useState(null); // 'view' | 'edit' | 'candidates' | 'changeStage' | 'delete'
   const [selectedDrive, setSelectedDrive] = useState(null);
+
+  const fetchDrivesList = async () => {
+    try {
+      const data = await placementDriveService.getPlacementDrives();
+      if (Array.isArray(data)) {
+        setDrives(data.map(mapBackendDriveToUi));
+      }
+    } catch (err) {
+      console.error("Error loading placement drives:", err);
+      toast.error("Failed to load recruitment drives from backend.");
+    }
+  };
+
+  useEffect(() => {
+    const fetchCompanyInfo = async () => {
+      try {
+        const settings = await getCompanySettings();
+        if (settings && settings.companyName) {
+          setCompanyName(settings.companyName);
+        }
+      } catch (err) {
+        console.warn("Could not fetch company name, using default.", err);
+      }
+    };
+
+    fetchCompanyInfo();
+    fetchDrivesList();
+  }, []);
 
   useEffect(() => {
     if (shouldOpenCreateDrive) {
@@ -112,21 +123,29 @@ export const RecruitmentDrives = () => {
     });
   };
 
-  const handleCreateDrive = (drive) => {
-    setDrives(prev => [
-      ...prev,
-      {
-        id: Date.now(),
-        driveName: drive.driveName,
-        role: drive.college || 'Campus Drive',
-        college: drive.college,
-        candidates: 0,
-        stage: 'Active',
-        deadline: formatDeadline(drive.date),
-        description: drive.description,
-      },
-    ]);
-    toast.success('Drive created successfully');
+  const handleCreateDrive = async (drive) => {
+    try {
+      const payload = {
+        company: companyName,
+        role: drive.driveName || 'Campus Drive',
+        package: drive.salary || 'Competitive',
+        drive_date: drive.date || new Date().toISOString().split('T')[0],
+        deadline: drive.date || new Date().toISOString().split('T')[0],
+        status: 'Open',
+        eligibility: {
+          cgpa: 6.0,
+          department: drive.college || []
+        },
+        rounds: []
+      };
+
+      await placementDriveService.createPlacementDrive(payload);
+      toast.success('Drive created successfully');
+      await fetchDrivesList();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to create drive on the backend.');
+    }
   };
 
   const filteredDrives = drives.filter(drive => {
@@ -236,10 +255,24 @@ export const RecruitmentDrives = () => {
         <EditDriveModal
           drive={selectedDrive}
           onClose={() => setActiveModal(null)}
-          onSave={(updatedDrive) => {
-            setDrives(prev => prev.map(d => d.id === updatedDrive.id ? updatedDrive : d));
-            toast.success('Drive updated successfully');
-            setActiveModal(null);
+          onSave={async (updatedDrive) => {
+            try {
+              const payload = {
+                company: updatedDrive.company || companyName,
+                role: updatedDrive.role,
+                package: updatedDrive.package || 'Competitive',
+                drive_date: updatedDrive.rawDriveDate || new Date().toISOString().split('T')[0],
+                deadline: updatedDrive.rawDeadline || new Date().toISOString().split('T')[0],
+                status: updatedDrive.stage === 'Active' ? 'Open' : (updatedDrive.stage === 'Screening' ? 'Upcoming' : (updatedDrive.stage === 'Closed' ? 'Closed' : 'Completed')),
+              };
+              await placementDriveService.updatePlacementDrive(updatedDrive.id, payload);
+              toast.success('Drive updated successfully');
+              await fetchDrivesList();
+              setActiveModal(null);
+            } catch (err) {
+              console.error(err);
+              toast.error('Failed to update drive.');
+            }
           }}
         />
       )}
@@ -257,10 +290,24 @@ export const RecruitmentDrives = () => {
         <ChangeStageModal
           drive={selectedDrive}
           onClose={() => setActiveModal(null)}
-          onSave={(newStage) => {
-            setDrives(prev => prev.map(d => d.id === selectedDrive.id ? { ...d, stage: newStage } : d));
-            toast.success('Stage updated successfully');
-            setActiveModal(null);
+          onSave={async (newStage) => {
+            try {
+              const payload = {
+                company: selectedDrive.company || companyName,
+                role: selectedDrive.role,
+                package: selectedDrive.package || 'Competitive',
+                drive_date: selectedDrive.rawDriveDate || new Date().toISOString().split('T')[0],
+                deadline: selectedDrive.rawDeadline || new Date().toISOString().split('T')[0],
+                status: newStage === 'Active' ? 'Open' : (newStage === 'Screening' ? 'Upcoming' : (newStage === 'Closed' ? 'Closed' : 'Completed')),
+              };
+              await placementDriveService.updatePlacementDrive(selectedDrive.id, payload);
+              toast.success('Stage updated successfully');
+              await fetchDrivesList();
+              setActiveModal(null);
+            } catch (err) {
+              console.error(err);
+              toast.error('Failed to update stage.');
+            }
           }}
         />
       )}
@@ -270,10 +317,16 @@ export const RecruitmentDrives = () => {
         <DeleteConfirmationModal
           drive={selectedDrive}
           onClose={() => setActiveModal(null)}
-          onDelete={() => {
-            setDrives(prev => prev.filter(d => d.id !== selectedDrive.id));
-            toast.success('Drive deleted successfully');
-            setActiveModal(null);
+          onDelete={async () => {
+            try {
+              await placementDriveService.deletePlacementDrive(selectedDrive.id);
+              toast.success('Drive deleted successfully');
+              await fetchDrivesList();
+              setActiveModal(null);
+            } catch (err) {
+              console.error(err);
+              toast.error('Failed to delete drive.');
+            }
           }}
         />
       )}

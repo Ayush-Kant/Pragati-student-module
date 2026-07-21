@@ -4,6 +4,10 @@ export const StageBadge = ({ stage }) => {
     'Assessment': 'bg-blue-100 text-blue-600',
     'Interview': 'bg-purple-100 text-purple-700',
     'Screening': 'bg-cyan-100 text-cyan-700',
+    'Open': 'bg-emerald-100 text-emerald-700',
+    'Upcoming': 'bg-amber-100 text-amber-700',
+    'Completed': 'bg-indigo-100 text-indigo-700',
+    'Closed': 'bg-red-100 text-red-700',
   };
 
   return (
