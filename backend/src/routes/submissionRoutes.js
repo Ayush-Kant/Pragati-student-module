@@ -28,6 +28,13 @@ router.get(
   submissionController.getSubmission
 );
 
+// Update submission URLs (only whitelisted fields reach SQL)
+router.patch(
+  "/:projectId/submission",
+  validateSubmission,
+  submissionController.updateSubmission
+);
+
 router.use(errorHandler);
 
 export default router;

@@ -61,7 +61,35 @@ export const getSubmission = async (req, res, next) => {
   }
 };
 
+/**
+ * Handles PATCH /api/student/projects/:projectId/submission
+ * Allows a student to update the GitHub / deployed URL of an existing
+ * submission.  Only whitelisted fields reach the SQL UPDATE statement.
+ */
+export const updateSubmission = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+    const studentId = req.user?.id;
+
+    if (!studentId) {
+      return res.status(401).json(formatError("Unauthorized: Student credentials missing."));
+    }
+
+    // Confirm an existing submission exists before updating
+    const existing = await submissionModel.getSubmission(Number(projectId), studentId);
+    if (!existing) {
+      return res.status(404).json(formatError("No submission found for this project."));
+    }
+
+    const updated = await submissionModel.updateSubmission(existing.id, req.body);
+    return res.status(200).json(formatSuccess("Submission updated successfully", updated));
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   submitFinalProject,
-  getSubmission
+  getSubmission,
+  updateSubmission
 };
