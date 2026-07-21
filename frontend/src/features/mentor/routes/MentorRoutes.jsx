@@ -11,6 +11,9 @@ import ProfessionalProfile from "../pages/ProfessionalProfile";
 import ExperienceLinks from "../pages/ExperienceLinks";
 import Availability from "../pages/Availability";
 
+// --- Existing Mentor Pages ---
+import MenteeManagementPage from "../pages/MenteeManagementPage";
+
 // --- Course & Feature Imports ---
 import Courses from "../../../pages/mentor/CoursesPage";
 import CreateCourse from "../../../pages/mentor/CreateCoursePage";
@@ -28,10 +31,10 @@ import QuestionBankPageQuizBuilder from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
 import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
 import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage.jsx";
+
 import SubmissionMonitoringPage from "../pages/SubmissionMonitoringPage";
 import ReviewGradingPage from "../pages/ReviewGradingPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
-
 import NotificationsPage from "../pages/NotificationsPage";
 import DiscussionForumPage from "../pages/DiscussionForumPage";
 import SlotsCalendarPage from "../pages/SlotsCalendarPage";
@@ -40,36 +43,62 @@ import SettingsPage from "../../../pages/mentor/SettingsPage";
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
     <Route element={<RoleRoute allowedRoles={["mentor"]} />}>
-      {/* All mentor pages share MentorLayout (sidebar + topnav) */}
+      {/* All mentor pages share MentorLayout */}
       <Route path="mentor" element={<MentorLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
+
         <Route path="dashboard" element={<Dashboard />} />
+
+        {/* Profile */}
         <Route path="profile" element={<MentorProfile />} />
+
+        {/* Existing Mentee Route */}
+        <Route path="mentees" element={<MenteeManagementPage />} />
+
+        {/* Courses */}
         <Route path="courses" element={<Courses />} />
         <Route path="courses/create" element={<CreateCourse />} />
+
+        {/* Settings */}
         <Route path="settings" element={<SettingsPage />} />
+
+        {/* Reports */}
         <Route path="export-report" element={<ExportReport />} />
+
+        {/* Projects */}
         <Route path="projects/create" element={<ProjectCreationPage />} />
+
+        {/* Challenges */}
         <Route path="challenge-creator" element={<ChallengeCreatorPage />} />
         <Route
           path="challenge-workspace"
           element={<ChallengeWorkspacePage />}
         />
+
+        {/* Submission */}
         <Route
           path="submission-monitoring"
           element={<SubmissionMonitoringPage />}
         />
         <Route path="review-grading" element={<ReviewGradingPage />} />
-        <Route path="project-analytics" element={<AnalyticsDashboardPage />} />
+        <Route
+          path="project-analytics"
+          element={<AnalyticsDashboardPage />}
+        />
 
+        {/* Activities */}
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
           <Route path="activities/create" element={<CreateActivity />} />
         </Route>
 
+        {/* Question Bank */}
         <Route path="question-bank" element={<QuestionBankPage />} />
         <Route path="question-bank/create" element={<CreateQuestionPage />} />
-        <Route path="question-bank/edit/:id" element={<EditQuestionPage />} />
+        <Route
+          path="question-bank/edit/:id"
+          element={<EditQuestionPage />}
+        />
         <Route
           path="question-bank/preview/:id"
           element={<QuestionPreviewPage />}
@@ -78,14 +107,21 @@ const mentorRoute = (
           path="question-bank/quiz-builder"
           element={<QuestionBankPageQuizBuilder />}
         />
-        <Route path="question-bank/attempts" element={<AttemptHistoryPage />} />
+        <Route
+          path="question-bank/attempts"
+          element={<AttemptHistoryPage />}
+        />
 
+        {/* Notifications & Discussion */}
         <Route path="notifications" element={<NotificationsPage />} />
-        <Route path="discussion-forum" element={<DiscussionForumPage />} />
+        <Route
+          path="discussion-forum"
+          element={<DiscussionForumPage />}
+        />
         <Route path="slots" element={<SlotsCalendarPage />} />
       </Route>
 
-      {/* Onboarding pages use their own OnboardingLayout — no MentorLayout */}
+      {/* Onboarding pages */}
       <Route path="mentor/onboarding/basic-info" element={<BasicInfo />} />
       <Route
         path="mentor/onboarding/professional-profile"
@@ -95,7 +131,10 @@ const mentorRoute = (
         path="mentor/onboarding/experience-links"
         element={<ExperienceLinks />}
       />
-      <Route path="mentor/onboarding/availability" element={<Availability />} />
+      <Route
+        path="mentor/onboarding/availability"
+        element={<Availability />}
+      />
     </Route>
   </Route>
 );
