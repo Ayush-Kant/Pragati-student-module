@@ -1,4 +1,5 @@
 import * as model from '../models/collegeReports.model.js';
+import { buildReportPayload, buildReportSummary } from '../utils/reportGenerator.js';
 
 const listReports = async (filters = {}) => {
     const page = parseInt(filters.page, 10) || 1;
@@ -27,11 +28,11 @@ const listReports = async (filters = {}) => {
 };
 
 const generateReport = async (payload = {}, userId = null) => {
-    const reportPayload = {
+    const reportPayload = buildReportPayload({
         ...payload,
         createdBy: userId,
         status: 'completed',
-    };
+    });
 
     const report = await model.createReport(reportPayload);
     await model.createHistoryEntry({
@@ -58,7 +59,7 @@ const previewReport = async (id) => {
     }
 
     return {
-        ...report,
+        ...buildReportSummary(report),
         preview: true,
         content: report.content || {},
     };
@@ -72,7 +73,7 @@ const downloadReport = async (id) => {
     }
 
     return {
-        ...report,
+        ...buildReportSummary(report),
         downloadUrl: `/api/reports/${id}/download`,
         format: report.format || 'json',
     };

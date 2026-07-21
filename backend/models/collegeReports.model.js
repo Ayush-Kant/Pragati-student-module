@@ -4,7 +4,7 @@ const getReports = async ({ page = 1, limit = 20, offset = 0, type, status } = {
     const values = [];
     let query = `
         SELECT id, title, type, status, format, content, created_at AS "createdAt", updated_at AS "updatedAt"
-        FROM reports
+        FROM generated_reports
         WHERE 1=1
     `;
 
@@ -27,7 +27,7 @@ const getReports = async ({ page = 1, limit = 20, offset = 0, type, status } = {
 
 const countReports = async ({ type, status } = {}) => {
     const values = [];
-    let query = `SELECT COUNT(*)::INTEGER AS total FROM reports WHERE 1=1`;
+    let query = `SELECT COUNT(*)::INTEGER AS total FROM generated_reports WHERE 1=1`;
 
     if (type) {
         values.push(type);
@@ -46,7 +46,7 @@ const countReports = async ({ type, status } = {}) => {
 const createReport = async (payload = {}) => {
     const result = await pool.query(
         `
-        INSERT INTO reports (
+        INSERT INTO generated_reports (
             title,
             type,
             status,
@@ -89,7 +89,7 @@ const getReportById = async (id) => {
     const result = await pool.query(
         `
         SELECT id, title, type, status, format, content, created_at AS "createdAt", updated_at AS "updatedAt"
-        FROM reports
+        FROM generated_reports
         WHERE id = $1
         `,
         [id]
@@ -100,7 +100,7 @@ const getReportById = async (id) => {
 
 const deleteReport = async (id) => {
     const result = await pool.query(
-        `DELETE FROM reports WHERE id = $1 RETURNING id`,
+        `DELETE FROM generated_reports WHERE id = $1 RETURNING id`,
         [id]
     );
 
