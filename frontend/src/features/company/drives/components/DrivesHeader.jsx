@@ -9,9 +9,9 @@ export const DrivesHeader = ({ onCreateClick }) => {
       </div>
       <button
         onClick={onCreateClick}
-        className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg transition-all"
+        className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl hover:shadow-md transition-all text-sm"
       >
-        <Plus size={20} />
+        <Plus size={18} />
         Create Drive
       </button>
     </div>

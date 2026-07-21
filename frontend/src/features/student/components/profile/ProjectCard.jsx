@@ -1,7 +1,11 @@
 import PropTypes from "prop-types";
 
 const ProjectCard = ({ project = {}, onEdit, onDelete }) => {
-  const tags = Array.isArray(project?.skills) ? project.skills : Array.isArray(project?.technologies) ? project.technologies : [];
+  const tags = Array.isArray(project?.skills)
+    ? project.skills
+    : Array.isArray(project?.technologies)
+      ? project.technologies
+      : [];
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
@@ -29,11 +33,17 @@ const ProjectCard = ({ project = {}, onEdit, onDelete }) => {
         </div>
 
         <div className="flex gap-2 shrink-0">
-          <button onClick={() => onEdit?.(project)} className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition">
+          <button
+            onClick={() => onEdit?.(project)}
+            className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition"
+          >
             Edit
           </button>
 
-          <button onClick={() => onDelete?.(project?.id ?? project)} className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition">
+          <button
+            onClick={() => onDelete?.(project?.id ?? project)}
+            className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+          >
             Delete
           </button>
         </div>

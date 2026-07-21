@@ -32,7 +32,4 @@ CREATE INDEX IF NOT EXISTS idx_modules_course_id
   ON modules(course_id);
 
 -- Add deferred circular references after both tables are created
-ALTER TABLE recruitment_drives
-  ADD CONSTRAINT fk_recruitment_drives_assigned_course
-  FOREIGN KEY (assigned_course_id) REFERENCES courses(id)
-  ON DELETE SET NULL;
+

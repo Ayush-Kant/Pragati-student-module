@@ -1,10 +1,11 @@
 import "./../styles/navbar.css";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { GlobalSearch } from "./GlobalSearch";
+import { useAuth } from "../../../../context/AuthContext";
 
-import { FiBell, FiSettings, FiSearch } from "react-icons/fi";
+import { FiBell, FiSettings, FiSearch, FiMenu } from "react-icons/fi";
 import {
   X,
   User,
@@ -442,13 +443,12 @@ const ChangePasswordModal = ({ onClose }) => {
 
 const LogoutModal = ({ onClose }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    // Clear any local auth state if present
-    try { localStorage.clear(); } catch (_) { }
+    logout();
     toast.success("Logged out successfully");
     onClose();
-    // Navigate to login if route exists, otherwise root
     navigate("/login", { replace: true });
   };
 
@@ -486,8 +486,24 @@ const LogoutModal = ({ onClose }) => {
 
 // ─── Main Navbar ──────────────────────────────────────────────────────────────
 
-const Navbar = () => {
+const Navbar = ({ openSidebar, setOpenSidebar }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const getPageTitle = () => {
+    const path = location.pathname;
+    if (path.includes("/dashboard")) return "Dashboard";
+    if (path.includes("/drives")) return "Recruitment Drives";
+    if (path.includes("/candidates")) return "Candidate Management";
+    if (path.includes("/assessments")) return "Assessments";
+    if (path.includes("/interviews")) return "Interviews";
+    if (path.includes("/training")) return "Training Management";
+    if (path.includes("/messages")) return "Messages";
+    if (path.includes("/offers")) return "Offers";
+    if (path.includes("/reports")) return "Reports & Analytics";
+    if (path.includes("/settings")) return "Settings";
+    return "Company Portal";
+  };
 
   // Notifications
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
@@ -502,7 +518,6 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
   const searchInputRef = useRef(null);
-  const [globalSearchKey, setGlobalSearchKey] = useState(null);
 
   // Modals
   const [activeModal, setActiveModal] = useState(null); // 'profile' | 'settings' | 'password' | 'logout'
@@ -556,17 +571,25 @@ const Navbar = () => {
       <header className="navbar">
         {/* Left */}
         <div className="navbar-left">
+          <button
+            onClick={() => setOpenSidebar && setOpenSidebar(!openSidebar)}
+            className="md:hidden text-gray-600 hover:text-gray-900 mr-2 p-1 hover:bg-gray-100 rounded-lg transition"
+            title="Toggle Sidebar"
+          >
+            <FiMenu size={20} />
+          </button>
           <div className="navbar-logo">P</div>
           <h2>Pragati</h2>
         </div>
 
         {/* Center */}
         <div className="navbar-center">
-          <div className="search-box">
-            <FiSearch size={16} className="search-icon" />
+          <div className="navbar-search-container">
+            <FiSearch size={16} className="navbar-search-icon" />
             <input
               type="text"
-              placeholder="Search..."
+              className="navbar-search-input"
+              placeholder="Search candidates, drives, assessments..."
               value={searchQuery}
               onChange={handleSearchChange}
               onKeyDown={handleSearchKeyDown}
@@ -623,10 +646,10 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Settings icon (existing) */}
+          {/* Settings icon */}
           <div
             className="nav-icon"
-            onClick={() => navigate("/settings")}
+            onClick={() => navigate("/company/settings")}
             style={{ cursor: "pointer" }}
           >
             <FiSettings size={18} />

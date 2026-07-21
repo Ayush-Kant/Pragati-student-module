@@ -1,6 +1,7 @@
 import { pool } from "../config/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { randomUUID } from "crypto";
 
 const ALLOWED_ROLES = ['student', 'mentor', 'admin', 'college', 'company'];
 
@@ -16,16 +17,17 @@ export const login = async (req, res) => {
     }
 
     const result = await pool.query(
-      `SELECT id, email, role, password_hash
-       FROM auth_users
-       WHERE email = $1`,
+      `SELECT a.id AS auth_user_id, a.uuid_id, a.email, a.role, a.password_hash, u.id AS user_id
+       FROM auth_users a
+       LEFT JOIN users u ON u.auth_user_id = a.id
+       WHERE a.email = $1`,
       [email]
     );
 
     if (!result.rows.length) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid credentials",
       });
     }
 
@@ -36,13 +38,16 @@ export const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid credentials",
       });
     }
 
     const token = jwt.sign(
       {
-        userId: user.id,
+        id: user.user_id,
+        uid: user.user_id,
+        userId: user.uuid_id,
+        authUserId: user.auth_user_id,
         email: user.email,
         role: user.role,
       },
@@ -52,20 +57,17 @@ export const login = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Login successful",
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      }
+      userId: user.uuid_id,
+      role: user.role,
+      message: "Login successful",
     });
 
   } catch (error) {
-    console.error("Login Error:", error);
+    console.error(error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Login failed",
     });
   }
 };
@@ -77,7 +79,7 @@ export const register = async (req, res) => {
     if (!email || !password || !role) {
       return res.status(400).json({
         success: false,
-        message: "Email, password, and role are required",
+        message: "Email, password and role are required",
       });
     }
 
@@ -94,28 +96,62 @@ export const register = async (req, res) => {
     );
 
     if (existing.rows.length) {
-      return res.status(409).json({
+      return res.status(400).json({
         success: false,
-        message: "Email already exists",
+        message: "User already exists",
       });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    
-    const result = await pool.query(
-      `INSERT INTO auth_users (email, password_hash, role, created_at)
-       VALUES ($1, $2, $3, NOW())
-       RETURNING id, email, role`,
-      [email, passwordHash, role]
-    );
+    const uuid = randomUUID();
+    const client = await pool.connect();
+    let authUserId;
+    let userId;
+    let companyId = null;
+    try {
+      await client.query("BEGIN");
+      const user = await client.query(
+        `INSERT INTO auth_users (email, password_hash, role, uuid_id)
+         VALUES ($1, $2, $3, $4)
+         RETURNING id` ,
+        [email, passwordHash, role, uuid]
+      );
+      authUserId = user.rows[0].id;
+      const userResult = await client.query(
+        `INSERT INTO users (auth_user_id, email, role, created_at, phone, username)
+         VALUES ($1, $2, $3, NOW(), $4, $5)
+         RETURNING id`,
+        [authUserId, email, role, null, email.split('@')[0]]
+      );
+      userId = userResult.rows[0].id;
 
-    const user = result.rows[0];
+      if (role === 'company') {
+        const companyResult = await client.query(
+          `INSERT INTO companies (user_id, name, email)
+           VALUES ($1, $2, $3)
+           RETURNING id`,
+          [userId, email.split('@')[0] + ' Corporate', email]
+        );
+        companyId = companyResult.rows[0].id;
+      }
 
+      await client.query("COMMIT");
+    }
+    catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
     const token = jwt.sign(
       {
-        userId: user.id,
-        email: user.email,
-        role: user.role,
+        id: userId,
+        uid: userId,
+        userId: uuid,
+        authUserId: authUserId,
+        email,
+        role,
+        companyId,
       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
@@ -123,20 +159,17 @@ export const register = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Registration successful",
+      userId: uuid,
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      }
+      message: "User registered successfully",
     });
 
   } catch (error) {
-    console.error("Registration Error:", error);
+    console.error(error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Registration failed",
     });
   }
-};
+};
+// reload backend server

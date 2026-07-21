@@ -35,12 +35,13 @@ const TrainingManagement = () => {
 
   const navigate = useNavigate();
 
-  const {
-    programs,
-    loading,
-    createProgram,
-    updateProgram,
-  } = useTrainingPrograms();
+const {
+  programs,
+  loading,
+  error,
+  createProgram,
+  updateProgram,
+} = useTrainingPrograms();
 
   const [search, setSearch] =
     useState("");
@@ -94,6 +95,11 @@ const avgCompletion =
 /* =====================================
         Search & Filters
 ===================================== */
+
+const roleOptions = [
+  "All",
+  ...new Set(programs.map((program) => program.targetRole)),
+];
 
 const filteredPrograms =
   useMemo(() => {
@@ -154,30 +160,31 @@ const filteredPrograms =
         Create Program
 ===================================== */
 
-const handleCreateProgram = (
-  newProgram
-) => {
-
-  createProgram(newProgram);
-
-  setOpenCreate(false);
-
+const handleCreateProgram = async (newProgram) => {
+  try {
+    await createProgram(newProgram);
+    setOpenCreate(false);
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 /* =====================================
         Edit Program
 ===================================== */
 
-const handleEditProgram = (
-  updatedProgram
-) => {
+const handleEditProgram = async (updatedProgram) => {
+  try {
+    await updateProgram(
+      updatedProgram.id,
+      updatedProgram
+    );
 
-  updateProgram(updatedProgram);
-
-  setOpenEdit(false);
-
-  setSelectedProgram(null);
-
+    setOpenEdit(false);
+    setSelectedProgram(null);
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 /* =====================================
@@ -215,6 +222,17 @@ if (loading) {
   );
 
 }
+
+if (error) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="bg-red-100 text-red-700 p-4 rounded-lg">
+        Failed to load training programs.
+      </div>
+    </div>
+  );
+}
+
 return (
 
   <div className="min-h-screen bg-white p-6">
@@ -302,29 +320,26 @@ return (
 
         {/* Role Filter */}
 
-        <select
-          value={roleFilter}
-          onChange={(e) =>
-            setRoleFilter(e.target.value)
-          }
-          className="
-            border
-            border-slate-300
-            rounded-xl
-            px-5
-            py-3
-            focus:outline-none
-            focus:ring-2
-            focus:ring-orange-400
-          "
-        >
-          <option>All</option>
-          <option>App Developer</option>
-          <option>AI Engineer</option>
-          <option>Backend Developer</option>
-          <option>Data Scientist</option>
-          <option>DevOps Engineer</option>
-        </select>
+       <select
+  value={roleFilter}
+  onChange={(e) => setRoleFilter(e.target.value)}
+  className="
+    border
+    border-slate-300
+    rounded-xl
+    px-5
+    py-3
+    focus:outline-none
+    focus:ring-2
+    focus:ring-orange-400
+  "
+>
+  {roleOptions.map((role) => (
+    <option key={role} value={role}>
+      {role}
+    </option>
+  ))}
+</select>
 
         {/* Status Filter */}
 

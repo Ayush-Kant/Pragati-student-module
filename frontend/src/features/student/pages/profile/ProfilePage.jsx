@@ -2,7 +2,6 @@ import { useState } from "react";
 import ProfileEditForm from "../../components/profile/ProfileEditForm";
 import ProjectCard from "../../components/profile/ProjectCard";
 
-// Basic URL validation used for social links
 const validateSocialLinks = (links = {}) => {
   const errors = {};
   const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
@@ -89,15 +88,16 @@ const ProfilePage = () => {
   ]);
 
   const handleLinkChange = (field, value) => {
-    const updatedLinks = { ...profile.portfolioLinks, [field]: value };
+    const updatedLinks = { ...(profile?.portfolioLinks || {}), [field]: value };
     setProfile((prev) => ({ ...prev, portfolioLinks: updatedLinks }));
+    setValidationError(null);
 
     const validation = validateSocialLinks(updatedLinks);
     setValidationErrors(validation.errors);
   };
 
   const handleSave = (updatedData) => {
-    const currentLinks = updatedData.portfolioLinks || profile.portfolioLinks;
+    const currentLinks = updatedData.portfolioLinks || profile?.portfolioLinks || {};
     const validation = validateSocialLinks(currentLinks);
 
     if (!validation.isValid) {
@@ -110,7 +110,8 @@ const ProfilePage = () => {
     setIsEditing(false);
     setShowSuccess(true);
     setValidationError(null);
-    setTimeout(() => setShowSuccess(false), 3000);
+    setValidationErrors({});
+    window.setTimeout(() => setShowSuccess(false), 3000);
   };
 
   const handleAddProject = () => {
@@ -155,7 +156,10 @@ const ProfilePage = () => {
             <p className="text-sm text-gray-400 mt-1">{isEditing ? "Update your details below" : "View and manage your profile"}</p>
           </div>
           {!isEditing && (
-            <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all"
+            >
               <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
@@ -165,7 +169,6 @@ const ProfilePage = () => {
         </div>
 
         {!isEditing && (
-<<<<<<< HEAD
           <>
             <div className="relative bg-white rounded-2xl border border-gray-100 shadow-sm px-4 sm:px-8 py-5 sm:py-7 mb-5 overflow-hidden">
               <div className="absolute right-0 top-0 w-48 h-full overflow-hidden pointer-events-none">
@@ -174,15 +177,23 @@ const ProfilePage = () => {
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6 relative z-10">
                 <div className="relative shrink-0 mx-auto sm:mx-0">
-                  <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-2xl font-bold text-orange-400 border-4 border-white shadow">{initials}</div>
+                  <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-2xl font-bold text-orange-400 border-4 border-white shadow">
+                    {initials}
+                  </div>
                   <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white" />
                 </div>
                 <div className="text-center sm:text-left w-full">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 leading-tight">{profile.name}</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 leading-tight">{profile?.name}</h2>
                   <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-3">
-                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">{profile.rollNo}</span>
-                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">{profile.department}</span>
-                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">Batch {profile.batch}</span>
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">
+                      {profile?.rollNo}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">
+                      {profile?.department}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">
+                      Batch {profile?.batch}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -193,33 +204,12 @@ const ProfilePage = () => {
                 <h3 className="text-base font-bold text-gray-800">Personal Information</h3>
                 <div className="w-8 h-0.5 bg-orange-400 mb-5" />
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  <InfoField label="Email" value={profile.email} />
-                  <InfoField label="Phone" value={profile.phone} />
-                  <InfoField label="City" value={profile.city} />
-                  <InfoField label="Department" value={profile.department} />
-                  <InfoField label="Batch" value={profile.batch} />
-                  <InfoField label="CGPA" value={profile.cgpa} />
-=======
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <div className="lg:col-span-2 bg-white rounded-2xl border p-6">
-              <h3 className="font-bold mb-5">Personal Information</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <InfoField label="Email" value={profile.email} />
-                <InfoField label="Phone" value={profile.phone} />
-                <InfoField label="City" value={profile.city} />
-                <InfoField label="Department" value={profile.department} />
-                <InfoField label="Batch" value={profile.batch} />
-                <InfoField label="CGPA" value={profile.cgpa} />
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border p-6">
-              <div className="flex items-center gap-5 mb-4">
-                <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-xl font-bold">{initials}</div>
-                <div>
-                  <h2 className="text-xl font-bold">{profile.name}</h2>
-                  <p className="text-sm text-gray-500">{profile.department}</p>
->>>>>>> origin/student-team
+                  <InfoField label="Email" value={profile?.email} />
+                  <InfoField label="Phone" value={profile?.phone} />
+                  <InfoField label="City" value={profile?.city} />
+                  <InfoField label="Department" value={profile?.department} />
+                  <InfoField label="Batch" value={profile?.batch} />
+                  <InfoField label="CGPA" value={profile?.cgpa} />
                 </div>
               </div>
 
@@ -227,7 +217,7 @@ const ProfilePage = () => {
                 <h3 className="text-base font-bold text-gray-800">Skills</h3>
                 <div className="w-8 h-0.5 bg-orange-400 mb-5" />
                 <div className="flex flex-wrap gap-2">
-                  {profile.skills.map((skill) => {
+                  {profile?.skills?.map((skill) => {
                     const config = SKILL_ICONS[skill] || SKILL_ICONS.default;
                     return (
                       <div key={skill} className={`flex items-center gap-1.5 rounded-xl px-3 py-2 border border-gray-100 ${config.bg}`}>
@@ -248,7 +238,7 @@ const ProfilePage = () => {
                     <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">GitHub Profile</label>
                     <input
                       type="url"
-                      value={profile.portfolioLinks.github}
+                      value={profile?.portfolioLinks?.github || ""}
                       onChange={(e) => handleLinkChange("github", e.target.value)}
                       className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.github ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-green-500"}`}
                     />
@@ -258,7 +248,7 @@ const ProfilePage = () => {
                     <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">LinkedIn Profile</label>
                     <input
                       type="url"
-                      value={profile.portfolioLinks.linkedin}
+                      value={profile?.portfolioLinks?.linkedin || ""}
                       onChange={(e) => handleLinkChange("linkedin", e.target.value)}
                       className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.linkedin ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-green-500"}`}
                     />
@@ -268,7 +258,7 @@ const ProfilePage = () => {
                     <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Personal Website</label>
                     <input
                       type="url"
-                      value={profile.portfolioLinks.website}
+                      value={profile?.portfolioLinks?.website || ""}
                       onChange={(e) => handleLinkChange("website", e.target.value)}
                       className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.website ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-green-500"}`}
                     />
@@ -305,9 +295,5 @@ const ProfilePage = () => {
             <ProfileEditForm profile={profile} onSave={handleSave} onCancel={() => setIsEditing(false)} />
           </div>
         )}
-      </div>
-    </div>
-  );
-};
 
 export default ProfilePage;

@@ -18,6 +18,12 @@ ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS min_gpa NUMERIC(3,1);
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS required_skills TEXT[];
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS max_openings INTEGER NOT NULL DEFAULT 1;
 ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS application_deadline TIMESTAMPTZ;
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS job_title VARCHAR(255);
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS department VARCHAR(100);
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS salary_package VARCHAR(100);
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS work_mode VARCHAR(50) DEFAULT 'Onsite';
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS location VARCHAR(255);
+ALTER TABLE recruitment_drives ADD COLUMN IF NOT EXISTS deadline TIMESTAMPTZ;
 -- NOTE: assigned_test_id intentionally has no FK to assessments(id) — that table
 -- does not exist yet on develop as of this PR. Add the FK constraint once the
 -- assessments module lands: ALTER TABLE recruitment_drives ADD CONSTRAINT
@@ -86,3 +92,22 @@ CREATE INDEX IF NOT EXISTS idx_drives_stage ON recruitment_drives(current_stage)
 CREATE INDEX IF NOT EXISTS idx_sdp_drive ON student_drive_progress(drive_id);
 CREATE INDEX IF NOT EXISTS idx_sdp_student ON student_drive_progress(student_id);
 CREATE INDEX IF NOT EXISTS idx_sdp_stage ON student_drive_progress(current_stage);
+-- Add circular foreign keys after both tables exist
+
+DO $$ BEGIN
+  ALTER TABLE courses
+    ADD CONSTRAINT fk_courses_drive
+    FOREIGN KEY (drive_id)
+    REFERENCES recruitment_drives(id)
+    ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE recruitment_drives
+    ADD CONSTRAINT fk_recruitment_drives_assigned_course
+    FOREIGN KEY (assigned_course_id)
+    REFERENCES courses(id)
+    ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;

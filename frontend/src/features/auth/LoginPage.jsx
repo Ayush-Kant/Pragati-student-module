@@ -15,7 +15,16 @@ const AuthPage = () => {
   const [errors, setErrors] = useState({});
   const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, userRole } = useAuth();
+  const [profileData, setProfileData] = useState({});
+
+  const getRedirectPath = (role) => (role === 'admin' ? '/admin' : `/${role}/dashboard`);
+
+  useEffect(() => {
+    if (isAuthenticated && userRole) {
+      navigate(getRedirectPath(userRole));
+    }
+  }, [isAuthenticated, userRole, navigate]);
 
   const slidesData = [
     {
@@ -103,9 +112,12 @@ const AuthPage = () => {
       if (result.success) {
         const userRole = result.user?.role;
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
-        login(userRole, result.token);
-
-        navigate(`/${userRole}/dashboard`);
+        login(result.role, result.token);
+        if (result.role === 'college' && !profileData?.id) {
+          navigate(`/college/add-profile`);
+        } else {
+          navigate(getRedirectPath(result.role));
+        }
       } else {
         setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
       }
