@@ -102,8 +102,8 @@ function MCQQuestionForm() {
   };
 
   return (
-    <div className="border rounded-lg p-4">
-      <h3 className="font-semibold mb-4">
+    <div className="rounded-lg border p-3 md:p-4">
+      <h3 className="mb-4 text-lg md:text-xl font-semibold">
         {isEdit
           ? "Edit MCQ Question"
           : "Add MCQ Question"}
@@ -117,7 +117,7 @@ function MCQQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:p-3 md:text-base"
           placeholder="Question Text"
           required
         />
@@ -129,7 +129,7 @@ function MCQQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:p-3 md:text-base"
           placeholder="Option A"
           required
         />
@@ -141,7 +141,7 @@ function MCQQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:p-3 md:text-base"
           placeholder="Option B"
           required
         />
@@ -153,7 +153,7 @@ function MCQQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:p-3 md:text-base"
           placeholder="Option C"
           required
         />
@@ -165,7 +165,7 @@ function MCQQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:p-3 md:text-base"
           placeholder="Option D"
           required
         />
@@ -177,7 +177,7 @@ function MCQQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
           required
         >
           <option value="">
@@ -197,26 +197,26 @@ function MCQQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:p-3 md:text-base"
           placeholder="Marks"
           min="1"
           required
         />
 
-        <div className="flex justify-end gap-3 mt-6">
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={() =>
               navigate(-1)
             }
-            className="px-4 py-2 border rounded-lg"
+            className="px-3 py-2 text-sm md:px-4 md:text-base border focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 rounded-lg"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            className="px-3 py-2 text-sm md:px-4 md:text-base bg-blue-600 text-white rounded-lg border focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" 
           >
             {isEdit
               ? "Update Question"
