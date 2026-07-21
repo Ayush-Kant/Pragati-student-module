@@ -104,11 +104,8 @@ app.use("/api/v1/admin/company", adminCompanyRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
-app.use("/api/v1/certificates", certificateRoutes);
-app.use("/api/v1/upload", uploadRoutes);
-app.use("/api/v1/skills", skillsRoutes);
 
-
+// Removed the three certificate routes from here.
 app.use("/api/mentor/content", contentRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);

@@ -1,71 +1,44 @@
 import React from "react";
 
-const BrandColorPicker = ({
-  register,
-  watch,
-  setValue,
-  errors,
-}) => {
+const BrandColorPicker = ({ register, watch, setValue, errors }) => {
   const primaryColor = watch("primaryColor") || "#2563eb";
   const secondaryColor = watch("secondaryColor") || "#1e293b";
 
-  const ColorField = ({
-    label,
-    name,
-    value,
-    error,
-  }) => (
+  const ColorField = ({ label, name, value, error }) => (
     <div>
-      <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+      <label className="mb-2 block text-[11px] font-medium text-gray-600 capitalize">
         {label}
       </label>
-
-      <div className="flex items-center gap-2 border rounded-lg px-2 py-2 bg-white">
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => setValue(name, e.target.value)}
-          className="w-10 h-10 border rounded cursor-pointer"
-        />
-
+      <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2">
+        <div
+          className="h-5 w-5 rounded border border-gray-200"
+          style={{ backgroundColor: value }}
+        >
+          <input
+            type="color"
+            value={value}
+            onChange={(e) => setValue(name, e.target.value)}
+            className="h-full w-full cursor-pointer opacity-0"
+          />
+        </div>
         <input
           type="text"
           {...register(name)}
           value={value}
           onChange={(e) => setValue(name, e.target.value)}
-          className="w-full outline-none text-sm font-medium bg-transparent"
+          className="w-full bg-transparent text-sm font-medium text-gray-700 outline-none"
         />
       </div>
-
-      {error && (
-        <p className="text-red-500 text-xs mt-1">
-          {error.message}
-        </p>
-      )}
+      {error && <p className="mt-1 text-xs text-red-500">{error.message}</p>}
     </div>
   );
 
   return (
-   
-  
-  <div className="space-y-4">
     <div className="grid grid-cols-2 gap-4">
-      <ColorField
-        label="Primary Color"
-        name="primaryColor"
-        value={primaryColor}
-        error={errors?.primaryColor}
-      />
-
-      <ColorField
-        label="Secondary Color"
-        name="secondaryColor"
-        value={secondaryColor}
-        error={errors?.secondaryColor}
-      />
+      <ColorField label="Primary Color" name="primaryColor" value={primaryColor} error={errors?.primaryColor} />
+      <ColorField label="Secondary Color" name="secondaryColor" value={secondaryColor} error={errors?.secondaryColor} />
     </div>
-  </div>
-);
+  );
 };
 
 export default BrandColorPicker;

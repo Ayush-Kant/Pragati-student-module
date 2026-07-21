@@ -6,9 +6,7 @@ import { useCertificateTemplate } from "../hooks/useCertificateTemplate";
 
 const CertificateTemplatePage = () => {
   const certificate = useCertificateTemplate();
-
   const { templateData, isLoading } = certificate;
-
   const [zoomLevel, setZoomLevel] = useState(1);
 
   const handleZoomIn = () => {
@@ -32,16 +30,13 @@ const CertificateTemplatePage = () => {
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-gray-100">
-
+    <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-white">
       {/* Left Panel */}
-      <div className="flex w-[420px] flex-col border-r border-gray-200 bg-white">
-
+      <div className="flex w-[420px] flex-col border-r border-gray-200 bg-white shadow-sm z-10">
         <div className="border-b p-6">
-          <h1 className="text-xl font-semibold">
+          <h1 className="text-xl font-bold text-gray-900">
             Template Configuration
           </h1>
-
           <p className="mt-1 text-sm text-gray-500">
             Design your premium completion certificate.
           </p>
@@ -53,37 +48,30 @@ const CertificateTemplatePage = () => {
             certificate={certificate}
           />
         </div>
-
       </div>
 
       {/* Right Panel */}
-      <div className="flex-1 overflow-auto bg-slate-900">
-
-        <div className="mx-auto flex w-full max-w-[1000px] flex-col p-6">
-
+      <div className="relative flex-1 overflow-hidden bg-[#283142]">
+        <div className="absolute top-6 left-6 right-6 z-20">
           <PreviewToolbar
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onDownload={handleDownload}
-            zoomLevel={zoomLevel}
           />
-
-          <div
-            className="mt-6 transition-transform duration-300"
-            style={{
-              transform: `scale(${zoomLevel})`,
-              transformOrigin: "top center",
-            }}
-          >
-            <LiveCertificatePreview
-              data={templateData}
-            />
-          </div>
-
         </div>
 
+        <div className="flex h-full w-full items-center justify-center overflow-auto p-12">
+          <div
+            className="transition-transform duration-300"
+            style={{
+              transform: `scale(${zoomLevel})`,
+              transformOrigin: "center center",
+            }}
+          >
+            <LiveCertificatePreview data={templateData} />
+          </div>
+        </div>
       </div>
-
     </div>
   );
 };
