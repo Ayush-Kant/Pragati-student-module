@@ -32,6 +32,8 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
 import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 import nominationRoutes from "./routes/collegeStudentNominations.routes.js";
+import collegeReportsGenerationRoutes from "./routes/collegeReportsGeneration.routes.js";
+
 
 import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
@@ -116,6 +118,10 @@ app.get("/", (req, res) => {
     message: "Backend is running",
   });
 });
+
+app.use("/api/reports", collegeReportsGenerationRoutes);
+app.use("/api/students", studentRoutes);
+
 
 app.use(errorMiddleware);
 
