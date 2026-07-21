@@ -1,7 +1,7 @@
 import api from '../../../../services/api.js';
 
 // Uses the shared axios instance from src/services/api.js
-// which auto-attaches the Bearer token and uses baseURL: http://localhost:5000/api
+// which auto-attaches the Bearer token and uses baseURL: http://localhost:5001/api
 
 export const getStudents = async (params = {}) => {
   const res = await api.get('/students', { params });

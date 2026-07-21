@@ -14,6 +14,7 @@ import Availability from "../pages/Availability";
 // --- Course & Feature Imports ---
 import Courses from "../../../pages/mentor/CoursesPage";
 import CreateCourse from "../../../pages/mentor/CreateCoursePage";
+
 import ExportReport from "../pages/ExportReport";
 import { ActivityProvider } from "../context/ActivityContext";
 import Activities from "../pages/Activities";
@@ -36,6 +37,7 @@ import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import NotificationsPage from "../pages/NotificationsPage";
 import DiscussionForumPage from "../pages/DiscussionForumPage";
 import SlotsCalendarPage from "../pages/SlotsCalendarPage";
+import SettingsPage from "../../../pages/mentor/SettingsPage";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
@@ -47,6 +49,7 @@ const mentorRoute = (
         <Route path="profile" element={<MentorProfile />} />
         <Route path="courses" element={<Courses />} />
         <Route path="courses/create" element={<CreateCourse />} />
+        <Route path="settings" element={<SettingsPage />} />
         <Route path="export-report" element={<ExportReport />} />
         <Route path="projects/create" element={<ProjectCreationPage />} />
 
