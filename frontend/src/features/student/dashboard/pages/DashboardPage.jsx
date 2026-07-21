@@ -15,6 +15,9 @@ import ProgressOverview from "../components/progress/ProgressOverview";
 import UpcomingActivities from "../components/sessions/UpcomingActivities";
 import NotificationPanel from "../components/notifications/NotificationPanel";
 
+// ── Common Fallbacks ──
+import LoadingSpinner from "../components/common/LoadingSpinner";
+
 const DashboardPage = () => {
   const {
     activeDrive,
@@ -40,53 +43,65 @@ const DashboardPage = () => {
         {error && (
           <div className="mb-5 flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 text-sm font-medium px-4 py-3 rounded-xl">
             <span className="flex items-center gap-2">⚠ {error}</span>
-            <button onClick={refetch} className="text-xs font-semibold underline hover:text-red-800 transition-colors">
+            <button 
+              onClick={refetch} 
+              className="text-xs font-semibold underline hover:text-red-800 transition-colors cursor-pointer"
+            >
               Retry
             </button>
           </div>
         )}
 
-        {/* ── Top Metrics Row ── */}
-        <StatisticsCards data={quickStats} loading={loading} />
+        {/* ── Initial Global Loading State ── */}
+        {loading && !quickStats ? (
+          <div className="py-12 flex justify-center">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          <>
+            {/* ── Top Metrics Row ── */}
+            <StatisticsCards data={quickStats} loading={loading} />
 
-        {/* ── Placement Drives & Quick Actions ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-          <div className="lg:col-span-2">
-            <ActiveDriveCard data={activeDrive} loading={loading} />
-          </div>
-          <div className="lg:col-span-1">
-            <QuickActions />
-          </div>
-        </div>
+            {/* ── Placement Drives & Quick Actions ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+              <div className="lg:col-span-2">
+                <ActiveDriveCard data={activeDrive} loading={loading} />
+              </div>
+              <div className="lg:col-span-1">
+                <QuickActions />
+              </div>
+            </div>
 
-        {/* ── Progress Metrics Section ── */}
-        <ProgressOverview data={progressRing} loading={loading} />
+            {/* ── Progress Metrics Section ── */}
+            <ProgressOverview data={progressRing} loading={loading} />
 
-        {/* ── Middle Row (Schedules, Deliverables & Logs) ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-          <div className="lg:col-span-2">
-            <UpcomingActivities 
-              sessions={upcomingSessions} 
-              tasks={pendingTasks} 
-              loading={loading} 
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <NotificationPanel data={recentNotifications} loading={loading} />
-          </div>
-        </div>
+            {/* ── Middle Row (Schedules, Deliverables & Logs) ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+              <div className="lg:col-span-2">
+                <UpcomingActivities 
+                  sessions={upcomingSessions} 
+                  tasks={pendingTasks} 
+                  loading={loading} 
+                />
+              </div>
+              <div className="lg:col-span-1">
+                <NotificationPanel data={recentNotifications} loading={loading} />
+              </div>
+            </div>
 
-        {/* ── Bottom Row (Leaderboard Evaluation) ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-1">
-            <LeaderboardPreview
-              leaderboard={leaderboard}
-              loading={loading}
-              error={error}
-            />
-          </div>
-          <div className="hidden lg:block lg:col-span-2" />
-        </div>
+            {/* ── Bottom Row (Leaderboard Evaluation) ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+              <div className="lg:col-span-1">
+                <LeaderboardPreview
+                  leaderboard={leaderboard}
+                  loading={loading}
+                  error={error}
+                />
+              </div>
+              <div className="hidden lg:block lg:col-span-2" />
+            </div>
+          </>
+        )}
 
       </div>
     </div>
