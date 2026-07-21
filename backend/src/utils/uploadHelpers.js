@@ -89,8 +89,8 @@ export const uploadToS3 = async (file) => {
     fs.writeFileSync(filepath, file.buffer);
     console.log(`[Local Fallback] Saved file locally to ${filepath}`);
 
-    // Return a clean, simulated S3 URL format
-    return `https://${AWS_BUCKET_NAME || "pragati-s3-bucket"}.s3.amazonaws.com/reports/${filename}`;
+    // Return a local URL path accessible via express.static / uploads
+    return `/uploads/${filename}`;
   } catch (err) {
     console.error("❌ Local file fallback failed:", err.message);
     throw new Error("Failed to upload project report file.");

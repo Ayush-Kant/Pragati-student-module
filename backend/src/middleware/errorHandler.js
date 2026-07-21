@@ -22,6 +22,14 @@
  * @param {function} next
  */
 const errorHandler = (err, req, res, next) => {
+    // Handle Multer file upload errors explicitly
+    if (err.name === 'MulterError') {
+        err.statusCode = 400;
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            err.message = 'File size exceeds maximum allowed limit (20MB)';
+        }
+    }
+
     // Determine appropriate HTTP status code
     const statusCode = err.statusCode
         || err.status

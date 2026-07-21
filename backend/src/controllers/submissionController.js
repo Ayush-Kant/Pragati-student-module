@@ -6,7 +6,7 @@ import { formatSuccess, formatError } from "../utils/projectHelpers.js";
 /**
  * Handles POST /api/student/projects/:projectId/submit
  */
-export const submitFinalProject = async (req, res) => {
+export const submitFinalProject = async (req, res, next) => {
   try {
     const { projectId } = req.params;
     const { githubUrl, deployedUrl } = req.body;
@@ -34,15 +34,14 @@ export const submitFinalProject = async (req, res) => {
 
     return res.status(200).json(formatSuccess("Final project submitted successfully", submission));
   } catch (err) {
-    const status = err.status || 500;
-    return res.status(status).json(formatError(err.message, err.details || {}));
+    next(err);
   }
 };
 
 /**
  * Handles GET /api/student/projects/:projectId/submission
  */
-export const getSubmission = async (req, res) => {
+export const getSubmission = async (req, res, next) => {
   try {
     const { projectId } = req.params;
     const studentId = req.user?.id;
@@ -58,8 +57,7 @@ export const getSubmission = async (req, res) => {
 
     return res.status(200).json(formatSuccess("Submission retrieved successfully", submission));
   } catch (err) {
-    const status = err.status || 500;
-    return res.status(status).json(formatError(err.message, err.details || {}));
+    next(err);
   }
 };
 

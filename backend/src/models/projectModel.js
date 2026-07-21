@@ -105,7 +105,22 @@ export const getProjectDetails = async (projectId, studentId) => {
   };
 };
 
+/**
+ * Checks whether a student is assigned to a given project.
+ * @param {number} projectId
+ * @param {number} studentId
+ * @returns {Promise<boolean>}
+ */
+export const checkStudentProjectAssignment = async (projectId, studentId) => {
+  const result = await pool.query(
+    "SELECT id FROM student_projects WHERE project_id = $1 AND student_id = $2",
+    [projectId, studentId]
+  );
+  return result.rows.length > 0;
+};
+
 export default {
+  checkStudentProjectAssignment,
   getProjectById,
   getProjectDetails
 };

@@ -3,7 +3,6 @@ import * as submissionModel from "../models/submissionModel.js";
 import * as projectModel from "../models/projectModel.js";
 import { isDeadlinePassed } from "../utils/deadlineHelpers.js";
 import { uploadToS3 } from "../utils/uploadHelpers.js";
-import { pool } from "../../config/db.js";
 
 /**
  * Validates a submission payload (business validation).
@@ -20,12 +19,9 @@ export const validateSubmission = async (projectId, studentId) => {
     throw error;
   }
 
-  // 2. Verify student is assigned to this project
-  const assignmentCheck = await pool.query(
-    "SELECT id FROM student_projects WHERE project_id = $1 AND student_id = $2",
-    [projectId, studentId]
-  );
-  if (assignmentCheck.rows.length === 0) {
+  // 2. Verify student is assigned to this project (delegated to model layer)
+  const isAssigned = await projectModel.checkStudentProjectAssignment(projectId, studentId);
+  if (!isAssigned) {
     const error = new Error("Unauthorized: Student is not assigned to this project");
     error.status = 403;
     throw error;
@@ -65,18 +61,11 @@ export const uploadProjectReport = async (file) => {
  * @returns {Promise<object>} The created/updated submission record
  */
 export const submitFinalProject = async (projectId, studentId, githubUrl, deployedUrl, reportUrl) => {
-  // Run business validations
+  // Run business validations (project exists, student assigned, deadline check)
   await validateSubmission(projectId, studentId);
 
-  // Verify final project has not already been submitted
-  const existingSub = await submissionModel.getSubmission(projectId, studentId);
-  if (existingSub) {
-    const error = new Error("Submission failed: Final project has already been submitted");
-    error.status = 400;
-    throw error;
-  }
-
-  // Submit final project details (handled via model's ON CONFLICT)
+  // Submit final project — ON CONFLICT DO UPDATE in the model allows
+  // idempotent re-submissions, so no duplicate guard is needed here.
   return submissionModel.submitFinalProject(projectId, studentId, githubUrl, deployedUrl, reportUrl);
 };
 

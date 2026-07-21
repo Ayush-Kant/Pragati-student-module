@@ -51,23 +51,36 @@ export const getSubmission = async (projectId, studentId) => {
 
 /**
  * Updates a submission record status or other fields.
- * @param {number} submissionId 
- * @param {object} updateData 
+ *
+ * Security: column names are validated against an explicit whitelist before
+ * being interpolated into the SQL SET clause. Any unrecognised key is rejected
+ * immediately so that no attacker-controlled string can reach the query.
+ *
+ * @param {number} submissionId
+ * @param {object} updateData   - Keyed by camelCase field names
  * @returns {Promise<object|null>}
  */
 export const updateSubmission = async (submissionId, updateData) => {
+  // Explicit camelCase → snake_case whitelist.
+  // ONLY these columns may be updated via this method.
+  const ALLOWED_COLUMNS = {
+    githubUrl:   "github_url",
+    deployedUrl: "deployed_url",
+    reportUrl:   "report_url",
+    status:      "status",
+  };
+
   const fields = [];
   const values = [];
   let index = 1;
 
   for (const [key, val] of Object.entries(updateData)) {
-    // Map camelCase keys to snake_case column names
-    let columnName = key;
-    if (key === "githubUrl") columnName = "github_url";
-    if (key === "deployedUrl") columnName = "deployed_url";
-    if (key === "reportUrl") columnName = "report_url";
-    
-    fields.push(`${columnName} = $${index}`);
+    if (!Object.prototype.hasOwnProperty.call(ALLOWED_COLUMNS, key)) {
+      const err = new Error(`Invalid field: '${key}' is not a permitted submission field`);
+      err.status = 400;
+      throw err;
+    }
+    fields.push(`${ALLOWED_COLUMNS[key]} = $${index}`);
     values.push(val);
     index++;
   }
@@ -77,7 +90,7 @@ export const updateSubmission = async (submissionId, updateData) => {
   values.push(submissionId);
   const query = `
     UPDATE project_submissions 
-    SET ${fields.join(", ")}, updated_at = NOW() 
+    SET ${fields.join(", ")} , updated_at = NOW() 
     WHERE id = $${index} 
     RETURNING 
       id, project_id AS "projectId", student_id AS "studentId", github_url AS "githubUrl", 

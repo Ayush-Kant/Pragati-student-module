@@ -2,7 +2,6 @@
 import * as milestoneModel from "../models/milestoneModel.js";
 import * as projectModel from "../models/projectModel.js";
 import { isDeadlinePassed } from "../utils/deadlineHelpers.js";
-import { pool } from "../../config/db.js";
 
 /**
  * Fetches all milestones for a project.
@@ -46,12 +45,9 @@ export const submitMilestone = async (projectId, milestoneId, studentId, githubU
     throw error;
   }
 
-  // 3. Verify student is assigned to this project
-  const assignmentCheck = await pool.query(
-    "SELECT id FROM student_projects WHERE project_id = $1 AND student_id = $2",
-    [projectId, studentId]
-  );
-  if (assignmentCheck.rows.length === 0) {
+  // 3. Verify student is assigned to this project (delegated to model layer)
+  const isAssigned = await projectModel.checkStudentProjectAssignment(projectId, studentId);
+  if (!isAssigned) {
     const error = new Error("Unauthorized: Student is not assigned to this project");
     error.status = 403;
     throw error;
@@ -64,18 +60,8 @@ export const submitMilestone = async (projectId, milestoneId, studentId, githubU
     throw error;
   }
 
-  // 4.5 Verify milestone has not already been submitted
-  const existingSub = await pool.query(
-    "SELECT id FROM project_milestone_submissions WHERE milestone_id = $1 AND student_id = $2",
-    [milestoneId, studentId]
-  );
-  if (existingSub.rows.length > 0) {
-    const error = new Error("Submission failed: Milestone has already been submitted");
-    error.status = 400;
-    throw error;
-  }
-
-  // 5. Submit the milestone (Insert/Update handled via model's ON CONFLICT)
+  // 5. Submit the milestone — ON CONFLICT DO UPDATE in the model allows
+  //    idempotent re-submissions, so no duplicate guard is needed here.
   return milestoneModel.submitMilestone(projectId, milestoneId, studentId, githubUrl, deployedUrl);
 };
 

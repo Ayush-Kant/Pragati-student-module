@@ -44,6 +44,7 @@ export const validateRequest = (validatorOrSchema, propertyOrOptions = 'body') =
             if (property === 'query') req.validatedQuery = value;
             else if (property === 'body') req.validatedBody = value;
             else if (property === 'params') req.validatedParams = value;
+            req[property] = value;
             return next();
         }
 

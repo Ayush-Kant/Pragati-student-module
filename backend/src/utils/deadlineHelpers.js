@@ -7,7 +7,8 @@
  */
 export const isDeadlinePassed = (dueDate) => {
   if (!dueDate) return false;
-  const now = new Date();
   const due = new Date(dueDate);
+  if (Number.isNaN(due.getTime())) return false;
+  const now = new Date();
   return now > due;
 };

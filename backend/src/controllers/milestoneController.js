@@ -5,7 +5,7 @@ import { formatSuccess, formatError } from "../utils/projectHelpers.js";
 /**
  * Handles POST /api/student/projects/:projectId/milestones/:milestoneId
  */
-export const submitMilestone = async (req, res) => {
+export const submitMilestone = async (req, res, next) => {
   try {
     const { projectId, milestoneId } = req.params;
     const { githubUrl, deployedUrl } = req.body;
@@ -25,22 +25,20 @@ export const submitMilestone = async (req, res) => {
 
     return res.status(200).json(formatSuccess("Milestone submitted successfully", submission));
   } catch (err) {
-    const status = err.status || 500;
-    return res.status(status).json(formatError(err.message, err.details || {}));
+    next(err);
   }
 };
 
 /**
  * Handles GET /api/student/projects/:projectId/milestones
  */
-export const getMilestones = async (req, res) => {
+export const getMilestones = async (req, res, next) => {
   try {
     const { projectId } = req.params;
     const milestones = await milestoneService.getMilestones(Number(projectId));
     return res.status(200).json(formatSuccess("Milestones retrieved successfully", { milestones }));
   } catch (err) {
-    const status = err.status || 500;
-    return res.status(status).json(formatError(err.message, err.details || {}));
+    next(err);
   }
 };
 

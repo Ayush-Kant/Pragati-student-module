@@ -5,7 +5,7 @@ import { formatSuccess, formatError } from "../utils/projectHelpers.js";
 /**
  * Handles GET /api/student/projects/:projectId/feedback
  */
-export const getFeedback = async (req, res) => {
+export const getFeedback = async (req, res, next) => {
   try {
     const { projectId } = req.params;
     const studentId = req.user?.id;
@@ -18,8 +18,7 @@ export const getFeedback = async (req, res) => {
     
     return res.status(200).json(formatSuccess("Project feedback retrieved successfully", feedbackReport));
   } catch (err) {
-    const status = err.status || 500;
-    return res.status(status).json(formatError(err.message, err.details || {}));
+    next(err);
   }
 };
 
