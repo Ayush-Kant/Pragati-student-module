@@ -88,8 +88,8 @@ function CodingQuestionForm() {
   };
 
   return (
-    <div className="border rounded-lg p-4">
-      <h3 className="font-semibold mb-4">
+    <div className="rounded-lg border p-3 md:p-4">
+      <h3 className="mb-4 text-lg md:text-xl font-semibold">
         {isEdit
           ? "Edit Coding Question"
           : "Add Coding Question"}
@@ -103,7 +103,7 @@ function CodingQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:p-3 md:text-base"
           placeholder="Problem Statement"
           rows={4}
           required
@@ -116,7 +116,7 @@ function CodingQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition px-3 py-2 text-sm md:p-3 md:text-base"
           placeholder="Language Support (Java, Python, C++)"
           required
         />
@@ -128,7 +128,7 @@ function CodingQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:p-3 md:text-base"
           placeholder="Sample Input"
           rows={3}
           required
@@ -141,7 +141,7 @@ function CodingQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:p-3 md:text-base"
           placeholder="Sample Output"
           rows={3}
           required
@@ -155,26 +155,26 @@ function CodingQuestionForm() {
               e.target.value
             )
           }
-          className="w-full border p-2 rounded mb-3"
+          className="mb-3 w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition px-3 py-2 text-sm md:p-3 md:text-base"
           placeholder="Marks"
           min="1"
           required
         />
 
-        <div className="flex justify-end gap-3 mt-6">
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={() =>
               navigate(-1)
             }
-            className="px-4 py-2 border rounded-lg"
+            className="rounded-lg border px-3 py-2 text-sm transition hover:bg-gray-100 md:px-4 md:text-base"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            className="rounded-lg bg-blue-600 px-3 py-2 text-sm text-white transition hover:bg-blue-700 md:px-4 md:text-base"
           >
             {isEdit
               ? "Update Coding Question"

@@ -37,10 +37,10 @@ const AssessmentEditModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-xl border border-gray-200 bg-white p-6 shadow-2xl transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white p-4 md:p-6 shadow-2xl transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900">
         {/* Header */}
-        <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 className="mb-6 text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
           Edit Assessment
         </h2>
 
@@ -50,7 +50,7 @@ const AssessmentEditModal = ({
         >
           {/* Assessment Title */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+            <label className="mb-2 block text-xs md:text-sm font-medium text-gray-700 dark:text-slate-300">
               Assessment Title
             </label>
 
@@ -63,13 +63,13 @@ const AssessmentEditModal = ({
                   title: e.target.value,
                 })
               }
-              className="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 placeholder:text-gray-400 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm md:p-3 md:text-base text-gray-900 placeholder:text-gray-400 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
             />
           </div>
 
           {/* Difficulty */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+            <label className="mb-2 block text-xs md:text-sm font-medium text-gray-700 dark:text-slate-300">
               Difficulty
             </label>
 
@@ -82,7 +82,7 @@ const AssessmentEditModal = ({
                     e.target.value,
                 })
               }
-              className="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm md:p-3 md:text-base text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
             >
               <option value="Easy">
                 Easy
@@ -100,7 +100,7 @@ const AssessmentEditModal = ({
 
           {/* Time Limit */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+            <label className="mb-2 block text-xs md:text-sm font-medium text-gray-700 dark:text-slate-300">
               Time Limit (Minutes)
             </label>
 
@@ -116,23 +116,22 @@ const AssessmentEditModal = ({
                     e.target.value,
                 })
               }
-              className="w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-            />
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm md:p-3 md:text-base text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"/>
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm md:px-4 md:text-base font-medium text-gray-700 transition hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
+              className="rounded-lg bg-blue-600 px-3 py-2 text-sm md:px-4 md:text-base font-medium text-white transition hover:bg-blue-700"
             >
               Save Changes
             </button>
