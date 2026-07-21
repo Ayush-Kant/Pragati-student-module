@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS generated_reports (
     status VARCHAR(50) NOT NULL DEFAULT 'completed',
     format VARCHAR(50) NOT NULL DEFAULT 'json',
     content JSONB DEFAULT '{}'::jsonb,
-    created_by INTEGER,
+    created_by VARCHAR(255),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

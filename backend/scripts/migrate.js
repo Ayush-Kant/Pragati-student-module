@@ -40,6 +40,8 @@ const migrationFiles = [
   "009_create_reports_analytics_tables.sql",
   "011_create_job_posting_tables.sql",
   "012_create_jobs_table.sql",
+  "013_create_reports_management_tables.sql",
+  "013_create_placement_drives.sql",
   "019_create_notifications.sql",
   "college.department.course.seeddata.sql",
   "student_module.sql",
