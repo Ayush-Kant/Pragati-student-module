@@ -1,8 +1,9 @@
 import express from "express";
+import connectDB from "./config/db.js";
+import studentProfileRouter from "./src/routes/index.js";
+import errorHandler from "./src/middleware/errorHandler.js";
 import cors from "cors";
 import dotenv from "dotenv";
-
-import { connectDB } from "./config/db.js";
 import { initializeLiveSessionModule } from "./src/database/migrations/liveSessionSchema.js";
 
 // Admin Routes
@@ -124,22 +125,17 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use(errorMiddleware);
+// ── Student Profile Module Routes ─────────────────────────────────────────────
+app.use(studentProfileRouter);
 
-connectDB()
-  .then(async () => {
-    try {
-      await initializeLiveSessionModule();
-      console.log("✅ Live session module initialized");
-    } catch (error) {
-      console.error("⚠️ Live session module initialization failed:", error.message);
-    }
+// ── Global Error Handler (must be last) ──────────────────────────────────────
+app.use(errorHandler);
 
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on PORT : ${PORT}`);
-    });
-  })
-  .catch((err) => {
+app.listen(PORT, () => {
+    console.log(`✅ Server running on PORT : ${PORT}`);
+});
+
+connectDB(process.env.POSTGRESQL_URI).catch((err) => {
     console.error("❌ PostgreSQL connection failed:", err.message);
     process.exit(1);
   });
