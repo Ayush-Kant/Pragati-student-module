@@ -2,6 +2,10 @@ import * as courseModel from "../models/courseModel.js";
 
 export const getModules = async (courseId) => {
     const modules = await courseModel.getCourseModules(courseId);
+    if (!modules) {
+        return null;
+    }
+
     return modules.map((module) => ({
         id: module.id,
         courseId: module.course_id,

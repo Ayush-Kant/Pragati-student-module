@@ -1,14 +1,9 @@
 import Joi from "joi";
 
-export const validateResource = (req, res, next) => {
-    const schema = Joi.object({
-        id: Joi.alternatives().try(Joi.number().integer().positive(), Joi.string().trim().required()),
-    });
+export const validateResource = Joi.object({
+    id: Joi.number().integer().positive().required(),
+});
 
-    const { error } = schema.validate(req.params);
-    if (error) {
-        return res.status(400).json({ success: false, message: "Invalid resource id" });
-    }
-
-    next();
-};
+export const validateLessonId = Joi.object({
+    lessonId: Joi.number().integer().positive().optional(),
+}).unknown(false);

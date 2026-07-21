@@ -26,6 +26,7 @@ const authenticateJWT = (req, res, next) => {
         return res.status(401).json({
             success: false,
             message: 'Authentication required. Please provide a valid Bearer token.',
+            error: {},
         });
     }
 
@@ -35,6 +36,7 @@ const authenticateJWT = (req, res, next) => {
         return res.status(401).json({
             success: false,
             message: 'Authentication token is missing.',
+            error: {},
         });
     }
 
@@ -54,6 +56,7 @@ const authenticateJWT = (req, res, next) => {
             return res.status(401).json({
                 success: false,
                 message: 'Session expired. Please log in again.',
+                error: {},
             });
         }
 
@@ -61,12 +64,14 @@ const authenticateJWT = (req, res, next) => {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid authentication token.',
+                error: {},
             });
         }
 
         return res.status(401).json({
             success: false,
             message: 'Invalid authentication token.',
+            error: {},
         });
     }
 };

@@ -1,6 +1,19 @@
 import { pool } from "../../config/db.js";
 
 export const getLessons = async (moduleId, studentId) => {
+  const moduleExists = await pool.query(
+    `
+      SELECT 1
+      FROM course_modules
+      WHERE id = $1
+    `,
+    [moduleId]
+  );
+
+  if (moduleExists.rows.length === 0) {
+    return null;
+  }
+
   const query = `
     SELECT
       l.id,
@@ -48,10 +61,26 @@ export const getLessonById = async (lessonId, studentId) => {
   `;
 
   const { rows } = await pool.query(query, [lessonId, studentId]);
-  return rows[0] || null;
+  return rows.length > 0 ? rows[0] : null;
 };
 
 export const updateLessonProgress = async (lessonId, studentId, completed) => {
+  const lessonInfoQuery = `
+    SELECT
+      l.id,
+      cm.course_id
+    FROM lessons l
+    JOIN course_modules cm ON cm.id = l.module_id
+    WHERE l.id = $1
+  `;
+
+  const { rows: lessonInfoRows } = await pool.query(lessonInfoQuery, [lessonId]);
+  const lessonInfo = lessonInfoRows.length > 0 ? lessonInfoRows[0] : null;
+
+  if (!lessonInfo) {
+    return null;
+  }
+
   const upsertQuery = `
     INSERT INTO lesson_progress (student_id, lesson_id, completed, completed_at)
     VALUES ($1, $2, $3, CASE WHEN $3 THEN NOW() ELSE NULL END)
@@ -62,20 +91,18 @@ export const updateLessonProgress = async (lessonId, studentId, completed) => {
   `;
 
   const { rows: progressRows } = await pool.query(upsertQuery, [studentId, lessonId, completed]);
-  const progressRow = progressRows[0];
+  const progressRow = progressRows[0] ?? null;
+
+  if (!progressRow) {
+    return null;
+  }
 
   const courseQuery = `
-    WITH lesson_info AS (
-      SELECT cm.course_id
-      FROM lessons l
-      JOIN course_modules cm ON cm.id = l.module_id
-      WHERE l.id = $1
-    ),
     totals AS (
       SELECT course_id, COUNT(*)::INT AS total_lessons
       FROM lessons l
       JOIN course_modules cm ON cm.id = l.module_id
-      WHERE cm.course_id = (SELECT course_id FROM lesson_info)
+      WHERE cm.course_id = $3
       GROUP BY course_id
     ),
     completed_totals AS (
@@ -83,7 +110,7 @@ export const updateLessonProgress = async (lessonId, studentId, completed) => {
       FROM lesson_progress lp
       JOIN lessons l ON l.id = lp.lesson_id
       JOIN course_modules cm ON cm.id = l.module_id
-      WHERE lp.student_id = $2 AND lp.completed = TRUE AND cm.course_id = (SELECT course_id FROM lesson_info)
+      WHERE lp.student_id = $2 AND lp.completed = TRUE AND cm.course_id = $3
       GROUP BY cm.course_id
     )
     INSERT INTO student_course_progress (student_id, course_id, completed_lessons, total_lessons, progress, created_at, updated_at)
@@ -100,7 +127,7 @@ export const updateLessonProgress = async (lessonId, studentId, completed) => {
     RETURNING *;
   `;
 
-  await pool.query(courseQuery, [lessonId, studentId]);
+  await pool.query(courseQuery, [lessonId, studentId, lessonInfo.course_id]);
 
   return progressRow;
 };

@@ -1,6 +1,19 @@
 import { pool } from "../../config/db.js";
 
 export const getCourseModules = async (courseId) => {
+  const courseExists = await pool.query(
+    `
+      SELECT 1
+      FROM training_courses
+      WHERE id = $1
+    `,
+    [courseId]
+  );
+
+  if (courseExists.rows.length === 0) {
+    return null;
+  }
+
   const query = `
     SELECT
       cm.id,
@@ -42,5 +55,5 @@ export const getModuleDetails = async (moduleId) => {
   `;
 
   const { rows } = await pool.query(query, [moduleId]);
-  return rows[0] || null;
+  return rows.length > 0 ? rows[0] : null;
 };

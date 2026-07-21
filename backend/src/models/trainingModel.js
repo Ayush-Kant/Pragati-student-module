@@ -49,5 +49,5 @@ export const getCourseById = async (id, studentId) => {
   `;
 
   const { rows } = await pool.query(query, [id, studentId]);
-  return rows[0] || null;
+  return rows.length > 0 ? rows[0] : null;
 };

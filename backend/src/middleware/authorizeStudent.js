@@ -18,6 +18,7 @@ const authorizeStudent = (req, res, next) => {
         return res.status(401).json({
             success: false,
             message: 'Authentication required.',
+            error: {},
         });
     }
 
@@ -25,6 +26,7 @@ const authorizeStudent = (req, res, next) => {
         return res.status(403).json({
             success: false,
             message: 'Access denied. This resource is only available to students.',
+            error: {},
         });
     }
 

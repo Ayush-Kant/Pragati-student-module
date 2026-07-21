@@ -1,6 +1,21 @@
 import { pool } from "../../config/db.js";
 
 export const getResources = async (lessonId) => {
+  if (lessonId != null) {
+    const lessonExists = await pool.query(
+      `
+        SELECT 1
+        FROM lessons
+        WHERE id = $1
+      `,
+      [lessonId]
+    );
+
+    if (lessonExists.rows.length === 0) {
+      return null;
+    }
+  }
+
   const query = `
     SELECT
       id,
@@ -32,5 +47,5 @@ export const downloadResource = async (resourceId) => {
   `;
 
   const { rows } = await pool.query(query, [resourceId]);
-  return rows[0] || null;
+  return rows.length > 0 ? rows[0] : null;
 };

@@ -35,16 +35,19 @@ const errorHandler = (err, req, res, next) => {
     const payload = {
         success: false,
         message: err.message || 'An unexpected error occurred',
+        error: {
+            code: err.code,
+        },
     };
 
     // Include validation errors array if present
     if (err.errors && Array.isArray(err.errors)) {
-        payload.errors = err.errors;
+        payload.error.details = err.errors;
     }
 
     // Include stack trace in development only
     if (process.env.NODE_ENV === 'development') {
-        payload.stack = err.stack;
+        payload.error.stack = err.stack;
     }
 
     res.status(statusCode).json(payload);
