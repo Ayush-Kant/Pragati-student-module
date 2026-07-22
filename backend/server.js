@@ -38,6 +38,7 @@ import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
 import collegeCommunicationAnnouncementsRoutes from "./routes/collegeCommunicationAnnouncements.routes.js";
+import collegeAnalyticsDashboardRouter from "./routes/collegeAnalyticsDashboard.routes.js";
 
 // company Assessment route
 import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
@@ -52,6 +53,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(errorMiddleware);
 
 app.use(
@@ -110,6 +112,8 @@ app.use("/api/v1/company/assessments", companyAssessmentRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
 app.use("/api", collegeCommunicationAnnouncementsRoutes);
+app.use("/api/analytics", collegeAnalyticsDashboardRouter);
+
 // Health Check
 app.get("/", (req, res) => {
   res.json({

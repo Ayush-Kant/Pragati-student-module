@@ -14,8 +14,9 @@ import * as requestValidator from "../validators/collegeRequests.validator.js";
 
 const router = express.Router();
 
-// Protect all routes
-router.use(authMiddleware, roleMiddleware("admin"));
+// Protect only the announcements and notifications subtrees.
+router.use("/announcements", authMiddleware, roleMiddleware("admin"));
+router.use("/notifications", authMiddleware, roleMiddleware("admin"));
 
 /* ===========================
    Announcements
