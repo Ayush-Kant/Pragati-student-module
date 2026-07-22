@@ -36,11 +36,6 @@ export const connectDB = async () => {
 
     console.log("✅ PostgreSQL connected successfully");
   } catch (error) {
-    console.error("❌ PostgreSQL connection failed");
-    console.error("Message :", error.message);
-    console.error("Code    :", error.code);
-    console.error("Details :", error);
-
     throw error;
   } finally {
     if (client) {
@@ -48,5 +43,4 @@ export const connectDB = async () => {
     }
   }
 };
-
 export default connectDB;

@@ -464,13 +464,13 @@ const getActiveDriveCompanies = async () => {
 
             d.id AS "driveId",
             d.title AS "driveTitle",
-            d.location,
-            d.start_date AS "startDate",
-            d.end_date AS "endDate"
+            NULL AS "location",
+            d.created_at AS "startDate",
+            d.created_at AS "endDate"
 
         FROM companies c
 
-        JOIN drives d
+        JOIN recruitment_drives d
         ON c.id = d.company_id
 
         WHERE d.status = 'active'

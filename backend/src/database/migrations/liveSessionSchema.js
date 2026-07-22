@@ -29,9 +29,17 @@ const createLiveSessionTablesQuery = `
   ADD COLUMN IF NOT EXISTS mentor_id INTEGER,
   ADD COLUMN IF NOT EXISTS session_type VARCHAR(50) NOT NULL DEFAULT 'webinar',
   ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMP WITH TIME ZONE,
+  ADD COLUMN IF NOT EXISTS trainer VARCHAR(255),
   ADD COLUMN IF NOT EXISTS date DATE,
   ADD COLUMN IF NOT EXISTS time VARCHAR(50),
+  ADD COLUMN IF NOT EXISTS duration VARCHAR(50),
+  ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Upcoming',
   ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+
+  DO $$ BEGIN
+    ALTER TABLE live_sessions ADD CONSTRAINT live_sessions_status_chk CHECK (status IN ('Upcoming', 'Scheduled', 'Live', 'Completed'));
+  EXCEPTION WHEN duplicate_object THEN NULL;
+  END $$;
 
   DO $$
   BEGIN
@@ -168,19 +176,26 @@ export const seedLiveSessionData = async () => {
           [firstSessionId, attendanceSeedData[0].studentId, attendanceSeedData[0].status],
         );
       }
+
+      const participantCheck = await pool.query(
+        "SELECT EXISTS (SELECT 1 FROM users WHERE id = $1) AS exists",
+        [participantSeedData[0].studentId]
+      );
+
+      if (participantCheck.rows[0]?.exists) {
+        await pool.query(
+          `INSERT INTO session_participants (session_id, student_id, joined_at, left_at)
+           VALUES ($1, $2, NOW(), NULL)
+           ON CONFLICT (session_id, student_id) DO NOTHING`,
+          [firstSessionId, participantSeedData[0].studentId],
+        );
+      }
     }
 
     await pool.query(
       `INSERT INTO session_recordings (session_id, title, duration, recording_url)
        VALUES ($1, $2, $3, $4)`,
       [firstSessionId, recordingSeedData[0].title, recordingSeedData[0].duration, recordingSeedData[0].recordingUrl],
-    );
-
-    await pool.query(
-      `INSERT INTO session_participants (session_id, student_id, joined_at, left_at)
-       VALUES ($1, $2, NOW(), NULL)
-       ON CONFLICT (session_id, student_id) DO NOTHING`,
-      [firstSessionId, participantSeedData[0].studentId],
     );
   }
 

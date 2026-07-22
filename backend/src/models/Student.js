@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from "@sequelize/core";
 import sequelize from "../../config/sequelize.js";
 
 class Student extends Model {}
@@ -27,7 +27,7 @@ Student.init(
     tableName: "students",
     underscored: true,
     timestamps: false,
-  }
+  },
 );
 
 export default Student;
