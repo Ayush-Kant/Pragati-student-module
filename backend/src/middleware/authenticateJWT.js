@@ -11,6 +11,26 @@
 
 import jwt from 'jsonwebtoken';
 
+// Helper to read token from header, cookie, or query param.
+const extractToken = (req) => {
+    const authHeader = req.headers['authorization'] ?? req.headers['Authorization'];
+    if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
+        return authHeader.slice(7).trim();
+    }
+
+    // Support token in cookie named 'token' if cookie parser is used
+    if (req.cookies && req.cookies.token) {
+        return req.cookies.token;
+    }
+
+    // Support ?token=... query param as a fallback
+    if (req.query && req.query.token) {
+        return String(req.query.token);
+    }
+
+    return null;
+};
+
 /**
  * authenticateJWT
  * ────────────────
@@ -20,22 +40,12 @@ import jwt from 'jsonwebtoken';
  *   Authorization: Bearer <token>
  */
 const authenticateJWT = (req, res, next) => {
-    const authHeader = req.headers['authorization'] ?? req.headers['Authorization'];
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({
-            success: false,
-            message: 'Authentication required. Please provide a valid Bearer token.',
-            error: {},
-        });
-    }
-
-    const token = authHeader.slice(7).trim(); // strip "Bearer "
+    const token = extractToken(req);
 
     if (!token) {
         return res.status(401).json({
             success: false,
-            message: 'Authentication token is missing.',
+            message: 'Authentication required. Please provide a valid Bearer token.',
             error: {},
         });
     }
