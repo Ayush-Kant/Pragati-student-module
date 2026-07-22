@@ -2,7 +2,7 @@ import { pool } from "../config/db.js";
 
 export const getProfile = async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
 
     if (!userId) {
       return res.status(401).json({
@@ -20,7 +20,7 @@ export const getProfile = async (req, res) => {
               mentors.verified,
               mentors.availability_json,
               drives.id AS drive_id,
-              drives.title
+              drives.title AS drive_title
           FROM mentors
 
           JOIN users
@@ -32,7 +32,7 @@ export const getProfile = async (req, res) => {
           LEFT JOIN drives
               ON drives.mentor_id = mentors.id
 
-          WHERE users.auth_user_id = $1;
+          WHERE auth_users.uuid_id = $1;
         `;
 
     const mentorResult = await pool.query(mentorQuery, [userId]);
@@ -72,7 +72,7 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user.userId;
 
     if (!userId) {
       return res.status(401).json({
@@ -95,9 +95,10 @@ export const updateProfile = async (req, res) => {
         avatar_url = COALESCE($3, avatar_url),
         availability_json = COALESCE($4, availability_json)
       WHERE user_id = (
-        SELECT id
+        SELECT users.id
         FROM users
-        WHERE auth_user_id = $5
+        JOIN auth_users ON auth_users.id = users.auth_user_id
+        WHERE auth_users.uuid_id = $5
       )
       RETURNING *
       `,

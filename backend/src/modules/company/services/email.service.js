@@ -7,8 +7,11 @@
  */
 
 import { Resend } from "resend";
+import dotenv from "dotenv";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+dotenv.config();
+
+const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_123456789");
 
 const FROM = "onboarding@resend.dev";
 

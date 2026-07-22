@@ -75,7 +75,7 @@
 
 @media (max-width: 768px) {
   .company-dashboard {
-    max-width: calc(100vw - 110px);
+    max-width: 100%;
   }
 }
 .stats-grid {
