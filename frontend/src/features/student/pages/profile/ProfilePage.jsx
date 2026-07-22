@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import ProfileEditForm from '../../components/profile/ProfileEditForm';
+import ProjectCard from '../../components/profile/ProjectCard';
 import ValidationAlert from '../../components/profile/ValidationAlert';
 
 const validateSocialLinks = (links = {}) => {
@@ -220,13 +221,12 @@ const ProfilePage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {projects.map((project) => (
-                                <div key={project.id} className="p-4 border border-gray-100 rounded-2xl bg-gray-50/50 relative group">
-                                    <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => handleDeleteProject(project.id)} className="text-gray-400 hover:text-red-600 text-xs bg-white border border-gray-200 p-1.5 rounded-lg shadow-sm">🗑️</button>
-                                    </div>
-                                    <h4 className="font-bold text-gray-800 text-sm">{project.title}</h4>
-                                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">{project.description}</p>
-                                </div>
+                                <ProjectCard
+                                    key={project.id}
+                                    project={project}
+                                    onDelete={() => handleDeleteProject(project.id)}
+                                    onEdit={() => { }}
+                                />
                             ))}
                         </div>
                     </div>
