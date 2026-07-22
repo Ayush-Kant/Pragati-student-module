@@ -1,133 +1,190 @@
 import { useState } from "react";
+import Modal from "react-modal";
+
+Modal.setAppElement("#root");
 
 export default function DriveCreateModal({
-    onClose,
-    addDrive
+  onClose,
+  addDrive,
 }) {
+  const [formData, setFormData] = useState({
+    title: "",
+    company: "",
+    minGPA: "",
+    requiredSkills: "",
+    maxOpenings: "",
+    deadline: "",
+  });
 
-    const [formData, setFormData] = useState({
-        title: "",
-        company: "",
-        minGPA: "",
-        requiredSkills: "",
-        maxOpenings: "",
-        deadline: ""
-    });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-    const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-        const { name, value } = e.target;
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value
-        }));
+    const newDrive = {
+      id: `drive_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      title: formData.title,
+      company: { name: formData.company },
+      status: "active",
+      currentStage: "screening",
+      candidates: Number(formData.maxOpenings),
+      minGPA: parseFloat(formData.minGPA) || 0,
+      requiredSkills: formData.requiredSkills,
+      maxOpenings: parseInt(formData.maxOpenings, 10) || 0,
+      deadline: formData.deadline,
     };
 
-    const handleSubmit = (e) => {
+    addDrive(newDrive);
+    onClose();
+  };
 
-        e.preventDefault();
+  return (
+    <Modal
+      isOpen={true}
+      onRequestClose={onClose}
+      shouldCloseOnOverlayClick={true}
+      className="
+        bg-white
+        rounded-xl
+        shadow-2xl
+        w-full
+        max-w-lg
+        mx-auto
+        outline-none
+        max-h-[90vh]
+        overflow-y-auto
+      "
+      overlayClassName="
+        fixed
+        inset-0
+        z-50
+        bg-black/40
+        flex
+        items-center
+        justify-center
+        p-4
+        overflow-y-auto
+      "
+    >
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">
+            Create Drive
+          </h2>
 
-        const newDrive = {
-            id: `drive_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
-            title: formData.title,
-            company: { name: formData.company },
-            status: "active",
-            currentStage: "screening",
-            candidates: Number(formData.maxOpenings),
-            minGPA: parseFloat(formData.minGPA) || 0,
-            requiredSkills: formData.requiredSkills,
-            maxOpenings: parseInt(formData.maxOpenings, 10) || 0,
-            deadline: formData.deadline,
-        };
-
-        addDrive(newDrive);
-        onClose();
-    };
-
-    return (
-        <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
-
-            <div className="bg-white p-6 rounded-lg w-125">
-
-                <h2 className="text-xl font-bold mb-4">
-                    Create Drive
-                </h2>
-
-                <form
-                    className="space-y-4"
-                    onSubmit={handleSubmit}
-                >
-
-                    <input
-                        type="text"
-                        name="title"
-                        placeholder="Drive Title"
-                        className="w-full border p-2 rounded"
-                        onChange={handleChange}
-                    />
-
-                    <input
-                        type="text"
-                        name="company"
-                        placeholder="Company"
-                        className="w-full border p-2 rounded"
-                        onChange={handleChange}
-                    />
-
-                    <input
-                        type="number"
-                        name="minGPA"
-                        placeholder="Minimum GPA"
-                        className="w-full border p-2 rounded"
-                        onChange={handleChange}
-                    />
-
-                    <input
-                        type="text"
-                        name="requiredSkills"
-                        placeholder="Required Skills"
-                        className="w-full border p-2 rounded"
-                        onChange={handleChange}
-                    />
-
-                    <input
-                        type="number"
-                        name="maxOpenings"
-                        placeholder="Max Openings"
-                        className="w-full border p-2 rounded"
-                        onChange={handleChange}
-                    />
-
-                    <input
-                        type="date"
-                        name="deadline"
-                        className="w-full border p-2 rounded"
-                        onChange={handleChange}
-                    />
-
-                    <div className="flex gap-3">
-
-                        <button
-                            className="bg-green-600 text-white px-4 py-2 rounded"
-                        >
-                            Create Drive
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="bg-gray-300 px-4 py-2 rounded"
-                        >
-                            Cancel
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
+          <button
+            type="button"
+            onClick={onClose}
+            className="
+              h-10
+              w-10
+              rounded-lg
+              border
+              border-gray-300
+              hover:bg-gray-100
+              text-2xl
+            "
+          >
+            ×
+          </button>
         </div>
-    );
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
+          <input
+            type="text"
+            name="title"
+            placeholder="Drive Title"
+            className="w-full border rounded-lg p-3"
+            onChange={handleChange}
+          />
+
+          <input
+            type="text"
+            name="company"
+            placeholder="Company"
+            className="w-full border rounded-lg p-3"
+            onChange={handleChange}
+          />
+
+          <input
+            type="number"
+            name="minGPA"
+            placeholder="Minimum GPA"
+            className="w-full border rounded-lg p-3"
+            onChange={handleChange}
+          />
+
+          <input
+            type="text"
+            name="requiredSkills"
+            placeholder="Required Skills"
+            className="w-full border rounded-lg p-3"
+            onChange={handleChange}
+          />
+
+          <input
+            type="number"
+            name="maxOpenings"
+            placeholder="Max Openings"
+            className="w-full border rounded-lg p-3"
+            onChange={handleChange}
+          />
+
+          <input
+            type="date"
+            name="deadline"
+            className="w-full border rounded-lg p-3"
+            onChange={handleChange}
+          />
+
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="
+                w-full
+                sm:w-auto
+                px-5
+                py-3
+                rounded-lg
+                border
+                border-gray-300
+                bg-white
+                hover:bg-gray-100
+              "
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              className="
+                w-full
+                sm:w-auto
+                px-5
+                py-3
+                rounded-lg
+                bg-green-600
+                hover:bg-green-700
+                text-white
+                font-medium
+              "
+            >
+              Create Drive
+            </button>
+          </div>
+        </form>
+      </div>
+    </Modal>
+  );
 }
