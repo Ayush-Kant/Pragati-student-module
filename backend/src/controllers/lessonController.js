@@ -24,6 +24,28 @@ export const getLessons = async (req, res, next) => {
     }
 };
 
+export const getLessonsByCourse = async (req, res, next) => {
+    try {
+        const lessons = await lessonService.getLessonsByCourse(req.params.id, getStudentId(req));
+
+        if (lessons === null) {
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+                error: { id: req.params.id },
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Course lessons retrieved successfully",
+            data: lessons,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getLessonById = async (req, res, next) => {
     try {
         const lesson = await lessonService.getLesson(req.params.id, getStudentId(req));

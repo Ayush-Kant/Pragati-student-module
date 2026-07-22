@@ -4,6 +4,10 @@ export const getLessons = async (moduleId, studentId) => {
     return await lessonModel.getLessons(moduleId, studentId);
 };
 
+export const getLessonsByCourse = async (courseId, studentId) => {
+    return await lessonModel.getLessonsByCourse(courseId, studentId);
+};
+
 export const getLesson = async (lessonId, studentId) => {
     return await lessonModel.getLessonById(lessonId, studentId);
 };

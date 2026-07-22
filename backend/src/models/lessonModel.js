@@ -64,6 +64,47 @@ export const getLessonById = async (lessonId, studentId) => {
   return rows.length > 0 ? rows[0] : null;
 };
 
+export const getLessonsByCourse = async (courseId, studentId) => {
+  const courseExists = await pool.query(
+    `
+      SELECT 1
+      FROM training_courses
+      WHERE id = $1
+    `,
+    [courseId]
+  );
+
+  if (courseExists.rows.length === 0) {
+    return null;
+  }
+
+  const query = `
+    SELECT
+      l.id,
+      l.module_id,
+      l.title,
+      l.description,
+      l.video_url,
+      l.duration,
+      l.lesson_order,
+      l.created_at,
+      l.updated_at,
+      COUNT(lr.id)::INT AS resource_count,
+      lp.completed,
+      lp.completed_at
+    FROM lessons l
+    JOIN course_modules cm ON cm.id = l.module_id
+    LEFT JOIN learning_resources lr ON lr.lesson_id = l.id
+    LEFT JOIN lesson_progress lp ON lp.lesson_id = l.id AND lp.student_id = $2
+    WHERE cm.course_id = $1
+    GROUP BY l.id, l.module_id, lp.completed, lp.completed_at
+    ORDER BY cm.module_order, l.lesson_order, l.id;
+  `;
+
+  const { rows } = await pool.query(query, [courseId, studentId]);
+  return rows;
+};
+
 export const updateLessonProgress = async (lessonId, studentId, completed) => {
   const lessonInfoQuery = `
     SELECT

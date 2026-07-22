@@ -102,6 +102,11 @@ BEGIN
         ALTER TABLE student_course_progress ADD CONSTRAINT uq_student_course_progress_student_course UNIQUE (student_id, course_id);
     END IF;
 
+    -- Ensure progress percentages are always within 0..100
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_student_course_progress_progress_range') THEN
+        ALTER TABLE student_course_progress ADD CONSTRAINT chk_student_course_progress_progress_range CHECK (progress >= 0 AND progress <= 100);
+    END IF;
+
     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_lesson_progress_student_lesson') THEN
         ALTER TABLE lesson_progress ADD CONSTRAINT uq_lesson_progress_student_lesson UNIQUE (student_id, lesson_id);
     END IF;

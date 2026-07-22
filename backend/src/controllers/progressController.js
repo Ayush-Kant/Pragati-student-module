@@ -25,6 +25,37 @@ export const getCourseProgress = async (req, res, next) => {
     }
 };
 
+export const getCourseProgressById = async (req, res, next) => {
+    try {
+        const studentId = getStudentId(req);
+        if (!studentId) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required",
+                error: {},
+            });
+        }
+
+        const progress = await progressService.getCourseProgressById(studentId, req.params.id);
+
+        if (!progress) {
+            return res.status(404).json({
+                success: false,
+                message: "Course progress not found",
+                error: { id: req.params.id },
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Course progress retrieved successfully",
+            data: progress,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const updateCourseProgress = async (req, res, next) => {
     try {
         const studentId = getStudentId(req);

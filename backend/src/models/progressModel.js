@@ -62,7 +62,10 @@ export const fetchCourseStructure = async (courseIds) => {
       l.id AS "lessonId",
       l.title AS "lessonTitle",
       CASE WHEN l.video_url IS NOT NULL AND l.video_url <> '' THEN 'video' ELSE 'lesson' END AS "contentType",
-      COALESCE(NULLIF(l.duration, '')::INT, 0) AS "durationSeconds",
+      CASE
+        WHEN trim(l.duration) ~ '^[0-9]+$' THEN trim(l.duration)::INT
+        ELSE 0
+      END AS "durationSeconds",
       l.lesson_order AS "lessonOrder"
     FROM training_courses tc
     JOIN course_modules cm ON cm.course_id = tc.id
@@ -96,6 +99,28 @@ export const getCourseProgress = async (studentId) => {
   return rows;
 };
 
+export const getCourseProgressById = async (studentId, courseId) => {
+  const query = `
+    SELECT
+      scp.id,
+      scp.student_id,
+      scp.course_id,
+      tc.title AS course_title,
+      scp.completed_lessons,
+      scp.total_lessons,
+      scp.progress,
+      scp.updated_at
+    FROM student_course_progress scp
+    JOIN training_courses tc ON tc.id = scp.course_id
+    WHERE scp.student_id = $1
+      AND scp.course_id = $2
+    LIMIT 1;
+  `;
+
+  const { rows } = await pool.query(query, [studentId, courseId]);
+  return rows.length > 0 ? rows[0] : null;
+};
+
 export const updateCourseProgress = async (studentId, courseId, progress) => {
   const courseExists = await pool.query(
     `
@@ -127,7 +152,13 @@ export const getLearningStatistics = async (studentId) => {
   const query = `
     SELECT
       COALESCE((SELECT COUNT(*) FROM lesson_progress WHERE student_id = $1 AND completed = TRUE), 0)::INT AS completed_lessons,
-      COALESCE((SELECT COUNT(*) FROM lessons), 0)::INT AS total_lessons,
+      COALESCE((
+        SELECT COUNT(*)
+        FROM lessons l
+        JOIN course_modules cm ON cm.id = l.module_id
+        JOIN student_course_progress scp ON scp.course_id = cm.course_id
+        WHERE scp.student_id = $1
+      ), 0)::INT AS total_lessons,
       COALESCE((SELECT AVG(progress) FROM student_course_progress WHERE student_id = $1), 0)::NUMERIC AS average_progress
   `;
 

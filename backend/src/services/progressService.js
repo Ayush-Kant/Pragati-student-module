@@ -173,6 +173,10 @@ export const getCourseProgress = async (studentId) => {
     return await progressModel.getCourseProgress(studentId);
 };
 
+export const getCourseProgressById = async (studentId, courseId) => {
+    return await progressModel.getCourseProgressById(studentId, courseId);
+};
+
 export const updateCourseProgress = async (studentId, courseId, progress) => {
     if (!studentId) {
         const error = new Error('Student authentication required');
