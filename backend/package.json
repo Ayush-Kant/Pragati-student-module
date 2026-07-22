@@ -21,6 +21,8 @@
         "express": "^5.2.1",
         "joi": "^18.2.3",
         "jsonwebtoken": "^9.0.3",
+        "multer": "^2.2.0",
+        "node-fetch": "^3.3.2",
         "node-pg": "^1.0.1",
         "pg": "^8.21.0",
         "resend": "^6.12.3",

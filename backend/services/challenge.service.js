@@ -1,5 +1,4 @@
 import { pool } from "../config/db.js";
-import fetch from "node-fetch";
 
 const JUDGE0_BASE_URL = process.env.JUDGE0_API_URL;
 const JUDGE0_API_KEY = process.env.JUDGE0_API_KEY;
@@ -59,7 +58,7 @@ export const addTestCasesService = async ({ challengeId, testCases }) => {
   if (challengeRes.rows.length === 0) return { statusCode: 404, success: false, message: "Challenge not found" };
 
   const valuesClause = testCases
-    .map((_, i) => { const b = i * 5; return `($1, $${b+2}, $${b+3}, $${b+4}, $${b+5}, $${b+6})`; })
+    .map((_, i) => { const b = i * 5; return `($1, $${b + 2}, $${b + 3}, $${b + 4}, $${b + 5}, $${b + 6})`; })
     .join(", ");
 
   const params = [challengeId];
