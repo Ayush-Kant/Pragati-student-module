@@ -26,6 +26,8 @@ import EditQuestionPage from "../pages/EditQuestionPage";
 import QuestionPreviewPage from "../pages/QuestionPreviewPage";
 import QuestionBankPageQuizBuilder from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
+
+import CertificateTemplatePage from "../pages/CertificateTemplatePage";
 import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
 import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage.jsx";
 import SubmissionMonitoringPage from "../pages/SubmissionMonitoringPage";
@@ -50,17 +52,15 @@ const mentorRoute = (
         <Route path="settings" element={<SettingsPage />} />
         <Route path="export-report" element={<ExportReport />} />
         <Route path="projects/create" element={<ProjectCreationPage />} />
+
+        {/* Add this line among the other mentor routes */}
+        <Route path="/mentor/certificates/template" element={<CertificateTemplatePage />} />
+
         <Route path="challenge-creator" element={<ChallengeCreatorPage />} />
         <Route
           path="challenge-workspace"
           element={<ChallengeWorkspacePage />}
         />
-        <Route
-          path="submission-monitoring"
-          element={<SubmissionMonitoringPage />}
-        />
-        <Route path="review-grading" element={<ReviewGradingPage />} />
-        <Route path="project-analytics" element={<AnalyticsDashboardPage />} />
 
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
