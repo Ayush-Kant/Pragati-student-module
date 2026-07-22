@@ -4,6 +4,7 @@ import Step1BasicInfo from "../../components/mentor/courses/steps/Step1BasicInfo
 import Step2Curriculum from "../../components/mentor/courses/steps/Step2Curriculum";
 import Step4AdditionalSettings from "../../components/mentor/courses/steps/Step4AdditionalSettings";
 import Step3Pricing from "../../components/mentor/courses/steps/Step3Pricing";
+import { useCourses } from "../../hooks/useCourses.js";
 
 const STEPS = [
   { id: 1, label: "Basic Information" },
@@ -14,6 +15,7 @@ const STEPS = [
 
 export default function CreateCourse() {
   const [currentStep, setCurrentStep] = useState(1);
+  const { handleCreateCourse } = useCourses();
   const [courseData, setCourseData] = useState({
     title: "",
     shortDescription: "",
@@ -58,6 +60,27 @@ export default function CreateCourse() {
       courseData.skillTags.length >= 1 &&
       courseData.driveId
     );
+  };
+
+  const handleStartCurriculum = async () => {
+    try {
+      const result = await handleCreateCourse(courseData);
+      handleUpdate({
+        courseId: result.courseId,
+        modules: [
+          {
+            id: result.firstModuleId,
+            title: "Module 1",
+            status: "Draft",
+            duration: "00m",
+            lectures: [],
+          },
+        ],
+      });
+      setCurrentStep(2);
+    } catch (error) {
+      console.error("Failed to create course:", error);
+    }
   };
 
   return (
@@ -132,7 +155,7 @@ export default function CreateCourse() {
           <Step1BasicInfo
             courseData={courseData}
             onUpdate={handleUpdate}
-            onNext={() => setCurrentStep(2)}
+            onNext={handleStartCurriculum}
             isValid={isStep1Valid()}
           />
         )}
