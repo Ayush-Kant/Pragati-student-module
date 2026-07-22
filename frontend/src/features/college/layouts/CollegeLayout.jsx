@@ -12,7 +12,7 @@ const CollegeLayout = () => {
   const [openSidebar, setOpenSidebar] = useState(false);
 
   // Dark Mode
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();

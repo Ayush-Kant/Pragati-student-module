@@ -49,8 +49,8 @@ const ShortlistedStudents = ({ limit }) => {
             onClick={() => setShowAll(false)}
             className={`group flex items-center gap-2 transition-colors ${
               darkMode
-                ? "text-blue-400 hover:text-blue-300"
-                : "text-blue-600 hover:text-blue-700"
+                ? "text-[#ff6d34] hover:text-[#ff8a5c]"
+                : "text-[#ff7a00] hover:text-[#e06b00]"
             }`}
           >
             <ArrowLeft
@@ -75,7 +75,7 @@ const ShortlistedStudents = ({ limit }) => {
   return (
     <div
       className={`rounded-3xl p-6 shadow-lg ${
-        darkMode ? "bg-[#151D30]" : "bg-white"
+        darkMode ? "bg-[#2D2D2D]" : "bg-white"
       }`}
     >
       {/* Header */}
@@ -102,8 +102,8 @@ const ShortlistedStudents = ({ limit }) => {
           onClick={() => setShowAll(true)}
           className={`group flex items-center gap-2 transition-colors ${
             darkMode
-              ? "text-blue-400 hover:text-blue-300"
-              : "text-blue-600 hover:text-blue-700"
+              ? "text-[#ff6d34] hover:text-[#ff8a5c]"
+              : "text-[#ff7a00] hover:text-[#e06b00]"
           }`}
         >
           <span className="transition-transform duration-200 group-hover:-translate-x-0.5">

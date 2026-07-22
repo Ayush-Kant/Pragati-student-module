@@ -41,7 +41,7 @@ const Navbar = ({
           </button>
 
           {/* Branding */}
-          <div className="hidden md:flex items-center gap-3 mr-4 pr-4 border-r border-gray-200 dark:border-gray-700">
+          <div className="hidden md:hidden items-center gap-3 mr-4 pr-4 border-r border-gray-200 dark:border-gray-700">
             <img
               src="https://uptoskills.com/uslogo.webp"
               alt="Uptoskills"

@@ -117,7 +117,7 @@ const CollegeSidebar = ({ openSidebar, setOpenSidebar, darkMode }) => {
         </div>
 
         {/* Logout Button */}
-        <div className={`mt-4 border-t pt-4 ${
+        {/* <div className={`mt-4 border-t pt-4 ${
           darkMode ? "border-[#2D2D2D]" : "border-gray-200"
         }`}>
           <button
@@ -135,7 +135,7 @@ const CollegeSidebar = ({ openSidebar, setOpenSidebar, darkMode }) => {
             <LogOut size={20} />
             <span>Logout</span>
           </button>
-        </div>
+        </div> */}
       </div>
     </aside>
   );

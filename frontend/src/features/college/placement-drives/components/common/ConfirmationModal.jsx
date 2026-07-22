@@ -6,6 +6,7 @@ const ConfirmationModal = ({
   cancelText = "Cancel",
   onConfirm,
   onCancel,
+  darkMode,
 }) => {
   if (!isOpen) return null;
 
@@ -15,14 +16,16 @@ const ConfirmationModal = ({
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-2xl"
+        className={`w-full max-w-md rounded-xl border p-6 shadow-2xl ${
+          darkMode ? 'border-[#3D3D3D] bg-[#2D2D2D]' : 'border-gray-200 bg-white'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
           {title}
         </h2>
 
-        <p className="mt-3 text-sm text-gray-600">
+        <p className={`mt-3 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
           {message}
         </p>
 
@@ -30,7 +33,11 @@ const ConfirmationModal = ({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+              darkMode
+                ? 'border-[#3D3D3D] text-gray-300 hover:bg-[#1A1A1A]'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-100'
+            }`}
           >
             {cancelText}
           </button>

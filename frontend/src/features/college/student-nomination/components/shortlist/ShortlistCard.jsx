@@ -24,8 +24,8 @@ const ShortlistCard = ({ student, variant = "dashboard" }) => {
       <div
         className={`relative group cursor-pointer rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg h-full flex flex-col justify-between ${
           darkMode
-            ? "border-slate-700/60 bg-[#151D30] hover:border-slate-500"
-            : "border-slate-200 bg-white hover:border-blue-300"
+            ? "border-[#3D3D3D] bg-[#2D2D2D] hover:border-[#4D4D4D]"
+            : "border-slate-200 bg-white hover:border-[#ff7a00]/30"
         }`}
       >
         <div>
@@ -44,7 +44,7 @@ const ShortlistCard = ({ student, variant = "dashboard" }) => {
           )}
 
           {/* Student Name */}
-          <h3 className={`truncate text-lg font-semibold pr-20 ${darkMode ? "group-hover:text-blue-400" : "group-hover:text-blue-600"}`}>
+          <h3 className={`truncate text-lg font-semibold pr-20 ${darkMode ? "group-hover:text-[#ff6d34]" : "group-hover:text-[#ff7a00]"}`}>
             {studentName}
           </h3>
 
@@ -76,16 +76,16 @@ const ShortlistCard = ({ student, variant = "dashboard" }) => {
     <div
       className={`group flex h-full cursor-pointer flex-col rounded-2xl border px-5 py-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
         darkMode
-          ? "border-slate-700/60 bg-[#151D30] hover:border-slate-500 hover:shadow-black/25"
-          : "border-slate-200 bg-white hover:border-blue-300"
+          ? "border-[#3D3D3D] bg-[#2D2D2D] hover:border-[#4D4D4D] hover:shadow-black/25"
+          : "border-slate-200 bg-white hover:border-[#ff7a00]/30"
       }`}
     >
       <div className="flex items-center gap-4">
         <div
           className={`flex h-15 w-15 shrink-0 items-center justify-center rounded-2xl border text-2xl font-bold shadow-md transition-all group-hover:-translate-y-1 ${
             darkMode
-              ? "border-slate-700 bg-slate-800/80 text-slate-200 group-hover:shadow-blue-500/20"
-              : "border-slate-200 bg-slate-100 text-slate-700 group-hover:shadow-blue-300/40"
+              ? "border-slate-700 bg-slate-800/80 text-slate-200 group-hover:shadow-[#ff6d34]/20"
+              : "border-slate-200 bg-slate-100 text-slate-700 group-hover:shadow-[#ff7a00]/40"
           }`}
         >
           {student.logo ? (
@@ -96,7 +96,7 @@ const ShortlistCard = ({ student, variant = "dashboard" }) => {
         </div>
 
         <div className="min-w-0 flex-1">
-          <h3 className={`truncate text-lg font-semibold transition-colors ${darkMode ? "group-hover:text-blue-400" : "group-hover:text-blue-500"}`}>
+          <h3 className={`truncate text-lg font-semibold transition-colors ${darkMode ? "group-hover:text-[#ff6d34]" : "group-hover:text-[#ff7a00]"}`}>
             {studentName}
           </h3>
 

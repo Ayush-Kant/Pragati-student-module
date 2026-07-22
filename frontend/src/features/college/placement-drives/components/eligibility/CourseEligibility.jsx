@@ -1,7 +1,7 @@
 import React from "react";
 import { COURSES } from "../../constants/placementDriveConstants";
 
-const CourseEligibility = ({ selectedCourses = [], onChange, isEditable = true }) => {
+const CourseEligibility = ({ selectedCourses = [], onChange, isEditable = true, darkMode }) => {
   const handleToggle = (course) => {
     if (!isEditable) return;
     if (selectedCourses.includes(course)) {
@@ -13,7 +13,7 @@ const CourseEligibility = ({ selectedCourses = [], onChange, isEditable = true }
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-semibold text-gray-700">
+      <label className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
         Eligible Courses <span className="text-red-500">*</span>
       </label>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -24,8 +24,12 @@ const CourseEligibility = ({ selectedCourses = [], onChange, isEditable = true }
               key={course}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm cursor-pointer transition-all ${
                 isChecked
-                  ? "border-[#ff7a00] bg-[#fff4ec] text-[#ff7a00] font-medium"
-                  : "border-gray-200 hover:bg-gray-50 text-gray-600"
+                  ? darkMode
+                    ? "border-[#ff6d34] bg-[#ff6d34]/10 text-[#ff6d34] font-medium"
+                    : "border-[#ff7a00] bg-[#fff4ec] text-[#ff7a00] font-medium"
+                  : darkMode
+                    ? "border-[#3D3D3D] hover:bg-[#2D2D2D] text-gray-400"
+                    : "border-gray-200 hover:bg-gray-50 text-gray-600"
               } ${!isEditable ? "opacity-80 cursor-default" : ""}`}
             >
               <input

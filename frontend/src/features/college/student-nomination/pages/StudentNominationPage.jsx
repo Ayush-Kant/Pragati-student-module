@@ -190,20 +190,20 @@ const StudentNominationPage = () => {
           />
         </div>
         
-        <button
-          onClick={() => setIsMobileFilterOpen(true)}
-          aria-label="Toggle structural filters drawer grid"
-          className={`md:hidden flex items-center justify-center p-3.5 rounded-2xl border relative shrink-0 transition-all duration-200 ${
-            darkMode
-              ? "border-slate-700/60 bg-[#151D30] hover:bg-[#1C263E] text-slate-300"
-              : "border-slate-300 bg-white hover:bg-slate-50 text-slate-600"
-          }`}
-        >
-          <Filter size={18} strokeWidth={2.2} />
-          {hasActiveFilters && (
-            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-blue-500 ring-2 ring-blue-500/30 animate-pulse" />
-          )}
-        </button>
+                <button
+                  onClick={() => setIsMobileFilterOpen(true)}
+                  aria-label="Toggle structural filters drawer grid"
+                  className={`md:hidden flex items-center justify-center p-3.5 rounded-2xl border relative shrink-0 transition-all duration-200 ${
+                    darkMode
+                      ? "border-[#3D3D3D] bg-[#2D2D2D] hover:bg-[#3D3D3D] text-gray-300"
+                      : "border-slate-300 bg-white hover:bg-slate-50 text-slate-600"
+                  }`}
+                >
+                  <Filter size={18} strokeWidth={2.2} />
+                  {hasActiveFilters && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#ff7a00] ring-2 ring-[#ff7a00]/30 animate-pulse" />
+                  )}
+                </button>
       </div>
 
       <div 
@@ -225,19 +225,19 @@ const StudentNominationPage = () => {
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs md:hidden animate-fade-in">
           <div 
             className={`w-full max-w-md rounded-t-3xl border-t shadow-2xl transition-all duration-300 transform translate-y-0 flex flex-col max-h-[85vh] ${
-              darkMode ? "bg-[#0F172A] border-slate-800 text-white" : "bg-white border-slate-200 text-slate-800"
+              darkMode ? "bg-[#1A1A1A] border-[#3D3D3D] text-white" : "bg-white border-slate-200 text-slate-800"
             }`}
           >
-            <div className={`flex items-center justify-between border-b p-5 shrink-0 ${darkMode ? "border-slate-800" : "border-slate-100"}`}>
+            <div className={`flex items-center justify-between border-b p-5 shrink-0 ${darkMode ? "border-[#3D3D3D]" : "border-slate-100"}`}>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold">Filter Options</h3>
                 {hasActiveFilters && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">Active</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#ff7a00]/10 text-[#ff7a00] border border-[#ff7a00]/20">Active</span>
                 )}
               </div>
               <button 
                 onClick={() => setIsMobileFilterOpen(false)} 
-                className={`p-1.5 rounded-xl border transition-colors ${darkMode ? "border-slate-800 bg-[#151D30] text-slate-400 hover:text-white" : "border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-800"}`}
+                className={`p-1.5 rounded-xl border transition-colors ${darkMode ? "border-[#3D3D3D] bg-[#2D2D2D] text-gray-400 hover:text-white" : "border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-800"}`}
               >
                 <X size={16} />
               </button>
@@ -245,29 +245,29 @@ const StudentNominationPage = () => {
 
             <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-5 pb-36">
               <div className="flex flex-col gap-1.5">
-                <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>Company</span>
+                <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Company</span>
                 <CompanyFilter value={selectedCompany} onChange={handleFilterChange(setSelectedCompany)} />
               </div>
               
               <div className="flex flex-col gap-1.5">
-                <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>Department</span>
+                <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Department</span>
                 <DepartmentFilter value={selectedDepartment} onChange={handleFilterChange(setSelectedDepartment)} />
               </div>
               
               {activeTab === "nominated" && (
                 <div className="flex flex-col gap-1.5">
-                  <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>Status Flag</span>
+                  <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Status Flag</span>
                   <StatusFilter value={selectedStatus} onChange={handleFilterChange(setSelectedStatus)} />
                 </div>
               )}
               
               <div className="flex flex-col gap-1.5">
-                <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>Batch Year</span>
+                <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Batch Year</span>
                 <BatchFilter value={selectedBatch} onChange={handleFilterChange(setSelectedBatch)} />
               </div>
             </div>
 
-            <div className={`grid grid-cols-2 gap-3 p-4 border-t shrink-0 ${darkMode ? "border-slate-800 bg-[#0F172A]" : "border-slate-100 bg-white"}`}>
+            <div className={`grid grid-cols-2 gap-3 p-4 border-t shrink-0 ${darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-100 bg-white"}`}>
               <button 
                 onClick={() => { 
                   setSelectedCompany(""); 
@@ -277,14 +277,14 @@ const StudentNominationPage = () => {
                   setIsMobileFilterOpen(false); 
                 }} 
                 className={`w-full py-3 text-sm font-semibold rounded-xl border transition-colors ${
-                  darkMode ? "border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/30" : "border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                  darkMode ? "border-[#3D3D3D] text-gray-400 hover:text-white hover:bg-[#2D2D2D]" : "border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50"
                 }`}
               >
                 Clear Filters
               </button>
               <button 
                 onClick={() => setIsMobileFilterOpen(false)} 
-                className="w-full py-3 text-sm font-semibold rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/15 active:scale-[0.98] transition-all"
+                className="w-full py-3 text-sm font-semibold rounded-xl bg-[#ff7a00] hover:bg-[#e06b00] text-white shadow-lg shadow-[#ff7a00]/15 active:scale-[0.98] transition-all"
               >
                 Apply Filters
               </button>

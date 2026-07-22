@@ -51,18 +51,18 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
   return (
     <div
       className={`rounded-3xl border shadow-lg ${
-        darkMode ? "border-slate-700 bg-[#151D30]" : "border-slate-200 bg-white"
+        darkMode ? "border-[#3D3D3D] bg-[#2D2D2D]" : "border-slate-200 bg-white"
       }`}
     >
       {/* HEADER */}
       <div
         className={`flex items-center gap-3 border-b px-8 py-6 ${
-          darkMode ? "border-slate-700" : "border-slate-200"
+          darkMode ? "border-[#3D3D3D]" : "border-slate-200"
         }`}
       >
         <div
           className={`rounded-2xl p-3 ${
-            darkMode ? "bg-blue-500/10 text-blue-400" : "bg-blue-100 text-blue-600"
+            darkMode ? "bg-[#ff6d34]/10 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"
           }`}
         >
           <UserPlus size={24} />
@@ -81,13 +81,13 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
           <h3 className="mb-6 text-lg font-semibold">Student Information</h3>
           <div
             className={`rounded-3xl border p-6 ${
-              darkMode ? "border-slate-700 bg-slate-800/30" : "border-slate-200 bg-slate-50"
+              darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-200 bg-slate-50"
             }`}
           >
             <div className="flex items-center gap-4">
               <div
                 className={`flex h-16 w-16 items-center justify-center rounded-2xl text-xl font-bold ${
-                  darkMode ? "bg-blue-500/10 text-blue-400" : "bg-blue-100 text-blue-600"
+                  darkMode ? "bg-[#ff6d34]/10 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"
                 }`}
               >
                 {student?.name?.charAt(0) || "S"}
@@ -140,7 +140,7 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
                 value={formData.company}
                 onChange={(e) => setFormData((prev) => ({ ...prev, company: e.target.value }))}
                 className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
-                  darkMode ? "border-slate-700 bg-slate-800 focus:border-blue-500" : "border-slate-300 bg-white focus:border-blue-500"
+                  darkMode ? "border-slate-700 bg-slate-800 focus:border-[#ff7a00]" : "border-slate-300 bg-white focus:border-[#ff7a00]"
                 }`}
               >
                 <option value="">Select Company</option>
@@ -163,7 +163,7 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
                 onChange={(e) => setFormData((prev) => ({ ...prev, role: e.target.value }))}
                 placeholder="Software Engineer"
                 className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
-                  darkMode ? "border-slate-700 bg-slate-800 focus:border-blue-500" : "border-slate-300 bg-white focus:border-blue-500"
+                  darkMode ? "border-slate-700 bg-slate-800 focus:border-[#ff7a00]" : "border-slate-300 bg-white focus:border-[#ff7a00]"
                 }`}
               />
             </div>
@@ -178,7 +178,7 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
                 onChange={(e) => setFormData((prev) => ({ ...prev, package: e.target.value }))}
                 placeholder="12"
                 className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
-                  darkMode ? "border-slate-700 bg-slate-800 focus:border-blue-500" : "border-slate-300 bg-white focus:border-blue-500"
+                  darkMode ? "border-slate-700 bg-slate-800 focus:border-[#ff7a00]" : "border-slate-300 bg-white focus:border-[#ff7a00]"
                 }`}
               />
             </div>
@@ -190,7 +190,7 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
                   darkMode ? "border-slate-700 bg-slate-800" : "border-slate-300 bg-slate-50"
                 }`}
               >
-                <span className="rounded-full bg-blue-500/10 px-3 py-1 text-sm font-medium text-blue-500">
+                <span className="rounded-full bg-[#ff6d34]/10 px-3 py-1 text-sm font-medium text-[#ff6d34]">
                   Nominated
                 </span>
               </div>
@@ -205,11 +205,11 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
               onChange={(e) => setFormData((prev) => ({ ...prev, remarks: e.target.value }))}
               placeholder="Enter remarks (optional)..."
               className={`w-full resize-none rounded-xl border px-4 py-3 outline-none transition ${
-                darkMode ? "border-slate-700 bg-slate-800 focus:border-blue-500" : "border-slate-300 bg-white focus:border-blue-500"
-              }`}
-            />
+                  darkMode ? "border-slate-700 bg-slate-800 focus:border-[#ff7a00]" : "border-slate-300 bg-white focus:border-[#ff7a00]"
+                }`}
+              />
+            </div>
           </div>
-        </div>
 
         <div className={`flex items-center justify-end gap-4 border-t pt-6 ${darkMode ? "border-slate-700" : "border-slate-200"}`}>
           <button
@@ -223,7 +223,7 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
           </button>
           <button
             type="button"
-            className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700"
+            className="rounded-xl bg-[#ff7a00] px-6 py-3 font-medium text-white transition hover:bg-[#e06b00]"
             onClick={handleNominate}
           >
             Nominate Student

@@ -1,18 +1,18 @@
 import { PAGE_SIZE_OPTIONS } from "../../constants/studentConstants"
 
-const StudentPagination = ({ currentPage, totalPages, totalItems, pageSize, onPageChange, onPageSizeChange }) => {
+const StudentPagination = ({ currentPage, totalPages, totalItems, pageSize, onPageChange, onPageSizeChange, darkMode }) => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
   const start = (currentPage - 1) * pageSize + 1
   const end = Math.min(currentPage * pageSize, totalItems)
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      <div className={`flex items-center gap-2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
         <span>Show</span>
         <select
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="border border-gray-200 rounded-lg px-2 py-1 text-sm outline-none cursor-pointer"
+          className={`rounded-lg px-2 py-1 text-sm outline-none cursor-pointer ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D] text-gray-300' : 'border border-gray-200'}`}
         >
           {PAGE_SIZE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -23,7 +23,9 @@ const StudentPagination = ({ currentPage, totalPages, totalItems, pageSize, onPa
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+            darkMode ? 'border-[#3D3D3D] text-gray-300 hover:bg-[#3D3D3D]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+          }`}
         >
           ‹ Prev
         </button>
@@ -33,8 +35,10 @@ const StudentPagination = ({ currentPage, totalPages, totalItems, pageSize, onPa
             onClick={() => onPageChange(p)}
             className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer ${
               p === currentPage
-                ? "bg-blue-600 text-white border-blue-600"
-                : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                ? "bg-[#ff6d34] text-white border-[#ff6d34]"
+                : darkMode
+                  ? "border-[#3D3D3D] text-gray-300 hover:bg-[#3D3D3D]"
+                  : "border-gray-200 text-gray-600 hover:bg-gray-50"
             }`}
           >
             {p}
@@ -43,7 +47,9 @@ const StudentPagination = ({ currentPage, totalPages, totalItems, pageSize, onPa
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+            darkMode ? 'border-[#3D3D3D] text-gray-300 hover:bg-[#3D3D3D]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+          }`}
         >
           Next ›
         </button>

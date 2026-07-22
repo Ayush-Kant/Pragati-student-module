@@ -61,8 +61,8 @@ const Pagination = ({
               ? "cursor-not-allowed opacity-50"
               : ""
           } ${
-            darkMode
-              ? "bg-[#151D30] hover:bg-slate-700"
+                          darkMode
+              ? "bg-[#2D2D2D] hover:bg-[#3D3D3D]"
               : "bg-white hover:bg-slate-100"
           }`}
         >
@@ -92,10 +92,10 @@ const Pagination = ({
               onClick={() => onPageChange(page)}
               className={`h-10 w-10 rounded-xl font-medium transition-all ${
                 currentPage === page
-                  ? "bg-blue-600 text-white shadow-md"
+                  ? "bg-[#ff7a00] text-white shadow-md"
                   : darkMode
-                  ? "bg-[#151D30] hover:bg-slate-700"
-                  : "bg-white hover:bg-slate-100"
+              ? "bg-[#2D2D2D] hover:bg-[#3D3D3D]"
+              : "bg-white hover:bg-slate-100"
               }`}
             >
               {page}
@@ -116,7 +116,7 @@ const Pagination = ({
               : ""
           } ${
             darkMode
-              ? "bg-[#151D30] hover:bg-slate-700"
+              ? "bg-[#2D2D2D] hover:bg-[#3D3D3D]"
               : "bg-white hover:bg-slate-100"
           }`}
         >
