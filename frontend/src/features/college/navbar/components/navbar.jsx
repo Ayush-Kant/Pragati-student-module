@@ -22,7 +22,7 @@ const Navbar = ({
         border-b
         ${
           darkMode
-            ? "bg-slate-900 border-slate-800"
+            ? "bg-[#1A1A1A] border-[#2D2D2D]"
             : "bg-white border-gray-200"
         }
       `}
@@ -40,17 +40,34 @@ const Navbar = ({
             <Menu size={24} />
           </button>
 
+          {/* Branding */}
+          <div className="hidden md:flex items-center gap-3 mr-4 pr-4 border-r border-gray-200 dark:border-gray-700">
+            <img
+              src="https://uptoskills.com/uslogo.webp"
+              alt="Uptoskills"
+              className="h-9 w-9"
+            />
+            <div>
+              <h1 className="font-bold text-base leading-tight text-[#ff6d34]">
+                Uptoskills LMS
+              </h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                College Management
+              </p>
+            </div>
+          </div>
+
           {/* Search */}
           <div
             className={`
               hidden md:flex
               items-center gap-3
-              rounded-xl
+              rounded-lg
               px-4 py-2
               w-80
               ${
                 darkMode
-                  ? "bg-slate-800"
+                  ? "bg-[#2D2D2D]"
                   : "bg-gray-100"
               }
             `}
@@ -71,7 +88,7 @@ const Navbar = ({
           {/* Dark Mode */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2D2D2D]"
           >
             {darkMode ? (
               <Sun size={20} />
@@ -81,7 +98,7 @@ const Navbar = ({
           </button>
 
           {/* Notification */}
-          <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800">
+          <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2D2D2D]">
             <Bell size={20} />
 
             <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500" />
@@ -92,7 +109,7 @@ const Navbar = ({
 
             <UserCircle2
               size={40}
-              className="text-blue-600"
+              className="text-[#ff6d34]"
             />
 
             <div className="hidden md:block">

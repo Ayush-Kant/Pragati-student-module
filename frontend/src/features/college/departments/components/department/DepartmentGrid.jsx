@@ -6,10 +6,11 @@ const DepartmentGrid = ({
   onView,
   onEdit,
   onDelete,
+  darkMode,
 }) => {
   if (!departments.length) {
     return (
-      <div className="lg:hidden bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+      <div className={`lg:hidden rounded-xl border p-8 text-center ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D] text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>
         No Departments Found
       </div>
     );
@@ -24,6 +25,7 @@ const DepartmentGrid = ({
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
+          darkMode={darkMode}
         />
       ))}
     </div>
