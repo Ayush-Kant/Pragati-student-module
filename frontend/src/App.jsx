@@ -13,7 +13,6 @@ import AdminRoute from "./features/admin/routes/AdminRoutes";
 import mentorRoute from "./features/mentor/routes/MentorRoutes";
 import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
-import MentorLogin from "./features/mentor/pages/MentorLogin";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
 
 function App() {
@@ -29,8 +28,6 @@ function App() {
 
         {/* ── Mentor ────────────────────────────────────────────────── */}
         {mentorRoute}
-        <Route path="/mentor/login" element={<MentorLogin />} />
-        {/* <Route path="/mentor/*" element={<MentorRoute />} /> */}
 
         {/* ── Admin ─────────────────────────────────────────────────── */}
         {AdminRoute}

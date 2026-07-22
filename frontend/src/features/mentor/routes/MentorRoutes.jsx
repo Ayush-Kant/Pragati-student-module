@@ -1,25 +1,32 @@
 import { Route, Navigate } from "react-router-dom";
+
+// --- Layouts & Guards ---
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
 import MentorLayout from "../components/layout/MentorLayout";
-import Dashboard from "../pages/Dashboard";
 
-// --- Profile & Onboarding Imports ---
-import MentorProfile from "../pages/MentorProfile";
+// --- Core Mentor Pages ---
+import Dashboard from "../pages/Dashboard";
+import SettingsPage from "../../../pages/mentor/SettingsPage";
+
+// --- Onboarding Pages ---
 import BasicInfo from "../pages/BasicInfo";
 import ProfessionalProfile from "../pages/ProfessionalProfile";
 import ExperienceLinks from "../pages/ExperienceLinks";
 import Availability from "../pages/Availability";
 
-// --- Course & Feature Imports ---
+// --- Courses & Projects ---
 import Courses from "../../../pages/mentor/CoursesPage";
 import CreateCourse from "../../../pages/mentor/CreateCoursePage";
+import ProjectCreationPage from "../pages/ProjectCreationPage";
+import CertificateTemplatePage from "../pages/CertificateTemplatePage";
 
-import ExportReport from "../pages/ExportReport";
+// --- Activities ---
 import { ActivityProvider } from "../context/ActivityContext";
 import Activities from "../pages/Activities";
 import CreateActivity from "../pages/CreateActivity";
-import ProjectCreationPage from "../pages/ProjectCreationPage";
+
+// --- Question Bank & Quizzes ---
 import QuestionBankPage from "../pages/QuestionBankPage";
 import CreateQuestionPage from "../pages/CreateQuestionPage";
 import EditQuestionPage from "../pages/EditQuestionPage";
@@ -27,46 +34,49 @@ import QuestionPreviewPage from "../pages/QuestionPreviewPage";
 import QuestionBankPageQuizBuilder from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
 
-import CertificateTemplatePage from "../pages/CertificateTemplatePage";
+// --- Challenges, Submissions & Grading ---
 import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
 import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage.jsx";
 import SubmissionMonitoringPage from "../pages/SubmissionMonitoringPage";
 import ReviewGradingPage from "../pages/ReviewGradingPage";
-import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 
+// --- Analytics & Reports ---
+import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
+import ExportReport from "../pages/ExportReport";
+
+// --- Communication & Scheduling ---
 import NotificationsPage from "../pages/NotificationsPage";
 import DiscussionForumPage from "../pages/DiscussionForumPage";
 import SlotsCalendarPage from "../pages/SlotsCalendarPage";
-import SettingsPage from "../../../pages/mentor/SettingsPage";
 
 const mentorRoute = (
   <Route element={<PrivateRoute />}>
     <Route element={<RoleRoute allowedRoles={["mentor"]} />}>
-      {/* All mentor pages share MentorLayout (sidebar + topnav) */}
+      {/* ==========================================
+          MAIN MENTOR PORTAL (Shared Sidebar & Topnav)
+          ========================================== */}
       <Route path="mentor" element={<MentorLayout />}>
+        {/* Core */}
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="profile" element={<MentorProfile />} />
+        <Route path="settings" element={<SettingsPage />} />
+
+        {/* Courses & Projects */}
         <Route path="courses" element={<Courses />} />
         <Route path="courses/create" element={<CreateCourse />} />
-        <Route path="settings" element={<SettingsPage />} />
-        <Route path="export-report" element={<ExportReport />} />
         <Route path="projects/create" element={<ProjectCreationPage />} />
-
-        {/* Add this line among the other mentor routes */}
-        <Route path="/mentor/certificates/template" element={<CertificateTemplatePage />} />
-
-        <Route path="challenge-creator" element={<ChallengeCreatorPage />} />
         <Route
-          path="challenge-workspace"
-          element={<ChallengeWorkspacePage />}
+          path="certificates/template"
+          element={<CertificateTemplatePage />}
         />
 
+        {/* Activities */}
         <Route element={<ActivityProvider />}>
           <Route path="activities" element={<Activities />} />
           <Route path="activities/create" element={<CreateActivity />} />
         </Route>
 
+        {/* Question Bank & Quizzes */}
         <Route path="question-bank" element={<QuestionBankPage />} />
         <Route path="question-bank/create" element={<CreateQuestionPage />} />
         <Route path="question-bank/edit/:id" element={<EditQuestionPage />} />
@@ -80,12 +90,31 @@ const mentorRoute = (
         />
         <Route path="question-bank/attempts" element={<AttemptHistoryPage />} />
 
+        {/* Challenges, Submissions & Grading */}
+        <Route path="challenge-creator" element={<ChallengeCreatorPage />} />
+        <Route
+          path="challenge-workspace"
+          element={<ChallengeWorkspacePage />}
+        />
+        <Route
+          path="submissions/monitoring"
+          element={<SubmissionMonitoringPage />}
+        />
+        <Route path="submissions/review" element={<ReviewGradingPage />} />
+
+        {/* Analytics & Reports */}
+        <Route path="analytics" element={<AnalyticsDashboardPage />} />
+        <Route path="export-report" element={<ExportReport />} />
+
+        {/* Communication & Scheduling */}
         <Route path="notifications" element={<NotificationsPage />} />
         <Route path="discussion-forum" element={<DiscussionForumPage />} />
         <Route path="slots" element={<SlotsCalendarPage />} />
       </Route>
 
-      {/* Onboarding pages use their own OnboardingLayout — no MentorLayout */}
+      {/* ==========================================
+          ONBOARDING FLOW (No MentorLayout)
+          ========================================== */}
       <Route path="mentor/onboarding/basic-info" element={<BasicInfo />} />
       <Route
         path="mentor/onboarding/professional-profile"
