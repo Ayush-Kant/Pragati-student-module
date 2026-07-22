@@ -2,48 +2,68 @@
 //  validateRequest.js
 //  Middleware factory: wraps a validator function into an Express middleware.
 //
-//  Usage:
-//    import { validateRequest } from '../middleware/validateRequest.js';
-//    import { validateSkill }   from '../validators/skillsValidator.js';
+//  Supports two calling conventions:
 //
-//    router.post('/skills', validateRequest(validateSkill), skillsController.addSkill);
+//  1. Validator-function style (student-team):
+//       validateRequest(validatorFn, options?)
+//       where validatorFn(body) => { valid, errors, sanitized }
 //
-//  The validator function receives req.body and must return:
-//    { valid: boolean, errors: string[], sanitized: object }
-//
-//  On success:
-//    • Replaces req.body with sanitized data.
-//    • Calls next().
-//  On failure:
-//    • Returns HTTP 422 Unprocessable Entity with the errors array.
+//  2. Joi-schema style (Projects Backend):
+//       validateRequest(joiSchema, 'body'|'params'|'query')
+//       where joiSchema.validate(data) => { error, value }
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * validateRequest
  * ────────────────
- * Returns an Express middleware that applies the given validator to req.body.
+ * Unified middleware factory that works with both validator-function style and Joi schema style.
  *
- * @param {function} validatorFn - A function (body) => { valid, errors, sanitized }
- * @param {object}   [options]
- * @param {boolean}  [options.requireName] - Forwarded to validators that accept it (e.g., skills PUT).
+ * @param {function|object} validatorOrSchema - A validator fn or a Joi schema
+ * @param {string|object}   [propertyOrOptions] - 'body'|'params'|'query' (Joi), or options object (validator fn)
  * @returns {function} Express middleware
  */
-export const validateRequest = (validatorFn, options = {}) => {
+export const validateRequest = (validatorOrSchema, propertyOrOptions = 'body') => {
     return (req, res, next) => {
-        // Some validators (e.g. validateSkill) accept a second argument
-        const result = validatorFn(req.body, options.requireName);
+        if (!validatorOrSchema) return next();
+
+        // Joi schema style: has a .validate() method
+        if (typeof validatorOrSchema.validate === 'function') {
+            const property = typeof propertyOrOptions === 'string' ? propertyOrOptions : 'body';
+            const { error, value } = validatorOrSchema.validate(req[property]);
+            if (error) {
+                const detailedErrors = error.details.reduce((acc, curr) => {
+                    acc[curr.path[0]] = curr.message;
+                    return acc;
+                }, {});
+                return res.status(400).json({
+                    success: false,
+                    message: error.details[0].message || 'Validation failed',
+                    errors: detailedErrors
+                });
+            }
+            if (property === 'query') req.validatedQuery = value;
+            else if (property === 'body') req.validatedBody = value;
+            else if (property === 'params') req.validatedParams = value;
+            req[property] = value;
+            return next();
+        }
+
+        // Validator-function style: validatorOrSchema(body, requireName?) => { valid, errors, sanitized }
+        const options = typeof propertyOrOptions === 'object' ? propertyOrOptions : {};
+        const result = validatorOrSchema(req.body, options.requireName);
 
         if (!result.valid) {
             return res.status(422).json({
                 success: false,
                 message: 'Validation failed',
-                errors:  result.errors,
+                errors: result.errors,
             });
         }
 
-        // Replace body with the sanitized version so controllers/services
-        // always receive clean, normalized data.
+        // Replace body with the sanitized version
         req.body = result.sanitized;
         next();
     };
 };
+
+export default validateRequest;
