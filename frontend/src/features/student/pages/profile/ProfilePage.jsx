@@ -295,5 +295,9 @@ const ProfilePage = () => {
             <ProfileEditForm profile={profile} onSave={handleSave} onCancel={() => setIsEditing(false)} />
           </div>
         )}
+      </div>
+    </div>
+  );
+};
 
 export default ProfilePage;
