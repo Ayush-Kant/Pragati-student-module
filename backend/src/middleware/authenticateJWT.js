@@ -1,33 +1,27 @@
 import jwt from 'jsonwebtoken';
 
-// Helper to read token from header, cookie, or query param.
 const extractToken = (req) => {
-    const authHeader = req.headers['authorization'] ?? req.headers['Authorization'];
-    if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
+    const authHeader = req.get?.('authorization') ?? req.headers?.authorization ?? req.headers?.Authorization;
+    if (typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
         return authHeader.slice(7).trim();
     }
 
-    // Support token in cookie named 'token' if cookie parser is used
-    if (req.cookies && req.cookies.token) {
+    if (req.cookies?.token) {
         return req.cookies.token;
     }
 
-    // Support ?token=... query param as a fallback
-    if (req.query && req.query.token) {
-        return String(req.query.token);
+    const queryToken = req.query?.token;
+    if (Array.isArray(queryToken)) {
+        return String(queryToken[0]);
+    }
+
+    if (typeof queryToken === 'string' && queryToken.trim()) {
+        return queryToken;
     }
 
     return null;
 };
 
-/**
- * authenticateJWT
- * ────────────────
- * Express middleware that validates the Authorization header.
- *
- * Expected header format:
- *   Authorization: Bearer <token>
- */
 const authenticateJWT = (req, res, next) => {
     const token = extractToken(req);
 
@@ -42,7 +36,6 @@ const authenticateJWT = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Attach the decoded payload to the request for downstream handlers
         req.user = {
             id: decoded.id ?? decoded.uid ?? null,
             userId: decoded.userId ?? decoded.uuid_id ?? decoded.sub ?? null,

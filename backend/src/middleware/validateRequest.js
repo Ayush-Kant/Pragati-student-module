@@ -1,52 +1,51 @@
 // ─────────────────────────────────────────────────────────────────────────────
 //  validateRequest.js
-//  Middleware factory: wraps a validator function into an Express middleware.
-//
-//  Usage:
-//    import { validateRequest } from '../middleware/validateRequest.js';
-//    import { validateSkill }   from '../validators/skillsValidator.js';
-//
-//    router.post('/skills', validateRequest(validateSkill), skillsController.addSkill);
-//
-//  The validator function receives req.body and must return:
-//    { valid: boolean, errors: string[], sanitized: object }
-//
-//  On success:
-//    • Replaces req.body with sanitized data.
-//    • Calls next().
-//  On failure:
-//    • Returns HTTP 422 Unprocessable Entity with the errors array.
+//  Unified middleware that supports Joi schemas, legacy validator functions,
+//  and body/params/query validation in one place.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * validateRequest
- * ────────────────
- * Returns an Express middleware that applies the given validator to req.body.
- *
- * @param {function} validatorFn - A function (body) => { valid, errors, sanitized }
- * @param {object}   [options]
- * @param {boolean}  [options.requireName] - Forwarded to validators that accept it (e.g., skills PUT).
- * @returns {function} Express middleware
- */
-export const validateRequest = (validatorFn, source = 'body', options = {}) => {
-    return (req, res, next) => {
-        const target = source === 'query' ? req.query : source === 'params' ? req.params : req.body;
+const resolveOptions = (sourceOrOptions = 'body', options = {}) => {
+    if (typeof sourceOrOptions === 'string') {
+        return { source: sourceOrOptions, options };
+    }
 
-        const assignValidated = (val) => {
-            if (source === 'query') {
-                req.query = val;
-                req.validatedQuery = val;
-            } else if (source === 'params') {
-                req.params = val;
-                req.validatedParams = val;
-            } else {
-                req.body = val;
-                req.validatedBody = val;
-            }
-        };
+    return {
+        source: sourceOrOptions?.source ?? 'body',
+        options: sourceOrOptions ?? {},
+    };
+};
+
+const selectTarget = (req, source) => {
+    if (source === 'query') return req.query;
+    if (source === 'params') return req.params;
+    return req.body;
+};
+
+const assignValidated = (req, source, value) => {
+    if (source === 'query') {
+        req.query = value;
+        req.validatedQuery = value;
+        return;
+    }
+
+    if (source === 'params') {
+        req.params = value;
+        req.validatedParams = value;
+        return;
+    }
+
+    req.body = value;
+    req.validatedBody = value;
+};
+
+export const validateRequest = (validatorFn, sourceOrOptions = 'body', options = {}) => {
+    const { source, options: resolvedOptions } = resolveOptions(sourceOrOptions, options);
+
+    return (req, res, next) => {
+        const target = selectTarget(req, source);
 
         if (typeof validatorFn === 'function') {
-            const result = validatorFn(target, options.requireName);
+            const result = validatorFn(target, resolvedOptions.requireName);
 
             if (!result || result.valid === false) {
                 return res.status(422).json({
@@ -57,7 +56,7 @@ export const validateRequest = (validatorFn, source = 'body', options = {}) => {
             }
 
             const sanitized = result.sanitized ?? target;
-            assignValidated(sanitized);
+            assignValidated(req, source, sanitized);
             return next();
         }
 
@@ -71,11 +70,11 @@ export const validateRequest = (validatorFn, source = 'body', options = {}) => {
                 return res.status(422).json({
                     success: false,
                     message: 'Validation failed',
-                    error: { details: error.details.map((d) => d.message) },
+                    error: { details: error.details.map((detail) => detail.message) },
                 });
             }
 
-            assignValidated(value);
+            assignValidated(req, source, value);
             return next();
         }
 
