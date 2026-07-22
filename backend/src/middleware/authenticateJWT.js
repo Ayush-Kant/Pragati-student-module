@@ -1,14 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  authenticateJWT.js
-//  Middleware: verifies the JWT Bearer token on every protected route.
-//
-//  On success: attaches req.user = { userId, email, role } and calls next().
-//  On failure: returns 401 Unauthorized.
-//
-//  JWT payload shape (set by auth.controller.js):
-//    { userId: string (uuid_id), email: string, role: string }
-// ─────────────────────────────────────────────────────────────────────────────
-
 import jwt from 'jsonwebtoken';
 
 // Helper to read token from header, cookie, or query param.
@@ -55,9 +44,10 @@ const authenticateJWT = (req, res, next) => {
 
         // Attach the decoded payload to the request for downstream handlers
         req.user = {
-            userId: decoded.userId ?? decoded.uuid_id ?? decoded.sub,
-            email: decoded.email,
-            role: decoded.role,
+            id: decoded.id ?? decoded.uid ?? null,
+            userId: decoded.userId ?? decoded.uuid_id ?? decoded.sub ?? null,
+            email: decoded.email ?? null,
+            role: decoded.role ?? null,
         };
 
         next();
@@ -66,14 +56,6 @@ const authenticateJWT = (req, res, next) => {
             return res.status(401).json({
                 success: false,
                 message: 'Session expired. Please log in again.',
-                error: {},
-            });
-        }
-
-        if (err.name === 'JsonWebTokenError') {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid authentication token.',
                 error: {},
             });
         }

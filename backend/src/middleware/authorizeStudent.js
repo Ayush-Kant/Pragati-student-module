@@ -1,11 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  authorizeStudent.js
-//  Middleware: ensures the authenticated user has the 'student' role.
-//
-//  Must be used AFTER authenticateJWT (requires req.user to be set).
-//  Returns 403 Forbidden if the role does not match.
-// ─────────────────────────────────────────────────────────────────────────────
-
 /**
  * authorizeStudent
  * ─────────────────
@@ -33,4 +25,5 @@ const authorizeStudent = (req, res, next) => {
     next();
 };
 
+export { authorizeStudent };
 export default authorizeStudent;
