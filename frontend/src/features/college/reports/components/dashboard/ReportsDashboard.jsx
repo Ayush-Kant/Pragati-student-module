@@ -9,15 +9,16 @@ export const ReportsDashboard = ({
   onPreviewReport, 
   onDownloadReport, 
   downloadingId,
-  onNavigateToReports 
+  onNavigateToReports,
+  darkMode 
 }) => {
   return (
     <div className="space-y-6">
       {/* 1. Statistics Summary Tiles */}
-      <ReportSummaryCards statistics={statistics} />
+      <ReportSummaryCards statistics={statistics} darkMode={darkMode} />
 
       {/* 2. Custom Visual Chart Vector Rows */}
-      <ReportStatistics reports={reports} />
+      <ReportStatistics reports={reports} darkMode={darkMode} />
 
       {/* 3. Bottom Double-Grid: Recent Reports list & Activity Audit Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -27,9 +28,10 @@ export const ReportsDashboard = ({
           onDownload={onDownloadReport}
           downloadingId={downloadingId}
           onViewAll={onNavigateToReports}
+          darkMode={darkMode}
         />
         
-        <ReportHistory reports={reports} />
+        <ReportHistory reports={reports} darkMode={darkMode} />
       </div>
     </div>
   );
