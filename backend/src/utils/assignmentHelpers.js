@@ -8,7 +8,9 @@ export const sanitizeInput = (value) => {
 
 export const normalizeStudentId = (req) => {
   const fallback = req?.user?.id ?? req?.headers?.["x-user-id"] ?? req?.query?.studentId;
-  return Number(fallback ?? 101);
+  const studentId = Number(fallback ?? 101);
+
+  return Number.isFinite(studentId) ? studentId : 101;
 };
 
 export const resolveAssignmentStudentId = (req) => {
