@@ -34,13 +34,33 @@ export const submitAssignment = async (assignmentId, studentId, payload) => {
 };
 
 export const updateSubmission = async (assignmentId, studentId, payload) => {
+  const fields = [];
+  const values = [assignmentId, studentId];
+  let index = 3;
+
+  if (payload.content !== undefined) {
+    fields.push(`content = $${index++}`);
+    values.push(payload.content ?? null);
+  }
+
+  if (payload.fileUrl !== undefined) {
+    fields.push(`file_url = $${index++}`);
+    values.push(payload.fileUrl ?? null);
+  }
+
+  if (payload.status !== undefined) {
+    fields.push(`status = $${index++}`);
+    values.push(payload.status ?? "Submitted");
+  }
+
+  if (fields.length === 0) {
+    return null;
+  }
+
   const result = await pool.query(
     `
     UPDATE assignment_submissions
-    SET content = COALESCE($3, content),
-        file_url = COALESCE($4, file_url),
-        status = COALESCE($5, status),
-        submitted_at = NOW()
+    SET ${fields.join(", ")}, submitted_at = NOW()
     WHERE assignment_id = $1 AND student_id = $2
     RETURNING
       id,
@@ -51,7 +71,7 @@ export const updateSubmission = async (assignmentId, studentId, payload) => {
       status,
       submitted_at AS "submittedAt"
     `,
-    [assignmentId, studentId, payload.content || null, payload.fileUrl || null, payload.status || null]
+    values
   );
 
   return result.rows[0];
