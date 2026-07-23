@@ -1,73 +1,51 @@
-// feedbackModel.js
 import { pool } from "../../config/db.js";
 
-/**
- * Fetches feedback records for a Capstone submission.
- * @param {number} submissionId 
- * @returns {Promise<Array>}
- */
-export const getFeedback = async (submissionId) => {
+export const getFeedback = async (assignmentId, studentId) => {
   const result = await pool.query(
-    `SELECT id, submission_id AS "submissionId", criterion, 
-            score, max_score AS "maxScore", comment, created_at AS "createdAt"
-     FROM project_feedback 
-     WHERE submission_id = $1 
-     ORDER BY id ASC`,
-    [submissionId]
+    `
+    SELECT
+      id,
+      assignment_id AS "assignmentId",
+      student_id AS "studentId",
+      remarks,
+      grade,
+      created_at AS "createdAt"
+    FROM assignment_feedback
+    WHERE assignment_id = $1 AND student_id = $2
+    ORDER BY created_at DESC
+    LIMIT 1
+    `,
+    [assignmentId, studentId]
   );
-  return result.rows.map(row => ({
-    id: row.id,
-    submissionId: row.submissionId,
-    criterion: row.criterion,
-    score: Number(row.score),
-    maxScore: Number(row.maxScore),
-    comment: row.comment,
-    createdAt: row.createdAt
-  }));
+
+  return result.rows[0];
 };
 
-/**
- * Fetches rubric criteria for a project.
- * @param {number} projectId 
- * @returns {Promise<Array>}
- */
-export const getRubric = async (projectId) => {
+export const addFeedback = async (assignmentId, studentId, payload) => {
   const result = await pool.query(
-    `SELECT id, project_id AS "projectId", criterion, max_score AS "maxScore", 
-            description, created_at AS "createdAt"
-     FROM project_rubrics 
-     WHERE project_id = $1 
-     ORDER BY id ASC`,
-    [projectId]
+    `
+    INSERT INTO assignment_feedback (assignment_id, student_id, remarks, grade)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (assignment_id, student_id)
+    DO UPDATE SET
+      remarks = EXCLUDED.remarks,
+      grade = EXCLUDED.grade,
+      created_at = NOW()
+    RETURNING
+      id,
+      assignment_id AS "assignmentId",
+      student_id AS "studentId",
+      remarks,
+      grade,
+      created_at AS "createdAt"
+    `,
+    [assignmentId, studentId, payload.remarks, payload.grade]
   );
-  return result.rows.map(row => ({
-    id: row.id,
-    projectId: row.projectId,
-    criterion: row.criterion,
-    maxScore: Number(row.maxScore),
-    description: row.description,
-    createdAt: row.createdAt
-  }));
-};
 
-/**
- * Gets submission status of a student's final submission.
- * @param {number} projectId 
- * @param {number} studentId 
- * @returns {Promise<object|null>}
- */
-export const getSubmissionStatus = async (projectId, studentId) => {
-  const result = await pool.query(
-    `SELECT id, status, submitted_at AS "submittedAt"
-     FROM project_submissions 
-     WHERE project_id = $1 AND student_id = $2`,
-    [projectId, studentId]
-  );
-  return result.rows[0] || null;
+  return result.rows[0];
 };
 
 export default {
   getFeedback,
-  getRubric,
-  getSubmissionStatus
+  addFeedback,
 };

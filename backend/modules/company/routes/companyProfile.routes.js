@@ -27,7 +27,7 @@ router.get("/profile", authMiddleware, getCompanyProfile);
 router.put(
   "/profile",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("company"),
   updateCompanyProfile,
 );
 
@@ -36,21 +36,21 @@ router.get("/team", authMiddleware, getCompanyTeam);
 router.post(
   "/team",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("company"),
   createCompanyTeamMember,
 );
 
 router.patch(
   "/team/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("company"),
   updateCompanyTeamMember,
 );
 
 router.delete(
   "/team/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("company"),
   deleteCompanyTeamMember,
 );
 

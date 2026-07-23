@@ -1,0 +1,224 @@
+import { formatDistanceToNow } from "date-fns";
+import {
+  CheckCircle2,
+  XCircle,
+  Lock,
+  Rocket,
+  Settings,
+  Bell,
+} from "lucide-react";
+
+const ActivityFeed = ({
+  activities,
+  darkMode,
+}) => {
+  // Safety Check
+  const safeActivities = Array.isArray(activities)
+    ? activities
+    : [];
+
+  // Empty State
+  if (safeActivities.length === 0) {
+    return (
+      <div
+        className={`flex items-center justify-center h-40 text-sm ${
+          darkMode
+            ? "text-gray-400"
+            : "text-gray-500"
+        }`}
+      >
+        No recent activity
+      </div>
+    );
+  }
+
+  // Action Icon Mapping
+  const activityIcons = {
+    verified_mentor: (
+      <CheckCircle2
+        size={18}
+        className="text-green-500"
+      />
+    ),
+
+    rejected_mentor: (
+      <XCircle
+        size={18}
+        className="text-red-500"
+      />
+    ),
+
+    closed_drive: (
+      <Lock
+        size={18}
+        className="text-gray-500"
+      />
+    ),
+
+    created_drive: (
+      <Rocket
+        size={18}
+        className="text-blue-500"
+      />
+    ),
+
+    updated_settings: (
+      <Settings
+        size={18}
+        className="text-yellow-500"
+      />
+    ),
+
+    default: (
+      <Bell
+        size={18}
+        className="text-gray-500"
+      />
+    ),
+  };
+
+  // Activity Description
+  const getActionText = (activity) => {
+    const performer =
+      activity?.performedBy || "Someone";
+
+    switch (activity?.action) {
+      case "verified_mentor":
+        return `${performer} verified a mentor`;
+
+      case "rejected_mentor":
+        return `${performer} rejected a mentor`;
+
+      case "closed_drive":
+        return `${performer} closed a drive`;
+
+      case "created_drive":
+        return `${performer} created a drive`;
+
+      case "updated_settings":
+        return `${performer} updated platform settings`;
+
+      default:
+        return `${performer} performed an admin action`;
+    }
+  };
+
+  return (
+    <div className="max-h-[420px] overflow-y-auto pr-2 space-y-4">
+      {safeActivities
+        .slice(0, 10)
+        .map((activity, index) => {
+          const activityDate =
+            activity?.createdAt
+              ? new Date(
+                  activity.createdAt
+                )
+              : null;
+
+          const relativeTime =
+            activityDate &&
+            !isNaN(activityDate)
+              ? formatDistanceToNow(
+                  activityDate,
+                  {
+                    addSuffix: true,
+                  }
+                )
+              : "Unknown time";
+
+          return (
+            <div
+              key={
+                activity?.logId ||
+                index
+              }
+              className={`
+                flex items-start gap-4
+                p-4
+                rounded-2xl
+                border
+                transition-colors
+                duration-200
+                ${
+                  darkMode
+                    ? "border-gray-700 bg-gray-800 hover:bg-gray-700"
+                    : "border-gray-100 bg-white hover:bg-gray-50"
+                }
+              `}
+            >
+              {/* Icon */}
+              <div
+                className={`
+                  w-11 h-11
+                  flex items-center justify-center
+                  rounded-full
+                  shrink-0
+                  ${
+                    darkMode
+                      ? "bg-gray-700"
+                      : "bg-gray-100"
+                  }
+                `}
+              >
+                {activityIcons[
+                  activity.action
+                ] ||
+                  activityIcons.default}
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                {/* Description */}
+                <p
+                  className={`text-sm sm:text-base font-medium break-words ${
+                    darkMode
+                      ? "text-white"
+                      : "text-gray-800"
+                  }`}
+                >
+                  {getActionText(
+                    activity
+                  )}
+                </p>
+
+                {/* Metadata */}
+                <div
+                  className={`flex flex-wrap items-center gap-2 mt-1 text-xs ${
+                    darkMode
+                      ? "text-gray-400"
+                      : "text-gray-500"
+                  }`}
+                >
+                  <span>
+                    {activity?.targetType ||
+                      "Unknown"}
+                  </span>
+
+                  <span>•</span>
+
+                  <span>
+                    ID:{" "}
+                    {activity?.targetId ||
+                      "N/A"}
+                  </span>
+                </div>
+
+                {/* Relative Time */}
+                <p
+                  className={`text-xs mt-2 ${
+                    darkMode
+                      ? "text-gray-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {relativeTime}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+    </div>
+  );
+};
+
+export default ActivityFeed;

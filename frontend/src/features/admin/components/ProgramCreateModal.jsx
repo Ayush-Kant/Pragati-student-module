@@ -111,13 +111,14 @@ const ProgramCreateModal = ({
 
   };
 
-  const submitHandler = (data) => {
-
-    onSubmit?.(data);
-
+ const submitHandler = async (data) => {
+  try {
+    await onSubmit?.(data);
     handleClose();
-
-  };
+  } catch (error) {
+    console.error("Failed to create program:", error);
+  }
+};
   return (
   <Modal
     isOpen={isOpen}
@@ -242,7 +243,7 @@ const ProgramCreateModal = ({
 
           <input
             type="text"
-            placeholder="App Developer"
+            placeholder="Web Developer"
             {...register("targetRole")}
             className="
               w-full

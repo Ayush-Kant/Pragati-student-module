@@ -1,27 +1,36 @@
-// feedbackController.js
 import * as feedbackService from "../services/feedbackService.js";
-import { formatSuccess, formatError } from "../utils/projectHelpers.js";
+import { normalizeStudentId } from "../utils/assignmentHelpers.js";
 
-/**
- * Handles GET /api/student/projects/:projectId/feedback
- */
 export const getFeedback = async (req, res, next) => {
   try {
-    const { projectId } = req.params;
-    const studentId = req.user?.id;
+    const studentId = normalizeStudentId(req);
+    const feedback = await feedbackService.getFeedback(req.params.id, studentId);
 
-    if (!studentId) {
-      return res.status(401).json(formatError("Unauthorized: Student credentials missing."));
-    }
+    res.status(200).json({
+      success: true,
+      data: feedback,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    const feedbackReport = await feedbackService.getFeedback(Number(projectId), studentId);
-    
-    return res.status(200).json(formatSuccess("Project feedback retrieved successfully", feedbackReport));
-  } catch (err) {
-    next(err);
+export const addFeedback = async (req, res, next) => {
+  try {
+    const studentId = normalizeStudentId(req);
+    const feedback = await feedbackService.addFeedback(req.params.id, studentId, req.body);
+
+    res.status(201).json({
+      success: true,
+      message: "Feedback added successfully",
+      data: feedback,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
 export default {
-  getFeedback
+  getFeedback,
+  addFeedback,
 };

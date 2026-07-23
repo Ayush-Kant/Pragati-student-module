@@ -37,7 +37,7 @@ const AnalyticsPanel = ({ analytics }) => {
         },
         {
             id: 4,
-            label: "Modules",
+            label: "Modules Completed",
             value: analytics?.modulesCompleted ?? 0,
             icon: BookOpen,
             bgColor: "bg-orange-100",

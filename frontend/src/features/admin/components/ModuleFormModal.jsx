@@ -50,13 +50,19 @@ const ModuleFormModal = ({
         onClose?.();
     };
 
-    const submitHandler = (data) => {
-        onSubmit?.({
-            ...data,
-            durationHours: Number(data.durationHours),
-            order: Number(data.order),
-        });
-    };
+   const submitHandler = async (data) => {
+  try {
+    await onSubmit?.({
+      ...data,
+      durationHours: Number(data.durationHours),
+      order: Number(data.order),
+    });
+
+    handleClose();
+  } catch (error) {
+    console.error("Failed to save module:", error);
+  }
+};
 
     return (
         <Modal
@@ -185,7 +191,7 @@ const ModuleFormModal = ({
                     <button
                         type="submit"
                         disabled={loading}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
                     >
                         {loading
                             ? "Saving..."

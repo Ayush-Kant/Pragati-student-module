@@ -1,107 +1,85 @@
-// submissionModel.js
 import { pool } from "../../config/db.js";
 
-/**
- * Submits the final capstone project.
- * @param {number} projectId 
- * @param {number} studentId 
- * @param {string} githubUrl 
- * @param {string} deployedUrl 
- * @param {string} reportUrl 
- * @returns {Promise<object>}
- */
-export const submitFinalProject = async (projectId, studentId, githubUrl, deployedUrl, reportUrl) => {
+export const submitAssignment = async (assignmentId, studentId, payload) => {
   const result = await pool.query(
-    `INSERT INTO project_submissions 
-       (project_id, student_id, github_url, deployed_url, report_url, submitted_at, status, updated_at)
-     VALUES 
-       ($1, $2, $3, $4, $5, NOW(), 'submitted', NOW())
-     ON CONFLICT (project_id, student_id) 
-     DO UPDATE SET 
-       github_url = EXCLUDED.github_url,
-       deployed_url = EXCLUDED.deployed_url,
-       report_url = EXCLUDED.report_url,
-       submitted_at = NOW(),
-       status = 'submitted',
-       updated_at = NOW()
-     RETURNING 
-       id, project_id AS "projectId", student_id AS "studentId", github_url AS "githubUrl", 
-       deployed_url AS "deployedUrl", report_url AS "reportUrl", submitted_at AS "submittedAt", status`,
-    [projectId, studentId, githubUrl, deployedUrl, reportUrl]
+    `
+    INSERT INTO assignment_submissions (
+      assignment_id,
+      student_id,
+      content,
+      file_url,
+      status,
+      submitted_at
+    )
+    VALUES ($1, $2, $3, $4, $5, NOW())
+    ON CONFLICT (assignment_id, student_id)
+    DO UPDATE SET
+      content = EXCLUDED.content,
+      file_url = EXCLUDED.file_url,
+      status = EXCLUDED.status,
+      submitted_at = NOW()
+    RETURNING
+      id,
+      assignment_id AS "assignmentId",
+      student_id AS "studentId",
+      content,
+      file_url AS "fileUrl",
+      status,
+      submitted_at AS "submittedAt"
+    `,
+    [assignmentId, studentId, payload.content || null, payload.fileUrl || null, payload.status || "Submitted"]
   );
+
   return result.rows[0];
 };
 
-/**
- * Retrieves the student's submission for a project.
- * @param {number} projectId 
- * @param {number} studentId 
- * @returns {Promise<object|null>}
- */
-export const getSubmission = async (projectId, studentId) => {
+export const updateSubmission = async (assignmentId, studentId, payload) => {
   const result = await pool.query(
-    `SELECT id, project_id AS "projectId", student_id AS "studentId", github_url AS "githubUrl",
-            deployed_url AS "deployedUrl", report_url AS "reportUrl", submitted_at AS "submittedAt", status
-     FROM project_submissions 
-     WHERE project_id = $1 AND student_id = $2`,
-    [projectId, studentId]
+    `
+    UPDATE assignment_submissions
+    SET content = COALESCE($3, content),
+        file_url = COALESCE($4, file_url),
+        status = COALESCE($5, status),
+        submitted_at = NOW()
+    WHERE assignment_id = $1 AND student_id = $2
+    RETURNING
+      id,
+      assignment_id AS "assignmentId",
+      student_id AS "studentId",
+      content,
+      file_url AS "fileUrl",
+      status,
+      submitted_at AS "submittedAt"
+    `,
+    [assignmentId, studentId, payload.content || null, payload.fileUrl || null, payload.status || null]
   );
-  return result.rows[0] || null;
+
+  return result.rows[0];
 };
 
-/**
- * Updates a submission record status or other fields.
- *
- * Security: column names are validated against an explicit whitelist before
- * being interpolated into the SQL SET clause. Any unrecognised key is rejected
- * immediately so that no attacker-controlled string can reach the query.
- *
- * @param {number} submissionId
- * @param {object} updateData   - Keyed by camelCase field names
- * @returns {Promise<object|null>}
- */
-export const updateSubmission = async (submissionId, updateData) => {
-  // Explicit camelCase → snake_case whitelist.
-  // ONLY these columns may be updated via this method.
-  const ALLOWED_COLUMNS = {
-    githubUrl:   "github_url",
-    deployedUrl: "deployed_url",
-    reportUrl:   "report_url",
-    status:      "status",
-  };
+export const getSubmissionHistory = async (assignmentId, studentId) => {
+  const result = await pool.query(
+    `
+    SELECT
+      id,
+      assignment_id AS "assignmentId",
+      student_id AS "studentId",
+      content,
+      file_url AS "fileUrl",
+      status,
+      submitted_at AS "submittedAt"
+    FROM assignment_submissions
+    WHERE assignment_id = $1 AND student_id = $2
+    ORDER BY submitted_at DESC
+    `,
+    [assignmentId, studentId]
+  );
 
-  const fields = [];
-  const values = [];
-  let index = 1;
-
-  for (const [key, val] of Object.entries(updateData)) {
-    if (!Object.prototype.hasOwnProperty.call(ALLOWED_COLUMNS, key)) {
-      const err = new Error(`Invalid field: '${key}' is not a permitted submission field`);
-      err.status = 400;
-      throw err;
-    }
-    fields.push(`${ALLOWED_COLUMNS[key]} = $${index}`);
-    values.push(val);
-    index++;
-  }
-
-  if (fields.length === 0) return null;
-
-  values.push(submissionId);
-  const query = `
-    UPDATE project_submissions 
-    SET ${fields.join(", ")} , updated_at = NOW() 
-    WHERE id = $${index} 
-    RETURNING 
-      id, project_id AS "projectId", student_id AS "studentId", github_url AS "githubUrl", 
-      deployed_url AS "deployedUrl", report_url AS "reportUrl", submitted_at AS "submittedAt", status`;
-
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+  return result.rows;
 };
 
 export default {
-  submitFinalProject,
-  getSubmission,
-  updateSubmission
+  submitAssignment,
+  updateSubmission,
+  getSubmissionHistory,
 };

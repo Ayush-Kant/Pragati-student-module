@@ -1,0 +1,152 @@
+/* HEADER */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid #ddd;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* LEFT */
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-box {
+  width: 50px;
+  height: 50px;
+  background-color: #66c2ff;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  font-size: 34px;
+  color: #444;
+}
+
+/* SEARCH */
+
+.search-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-bar {
+  width: 70%;
+  max-width: 700px;
+  min-width: 250px;
+
+  padding: 14px 18px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+/* BUTTONS */
+
+.button-section {
+  display: flex;
+  gap: 12px;
+}
+
+.icon-btn {
+  width: 52px;
+  height: 52px;
+
+  border: none;
+  border-radius: 10px;
+
+  background-color: #f1f5f9;
+  color: #4b5563;
+
+  font-size: 20px;
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.icon-btn:hover {
+  background-color: #dbeafe;
+}
+
+/* MESSAGE */
+
+.message {
+  padding: 10px 20px;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+/* -------------------- */
+/* TABLET SCREEN */
+/* -------------------- */
+
+@media (max-width: 992px) {
+  .logo-text {
+    display: block;
+    font-size: 28px;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+}
+
+/* -------------------- */
+/* MOBILE SCREEN */
+/* -------------------- */
+
+@media (max-width: 600px) {
+  .header {
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  /* Pragati text hide */
+  .logo-text {
+    display: none;
+  }
+
+  /* buttons hide */
+  .button-section {
+    display: none;
+  }
+
+  /* only P + search */
+  .search-section {
+    flex: 1;
+  }
+
+  .search-bar {
+    width: 100%;
+    min-width: 120px;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .logo-box {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+}

@@ -1,0 +1,398 @@
+/* Company Settings Page - Minimal Styling */
+
+.company-settings {
+  /* No custom padding or background - uses parent layout */
+  padding-top: 20px;
+}
+
+.settings-header {
+  margin-bottom: 20px;
+  border-top: none;
+}
+
+.settings-header h1 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  margin-bottom: 4px;
+}
+
+.settings-header p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Error Banner */
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  color: #7f1d1d;
+  font-size: 13px;
+}
+
+.error-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.error-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #7f1d1d;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.error-close:hover {
+  opacity: 0.7;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Settings Container */
+
+.settings-container {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* Settings Section */
+
+.settings-section {
+  padding: 20px;
+}
+
+.settings-section h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 14px 0;
+}
+
+.section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Section Divider */
+
+.section-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0;
+}
+
+/* Logo Section */
+
+.logo-section {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-box {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: bold;
+  color: white;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.logo-upload {
+  flex: 1;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.logo-hint {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 6px 0 0 0;
+}
+
+/* Form Rows */
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-row.full-width {
+  grid-template-columns: 1fr;
+}
+
+/* Form Groups */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Input Wrapper (for icons) */
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+  background: white;
+  color: #111827;
+}
+
+.input-wrapper .form-input,
+.input-wrapper .form-textarea {
+  width: 100%;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.form-input:disabled,
+.form-textarea:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.error-message {
+  font-size: 12px;
+  color: #dc2626;
+  margin: 0;
+}
+
+/* Notification Section */
+
+.notification-section {
+  gap: 12px;
+}
+
+.notification-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox-input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.checkbox-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+  user-select: none;
+}
+
+.notification-desc {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0 0 0 24px;
+}
+
+/* Form Actions */
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+/* Buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.btn-secondary {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #d1d5db;
+}
+
+/* Loading Spinner */
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+  .settings-section {
+    padding: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .logo-section {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

@@ -1,43 +1,10 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  errorHandler.js
-//  Global Express error-handling middleware.
-//
-//  Must be registered LAST in the middleware chain (after all routes):
-//    app.use(errorHandler);
-//
-//  Catches any error passed via next(err) and formats a consistent
-//  JSON response. In development, includes the stack trace.
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * errorHandler
- * ─────────────
- * Express 4-argument error handler.
- * Reads err.statusCode if set by service/model layers, defaults to 500.
- * Also handles err.status for backward compatibility with Projects Backend services.
- *
- * @param {Error}  err
- * @param {object} req
- * @param {object} res
- * @param {function} next
- */
-const errorHandler = (err, req, res, next) => {
-    // Handle Multer file upload errors explicitly
-    if (err.name === 'MulterError') {
-        err.statusCode = 400;
-        if (err.code === 'LIMIT_FILE_SIZE') {
-            err.message = 'File size exceeds maximum allowed limit (20MB)';
-        }
-    }
-
-    // Determine appropriate HTTP status code
+export const errorHandler = (err, req, res, next) => {
     const statusCode = err.statusCode
         || err.status
-        || (err.code === '23505' ? 409 : null)  // PostgreSQL unique violation
-        || (err.code === '23503' ? 404 : null)  // PostgreSQL foreign key violation
+        || (err.code === '23505' ? 409 : null)
+        || (err.code === '23503' ? 404 : null)
         || 500;
 
-    // Log server errors
     if (statusCode >= 500) {
         console.error(`[ErrorHandler] ${req.method} ${req.path}`, err);
     }
@@ -50,12 +17,10 @@ const errorHandler = (err, req, res, next) => {
         },
     };
 
-    // Include validation errors array if present
     if (err.errors && Array.isArray(err.errors)) {
         payload.error.details = err.errors;
     }
 
-    // Include stack trace in development only
     if (process.env.NODE_ENV === 'development') {
         payload.error.stack = err.stack;
     }

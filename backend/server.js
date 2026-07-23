@@ -4,6 +4,45 @@ import dotenv from 'dotenv';
 
 import { connectDB } from './config/db.js';
 import { initializeLiveSessionModule } from './src/database/migrations/liveSessionSchema.js';
+import initializeAssignmentModule from './src/database/migrations/assignmentSchema.js';
+
+// Admin Routes
+import adminDashboardRoutes from './routes/admin.dashboard.routes.js';
+import adminCollegeRoutes from './routes/admin.college.routes.js';
+import adminAssessmentRoutes from './routes/admin.assessment.routes.js';
+import adminDriveRoutes from './routes/admin.drive.routes.js';
+import adminNotificationRoutes from './routes/admin.notification.routes.js';
+import adminDisputeRoutes from './routes/admin.dispute.routes.js';
+import adminCourseRoutes from './routes/admin.course.routes.js';
+import adminStudentRoutes from './routes/admin.student.routes.js';
+import adminMentorRoutes from './routes/admin.mentor.routes.js';
+import adminCompanyRoutes from './routes/admin.company.routes.js';
+
+// Standard & Role-Specific Routes
+import authRouter from './routes/auth.routes.js';
+import studentRoutes from './routes/student.routes.js';
+import contentRoutes from './routes/content.routes.js';
+import notificationRoutes from './routes/notification.routes.js';
+import collegeProfileRoutes from './routes/collage.profile.routes.js';
+import companyProfileRoutes from './modules/company/routes/companyProfile.routes.js';
+import companyCandidateRoutes from './modules/company/routes/companyCandidate.routes.js';
+import companyDashboardRoutes from './modules/company/routes/companyDashboard.routes.js';
+import companyReportsRoutes from './modules/company/routes/companyReports.routes.js';
+import companyDrivesRoutes from './modules/company/routes/companyDrives.routes.js';
+import companyAssessmentRoutes from './modules/company/routes/companyAssessment.routes.js';
+import companyInterviewRoutes from './modules/company/routes/companyInterview.routes.js';
+import companyNotificationRoutes from './modules/company/routes/companyNotification.routes.js';
+import companyOfferRoutes from './modules/company/routes/companyOffer.routes.js';
+import interviewRoutes from './routes/interview.routes.js';
+import mentorRoutes from './routes/mentor.routes.js';
+import trainingRoutes from './routes/trainingRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
+import collegeDashboardRoutes from './routes/college.dashboard.routes.js';
+import collegeJobsRoutes from './routes/college.jobs.routes.js';
+import departmentRoutes from './routes/college.department.routes.js';
+import courseRoutes from './routes/college.course.routes.js';
+import departmentStatisticsRoutes from './routes/college.departmentstatistics.routes.js';
+import placementDriveRoutes from './routes/placementDrives.routes.js';
 
 // Student training / learning routes
 import studentTrainingRoutes from './src/routes/trainingRoutes.js';
@@ -11,24 +50,20 @@ import studentCourseRoutes from './src/routes/courseRoutes.js';
 import studentLessonRoutes from './src/routes/lessonRoutes.js';
 import studentResourceRoutes from './src/routes/resourceRoutes.js';
 import studentProgressRoutes from './src/routes/progressRoutes.js';
-
-// Live sessions
-import liveSessionRoutes from './src/routes/liveSessionRoutes.js';
-
-import questionBankRouter from './routes/questionBank.routes.js';
 import learningRoutes from './routes/learningRoutes.js';
 import challengeRoutes from './routes/challenge.routes.js';
-import companyProfileRoutes from './modules/company/routes/companyProfile.routes.js';
-import companyAssessmentRoutes from './modules/company/routes/companyAssessment.routes.js';
+import questionBankRouter from './routes/questionBank.routes.js';
 
-// Student Profile Module
-import studentProfileRouter from './src/routes/index.js';
-
-// Projects Backend Module Routes
-import projectRoutes from './src/routes/projectRoutes.js';
-import milestoneRoutes from './src/routes/milestoneRoutes.js';
+// Live sessions and student assignment endpoints
+import liveSessionRoutes from './src/routes/liveSessionRoutes.js';
+import assignmentRoutes from './src/routes/assignmentRoutes.js';
 import submissionRoutes from './src/routes/submissionRoutes.js';
 import feedbackRoutes from './src/routes/feedbackRoutes.js';
+import gradeRoutes from './src/routes/gradeRoutes.js';
+import deadlineRoutes from './src/routes/deadlineRoutes.js';
+
+// Student profile routes
+import studentProfileRouter from './src/routes/index.js';
 
 // Middleware
 import errorHandler from './src/middleware/errorHandler.js';
@@ -63,37 +98,68 @@ app.use(
   }),
 );
 
-// Training & Learning Module (MOD-4)
+// Auth + shared routes
+app.use('/api/auth', authRouter);
+app.use('/api/student/dashboard', dashboardRoutes);
+app.use('/api/student/notifications', notificationRoutes);
+app.use('/api/students', studentRoutes);
+app.use('/api/mentor', contentRoutes);
+app.use('/api/mentor', mentorRoutes);
+app.use('/api/mentor', questionBankRouter);
+
+// Admin routes
+app.use('/api/v1/admin/dashboard', adminDashboardRoutes);
+app.use('/api/v1/admin/colleges', adminCollegeRoutes);
+app.use('/api/v1/admin/assessments', adminAssessmentRoutes);
+app.use('/api/v1/admin/students', adminStudentRoutes);
+app.use('/api/v1/admin/mentors', adminMentorRoutes);
+app.use('/api/v1/admin/courses', adminCourseRoutes);
+app.use('/api/v1/admin/drives', adminDriveRoutes);
+app.use('/api/v1/admin/company', adminCompanyRoutes);
+app.use('/api/v1/admin/company/interviews', interviewRoutes);
+app.use('/api/v1/admin/notifications', adminNotificationRoutes);
+app.use('/api/v1/admin/disputes', adminDisputeRoutes);
+
+// College + placement routes
+app.use('/api/college/profile', collegeProfileRoutes);
+app.use('/api/college/dashboard', collegeDashboardRoutes);
+app.use('/api/departments/statistics', departmentStatisticsRoutes);
+app.use('/api/departments', departmentRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/placement-drives', placementDriveRoutes);
+app.use('/api/v1/company/jobs', collegeJobsRoutes);
+
+// Company routes
+app.use('/api/v1/company', companyProfileRoutes);
+app.use('/api/v1/company/candidates', companyCandidateRoutes);
+app.use('/api/v1/company/dashboard', companyDashboardRoutes);
+app.use('/api/v1/company/reports', companyReportsRoutes);
+app.use('/api/v1/company/drives', companyDrivesRoutes);
+app.use('/api/v1/company/assessments', companyAssessmentRoutes);
+app.use('/api/v1/company/interviews', companyInterviewRoutes);
+app.use('/api/v1/company/notifications', companyNotificationRoutes);
+app.use('/api/v1/company/offers', companyOfferRoutes);
+app.use('/api/v1/company/training', trainingRoutes);
+
+// Student learning/training routes
 app.use('/api/student/training', studentTrainingRoutes);
 app.use('/api/student/training', studentCourseRoutes);
 app.use('/api/student/training', studentLessonRoutes);
 app.use('/api/student/training', studentResourceRoutes);
 app.use('/api/student/training', studentProgressRoutes);
-
-// Live Sessions
+app.use('/api/student/learning', learningRoutes);
+app.use('/api/student/challenges', challengeRoutes);
 app.use('/api/student/live-sessions', liveSessionRoutes);
 
-// Student Profile Module
+// Assignment routes
+app.use('/api/student/assignments', assignmentRoutes);
+app.use('/api/student/assignments', submissionRoutes);
+app.use('/api/student/assignments', feedbackRoutes);
+app.use('/api/student/assignments', gradeRoutes);
+app.use('/api/student/assignments', deadlineRoutes);
+
+// Student profile routes
 app.use(studentProfileRouter);
-
-// Student Learning Routes
-app.use('/api/student/learning', learningRoutes);
-
-// Student Projects Backend Routes
-app.use('/api/student/projects', projectRoutes);
-app.use('/api/student/projects', milestoneRoutes);
-app.use('/api/student/projects', submissionRoutes);
-app.use('/api/student/projects', feedbackRoutes);
-
-// Challenge Routes
-app.use('/api/student/challenges', challengeRoutes);
-
-// Question Bank (Mentor)
-app.use('/api/mentor', questionBankRouter);
-
-// Company Routes
-app.use('/api/v1/company', companyProfileRoutes);
-app.use('/api/v1/company/assessments', companyAssessmentRoutes);
 
 // Health check
 app.get('/', (req, res) => res.json({ message: '✅ Backend is running' }));
@@ -108,6 +174,13 @@ connectDB()
       console.log('✅ Live session module initialized');
     } catch (error) {
       console.error('⚠️ Live session module initialization failed:', error.message);
+    }
+
+    try {
+      await initializeAssignmentModule();
+      console.log('✅ Assignment module initialized');
+    } catch (error) {
+      console.error('⚠️ Assignment module initialization failed:', error.message);
     }
 
     app.listen(PORT, () => {

@@ -1,23 +1,20 @@
-// feedbackValidator.js
+import { sanitizeInput } from "../utils/assignmentHelpers.js";
 
-/**
- * Middleware to validate parameters for feedback requests.
- */
 export const validateFeedback = (req, res, next) => {
-  const { projectId } = req.params;
-  const projIdNum = Number(projectId);
+  const { remarks, grade } = req.body;
 
-  if (!projectId || !Number.isInteger(projIdNum) || projIdNum <= 0) {
+  if (!remarks || !grade) {
     return res.status(400).json({
       success: false,
-      message: "Validation failed",
-      error: { projectId: "Invalid project ID. Must be a positive integer." }
+      message: "remarks and grade are required",
     });
   }
 
+  req.body.remarks = sanitizeInput(remarks);
+  req.body.grade = sanitizeInput(grade);
   next();
 };
 
 export default {
-  validateFeedback
+  validateFeedback,
 };
