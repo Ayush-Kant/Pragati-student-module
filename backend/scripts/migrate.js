@@ -23,6 +23,7 @@ const migrationFiles = [
   "003_create_admin_dashboard.sql",
   "004_create_notifications.sql",
   "006_create_assessments.sql",
+  "006_create_assessments_minimal.sql",
   "006_create_college_profiles.sql",
   "006_create_dashboard_support.sql",
   "006_create_training_coordination.sql",
@@ -42,8 +43,11 @@ const migrationFiles = [
   "012_create_jobs_table.sql",
   "013_create_reports_management_tables.sql",
   "013_create_placement_drives.sql",
+  "014_create_college_communication_announcements.sql",
   "019_create_notifications.sql",
   "college.department.course.seeddata.sql",
+  "collegeStudentNominations.sql",
+  "collegeAnalyticsDashboard.sql",
   "student_module.sql",
 ];
 
