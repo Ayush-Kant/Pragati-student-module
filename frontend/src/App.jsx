@@ -5,10 +5,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
 
-// ── Contexts ──
-import { AuthProvider} from './context/AuthContext';
 
-// ── Route Modules ──
+// ── Student Module ───────────────────────────────────────────────────────────
+import { AuthProvider} from './context/AuthContext';
 import VerificationPage from './features/student/pages/public/VerificationPage';
 import StudentRoutes from "./features/student/routes/StudentRoutes";
 import AdminRoute from "./features/admin/routes/AdminRoutes";
@@ -16,47 +15,40 @@ import mentorRoute from "./features/mentor/routes/MentorRoutes";
 import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
-import CollegeProfilePage from "./features/college/profile/pages/CollegeProfilePage";
-
-// Placement Drives
-import CollegeLayout from "./features/college/layouts/CollegeLayout";
-import PlacementDrivesPage from "./features/college/placement-drives/pages/PlacementDrivesPage";
 
 function App() {
-
   return (
     <AuthProvider>
       <Toaster />
       <Routes>
+        
         <Route path="/" element={<Navigate to="/login" replace />} />
-
-        {/* ── Auth Routes ── */}
+        
+        {/* ── Auth Routes ────────────────────────────────────────── */}
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
 
-        {/* ── Public Test Route (Preview) ── */}
-        <Route path='/preview/college-profile' element={<CollegeProfilePage />} />
-        <Route path='/uptoskills-profile' element={<CollegeProfilePage />} />
-
-        {/* ── Mentor ── */}
+        {/* ── Mentor ────────────────────────────────────────────────── */}
         {mentorRoute}
 
-        {/* ── Admin ── */}
+        {/* ── Admin ─────────────────────────────────────────────────── */}
+       
         {AdminRoute}
 
-        {/* ── Student ── */}
+        {/* ── Student ───────────────────────────────────────────────── */}
         {StudentRoutes}
 
-        {/* ── College ── */}
-        {collegeRoute}
-        <Route path="/college" element={<CollegeLayout />}>
-          <Route path="drives" element={<PlacementDrivesPage />} />
-        </Route>
+      {/* Collge */}
 
-        {/* ── Company ── */}
-        {CompanyRoute}
+      {collegeRoute}
 
-        {/* ── Public ── */}
+
+  {/* Company */}
+
+      {CompanyRoute}
+
+      
+        {/* Public certificate verification */}
         <Route path='/verify/:code' element={<VerificationPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
