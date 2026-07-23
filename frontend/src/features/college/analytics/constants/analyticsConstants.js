@@ -13,6 +13,11 @@ export const API_ENDPOINTS = {
   EXPORT_EXCEL: "/analytics/export/excel",
 };
 
+export const BRAND = {
+  ORANGE: "#ff6d34",
+  TEAL: "#00bea3",
+};
+
 export const REPORT_TYPES = [
   { value: "dashboard", label: "Dashboard Overview" },
   { value: "placements", label: "Placement Analytics" },
@@ -27,13 +32,13 @@ export const EXPORT_FORMATS = {
 };
 
 export const CHART_COLORS = {
-  primary: "#2563eb",
-  secondary: "#06B6D4",
+  primary: "#00bea3",
+  secondary: "#ff6d34",
   success: "#10B981",
   warning: "#F59E0B",
   danger: "#EF4444",
   purple: "#8B5CF6",
-  palette: ["#2563eb", "#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6"],
+  palette: ["#00bea3", "#ff6d34", "#F59E0B", "#8B5CF6", "#EC4899", "#14B8A6", "#2563eb", "#EF4444"],
 };
 
 export const BATCH_OPTIONS = ["2024", "2025", "2026", "2027"];

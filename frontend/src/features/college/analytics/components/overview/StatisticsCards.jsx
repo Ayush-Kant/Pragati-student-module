@@ -1,10 +1,31 @@
 import { Users, GraduationCap, TrendingUp, IndianRupee } from "lucide-react";
+import { cardClass, headingText, subtleText } from "../../utils/analyticsHelpers";
 
 const cards = [
-  { key: "totalStudents", label: "Total Students", icon: Users, color: "bg-blue-50 text-blue-600 border-blue-100" },
-  { key: "totalPlaced", label: "Total Placed", icon: GraduationCap, color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-  { key: "placementRate", label: "Placement Rate", icon: TrendingUp, color: "bg-amber-50 text-amber-600 border-amber-100" },
-  { key: "averagePackage", label: "Avg Package", icon: IndianRupee, color: "bg-purple-50 text-purple-600 border-purple-100" },
+  {
+    key: "totalStudents",
+    label: "Total Students",
+    icon: Users,
+    iconBg: "bg-gradient-to-br from-orange-50 to-amber-50 text-[#ff6d34] border border-orange-200/80",
+  },
+  {
+    key: "totalPlaced",
+    label: "Total Placed",
+    icon: GraduationCap,
+    iconBg: "bg-gradient-to-br from-teal-50 to-emerald-50 text-[#00bea3] border border-teal-200/80",
+  },
+  {
+    key: "placementRate",
+    label: "Placement Rate",
+    icon: TrendingUp,
+    iconBg: "bg-gradient-to-br from-orange-50 to-rose-50 text-[#ff6d34] border border-orange-200/80",
+  },
+  {
+    key: "averagePackage",
+    label: "Avg Package",
+    icon: IndianRupee,
+    iconBg: "bg-gradient-to-br from-teal-50 to-cyan-50 text-[#00bea3] border border-teal-200/80",
+  },
 ];
 
 export const StatisticsCards = ({ darkMode, data }) => {
@@ -16,25 +37,22 @@ export const StatisticsCards = ({ darkMode, data }) => {
   };
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map(({ key, label, icon: Icon, color }) => (
-        <div
-          key={key}
-          className={`rounded-2xl border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${
-            darkMode ? "bg-[#2D2D2D] border-[#3D3D3D]" : "bg-white border-gray-100"
-          }`}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <p className={`text-xs font-bold tracking-wider uppercase ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-              {label}
-            </p>
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center border ${color}`}>
-              <Icon className="w-4 h-4" />
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      {cards.map(({ key, label, icon: Icon, iconBg }) => (
+        <div key={key} className={cardClass(darkMode)}>
+          <div className="flex justify-between items-start">
+            <div>
+              <p className={`text-xs font-bold tracking-wider uppercase ${subtleText(darkMode)}`}>
+                {label}
+              </p>
+              <h3 className={`text-3xl font-extrabold mt-2 tracking-tight ${headingText(darkMode)}`}>
+                {values[key]}
+              </h3>
+            </div>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${iconBg}`}>
+              <Icon className="w-5.5 h-5.5" />
             </div>
           </div>
-          <h3 className={`text-2xl font-extrabold tracking-tight ${darkMode ? "text-white" : "text-[#2D3436]"}`}>
-            {values[key]}
-          </h3>
         </div>
       ))}
     </div>

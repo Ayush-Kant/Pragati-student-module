@@ -27,3 +27,11 @@ export const calculateTrend = (current, previous) => {
 };
 
 export const cn = (...classes) => classes.filter(Boolean).join(" ");
+
+export const cardClass = (darkMode) =>
+  `rounded-2xl border p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 ${
+    darkMode ? "bg-[#2D2D2D] border-[#3D3D3D]" : "bg-white border-gray-100"
+  }`;
+
+export const subtleText = (darkMode) => darkMode ? "text-gray-400" : "text-gray-500";
+export const headingText = (darkMode) => darkMode ? "text-white" : "text-[#2D3436]";

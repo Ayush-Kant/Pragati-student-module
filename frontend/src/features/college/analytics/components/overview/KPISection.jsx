@@ -1,4 +1,5 @@
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { cardClass, headingText, subtleText } from "../../utils/analyticsHelpers";
 
 export const KPISection = ({ darkMode, placementData = [] }) => {
   const latest = placementData[placementData.length - 1] || {};
@@ -26,7 +27,7 @@ export const KPISection = ({ darkMode, placementData = [] }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
       {kpis.map(({ label, value, prev, curr }) => {
         const diff = (curr || 0) - (prev || 0);
         const dir = diff > 0 ? "up" : diff < 0 ? "down" : "neutral";
@@ -38,15 +39,12 @@ export const KPISection = ({ darkMode, placementData = [] }) => {
             : "bg-gray-100 text-gray-600";
 
         return (
-          <div
-            key={label}
-            className={`rounded-2xl border p-4 ${darkMode ? "bg-[#2D2D2D] border-[#3D3D3D]" : "bg-white border-gray-100"}`}
-          >
-            <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+          <div key={label} className={cardClass(darkMode)}>
+            <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${subtleText(darkMode)}`}>
               {label}
             </p>
             <div className="flex items-center gap-3">
-              <h4 className={`text-xl font-extrabold ${darkMode ? "text-white" : "text-[#2D3436]"}`}>{value}</h4>
+              <h4 className={`text-2xl font-extrabold ${headingText(darkMode)}`}>{value}</h4>
               <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${badge}`}>
                 {dir === "up" && <TrendingUp className="w-3 h-3" />}
                 {dir === "down" && <TrendingDown className="w-3 h-3" />}

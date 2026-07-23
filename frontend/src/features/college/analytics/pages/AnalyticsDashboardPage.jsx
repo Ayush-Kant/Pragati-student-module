@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { BarChart3, RefreshCw, Download } from "lucide-react";
+import { BarChart3, RefreshCw, Download, FileText, LayoutDashboard, PieChart } from "lucide-react";
 
 import { useAnalyticsDashboard } from "../hooks/useAnalyticsDashboard";
 import { useAnalyticsFilters } from "../hooks/useAnalyticsFilters";
@@ -28,6 +28,7 @@ import { ReportFilter } from "../components/filters/ReportFilter";
 
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
 import { ErrorState } from "../components/common/ErrorState";
+import { headingText, subtleText, cardClass } from "../utils/analyticsHelpers";
 
 import {
   placementTrend,
@@ -38,19 +39,19 @@ import {
   studentPerformance,
 } from "../types/analyticsDummyData";
 
-const TABS = ["Overview", "Charts", "Reports"];
+const TABS = [
+  { id: "Overview", icon: LayoutDashboard, label: "Overview" },
+  { id: "Charts", icon: PieChart, label: "Charts" },
+  { id: "Reports", icon: FileText, label: "Reports" },
+];
 
 const AnalyticsDashboardPage = () => {
   const { darkMode } = useOutletContext();
   const { dashboardData, placementData, companyData, departmentData, studentData, loading, error, refresh } = useAnalyticsDashboard();
   const { filters, updateFilterField } = useAnalyticsFilters();
-  const { reportData, loading: reportLoading } = useAnalyticsReports(filters.reportType, filters);
+  const { loading: reportLoading } = useAnalyticsReports(filters.reportType, filters);
 
   const [activeTab, setActiveTab] = useState("Overview");
-
-  const handleExport = (format) => {
-    alert(`Exporting analytics as ${format.toUpperCase()}...`);
-  };
 
   if (loading) {
     return (
@@ -71,62 +72,75 @@ const AnalyticsDashboardPage = () => {
   return (
     <div className="flex flex-col gap-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <BarChart3 className="w-6 h-6 text-blue-600" />
-            <h1 className={`text-2xl font-bold ${darkMode ? "text-white" : "text-[#2D3436]"}`}>Analytics Dashboard</h1>
+      <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b ${
+        darkMode ? "border-[#3D3D3D]" : "border-gray-200"
+      }`}>
+        <div className="flex items-center gap-4">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[#ff6d34] to-[#ff8f66] shadow-lg shadow-orange-500/20`}>
+            <BarChart3 className="w-6 h-6 text-white" />
           </div>
-          <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-            Monitor placement statistics, student analytics, and performance insights.
-          </p>
+          <div>
+            <h1 className={`text-2xl font-extrabold tracking-tight ${headingText(darkMode)}`}>
+              Analytics Dashboard
+            </h1>
+            <p className={`text-sm mt-0.5 ${subtleText(darkMode)}`}>
+              Monitor placement statistics, student analytics, and performance insights.
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={refresh}
-            className={`inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg border transition-all ${
-              darkMode ? "border-[#3D3D3D] text-gray-300 hover:bg-[#2D2D2D]" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl border transition-all ${
+              darkMode
+                ? "border-[#3D3D3D] text-gray-300 hover:bg-[#3D3D3D]"
+                : "border-gray-200 text-gray-600 hover:bg-gray-50"
             }`}
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Refresh
           </button>
           <button
-            onClick={() => handleExport("pdf")}
-            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            onClick={() => alert("Exporting analytics as PDF...")}
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl bg-gradient-to-r from-[#ff6d34] to-[#ff8f66] text-white hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 transition-all duration-200"
           >
             <Download className="w-3.5 h-3.5" />
-            Export
+            Export PDF
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className={`flex gap-1 p-1 rounded-xl w-fit ${darkMode ? "bg-[#2D2D2D]" : "bg-gray-100"}`}>
-        {TABS.map((tab) => (
+      <div className={`flex gap-1 p-1.5 rounded-2xl w-fit ${darkMode ? "bg-[#2D2D2D]" : "bg-gray-100"}`}>
+        {TABS.map(({ id, icon: Icon, label }) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === tab
-                ? "bg-blue-600 text-white shadow-sm"
+            key={id}
+            onClick={() => setActiveTab(id)}
+            className={`flex items-center gap-2 px-5 py-2.5 text-xs font-semibold rounded-xl transition-all duration-200 ${
+              activeTab === id
+                ? darkMode
+                  ? "bg-[#00bea3] text-white shadow-lg shadow-teal-500/20"
+                  : "bg-[#00bea3] text-white shadow-lg shadow-teal-500/25"
                 : darkMode
                 ? "text-gray-400 hover:text-white hover:bg-[#3D3D3D]"
                 : "text-gray-500 hover:text-[#2D3436] hover:bg-white"
             }`}
           >
-            {tab}
+            <Icon className="w-3.5 h-3.5" />
+            {label}
           </button>
         ))}
       </div>
 
       {/* Filters */}
-      <div className={`flex flex-wrap items-center gap-3 p-4 rounded-xl border ${darkMode ? "bg-[#2D2D2D] border-[#3D3D3D]" : "bg-white border-gray-100"}`}>
-        <BatchFilter darkMode={darkMode} value={filters.batch} onChange={(v) => updateFilterField("batch", v)} />
-        <DepartmentFilter darkMode={darkMode} value={filters.department} onChange={(v) => updateFilterField("department", v)} />
-        <CompanyFilter darkMode={darkMode} value={filters.company} onChange={(v) => updateFilterField("company", v)} />
-        <ReportFilter darkMode={darkMode} value={filters.reportType} onChange={(v) => updateFilterField("reportType", v)} />
-        <DateFilter darkMode={darkMode} value={filters.dateRange} onChange={(v) => updateFilterField("dateRange", v)} />
+      <div className={cardClass(darkMode)}>
+        <div className="flex flex-wrap items-center gap-3">
+          <BatchFilter darkMode={darkMode} value={filters.batch} onChange={(v) => updateFilterField("batch", v)} />
+          <DepartmentFilter darkMode={darkMode} value={filters.department} onChange={(v) => updateFilterField("department", v)} />
+          <CompanyFilter darkMode={darkMode} value={filters.company} onChange={(v) => updateFilterField("company", v)} />
+          <ReportFilter darkMode={darkMode} value={filters.reportType} onChange={(v) => updateFilterField("reportType", v)} />
+          <DateFilter darkMode={darkMode} value={filters.dateRange} onChange={(v) => updateFilterField("dateRange", v)} />
+        </div>
       </div>
 
       {/* Content */}
