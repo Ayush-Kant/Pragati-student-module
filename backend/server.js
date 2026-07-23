@@ -1,8 +1,11 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 
-import { connectDB } from "./config/db.js";
+import { connectDB, pool } from "./config/db.js";
 import { initializeLiveSessionModule } from "./src/database/migrations/liveSessionSchema.js";
 import initializeAssignmentModule from "./src/database/migrations/assignmentSchema.js";
 
@@ -55,34 +58,67 @@ import deadlineRoutes from "./src/routes/deadlineRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import studentProfileRouter from "./src/routes/index.js";
 
+// ─── Bootstrap ────────────────────────────────────────────────────────────────
 dotenv.config();
-
-console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(express.json());
+// ─── Security Middleware ───────────────────────────────────────────────────────
 
+// Helmet: sets secure HTTP headers (XSS protection, clickjacking, MIME sniffing, etc.)
+app.use(helmet());
+
+// CORS: dynamic allowlist — localhost in dev, CLIENT_URL in production
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin || origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) {
         return callback(null, true);
       }
-
       const clientUrl = process.env.CLIENT_URL;
       if (clientUrl && origin === clientUrl) {
         return callback(null, true);
       }
-
       return callback(new Error(`CORS policy: origin ${origin} not allowed`));
     },
     credentials: true,
   }),
 );
 
-// Routes
+// ─── General Middleware ────────────────────────────────────────────────────────
+
+// HTTP request logger — "combined" in production (Apache format), "dev" locally
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+
+// Body parser with 10kb limit to prevent payload-bomb attacks
+app.use(express.json({ limit: "10kb" }));
+
+// ─── Rate Limiting ─────────────────────────────────────────────────────────────
+
+// Strict limiter for auth routes — prevents brute-force on login/register
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,                   // 20 attempts per window per IP
+  standardHeaders: true,     // Return rate limit info in RateLimit-* headers
+  legacyHeaders: false,
+  message: { success: false, message: "Too many requests. Please try again later." },
+});
+
+// General API limiter — protects all other endpoints
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many requests. Please try again later." },
+});
+
+app.use("/api/v1/auth", authLimiter);
+app.use("/api/auth",    authLimiter);
+app.use("/api",         generalLimiter);
+
+// ─── Routes ───────────────────────────────────────────────────────────────────
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/live-sessions", liveSessionRoutes);
@@ -127,15 +163,44 @@ app.use("/api/student/assignments", feedbackRoutes);
 app.use("/api/student/assignments", gradeRoutes);
 app.use("/api/student/assignments", deadlineRoutes);
 
+// Health check endpoint (used by Docker HEALTHCHECK and load balancers)
 app.get("/", (req, res) => {
-  res.json({
-    message: "Backend is running",
-  });
+  res.json({ success: true, message: "Backend is running" });
 });
 
 app.use(studentProfileRouter);
+
+// Global error handler — must be registered last
 app.use(errorMiddleware);
 
+// ─── Graceful Shutdown ────────────────────────────────────────────────────────
+
+let server;
+
+const shutdown = async (signal) => {
+  console.log(`\n${signal} received — shutting down gracefully...`);
+  server.close(async () => {
+    try {
+      await pool.end();
+      console.log("✅ PostgreSQL pool closed");
+    } catch (err) {
+      console.error("⚠️  Error closing PostgreSQL pool:", err.message);
+    }
+    console.log("✅ Server closed");
+    process.exit(0);
+  });
+
+  // Force exit if graceful shutdown takes more than 10s
+  setTimeout(() => {
+    console.error("❌ Forced shutdown after timeout");
+    process.exit(1);
+  }, 10_000);
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT",  () => shutdown("SIGINT"));
+
+// ─── Start ────────────────────────────────────────────────────────────────────
 connectDB()
   .then(async () => {
     try {
@@ -152,8 +217,9 @@ connectDB()
       console.error("⚠️ Assignment module initialization failed:", error.message);
     }
 
-    app.listen(PORT, () => {
+    server = app.listen(PORT, () => {
       console.log(`✅ Server running on PORT : ${PORT}`);
+      console.log(`   Environment : ${process.env.NODE_ENV || "development"}`);
     });
   })
   .catch((err) => {

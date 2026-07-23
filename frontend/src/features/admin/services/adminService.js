@@ -1,5 +1,11 @@
 import api from "../../../services/api";
 
+// ─── Feature Flags ────────────────────────────────────────────────────────────
+// Set VITE_USE_MOCK_DATA=true in .env.local for local dev without a backend.
+// NEVER set this to true in production (.env or CI).
+const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === "true";
+const USE_MOCK_LMS  = import.meta.env.VITE_USE_MOCK_LMS  === "true";
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Admin Profile
 // ─────────────────────────────────────────────────────────────────────────────
@@ -286,8 +292,7 @@ export const PIPELINE_STAGES = [
   "selection",
 ];
 
-// Feature Flag: set to false to use real backend APIs (when available)
-const USE_MOCK_DATA = true;
+// Feature Flag: controlled via VITE_USE_MOCK_DATA env variable (see top of file)
 
 export const getDrives = async () => {
   try {
@@ -851,7 +856,7 @@ const mockPrograms = [
   },
 ];
 
-const USE_MOCK_LMS = true;
+// USE_MOCK_LMS: controlled via VITE_USE_MOCK_LMS env variable (see top of file)
 
 export const adminService = {
   async getTrainingAnalytics(programId) {
