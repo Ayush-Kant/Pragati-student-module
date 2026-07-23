@@ -1,15 +1,6 @@
 import * as service from '../services/collegeReports.service.js';
-import { resolveUserIntId } from '../utils/userResolver.js';
-import { pool } from '../config/db.js';
+import { resolveCollegeId } from '../services/collegeContext.service.js';
 import { successResponse, errorResponse } from '../utils/responseHandler.js';
-
-const getCollegeId = async (req) => {
-  const userId = req.user?.userId || req.user?.id;
-  const intUserId = await resolveUserIntId(userId);
-  if (!intUserId) return null;
-  const result = await pool.query('SELECT id FROM colleges WHERE user_id = $1', [intUserId]);
-  return result.rows[0]?.id || null;
-};
 
 const getReports = async (req, res, next) => {
   try { res.status(200).json({ success: true, data: await service.listReports(req.query) }); } catch (error) { next(error); }
@@ -51,7 +42,7 @@ const downloadReport = async (req, res, next) => {
 
 const exportAnalytics = async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) return errorResponse(res, 'College profile not found.', 404);
     const format = req.path.includes('pdf') ? 'pdf' : 'excel';
     const result = await service.exportAnalytics(collegeId, format, req.query.reportType, req.query);
@@ -62,7 +53,7 @@ const exportAnalytics = async (req, res, next) => {
 };
 const getAnalyticsReport = (reportType, message) => async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) return errorResponse(res, 'College profile not found.', 404);
     const result = await service.exportAnalytics(collegeId, 'excel', reportType, req.query);
     return successResponse(res, { report: result.content, filename: result.filename }, message);

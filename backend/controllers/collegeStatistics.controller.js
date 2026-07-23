@@ -2,27 +2,15 @@
  * Location: backend/controllers/collegeStatistics.controller.js
  */
 import * as collegeStatisticsService from "../services/collegeStatistics.service.js";
-import { resolveUserIntId } from "../utils/userResolver.js";
-import { pool } from "../config/db.js";
+import { resolveCollegeId } from '../services/collegeContext.service.js';
 import { successResponse, errorResponse } from "../utils/responseHandler.js";
 
 /**
  * Helper to fetch collegeId from logged-in user
  */
-const getCollegeId = async (req) => {
-  const intUserId = await resolveUserIntId(req.user.userId);
-  if (!intUserId) return null;
-
-  const result = await pool.query(
-    "SELECT id FROM colleges WHERE user_id = $1",
-    [intUserId]
-  );
-  return result.rows[0]?.id || null;
-};
-
 export const getStudentAnalytics = async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) {
       return errorResponse(res, "College profile not found.", 404);
     }
@@ -36,7 +24,7 @@ export const getStudentAnalytics = async (req, res, next) => {
 
 export const getPlacementTrend = async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) {
       return errorResponse(res, "College profile not found.", 404);
     }
@@ -50,7 +38,7 @@ export const getPlacementTrend = async (req, res, next) => {
 
 export const getHiringTrend = async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) {
       return errorResponse(res, "College profile not found.", 404);
     }

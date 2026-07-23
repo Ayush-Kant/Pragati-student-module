@@ -2,29 +2,15 @@
  * Location: backend/controllers/collegeAnalytics.controller.js
  */
 import * as collegeAnalyticsService from "../services/collegeAnalytics.service.js";
-import { resolveUserIntId } from "../utils/userResolver.js";
-import { pool } from "../config/db.js";
+import { resolveCollegeId } from '../services/collegeContext.service.js';
 import { successResponse, errorResponse } from "../utils/responseHandler.js";
 
 /**
  * Helper to fetch collegeId from logged-in user
  */
-const getCollegeId = async (req) => {
-  const intUserId = await resolveUserIntId(req.user.userId);
-  if (!intUserId) return null;
-
-  const result = await pool.query(
-    "SELECT id FROM colleges WHERE user_id = $1",
-    [intUserId]
-  );
-  return result.rows[0]?.id || null;
-};
-
-
-console.log("ENTERED DASHBOARD CONTROLLER");
 export const getDashboardAnalytics = async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) {
       return errorResponse(res, "College profile not found for logged in user.", 404);
     }
@@ -38,7 +24,7 @@ export const getDashboardAnalytics = async (req, res, next) => {
 
 export const getOverviewStatistics = async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) {
       return errorResponse(res, "College profile not found.", 404);
     }
@@ -52,7 +38,7 @@ export const getOverviewStatistics = async (req, res, next) => {
 
 export const getPlacementAnalytics = async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) {
       return errorResponse(res, "College profile not found.", 404);
     }
@@ -66,7 +52,7 @@ export const getPlacementAnalytics = async (req, res, next) => {
 
 export const getCompanyAnalytics = async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) {
       return errorResponse(res, "College profile not found.", 404);
     }
@@ -80,7 +66,7 @@ export const getCompanyAnalytics = async (req, res, next) => {
 
 export const getDepartmentAnalytics = async (req, res, next) => {
   try {
-    const collegeId = await getCollegeId(req);
+    const collegeId = await resolveCollegeId(req.user);
     if (!collegeId) {
       return errorResponse(res, "College profile not found.", 404);
     }

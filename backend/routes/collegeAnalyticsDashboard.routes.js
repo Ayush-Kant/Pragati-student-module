@@ -16,11 +16,7 @@ import collegeAnalyticsValidator from "../validators/collegeAnalytics.validator.
 import collegeStatisticsValidator from "../validators/collegeStatistics.validator.js";
 import collegeReportsValidator from "../validators/collegeReports.validator.js";
 
-console.log("✅ College Analytics Routes Loaded");
-
 const router = express.Router();
-
-console.log("✅ Applying roleMiddleware('college')");
 
 
 // Apply auth and role verification to all analytics endpoints
