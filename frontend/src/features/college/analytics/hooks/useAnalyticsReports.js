@@ -83,5 +83,14 @@ export const useAnalyticsReports = (reportType = 'Overview', activeFilters = {})
     fetchReportData();
   }, [fetchReportData]);
 
-  return\ \{\r\n\ \ \ \ reportData,\r\n\ \ \ \ loading,\r\n\ \ \ \ error,\r\n\ \ \ \ exporting,\r\n\ \ \ \ executeExport,\r\n\ \ \ \ printReportElement,\r\n\ \ \ \ refreshReport:\ fetchReportData,\r\n\ \ \ \ exportReport\r\n\ \ };
+  return {
+    reportData,
+    loading,
+    error,
+    exporting,
+    executeExport,
+    printReportElement,
+    refreshReport: fetchReportData,
+    exportReport
+  };
 };
