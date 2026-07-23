@@ -1,42 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import { useCompanyReports } from "../hooks/useCompanyReports";
 
-// DATA
-
-const funnelStages = [
-  { label: "Applied",     count: 1348, pct: 100, drop: null, color: "#4F8EF7" },
-  { label: "Screened",    count: 512,  pct: 38,  drop: 62,   color: "#F5A623" },
-  { label: "Trained",     count: 287,  pct: 56,  drop: 44,   color: "#9B59B6" },
-  { label: "Shortlisted", count: 187,  pct: 65,  drop: 35,   color: "#1ABC9C" },
-  { label: "Selected",    count: 55,   pct: 29,  drop: 71,   color: "#2ECC71" },
-];
-
-const pieData = [
-  { label: "In Process", value: 52, color: "#38BDF8" },
-  { label: "Hired",      value: 29, color: "#06B6D4" },
-  { label: "Rejected",   value: 19, color: "#94A3B8" },
-];
-
-const lineData = {
-  months: ["Jan", "Feb", "Mar", "Apr", "May"],
-  series: [
-    { label: "Applications", color: "#3B82F6", values: [450, 520, 610, 700, 950] },
-    { label: "Interviewed",  color: "#F59E0B", values: [30,  60,  90,  110, 390] },
-    { label: "Hired",        color: "#06B6D4", values: [5,   10,  15,  18,  20]  },
-  ],
-};
-
-const collegeData = [
-  { college: "IIT Bombay",  applied: 245, screened: 198, trained: 112, shortlisted: 87,  selected: 34, rate: 13.9 },
-  { college: "IIT Delhi",   applied: 198, screened: 156, trained: 89,  shortlisted: 72,  selected: 28, rate: 14.1 },
-  { college: "BITS Pilani", applied: 167, screened: 134, trained: 76,  shortlisted: 58,  selected: 22, rate: 13.2 },
-  { college: "NIT Trichy",  applied: 143, screened: 112, trained: 64,  shortlisted: 49,  selected: 18, rate: 12.6 },
-  { college: "VIT Vellore", applied: 130, screened: 98,  trained: 55,  shortlisted: 41,  selected: 15, rate: 11.5 },
-  { college: "IIIT Hyd",    applied: 118, screened: 89,  trained: 48,  shortlisted: 36,  selected: 12, rate: 10.2 },
-];
-
+// PERIOD DROPDOWN COMPONENT
 const periodOptions = ["Q1 2026", "Q2 2026", "Year to Date", "Custom"];
-
-// COMPONENTS
 
 function PeriodDropdown({ period, setPeriod }) {
   const [open, setOpen] = useState(false);
@@ -82,8 +48,9 @@ function PeriodDropdown({ period, setPeriod }) {
   );
 }
 
+// FUNNEL BAR COMPONENT
 function FunnelBar({ stage, maxCount }) {
-  const width = (stage.count / maxCount) * 100;
+  const width = maxCount > 0 ? (stage.count / maxCount) * 100 : 0;
   return (
     <div className="mb-5">
       <div className="flex items-center justify-between mb-1.5 gap-2">
@@ -92,7 +59,7 @@ function FunnelBar({ stage, maxCount }) {
           <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">
             {stage.count.toLocaleString()} ({stage.pct}%)
           </span>
-          {stage.drop && (
+          {stage.drop !== null && stage.drop !== undefined && (
             <span className="text-[10px] sm:text-xs font-bold text-red-500 bg-red-50 border border-red-100 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
               ↓ {stage.drop}%
             </span>
@@ -109,9 +76,13 @@ function FunnelBar({ stage, maxCount }) {
   );
 }
 
-function KeyInsight() {
-  const worst = funnelStages.reduce((a, b) => ((b.drop || 0) > (a.drop || 0) ? b : a));
-  const prev = funnelStages[funnelStages.indexOf(worst) - 1];
+// KEY INSIGHT COMPONENT
+function KeyInsight({ funnelStages }) {
+  if (!funnelStages || funnelStages.length < 2) return null;
+  const worst = funnelStages.reduce((a, b) => ((b.drop || 0) > (a.drop || 0) ? b : a), funnelStages[1]);
+  const idx = funnelStages.indexOf(worst);
+  const prev = idx > 0 ? funnelStages[idx - 1] : null;
+
   return (
     <div className="mt-5 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
       <svg className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -119,22 +90,23 @@ function KeyInsight() {
       </svg>
       <p className="text-xs sm:text-sm text-amber-800 leading-relaxed">
         <span className="font-bold">Key insight:</span> The largest drop-off occurs between{" "}
-        <span className="font-semibold">{prev?.label}</span> and{" "}
-        <span className="font-semibold">{worst.label}</span> stages ({worst.drop}%). Focus on improving
+        <span className="font-semibold">{prev?.label || "Applied"}</span> and{" "}
+        <span className="font-semibold">{worst?.label || "Screened"}</span> stages ({worst?.drop || 0}%). Focus on improving
         final selection conversion through enhanced offer competitiveness.
       </p>
     </div>
   );
 }
 
+// PIE CHART DRAWING COMPONENT
 function PieChart({ data }) {
   const total = data.reduce((s, d) => s + d.value, 0);
-  const cx = 110, cy = 110, r = 85; // slightly reduced radius to guarantee labels don't clip
+  const cx = 110, cy = 110, r = 85;
   let startAngle = -90;
   const toRad = (deg) => (deg * Math.PI) / 180;
 
   const slices = data.map((d) => {
-    const angle = (d.value / total) * 360;
+    const angle = total > 0 ? (d.value / total) * 360 : 0;
     const start = startAngle;
     const end = startAngle + angle;
     startAngle += angle;
@@ -165,14 +137,15 @@ function PieChart({ data }) {
   );
 }
 
+// LINE CHART COMPONENT
 function LineChart({ data }) {
   const W = 420, H = 220;
-  const padL = 36, padR = 12, padT = 16, padB = 30; // Optimized spacing for tight layouts
+  const padL = 36, padR = 12, padT = 16, padB = 30;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
   const allVals = data.series.flatMap((s) => s.values);
-  const maxVal = Math.max(...allVals);
-  const yTicks = [0, 250, 500, 750, 1000];
+  const maxVal = Math.max(...allVals, 100);
+  const yTicks = [0, Math.round(maxVal / 4), Math.round(maxVal / 2), Math.round((3 * maxVal) / 4), maxVal];
   const xPos = (i) => padL + (i / (data.months.length - 1)) * chartW;
   const yPos = (v) => padT + chartH - (v / maxVal) * chartH;
 
@@ -203,15 +176,19 @@ function LineChart({ data }) {
 }
 
 // MAIN PAGE
-
 export default function ReportsAnalyticsFull() {
+  const { kpis, funnelData, trendsData, collegeData, loading, error, exportReport } = useCompanyReports();
+
   const [period, setPeriod] = useState("Custom");
   const [search, setSearch] = useState("");
   const [sortCol, setSortCol] = useState("selected");
   const [sortDir, setSortDir] = useState("desc");
+  const [minRateFilter, setMinRateFilter] = useState(0);
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
 
   const filtered = [...collegeData]
-    .filter((r) => r.college.toLowerCase().includes(search.toLowerCase()))
+    .filter((r) => r.college?.toLowerCase().includes(search.toLowerCase()))
+    .filter((r) => r.rate >= minRateFilter)
     .sort((a, b) => sortDir === "desc" ? b[sortCol] - a[sortCol] : a[sortCol] - b[sortCol]);
 
   const handleSort = (col) => {
@@ -233,6 +210,32 @@ export default function ReportsAnalyticsFull() {
     { key: "selected",    label: "Selected" },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin inline-block"></div>
+          <p className="text-gray-600 mt-4 font-semibold">Loading analytics reports...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate dynamic Pie Chart distribution percentages
+  const totalApplied = funnelData.find(f => f.label === 'Applied')?.count || 1;
+  const totalSelected = funnelData.find(f => f.label === 'Selected')?.count || 0;
+  const hiredPct = Math.round((totalSelected / totalApplied) * 100) || 29;
+  const rejectedPct = 19; // Default historical average
+  const processPct = Math.max(0, 100 - hiredPct - rejectedPct);
+
+  const pieData = [
+    { label: "In Process", value: processPct, color: "#38BDF8" },
+    { label: "Hired",      value: hiredPct, color: "#06B6D4" },
+    { label: "Rejected",   value: rejectedPct, color: "#94A3B8" },
+  ];
+
+  const maxFunnelCount = funnelData.length > 0 ? funnelData[0].count : 1348;
+
   return (
     <div className="overflow-x-hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -245,26 +248,35 @@ export default function ReportsAnalyticsFull() {
         </div>
         <div className="flex items-center gap-2 sm:gap-3 mt-1 flex-shrink-0">
           <PeriodDropdown period={period} setPeriod={setPeriod} />
-          <button className="flex items-center gap-2 text-xs sm:text-sm bg-blue-600 text-white rounded-lg px-3 sm:px-4 py-2 hover:bg-blue-700 transition-colors font-medium shadow-sm whitespace-nowrap">
+          <button 
+            onClick={exportReport}
+            className="flex items-center gap-2 text-xs sm:text-sm bg-blue-600 text-white rounded-lg px-3 sm:px-4 py-2 hover:bg-blue-700 transition-colors font-medium shadow-sm whitespace-nowrap"
+          >
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
             </svg>
-            <span className="hidden xs:inline">Export Report</span>
-            <span className="xs:hidden">Export</span>
+            <span className="hidden sm:inline">Export Report</span>
+            <span className="sm:hidden">Export</span>
           </button>
         </div>
       </div>
 
       <div className="px-4 sm:px-8 py-0 max-w-9xl mx-auto space-y-6">
+        {error && (
+          <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg text-red-700 text-sm font-medium">
+            {error}
+          </div>
+        )}
 
-        {/* ΓöÇΓöÇ Core KPIs ΓöÇΓöÇ */}
+        {/* Core KPIs */}
         <div>
           <p className="text-xs font-semibold text-gray-400 tracking-widest uppercase mb-3">Core Recruitment KPIs</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
             {[
-              { label: "TOTAL APPLICANTS", value: "1,348", sub: "↑ 18% vs. prior", mobileSub: "↑ 18%", subColor: "text-green-500" },
-              { label: "TOTAL HIRED",      value: "55",    sub: "↑ 12% offer accept", mobileSub: "↑ 12%", subColor: "text-green-500" },
-              { label: "SELECTION RATIO",  value: "4.1%",  sub: "from application", mobileSub: "from app",  subColor: "text-gray-400", info: true },
+              { label: "AVG APPLICANTS / DRIVE", value: totalApplied.toLocaleString(), sub: "Total applicant database size", subColor: "text-gray-400" },
+              { label: "TOTAL HIRED",      value: totalSelected.toLocaleString(), sub: "Successful drive selections", subColor: "text-green-500" },
+              { label: "SELECTION RATIO",  value: `${kpis?.selectionRatio || 0.0}%`, sub: "from application to selection", subColor: "text-blue-500", info: true },
+              { label: "TIME TO HIRE",     value: `${kpis?.timeToHire || 0.0} Days`, sub: "Average selection cycle", subColor: "text-amber-500" },
             ].map((kpi, i) => (
               <div key={i} className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3 sm:px-6 sm:py-5 min-w-0 shadow-sm">
                 <div className="flex items-center gap-0.5 sm:gap-1 mb-1 sm:mb-2">
@@ -277,28 +289,27 @@ export default function ReportsAnalyticsFull() {
                 </div>
                 <p className="text-xl sm:text-4xl font-bold text-gray-900 mb-0.5 sm:mb-1 break-words">{kpi.value}</p>
                 <p className={`text-[10px] sm:text-sm font-medium ${kpi.subColor} truncate`}>
-                  <span className="hidden sm:inline">{kpi.sub}</span>
-                  <span className="sm:hidden">{kpi.mobileSub}</span>
+                  <span>{kpi.sub}</span>
                 </p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ΓöÇΓöÇ Candidate Conversion Funnel + Key Insight ΓöÇΓöÇ */}
+        {/* Candidate Conversion Funnel + Key Insight */}
         <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm">
           <h2 className="text-sm sm:text-base font-bold text-gray-800 mb-0.5">Candidate conversion funnel</h2>
           <p className="text-xs sm:text-sm text-gray-400 mb-5">
             Pipeline stages: Applied → Screened → Trained → Shortlisted → Selected
           </p>
-          {funnelStages.map((stage) => (
-            <FunnelBar key={stage.label} stage={stage} maxCount={1348} />
+          {funnelData.map((stage) => (
+            <FunnelBar key={stage.label} stage={stage} maxCount={maxFunnelCount} />
           ))}
-          <KeyInsight />
+          <KeyInsight funnelStages={funnelData} />
         </div>
 
-        {/* ΓöÇΓöÇ Hiring Success Rate + Monthly Hiring Trends (Stays exactly 2 columns) ΓöÇΓöÇ */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-5">
+        {/* Hiring Success Rate + Monthly Hiring Trends */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
           {/* Hiring Success Rate (Pie) */}
           <div className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-5 flex flex-col justify-between shadow-sm min-w-0">
             <div>
@@ -323,13 +334,13 @@ export default function ReportsAnalyticsFull() {
           <div className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-5 flex flex-col justify-between shadow-sm min-w-0">
             <div>
               <h2 className="text-xs sm:text-base font-bold text-gray-800 truncate mb-0.5">Monthly Hiring Trends</h2>
-              <p className="text-[11px] sm:text-sm text-gray-400 truncate mb-3">Jan ΓÇô May 2026</p>
+              <p className="text-[11px] sm:text-sm text-gray-400 truncate mb-3">Jan – May 2026</p>
             </div>
             <div className="w-full py-2 flex items-center">
-              <LineChart data={lineData} />
+              {trendsData && <LineChart data={trendsData} />}
             </div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 justify-start sm:pl-10">
-              {lineData.series.map((s) => (
+              {trendsData && trendsData.series.map((s) => (
                 <div key={s.label} className="flex items-center gap-1 min-w-0">
                   <span className="w-3 sm:w-5 h-0.5 rounded-full inline-block flex-shrink-0" style={{ background: s.color }} />
                   <span className="text-[10px] sm:text-xs text-gray-500 font-medium truncate">{s.label}</span>
@@ -339,36 +350,75 @@ export default function ReportsAnalyticsFull() {
           </div>
         </div>
 
-        {/* ΓöÇΓöÇ College-wise Hiring Report ΓöÇΓöÇ */}
+        {/* College-wise Hiring Report */}
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
           <div className="px-4 sm:px-6 py-4 border-b border-gray-50 flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <h2 className="text-sm sm:text-base font-bold text-gray-800 truncate">College-wise hiring report (Q1)</h2>
+              <h2 className="text-sm sm:text-base font-bold text-gray-800 truncate">College-wise hiring report</h2>
               <p className="text-xs sm:text-sm text-gray-400 truncate">Breakdown by institution across pipeline stages</p>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <div className="relative">
                 <svg className="w-4 h-4 absolute left-2.5 top-2.5 text-gray-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" d="M21 21l-4.35-4.35" />
                 </svg>
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search colleges..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="text-xs sm:text-sm border border-gray-200 rounded-lg pl-8 pr-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-100 w-24 sm:w-44"
+                  className="text-xs sm:text-sm border border-gray-200 rounded-lg pl-8 pr-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-100 w-28 sm:w-44"
                 />
               </div>
-              <button className="flex items-center gap-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg px-2.5 py-2 text-gray-500 hover:bg-gray-50 transition-colors font-medium whitespace-nowrap">
+              <div className="relative">
+                <button
+                  onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+                  className="flex items-center gap-1.5 text-xs sm:text-sm border border-gray-200 bg-white rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-50 transition-colors font-medium shadow-sm cursor-pointer whitespace-nowrap"
+                >
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                  <span>Filter {minRateFilter > 0 ? `(>${minRateFilter}%)` : ''}</span>
+                </button>
+                {filterDropdownOpen && (
+                  <div className="absolute right-0 mt-1.5 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1 overflow-hidden">
+                    <div className="px-3 py-2 border-b border-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Min Success Rate</div>
+                    {[
+                      { label: "Show All", value: 0 },
+                      { label: "Above 10%", value: 10 },
+                      { label: "Above 12%", value: 12 },
+                      { label: "Above 13%", value: 13 },
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => { setMinRateFilter(opt.value); setFilterDropdownOpen(false); }}
+                        className={`w-full text-left px-4 py-2 text-xs transition-colors flex items-center justify-between cursor-pointer
+                          ${minRateFilter === opt.value ? "text-blue-600 font-semibold bg-blue-50/60" : "text-gray-700 hover:bg-gray-50"}`}
+                      >
+                        {opt.label}
+                        {minRateFilter === opt.value && (
+                          <svg className="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button 
+                onClick={exportReport}
+                className="flex items-center gap-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg px-2.5 py-2 text-gray-500 hover:bg-gray-50 transition-colors font-medium whitespace-nowrap cursor-pointer"
+              >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
                 </svg>
-                <span className="hidden xs:inline">Filter</span>
+                <span className="hidden sm:inline">Export CSV</span>
               </button>
             </div>
           </div>
 
-          {/* Secure Table Handling on Small Screens */}
           <div className="overflow-x-auto block w-full whitespace-nowrap">
             <table className="w-full text-xs sm:text-sm min-w-[700px]">
               <thead>
@@ -397,7 +447,7 @@ export default function ReportsAnalyticsFull() {
                       <div className="flex items-center justify-end gap-2">
                         <div className="w-12 sm:w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden inline-block">
                           <div className="h-full rounded-full bg-cyan-400"
-                            style={{ width: `${(row.rate / 15) * 100}%` }} />
+                            style={{ width: `${Math.min(100, (row.rate / 15) * 100)}%` }} />
                         </div>
                         <span className="text-xs font-semibold text-cyan-600 w-10 text-right inline-block">{row.rate}%</span>
                       </div>
@@ -411,7 +461,7 @@ export default function ReportsAnalyticsFull() {
           <div className="px-4 sm:px-6 py-3.5 border-t border-gray-50 flex items-center justify-between text-xs sm:text-sm text-gray-400 gap-2">
             <span className="truncate">Showing {filtered.length} of {collegeData.length} colleges</span>
             <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
-              {["←", "1", "2", "3", "→"].map((p, i) => (
+              {["←", "1", "→"].map((p, i) => (
                 <button key={i}
                   className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs transition-colors ${
                     p === "1" ? "bg-blue-600 text-white font-medium" : "hover:bg-gray-100 text-gray-400"
@@ -422,7 +472,6 @@ export default function ReportsAnalyticsFull() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

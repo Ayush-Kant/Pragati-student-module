@@ -1,11 +1,59 @@
-# 📚 API Documentation — Module 6: Training Coordination
+# Live Session API Documentation
+
+## Base URL
+http://localhost:5000/api/student/live-sessions
+
+## Authentication
+All routes require a Bearer JWT token with the `student` role.
+
+## Endpoints
+
+### Live Sessions
+- GET /api/student/live-sessions
+- GET /api/student/live-sessions/:id
+- POST /api/student/live-sessions/:id/join
+- POST /api/student/live-sessions/:id/leave
+
+### Attendance
+- GET /api/student/live-sessions/attendance
+- POST /api/student/live-sessions/:id/attendance
+- PATCH /api/student/live-sessions/:id/attendance
+
+### Recordings
+- GET /api/student/live-sessions/recordings
+- GET /api/student/live-sessions/recordings/:id
+
+### Participants
+- GET /api/student/live-sessions/:id/participants
+- POST /api/student/live-sessions/:id/participants
+- DELETE /api/student/live-sessions/:id/participants/:participantId
+
+### Schedules
+- GET /api/student/live-sessions/schedules
+- GET /api/student/live-sessions/upcoming
+
+## Sample Payloads
+
+### Attendance
+{
+  "status": "Present"
+}
+
+### Participant
+{
+  "studentId": 101
+}
+
+---
+
+# ?? API Documentation � Module 6: Training Coordination
 
 **Base URL:** `http://localhost:5000/api/v1/company/training`  
 **Auth:** All endpoints require `Authorization: Bearer <JWT_TOKEN>` header
 
 ---
 
-## 🔐 Authentication
+## ?? Authentication
 
 All endpoints are protected by JWT authentication.  
 JWT token is obtained from the `/api/v1/auth/login` endpoint.
@@ -18,26 +66,26 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 **Error Responses:**
 | Status | Message |
 |--------|---------|
-| 401 | `"Invalid or expired JWT token"` |
-| 403 | `"Access denied. Insufficient permissions."` |
+| 401 | "Invalid or expired JWT token" |
+| 403 | "Access denied. Insufficient permissions." |
 
 ---
 
-## 📋 Endpoints
+## ?? Endpoints
 
 ---
 
 ### 1. GET `/api/v1/company/training`
 
 **Description:** List all training programs for the authenticated company.  
-**Auth Required:** ✅ Yes  
+**Auth Required:** ? Yes  
 **Target Response Time:** < 500ms
 
 **Query Parameters:**
 
 | Parameter | Type   | Required | Default | Description            |
 |-----------|--------|----------|---------|------------------------|
-| status    | string | No       | —       | Filter by status: `ACTIVE`, `COMPLETED`, `PAUSED`, `CANCELLED` |
+| status    | string | No       | �       | Filter by status: `ACTIVE`, `COMPLETED`, `PAUSED`, `CANCELLED` |
 | limit     | number | No       | 10      | Max results per page   |
 | offset    | number | No       | 0       | Number of results to skip |
 
@@ -86,7 +134,7 @@ curl -X GET "http://localhost:5000/api/v1/company/training?status=ACTIVE&limit=1
 ### 2. GET `/api/v1/company/training/:id`
 
 **Description:** Get detailed information for a specific training program.  
-**Auth Required:** ✅ Yes  
+**Auth Required:** ? Yes  
 **Target Response Time:** < 300ms
 
 **Path Parameters:**
@@ -136,7 +184,7 @@ curl -X GET "http://localhost:5000/api/v1/company/training/T101" \
 ### 3. PATCH `/api/v1/company/training/:id/assign-mentor`
 
 **Description:** Assign a mentor to a training program.  
-**Auth Required:** ✅ Yes  
+**Auth Required:** ? Yes  
 **Target Response Time:** < 400ms
 
 **Path Parameters:**
@@ -185,7 +233,7 @@ curl -X PATCH "http://localhost:5000/api/v1/company/training/T101/assign-mentor"
 ### 4. GET `/api/v1/company/training/:id/progress`
 
 **Description:** Get comprehensive analytics and progress data for a training program.  
-**Auth Required:** ✅ Yes  
+**Auth Required:** ? Yes  
 **Target Response Time:** < 600ms
 
 **Path Parameters:**
@@ -211,35 +259,11 @@ curl -X GET "http://localhost:5000/api/v1/company/training/T101/progress" \
     "completionPercentage": 0,
     "attendanceRate": 100,
     "assignmentSubmissions": {
-      "completed": 1,
+      "submitted": 0,
       "pending": 0
-    },
-    "engagementScore": 5,
-    "performanceMetrics": {
-      "average": 100,
-      "highest": 100,
-      "lowest": 100
-    },
-    "mentorFeedback": "Good progress overall, candidate is grasping concepts well",
-    "atRiskCandidates": []
+    }
   }
 }
-```
-
-**Analytics Fields Explained:**
-
-| Field | Formula/Description |
-|-------|---------------------|
-| `completionPercentage` | % of candidates with status `COMPLETED` |
-| `attendanceRate` | Average attendance across all enrolled candidates |
-| `assignmentSubmissions` | Count of completed vs pending assignment scores |
-| `engagementScore` | Average engagement score across all candidates |
-| `performanceMetrics` | Average/highest/lowest readiness scores |
-| `atRiskCandidates` | Candidate IDs with readiness score < 50 |
-
-**Readiness Score Formula:**
-```
-readinessScore = (attendance × 0.3) + (assignmentScore × 0.4) + (engagementScore × 0.3)
 ```
 
 **Error Responses:**
@@ -251,38 +275,7 @@ readinessScore = (attendance × 0.3) + (assignmentScore × 0.4) + (engagementSco
 
 ---
 
-## 📊 Data Models
-
-### Training Status Enum
-```
-ACTIVE | COMPLETED | PAUSED | CANCELLED
-```
-
-### Candidate Progress Status Enum
-```
-ENROLLED | IN_PROGRESS | COMPLETED | DROPPED
-```
-
-### Mentor Feedback Rating
-```
-Integer from 1 to 5
-```
-
----
-
-## 🚨 Standard Error Response Format
-
-All error responses follow this format:
-```json
-{
-  "success": false,
-  "message": "Human-readable error description"
-}
-```
-
----
-
-## 🧪 Quick Test Reference
+## ?? Quick Test Reference
 
 ```bash
 # Get auth token first

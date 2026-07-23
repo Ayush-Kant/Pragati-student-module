@@ -1,4 +1,5 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from "@sequelize/core";
+import { PostgresDialect } from "@sequelize/postgres";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -6,21 +7,23 @@ dotenv.config();
 const connectionString = process.env.POSTGRESQL_URI || "";
 
 if (!connectionString) {
-  console.warn("⚠️ Warning: POSTGRESQL_URI environment variable is not defined.");
+  console.warn(
+    "⚠️ Warning: POSTGRESQL_URI environment variable is not defined.",
+  );
 }
 
-export const sequelize = new Sequelize(connectionString, {
-  dialect: "postgres",
-  logging: false, // Set to console.log if you need query debugging
-  dialectOptions: {
-    ssl:
-      process.env.NODE_ENV === "production"
-        ? { rejectUnauthorized: true }
-        : false,
-  },
+export const sequelize = new Sequelize({
+  dialect: PostgresDialect,
+  url: connectionString,
+  logging: false,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: true }
+      : false,
+
   define: {
     timestamps: true,
-    underscored: true, // Map camelCase properties in Sequelize models to snake_case in tables
+    underscored: true,
   },
 });
 

@@ -5,9 +5,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
 
-
 // ── Student Module ───────────────────────────────────────────────────────────
-import { AuthProvider} from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import VerificationPage from './features/student/pages/public/VerificationPage';
 import StudentRoutes from "./features/student/routes/StudentRoutes";
 import AdminRoute from "./features/admin/routes/AdminRoutes";
@@ -21,10 +20,9 @@ function App() {
     <AuthProvider>
       <Toaster />
       <Routes>
-        
         <Route path="/" element={<Navigate to="/login" replace />} />
         
-        {/* ── Auth Routes ────────────────────────────────────────── */}
+        {/* ── Auth Routes ── */}
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
 
@@ -32,22 +30,17 @@ function App() {
         {mentorRoute}
 
         {/* ── Admin ─────────────────────────────────────────────────── */}
-       
         {AdminRoute}
 
         {/* ── Student ───────────────────────────────────────────────── */}
         {StudentRoutes}
 
-      {/* Collge */}
+        {/* ── College ── */}
+        {collegeRoute}
 
-      {collegeRoute}
+        {/* ── Company ── */}
+        {CompanyRoute}
 
-
-  {/* Company */}
-
-      {CompanyRoute}
-
-      
         {/* Public certificate verification */}
         <Route path='/verify/:code' element={<VerificationPage />} />
 
