@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   getPlacementDrives,
   createPlacementDrive,
@@ -12,9 +12,10 @@ const usePlacementDrives = () => {
   const [error, setError] = useState("");
 
   // Fetch all drives
-  const fetchDrives = async () => {
+  const fetchDrives = useCallback(async () => {
     try {
       setLoading(true);
+      setError("");
 
       const response = await getPlacementDrives();
 
@@ -28,50 +29,61 @@ const usePlacementDrives = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Create drive
   const addDrive = async (drive) => {
-    const response = await createPlacementDrive(drive);
-
-    if (response.success) {
-      setDrives((prev) => [...prev, response.data]);
+    try {
+      const response = await createPlacementDrive(drive);
+      if (response.success && response.data) {
+        setDrives((prev) => [response.data, ...prev]);
+      }
+      return response;
+    } catch (err) {
+      console.error("Error creating placement drive:", err);
+      return { success: false, error: err.message };
     }
-
-    return response;
   };
 
   // Update drive
   const editDrive = async (id, updatedDrive) => {
-    const response = await updatePlacementDrive(id, updatedDrive);
+    try {
+      const response = await updatePlacementDrive(id, updatedDrive);
 
-    if (response.success) {
-      setDrives((prev) =>
-        prev.map((drive) =>
-          drive.id === id ? response.data : drive
-        )
-      );
+      if (response.success && response.data) {
+        setDrives((prev) =>
+          prev.map((drive) =>
+            drive.id === id ? response.data : drive
+          )
+        );
+      }
+      return response;
+    } catch (err) {
+      console.error("Error updating placement drive:", err);
+      return { success: false, error: err.message };
     }
-
-    return response;
   };
 
   // Delete drive
   const removeDrive = async (id) => {
-    const response = await deletePlacementDrive(id);
+    try {
+      const response = await deletePlacementDrive(id);
 
-    if (response.success) {
-      setDrives((prev) =>
-        prev.filter((drive) => drive.id !== id)
-      );
+      if (response.success) {
+        setDrives((prev) =>
+          prev.filter((drive) => drive.id !== id)
+        );
+      }
+      return response;
+    } catch (err) {
+      console.error("Error deleting placement drive:", err);
+      return { success: false, error: err.message };
     }
-
-    return response;
   };
 
   useEffect(() => {
     fetchDrives();
-  }, []);
+  }, [fetchDrives]);
 
   return {
     drives,
@@ -84,4 +96,4 @@ const usePlacementDrives = () => {
   };
 };
 
-export default usePlacementDrives;
+export default usePlacementDrives;

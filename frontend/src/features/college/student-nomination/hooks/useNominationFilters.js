@@ -1,46 +1,86 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from "react";
+import { searchStudents } from "../utils/studentNominationHelpers";
 
-const useNominationFilters = (students = []) => {
-  const [search, setSearch] = useState('')
-  const [company, setCompany] = useState('All')
-  const [department, setDepartment] = useState('All')
-  const [status, setStatus] = useState('All')
-  const [batch, setBatch] = useState('All')
 
-  const filtered = useMemo(() => {
-    return students.filter((s) => {
-      const matchSearch =
-        !search ||
-        s.name?.toLowerCase().includes(search.toLowerCase()) ||
-        s.enrollmentNo?.toLowerCase().includes(search.toLowerCase()) ||
-        s.enrollment_no?.toLowerCase().includes(search.toLowerCase())
+const useNominationFilters = (students = [], pageSize = 8) => {
+  // Functional Filtering State Configurations
+  const [searchQuery, setSearchQuery] = useState("");
+  const [company, setCompany] = useState("All");
+  const [department, setDepartment] = useState("All");
+  const [batch, setBatch] = useState("All");
+  const [status, setStatus] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
 
-      const matchCompany = company === 'All' || s.company === company || s.company_name === company
-      const matchDept = department === 'All' || s.department === department
-      const matchStatus = status === 'All' || s.status === status || s.placementStatus === status
-      const matchBatch = batch === 'All' || s.batch === batch
+  const hasSearched = searchQuery.trim().length > 0;
 
-      return matchSearch && matchCompany && matchDept && matchStatus && matchBatch
-    })
-  }, [students, search, company, department, status, batch])
+  const filteredStudents = useMemo(() => {
+
+    const searchedStudents = searchStudents(students, searchQuery);
+
+    return searchedStudents.filter((student) => {
+      const matchesCompany =
+  company === "All" ||
+  student.company === company ||
+  student.company_name === company;
+
+const matchesDepartment =
+  department === "All" ||
+  student.department === department;
+
+const matchesBatch =
+  batch === "All" ||
+  student.batch === batch;
+
+const matchesStatus =
+  status === "All" ||
+  student.status === status ||
+  student.placementStatus === status;
+
+      return matchesCompany && matchesDepartment && matchesBatch && matchesStatus;
+    });
+  }, [students, searchQuery, company, department, batch, status]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, company, department, batch, status]);
+
+  const totalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(filteredStudents.length / pageSize));
+  }, [filteredStudents, pageSize]);
+
+  const paginatedStudents = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredStudents.slice(start, start + pageSize);
+  }, [filteredStudents, currentPage, pageSize]);
 
   const resetFilters = () => {
-    setSearch('')
-    setCompany('All')
-    setDepartment('All')
-    setStatus('All')
-    setBatch('All')
-  }
+    setSearchQuery("");
+    setCompany("All");
+    setDepartment("All");
+    setBatch("All");
+    setStatus("All");
+    setCurrentPage(1);
+  };
 
   return {
-    search, setSearch,
-    company, setCompany,
-    department, setDepartment,
-    status, setStatus,
-    batch, setBatch,
-    filtered,
+    searchQuery,
+    setSearchQuery,
+    hasSearched,
+    company,
+    setCompany,
+    department,
+    setDepartment,
+    batch,
+    setBatch,
+    status,
+    setStatus,
     resetFilters,
-  }
-}
+    filteredStudents,
+    paginatedStudents,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+  };
+};
 
-export default useNominationFilters
+export default useNominationFilters;

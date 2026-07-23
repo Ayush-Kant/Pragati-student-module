@@ -22,14 +22,11 @@ created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
-
-
 -- INDEXES
 CREATE INDEX idx_students_status       ON students(status);
 CREATE INDEX idx_students_college      ON students(college_id);
 CREATE INDEX idx_students_name         ON students(name);
 CREATE INDEX idx_students_skills       ON students USING GIN(skills);
-
 
 INSERT INTO students (
     name,
@@ -73,7 +70,4 @@ VALUES
     'blocked'
 );
 
-
 SELECT * FROM students;
-
-

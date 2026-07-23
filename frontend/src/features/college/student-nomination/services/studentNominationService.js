@@ -1,95 +1,152 @@
-import api from '../../../../services/api.js'
+import api from "../../../../services/api";
 import {
   eligibleStudents,
   nominatedStudents,
-} from '../types/studentNominationDummyData.js'
+} from "../types/studentNominationDummyData";
 
-const USE_DUMMY = false
+const USE_DUMMY = false;
 
 export const getEligibleStudents = async (params = {}) => {
-  if (USE_DUMMY) return { success: true, data: eligibleStudents }
+  if (USE_DUMMY) {
+    return { success: true, data: eligibleStudents };
+  }
+
   try {
-    const response = await api.get('/nominations/eligible', { params })
+    const response = await api.get("/nominations/eligible", { params });
     return {
       success: true,
       data: response.data.data,
       pagination: response.data.pagination,
-    }
+    };
   } catch (err) {
-    console.warn('API failed, using dummy data')
-    return { success: true, data: eligibleStudents }
+    console.error("Error fetching eligible students:", err);
+    return { success: true, data: eligibleStudents };
   }
-}
+};
 
 export const getNominations = async (params = {}) => {
-  if (USE_DUMMY) return { success: true, data: nominatedStudents }
+  if (USE_DUMMY) {
+    return { success: true, data: nominatedStudents };
+  }
+
   try {
-    const response = await api.get('/nominations', { params })
+    const response = await api.get("/nominations", { params });
     return {
       success: true,
       data: response.data.data,
       pagination: response.data.pagination,
-    }
+    };
   } catch (err) {
-    console.warn('API failed, using dummy data')
-    return { success: true, data: nominatedStudents }
+    console.error("Error fetching nominations:", err);
+    return { success: true, data: nominatedStudents };
   }
-}
+};
 
 export const getShortlistedStudents = async (params = {}) => {
   try {
-    const response = await api.get('/shortlists', { params })
+    const response = await api.get("/shortlists", { params });
     return {
       success: true,
       data: response.data.data,
       pagination: response.data.pagination,
-    }
+    };
   } catch (err) {
-    return { success: false, message: err.response?.data?.message || 'Failed to fetch shortlists', data: [] }
+    return {
+      success: false,
+      message:
+        err.response?.data?.message || "Failed to fetch shortlisted students",
+      data: [],
+    };
   }
-}
+};
 
 export const nominateStudent = async (data) => {
   try {
-    const response = await api.post('/nominations', data)
-    return { success: true, data: response.data.data }
+    const response = await api.post("/nominations", data);
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
   } catch (err) {
-    return { success: false, message: err.response?.data?.message || 'Failed to nominate student' }
+    return {
+      success: false,
+      message:
+        err.response?.data?.message || "Failed to nominate student",
+    };
   }
-}
+};
 
 export const updateNomination = async (id, data) => {
   try {
-    const response = await api.put(`/nominations/${id}`, data)
-    return { success: true, data: response.data.data }
+    const response = await api.put(`/nominations/${id}`, data);
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
   } catch (err) {
-    return { success: false, message: err.response?.data?.message || 'Failed to update nomination' }
+    return {
+      success: false,
+      message:
+        err.response?.data?.message || "Failed to update nomination",
+    };
   }
-}
+};
 
 export const removeNomination = async (id) => {
   try {
-    const response = await api.delete(`/nominations/${id}`)
-    return { success: true, message: response.data.message }
+    const response = await api.delete(`/nominations/${id}`);
+    return {
+      success: true,
+      message: response.data.message,
+    };
   } catch (err) {
-    return { success: false, message: err.response?.data?.message || 'Failed to remove nomination' }
+    return {
+      success: false,
+      message:
+        err.response?.data?.message || "Failed to remove nomination",
+    };
   }
-}
+};
 
-export const getCompanyShortlist = async (companyId, params = {}) => {
+export const getCompanyShortlist = async (
+  companyId,
+  params = {}
+) => {
   try {
-    const response = await api.get(`/shortlists/company/${companyId}`, { params })
-    return { success: true, data: response.data.data }
+    const response = await api.get(
+      `/shortlists/company/${companyId}`,
+      { params }
+    );
+
+    return {
+      success: true,
+      data: response.data.data,
+    };
   } catch (err) {
-    return { success: false, message: err.response?.data?.message || 'Failed to fetch company shortlist', data: [] }
+    return {
+      success: false,
+      message:
+        err.response?.data?.message ||
+        "Failed to fetch company shortlist",
+      data: [],
+    };
   }
-}
+};
 
 export const getNominationStatistics = async () => {
   try {
-    const response = await api.get('/nominations/statistics')
-    return { success: true, data: response.data.data }
+    const response = await api.get("/nominations/statistics");
+
+    return {
+      success: true,
+      data: response.data.data,
+    };
   } catch (err) {
-    return { success: false, data: null }
+    return {
+      success: false,
+      data: null,
+    };
   }
-}
+};

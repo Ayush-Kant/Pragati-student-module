@@ -1,47 +1,45 @@
-import { Check, Clock3, X } from "lucide-react";
+import { Check, Clock3, X, BadgeCheck } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
-
-const statusFlow = [
-  {
-    key: "nominated",
-    label: "Nominated",
-  },
-  {
-    key: "waiting",
-    label: "Waiting",
-  },
-  {
-    key: "shortlisted",
-    label: "Shortlisted",
-  },
-  {
-    key: "rejected",
-    label: "Rejected",
-  },
-];
 
 const NominationStatus = ({ status, timeline = {} }) => {
   const { darkMode } = useOutletContext();
 
-  const getStatusState = (stepLabel) => {
+  // 1. COMPLETELY ISOLATED PATHS: A candidate can never be both Shortlisted and Rejected
+  const getStatusFlow = () => {
+    const baseFlow = [
+      { key: "nominated", label: "Nominated" },
+      { key: "waiting", label: "Waiting" },
+    ];
+
     if (status === "Rejected") {
-      if (stepLabel === "Rejected") return "current";
-
-      if (stepLabel === "Nominated" || stepLabel === "Waiting") {
-        return "completed";
-      }
-
-      return "upcoming";
+      return [...baseFlow, { key: "rejected", label: "Rejected" }];
+    }
+    
+    if (status === "Selected") {
+      return [
+        ...baseFlow,
+        { key: "shortlisted", label: "Shortlisted" },
+        { key: "selected", label: "Selected" },
+      ];
     }
 
-    const labels = statusFlow.map((item) => item.label);
+    if (status === "Shortlisted") {
+      return [...baseFlow, { key: "shortlisted", label: "Shortlisted" }];
+    }
 
+    // Default fallback line for "Nominated" or "Waiting" statuses
+    return baseFlow;
+  };
+
+  const currentFlow = getStatusFlow();
+
+  const getStatusState = (stepLabel) => {
+    const labels = currentFlow.map((item) => item.label);
     const currentIndex = labels.indexOf(status);
     const stepIndex = labels.indexOf(stepLabel);
 
     if (stepIndex < currentIndex) return "completed";
     if (stepIndex === currentIndex) return "current";
-
     return "upcoming";
   };
 
@@ -57,17 +55,20 @@ const NominationStatus = ({ status, timeline = {} }) => {
         );
 
       case "current":
+        let bgClass = "bg-amber-500";
+        let Icon = Clock3;
+
+        if (stepLabel === "Rejected") {
+          bgClass = "bg-red-500";
+          Icon = X;
+        } else if (stepLabel === "Selected") {
+          bgClass = "bg-emerald-600";
+          Icon = BadgeCheck;
+        }
+
         return (
-          <div
-            className={`flex h-10 w-10 items-center justify-center rounded-full text-white shadow-md ${
-              stepLabel === "Rejected" ? "bg-red-500" : "bg-amber-500"
-            }`}
-          >
-            {stepLabel === "Rejected" ? (
-              <X size={18} strokeWidth={2.5} />
-            ) : (
-              <Clock3 size={18} strokeWidth={2.5} />
-            )}
+          <div className={`flex h-10 w-10 items-center justify-center rounded-full text-white shadow-md ${bgClass}`}>
+            <Icon size={18} strokeWidth={2.5} />
           </div>
         );
 
@@ -87,14 +88,13 @@ const NominationStatus = ({ status, timeline = {} }) => {
   return (
     <div
       className={`rounded-3xl border p-6 ${
-        darkMode ? "border-slate-700 bg-[#151D30]" : "border-slate-200 bg-white"
+        darkMode ? "border-[#3D3D3D] bg-[#2D2D2D]" : "border-slate-200 bg-white"
       }`}
     >
-      {/* Current Status */}
-
+      {/* Current Status Header Card */}
       <div
         className={`mb-8 rounded-2xl border px-5 py-4 ${
-          status === "Shortlisted"
+          status === "Shortlisted" || status === "Selected"
             ? "border-emerald-500/20 bg-emerald-500/10"
             : status === "Rejected"
               ? "border-red-500/20 bg-red-500/10"
@@ -111,7 +111,7 @@ const NominationStatus = ({ status, timeline = {} }) => {
 
         <h3
           className={`mt-2 text-xl font-bold ${
-            status === "Shortlisted"
+            status === "Shortlisted" || status === "Selected"
               ? "text-emerald-500"
               : status === "Rejected"
                 ? "text-red-500"
@@ -122,39 +122,29 @@ const NominationStatus = ({ status, timeline = {} }) => {
         </h3>
       </div>
 
-      {/* Header */}
-
+      {/* Description Header */}
       <div>
         <h3 className="text-lg font-semibold">Nomination Timeline</h3>
-
-        <p
-          className={`mt-1 text-sm ${
-            darkMode ? "text-slate-400" : "text-slate-500"
-          }`}
-        >
+        <p className={`mt-1 text-sm ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
           Track the complete nomination journey.
         </p>
       </div>
 
-      {/* Timeline */}
-
+      {/* Rendered Timeline Path */}
       <div className="mt-8 space-y-7">
-        {statusFlow.map((step, index) => {
+        {currentFlow.map((step, index) => {
           const state = getStatusState(step.label);
 
           return (
             <div key={step.key} className="relative flex items-start gap-4">
               {/* Indicator */}
-
               <div className="relative z-10">{getIndicator(step.label)}</div>
 
               {/* Connector */}
-
-              {index !== statusFlow.length - 1 && (
+              {index !== currentFlow.length - 1 && (
                 <div
                   className={`absolute left-[19px] top-10 h-12 w-0.5 ${
-                    state === "completed" ||
-                    (state === "current" && step.label !== "Rejected")
+                    state === "completed" || (state === "current" && step.label !== "Rejected" && step.label !== "Selected")
                       ? "bg-emerald-500"
                       : darkMode
                         ? "bg-slate-700"
@@ -163,8 +153,7 @@ const NominationStatus = ({ status, timeline = {} }) => {
                 />
               )}
 
-              {/* Content */}
-
+              {/* Content text */}
               <div className="pt-1">
                 <h4
                   className={`font-semibold ${
@@ -173,7 +162,9 @@ const NominationStatus = ({ status, timeline = {} }) => {
                       : state === "current"
                         ? step.label === "Rejected"
                           ? "text-red-500"
-                          : "text-amber-500"
+                          : step.label === "Selected"
+                            ? "text-emerald-600"
+                            : "text-amber-500"
                         : darkMode
                           ? "text-slate-300"
                           : "text-slate-600"
@@ -182,11 +173,7 @@ const NominationStatus = ({ status, timeline = {} }) => {
                   {step.label}
                 </h4>
 
-                <p
-                  className={`mt-1 text-sm ${
-                    darkMode ? "text-slate-500" : "text-slate-400"
-                  }`}
-                >
+                <p className={`mt-1 text-sm ${darkMode ? "text-slate-500" : "text-slate-400"}`}>
                   {timeline?.[step.key] || "Pending"}
                 </p>
               </div>

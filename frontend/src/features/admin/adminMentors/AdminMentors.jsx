@@ -1,6 +1,7 @@
-import React from 'react';
 
-export default function () {
-  return <div> Component</div>;
+import MentorManagement from '../pages/MentorManagement';
+
+export default function AdminMentors() {
+  return <MentorManagement />;
 }
 

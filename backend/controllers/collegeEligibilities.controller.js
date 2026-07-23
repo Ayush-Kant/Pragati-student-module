@@ -3,7 +3,9 @@ import {
   checkEligibilityService,
   getEligibleDepartmentsService,
   getEligibleBatchesService,
+  createEligibleStudentService,
 } from '../services/collegeEligibilities.service.js'
+import { validateCreateEligibleStudent } from '../validators/collegeEligibilities.validator.js'
 import { successResponse, errorResponse, paginatedResponse } from '../utils/responseHandler.js'
 
 export const getEligibleStudents = async (req, res, next) => {
@@ -39,6 +41,22 @@ export const getEligibleBatches = async (req, res, next) => {
     const batches = await getEligibleBatchesService()
     return successResponse(res, batches, 'Batches fetched successfully')
   } catch (err) {
+    next(err)
+  }
+}
+
+export const createEligibleStudent = async (req, res, next) => {
+  try {
+    const { isValid, errors } = validateCreateEligibleStudent(req.body)
+    if (!isValid) return errorResponse(res, 'Validation failed', 400, errors)
+
+    const student = await createEligibleStudentService(req.body)
+    return successResponse(res, student, 'Eligible student created successfully', 201)
+  } catch (err) {
+    // Check for unique constraint violation (e.g. duplicate student_id)
+    if (err.code === '23505') {
+      return errorResponse(res, 'Student is already in the eligible list', 409)
+    }
     next(err)
   }
 }

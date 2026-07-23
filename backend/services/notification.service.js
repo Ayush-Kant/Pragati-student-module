@@ -1,83 +1,72 @@
 import { pool } from "../config/db.js";
+import format from "pg-format";
 
-// GET ALL NOTIFICATIONS
-export const getNotificationsService = async (
-  userId
-) => {
-  try {
-    const query = `
-      SELECT
-        id AS "notificationId",
-        title,
-        message,
-        type,
-        is_read AS "isRead",
-        created_at AS "createdAt"
-      FROM notifications
-      WHERE student_auth_user_id = $1
-      ORDER BY created_at DESC
-    `;
+export const getNotificationsService = async (userId, page = 1, limit = 20) => {
+  const offset = (page - 1) * limit;
 
-    const result = await pool.query(query, [
-      userId,
-    ]);
+  // Run queries concurrently
+  const [notificationsResult, countResult, unreadCountResult] = await Promise.all([
+    pool.query(
+      `SELECT id, title, message, type, link_url AS "linkUrl", is_read AS "isRead", created_at AS "createdAt"
+       FROM notifications
+       WHERE user_id = $1
+       ORDER BY created_at DESC
+       LIMIT $2 OFFSET $3`,
+      [userId, limit, offset]
+    ),
+    pool.query(`SELECT COUNT(*) FROM notifications WHERE user_id = $1`, [userId]),
+    pool.query(`SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND is_read = false`, [userId]),
+  ]);
 
-    return {
-      notifications: result.rows,
-      pagination: {
-        unreadCount: result.rows.filter(
-          (n) => !n.isRead
-        ).length,
-      },
-    };
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  const notifications = notificationsResult.rows || [];
+  const total = parseInt(countResult.rows[0].count, 10) || 0;
+  const unreadCount = parseInt(unreadCountResult.rows[0].count, 10) || 0;
+
+  return {
+    notifications,
+    unreadCount,
+    total,
+    page: parseInt(page, 10),
+    limit: parseInt(limit, 10)
+  };
 };
 
-// MARK SINGLE NOTIFICATION READ
-export const markNotificationReadService =
-  async (notificationId, userId) => {
-    try {
-      const query = `
-      UPDATE notifications
-      SET is_read = true
-      WHERE id = $1
-      AND student_auth_user_id = $2
-    `;
+export const markNotificationsAsReadService = async (userId, notificationIds, markAll) => {
+  if (markAll) {
+    const result = await pool.query(
+      `UPDATE notifications SET is_read = true WHERE user_id = $1 AND is_read = false`,
+      [userId]
+    );
+    return result.rowCount;
+  }
 
-      await pool.query(query, [
-        notificationId,
-        userId,
-      ]);
+  if (notificationIds && notificationIds.length > 0) {
+    const result = await pool.query(
+      `UPDATE notifications SET is_read = true WHERE user_id = $1 AND id = ANY($2::int[]) AND is_read = false`,
+      [userId, notificationIds]
+    );
+    return result.rowCount;
+  }
 
-      return {
-        success: true,
-      };
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  };
+  return 0;
+};
 
-// MARK ALL READ
-export const markAllNotificationsReadService =
-  async (userId) => {
-    try {
-      const query = `
-      UPDATE notifications
-      SET is_read = true
-      WHERE student_auth_user_id = $1
-    `;
+export const createBulkNotificationsService = async (userIds, { title, message, type, linkUrl }) => {
+  if (!userIds || userIds.length === 0) return;
 
-      await pool.query(query, [userId]);
+  // Create an array of arrays for pg-format
+  const values = userIds.map((userId) => [
+    userId,
+    title,
+    message,
+    type || 'info',
+    linkUrl || null
+  ]);
 
-      return {
-        success: true,
-      };
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  };
+  const query = format(
+    'INSERT INTO notifications (user_id, title, message, type, link_url) VALUES %L',
+    values
+  );
+
+  await pool.query(query);
+};

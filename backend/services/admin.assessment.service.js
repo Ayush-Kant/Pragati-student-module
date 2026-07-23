@@ -2,13 +2,25 @@ import { pool } from "../config/db.js";
 
 class AdminAssessmentService {
   async createAssessment(data, createdBy) {
+    // Resolve UUID (createdBy) to users.id for the created_by FK
+    let resolvedCreatedBy = null;
+    if (createdBy) {
+      const userRes = await pool.query(
+        `SELECT users.id FROM users
+         INNER JOIN auth_users ON auth_users.id = users.auth_user_id
+         WHERE auth_users.uuid_id = $1`,
+        [createdBy]
+      );
+      resolvedCreatedBy = userRes.rows[0]?.id ?? null;
+    }
+
     // Assessments always start as 'draft' by default
     const query = `
       INSERT INTO assessments (title, type, difficulty, time_limit_minutes, total_marks, created_by, status)
       VALUES ($1, $2, $3, $4, $5, $6, 'draft')
       RETURNING *;
     `;
-    const values = [data.title, data.type, data.difficulty, data.timeLimitMinutes, data.totalMarks, createdBy];
+    const values = [data.title, data.type, data.difficulty, data.timeLimitMinutes, data.totalMarks, resolvedCreatedBy];
     const result = await pool.query(query, values);
     return result.rows[0];
   }

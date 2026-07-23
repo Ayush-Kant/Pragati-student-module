@@ -10,11 +10,12 @@ const CompanyRow = ({
   onView,
   onEdit,
   onDelete,
+  darkMode,
 }) => {
   return (
-    <tr className="border-b hover:bg-slate-50 transition">
+    <tr className={`border-b transition ${darkMode ? 'border-[#3D3D3D] hover:bg-[#1A1A1A]' : 'hover:bg-slate-50'}`}>
 
-      <td className="px-6 py-4 font-medium">
+      <td className={`px-6 py-4 font-medium ${darkMode ? 'text-white' : ''}`}>
         {company.company}
       </td>
 
@@ -24,13 +25,13 @@ const CompanyRow = ({
 
           <MapPin size={16} className="text-red-500"/>
 
-          {company.location}
+          <span className={darkMode ? 'text-gray-300' : ''}>{company.location}</span>
 
         </div>
 
       </td>
 
-      <td className="px-6 py-4 text-green-600 font-semibold">
+      <td className={`px-6 py-4 font-semibold ${darkMode ? 'text-[#00bea3]' : 'text-green-600'}`}>
         {company.package}
       </td>
 
@@ -40,7 +41,7 @@ const CompanyRow = ({
 
           <button
             onClick={() => onView(company)}
-            className="text-blue-600 hover:text-blue-800"
+            className={darkMode ? 'text-[#ff6d34] hover:text-[#ff6d34]/80' : 'text-blue-600 hover:text-blue-800'}
             aria-label="View company details"
           >
             <Eye size={18}/>

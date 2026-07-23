@@ -1,6 +1,6 @@
 import ConfirmationModal from "../common/ConfirmationModal"
 
-const DeleteStudentModal = ({ student, onConfirm, onCancel }) => (
+const DeleteStudentModal = ({ student, onConfirm, onCancel, darkMode }) => (
   <ConfirmationModal
     title="Delete Student"
     message={`Are you sure you want to delete ${student?.name} (${student?.enrollmentNo})? This action cannot be undone.`}
@@ -8,6 +8,7 @@ const DeleteStudentModal = ({ student, onConfirm, onCancel }) => (
     onCancel={onCancel}
     confirmLabel="Delete"
     danger={true}
+    darkMode={darkMode}
   />
 )
 

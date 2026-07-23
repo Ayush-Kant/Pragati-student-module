@@ -3,6 +3,7 @@ import { X, CircleUserRound } from "lucide-react";
 
 import StatusBadge from "../common/StatusBadge";
 import NominationStatus from "./NominationStatus";
+import { formatPackage, getStudentName } from "../../utils/studentNominationHelpers";
 
 const NominationDetails = ({ student, isOpen, onClose }) => {
   const { darkMode } = useOutletContext();
@@ -13,7 +14,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
     <div
       className={`flex h-full w-full flex-col overflow-hidden rounded-3xl border transition-all duration-300 ${
         darkMode
-          ? "border-slate-700/60 bg-[#151D30]"
+          ? "border-[#3D3D3D] bg-[#2D2D2D]"
           : "border-slate-200 bg-white"
       }`}
     >
@@ -23,7 +24,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
 
       <div
         className={`flex items-center justify-between border-b p-6 ${
-          darkMode ? "border-slate-700/60" : "border-slate-200"
+          darkMode ? "border-[#3D3D3D]" : "border-slate-200"
         }`}
       >
         <div>
@@ -41,7 +42,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
         <button
           onClick={onClose}
           className={`rounded-xl p-2 transition-colors ${
-            darkMode ? "hover:bg-slate-800" : "hover:bg-slate-100"
+            darkMode ? "hover:bg-[#1A1A1A]" : "hover:bg-slate-100"
           }`}
         >
           <X size={18} />
@@ -65,7 +66,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
           />
 
           <h2 className="mt-4 text-xl font-semibold text-center">
-            {student.name || student.student}
+            {getStudentName(student)}
           </h2>
 
           <p
@@ -96,7 +97,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
           <div
             className={`space-y-4 rounded-2xl border p-5 ${
               darkMode
-                ? "border-slate-700/60 bg-slate-800/20"
+                ? "border-[#3D3D3D] bg-[#1A1A1A]"
                 : "border-slate-200 bg-slate-50"
             }`}
           >
@@ -126,7 +127,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
               <span className="text-slate-500">Package</span>
 
               <span className="font-medium text-right">
-                {student.package || "--"}
+                {formatPackage(student.package)}
               </span>
             </div>
 
@@ -154,7 +155,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
           <div
             className={`space-y-4 rounded-2xl border p-5 ${
               darkMode
-                ? "border-slate-700/60 bg-slate-800/20"
+                ? "border-[#3D3D3D] bg-[#1A1A1A]"
                 : "border-slate-200 bg-slate-50"
             }`}
           >

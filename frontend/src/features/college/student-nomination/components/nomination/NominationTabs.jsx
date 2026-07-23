@@ -25,7 +25,7 @@ const NominationTabs = ({
     <div
       className={`mb-6 flex items-center rounded-2xl border p-1 ${
         darkMode
-          ? "border-slate-700 bg-[#151D30]"
+          ? "border-[#3D3D3D] bg-[#2D2D2D]"
           : "border-slate-200 bg-white"
       }`}
     >
@@ -38,9 +38,9 @@ const NominationTabs = ({
             onClick={() => setActiveTab(tab.id)}
             className={`flex flex-1 items-center justify-center gap-3 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 ${
               active
-                ? "bg-blue-600 text-white shadow-lg"
+                ? darkMode ? "bg-[#ff6d34] text-white shadow-lg" : "bg-[#ff7a00] text-white shadow-lg"
                 : darkMode
-                  ? "text-slate-300 hover:bg-slate-800"
+                  ? "text-gray-300 hover:bg-[#3D3D3D]"
                   : "text-slate-600 hover:bg-slate-100"
             }`}
           >
@@ -51,7 +51,7 @@ const NominationTabs = ({
                 active
                   ? "bg-white/20 text-white"
                   : darkMode
-                    ? "bg-slate-700 text-slate-300"
+                    ? "bg-[#3D3D3D] text-gray-300"
                     : "bg-slate-200 text-slate-700"
               }`}
             >

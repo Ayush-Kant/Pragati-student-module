@@ -6,11 +6,13 @@ import {
   getRevenueAnalytics as getRevenueAnalyticsservices,
   getAdmissionsAnalytics as getAdmissionsAnalyticsservices
 } from "../services/college.dashboard.service.js";
+import { resolveUserIntId } from "../utils/userResolver.js";
 
 export const getDashboardData = async (req, res, next) => {
   try {
     const userId = req.user.userId;
-    // We pass userId to all services so they can filter by the specific college
+    const intUserId = await resolveUserIntId(userId);
+    // We pass intUserId to all services so they can filter by the specific college
     const [
       overview,
       stats,
@@ -19,12 +21,12 @@ export const getDashboardData = async (req, res, next) => {
       revenueAnalytics,
       admissionsAnalytics
     ] = await Promise.all([
-      getDashboardOverviewservices(userId),
-      getDashboardStatsservices(userId),
-      getDashboardActivitiesservices(userId),
-      getPlacementAnalyticsservices(userId),
-      getRevenueAnalyticsservices(userId),
-      getAdmissionsAnalyticsservices(userId)
+      getDashboardOverviewservices(intUserId),
+      getDashboardStatsservices(intUserId),
+      getDashboardActivitiesservices(intUserId),
+      getPlacementAnalyticsservices(intUserId),
+      getRevenueAnalyticsservices(intUserId),
+      getAdmissionsAnalyticsservices(intUserId)
     ]);
 
     return res.status(200).json({

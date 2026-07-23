@@ -1,98 +1,169 @@
-import { useState, useEffect, useCallback } from 'react'
+
+
+import { useEffect, useState, useCallback } from "react";
 import {
   getEligibleStudents,
-  getNominations,
-  nominateStudent,
-  updateNomination,
-  removeNomination,
-} from '../services/studentNominationService.js'
+  getNominatedStudents,
+  nominateStudent as nominateStudentService,
+  updateNomination as updateNominationService,
+  removeNomination as removeNominationService,
+} from "../services/studentNominationService";
+
+import {
+  validateNomination,
+  validateEditNomination,
+  validateDuplicateNomination,
+} from "../validations/studentNominationValidation";
 
 const useStudentNomination = () => {
-  const [eligibleStudents, setEligibleStudents] = useState([])
-  const [nominatedStudents, setNominatedStudents] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [eligibleStudentsList, setEligibleStudents] = useState([]);
+  const [nominatedStudentsList, setNominatedStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const fetchEligible = useCallback(async (params = {}) => {
-    const res = await getEligibleStudents(params)
-        if (res.success) {
-            const mapped = (res.data || []).map(s => ({
-            ...s,
-            enrollmentNo: s.enrollment_no || s.enrollmentNo,
-            placementStatus: s.placement_status || s.placementStatus,
-            company: s.company_name || s.company || '—',
-                    status: s.placement_status || 'Eligible',
-                timeline: {
-                nominated: s.nomination_date
-                ? new Date(s.nomination_date).toLocaleDateString('en-IN')
-                : '—'
-            }
-        }))
-        setEligibleStudents(mapped)
-        }
-    }, [])
-
-  const fetchNominated = useCallback(async (params = {}) => {
-  const res = await getNominations(params)
-  if (res.success) {
-    const mapped = (res.data || []).map(n => ({
-            ...n,
-            enrollmentNo: n.enrollment_no || n.enrollmentNo,
-            company: n.company_name || n.company,
-            timeline: {
-                nominated: n.nomination_date
-                ? new Date(n.nomination_date).toLocaleDateString('en-IN')
-                : '—'
-            }
-            }))
-        setNominatedStudents(mapped)
-        }
-    }, [])
-
-  const fetchAll = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+  const fetchNominationData = useCallback(async () => {
     try {
-      await Promise.all([fetchEligible(), fetchNominated()])
-    } catch {
-      setError('Failed to load data')
+      setLoading(true);
+      setError(null);
+      const [eligibleResponse, nominatedResponse] = await Promise.all([
+        getEligibleStudents(),
+        getNominatedStudents(),
+      ]);
+
+      if (eligibleResponse.success) {
+        setEligibleStudents(
+  (eligibleResponse.data || []).map((s) => ({
+    ...s,
+    enrollmentNo: s.enrollment_no || s.enrollmentNo,
+    placementStatus: s.placement_status || s.placementStatus,
+    company: s.company_name || s.company || "—",
+    status: s.placement_status || "Eligible",
+    timeline: {
+      nominated: s.nomination_date
+        ? new Date(s.nomination_date).toLocaleDateString("en-IN")
+        : "—",
+    },
+  }))
+);
+      }
+      if (nominatedResponse.success) {
+        setNominatedStudents(
+  (nominatedResponse.data || []).map((n) => ({
+    ...n,
+    enrollmentNo: n.enrollment_no || n.enrollmentNo,
+    company: n.company_name || n.company,
+    timeline: {
+      nominated: n.nomination_date
+        ? new Date(n.nomination_date).toLocaleDateString("en-IN")
+        : "—",
+    },
+  }))
+);
+      }
+    } catch (err) {
+      setError(err.message || "Failed to synchronize placement nomination pools.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [fetchEligible, fetchNominated])
+  }, []);
 
   useEffect(() => {
-    fetchAll()
-  }, [fetchAll])
+    fetchNominationData();
+  }, [fetchNominationData]);
 
-  const nominate = async (data) => {
-    const res = await nominateStudent(data)
-    if (res.success) await fetchAll()
-    return res
-  }
 
-  const update = async (id, data) => {
-    const res = await updateNomination(id, data)
-    if (res.success) await fetchNominated()
-    return res
-  }
+  const nominateStudent = async (studentData) => {
 
-  const remove = async (id) => {
-    const res = await removeNomination(id)
-    if (res.success) await fetchNominated()
-    return res
-  }
+    const validation = validateNomination(studentData);
+    if (!validation.isValid) return validation;
+
+    const duplicate = validateDuplicateNomination(studentData.id, nominatedStudentsList);
+    if (duplicate.isDuplicate) {
+      return {
+        isValid: false,
+        errors: { student: duplicate.message },
+      };
+    }
+
+    try {
+      setLoading(true);
+      const response = await nominateStudentService(studentData);
+      if (response.success) {
+
+        setNominatedStudents((prev) => [...prev, response.data]);
+      }
+      return {
+        isValid: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (err) {
+      return {
+        isValid: false,
+        errors: { service: err.message || "Unable to complete nomination pipeline request." },
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateNomination = async (studentId, formData, originalData) => {
+
+    const validation = validateEditNomination(formData, originalData);
+    if (!validation.isValid) return validation;
+
+    try {
+      setLoading(true);
+      const response = await updateNominationService(studentId, formData);
+      if (response.success) {
+        setNominatedStudents((prev) =>
+          prev.map((student) => (student.id === studentId ? response.data : student))
+        );
+      }
+      return {
+        isValid: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (err) {
+      return {
+        isValid: false,
+        errors: { service: err.message || "Unable to save modified nomination options." },
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeNomination = async (studentId) => {
+    try {
+      setLoading(true);
+      const response = await removeNominationService(studentId);
+      if (response.success) {
+        setNominatedStudents((prev) => prev.filter((student) => student.id !== studentId));
+      }
+      return response;
+    } catch (err) {
+      return {
+        success: false,
+        message: err.message || "Unable to truncate nomination entry.",
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
-    eligibleStudents,
-    nominatedStudents,
+    eligibleStudents: eligibleStudentsList,
+    nominatedStudents: nominatedStudentsList,
     loading,
     error,
-    fetchAll,
-    nominate,
-    update,
-    remove,
-  }
-}
+    nominateStudent,
+    updateNomination,
+    removeNomination,
+    refreshData: fetchNominationData,
+  };
+};
 
-export default useStudentNomination
+export default useStudentNomination;
+

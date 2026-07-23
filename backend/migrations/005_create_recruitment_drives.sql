@@ -86,3 +86,22 @@ CREATE INDEX IF NOT EXISTS idx_drives_stage ON recruitment_drives(current_stage)
 CREATE INDEX IF NOT EXISTS idx_sdp_drive ON student_drive_progress(drive_id);
 CREATE INDEX IF NOT EXISTS idx_sdp_student ON student_drive_progress(student_id);
 CREATE INDEX IF NOT EXISTS idx_sdp_stage ON student_drive_progress(current_stage);
+-- Add circular foreign keys after both tables exist
+
+DO $$ BEGIN
+  ALTER TABLE courses
+    ADD CONSTRAINT fk_courses_drive
+    FOREIGN KEY (drive_id)
+    REFERENCES recruitment_drives(id)
+    ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE recruitment_drives
+    ADD CONSTRAINT fk_recruitment_drives_assigned_course
+    FOREIGN KEY (assigned_course_id)
+    REFERENCES courses(id)
+    ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;

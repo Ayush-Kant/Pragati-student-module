@@ -68,3 +68,29 @@ export const getEligibleBatches = async () => {
   )
   return result.rows.map(r => r.batch)
 }
+
+export const createEligibleStudent = async (data) => {
+  const {
+    student_id,
+    enrollment_no,
+    name,
+    email,
+    department,
+    course,
+    semester,
+    batch,
+    cgpa,
+    placement_status = 'Eligible',
+    skills = [],
+  } = data
+
+  const result = await pool.query(
+    `INSERT INTO eligible_students 
+      (student_id, enrollment_no, name, email, department, course, semester, batch, cgpa, placement_status, skills)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+     RETURNING *`,
+    [student_id, enrollment_no, name, email, department, course, semester, batch, cgpa, placement_status, skills]
+  )
+
+  return result.rows[0]
+}

@@ -1,5 +1,7 @@
-
-import { dashboardApiResponse, leaderboardData } from "../types/dashboardDummyData";
+import {
+  dashboardApiResponse,
+  leaderboardData,
+} from "../types/dashboardDummyData";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -18,15 +20,10 @@ const simulateApi = (data, delay = 600) =>
 // ─────────────────────────────────────────────────────
 
 export const getDashboardData = async (studentId) => {
-  
-
   return simulateApi(dashboardApiResponse.data);
 };
 
-
 export const getLeaderboard = async () => {
-
-
   return simulateApi(leaderboardData);
 };
 
