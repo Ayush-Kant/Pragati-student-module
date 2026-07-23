@@ -8,40 +8,17 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const migrationsDir = path.join(__dirname, "../migrations");
 
-// Hardcoded execution order based on your dependencies
-const migrationFiles = [
-  "001_create_users_mentors.sql", // 001
-  "005_create_company_management.sql", // 002
-  "004_create_college_management.sql", // 003
-  "005_create_student_management.sql", // 004
-  "005_create_recruitment_drives.sql", // 005
-  "005_create_company_tables.sql", // 006
-  "002_create_content_tables.sql", // 007
-  "003_create_admin_dashboard.sql", // 008
-  "004_create_notifications.sql", // 009
-  // "006_create_assessments_minimal.sql", // 010
-  "006_create_assessments.sql", // 011
-  "006_create_college_profiles.sql", // 012
-  "006_create_dashboard_support.sql", // 013
-  // "006_create_reports_analytics_tables.sql", // 014
-  "006_create_training_coordination.sql", // 015
-  // "006_update_interviews_table.sql", // 016
-  "007_create_dashboard_tables.sql", // 017
-  "007_offers_hiring_tables.sql", // 018
-  "008_create_notifications.sql", // 019
-  "010_create_disputes.sql", // 020
-  "Students.sql", // 021
-  "011_create_live_sessions_module.sql", // 022
-];
+const migrationFiles = fs
+  .readdirSync(migrationsDir)
+  .filter((file) => file.endsWith(".sql"))
+  .sort();
 
 async function runMigrationsFresh() {
   try {
     console.log("Dropping existing tables and types to start fresh...");
 
-    // 1. Dynamically fetch and drop all tables in the public schema
     const { rows: tables } = await pool.query(`
       SELECT tablename
       FROM pg_tables
@@ -54,13 +31,12 @@ async function runMigrationsFresh() {
       console.log(`✔ Dropped ${tables.length} existing tables.`);
     }
 
-    // 2. Dynamically fetch and drop all custom types (like ENUMs) in the public schema
     const { rows: types } = await pool.query(`
       SELECT t.typname
       FROM pg_type t
       JOIN pg_namespace n ON t.typnamespace = n.oid
       WHERE n.nspname = 'public'
-        AND t.typtype = 'e'; -- 'e' stands for enum
+        AND t.typtype = 'e';
     `);
 
     if (types.length > 0) {
@@ -72,7 +48,7 @@ async function runMigrationsFresh() {
     console.log("Database clean slate ready.");
   } catch (error) {
     console.error("❌ Failed to drop existing database objects:", error);
-    throw error; // Halt execution if we can't get a clean slate
+    throw error;
   }
 }
 
@@ -200,7 +176,6 @@ async function runMigrations() {
     console.log("\n==============================");
     console.log("Running SQL migrations in strict order...");
     console.log("==============================\n");
-
     for (const file of migrationFiles) {
       const filePath = path.join(migrationsDir, file);
 
@@ -239,19 +214,24 @@ async function runMigrations() {
     console.error(error);
 
     throw error;
+
   } finally {
     client.release();
   }
 }
 
-// Execute Sequence
-(async () => {
-  try {
-    await runMigrationsFresh();
-    await runMigrations();
-    process.exit(0);
-  } catch (error) {
-    console.error("\n💥 Fatal error during migration process.");
-    process.exit(1);
-  }
-})();
+export { runMigrationsFresh, runMigrations };
+export default runMigrations;
+
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  (async () => {
+    try {
+      await runMigrationsFresh();
+      await runMigrations();
+      process.exit(0);
+    } catch (error) {
+      console.error("\n💥 Fatal error during migration process.");
+      process.exit(1);
+    }
+  })();
+}

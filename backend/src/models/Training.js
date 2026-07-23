@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from "@sequelize/core";
 import sequelize from "../../config/sequelize.js";
 import Company from "./Company.js";
 import Mentor from "./Mentor.js";
@@ -75,7 +75,7 @@ Training.init(
         }
       },
     },
-  }
+  },
 );
 
 Training.belongsTo(Company, { foreignKey: "companyId", as: "company" });

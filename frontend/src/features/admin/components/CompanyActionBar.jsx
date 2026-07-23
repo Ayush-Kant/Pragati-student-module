@@ -69,7 +69,14 @@ export default function CompanyActionBar({ company, onStatusChange, actionLoadin
                     isOpen={modalType === "approve"}
                     company={company}
                     onClose={() => setModalType(null)}
+                    // onConfirm={() => {
+                    //     onStatusChange(company.id, "approved");
+                    //     setModalType(null);
+                    // }}
                     onConfirm={() => {
+                        console.log("Company object:", company);
+                        console.log("Company ID:", company.id);
+
                         onStatusChange(company.id, "approved");
                         setModalType(null);
                     }}

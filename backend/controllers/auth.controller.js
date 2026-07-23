@@ -17,10 +17,9 @@ export const login = async (req, res) => {
     }
 
     const result = await pool.query(
-      `SELECT a.id AS auth_user_id, a.uuid_id, a.email, a.role, a.password_hash, u.id AS user_id, c.id AS company_id
+      `SELECT a.id AS auth_user_id, a.uuid_id, a.email, a.role, a.password_hash, u.id AS user_id
        FROM auth_users a
        LEFT JOIN users u ON u.auth_user_id = a.id
-       LEFT JOIN companies c ON c.user_id = u.id
        WHERE a.email = $1`,
       [email]
     );
@@ -51,7 +50,6 @@ export const login = async (req, res) => {
         authUserId: user.auth_user_id,
         email: user.email,
         role: user.role,
-        companyId: user.company_id,
       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }

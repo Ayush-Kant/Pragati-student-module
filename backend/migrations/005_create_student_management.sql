@@ -1,3 +1,5 @@
+
+
 -- Assumes these tables already exist (created by earlier interns):
 --   users, colleges, recruitment_drives
 -- TABLE: students
@@ -40,6 +42,7 @@ VALUES (
     ARRAY['MERN','Node.js'],
     2023
 );
+
 
 INSERT INTO students (
     name,
