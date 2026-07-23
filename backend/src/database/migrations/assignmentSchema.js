@@ -1,6 +1,12 @@
 import { pool } from "../../../config/db.js";
-import { assignmentSeedData, submissionSeedData, feedbackSeedData, gradeSeedData, deadlineSeedData } from "../seeders/assignmentSeedData.js";
 import { seedAssignments } from "../seedAssignments.js";
+import {
+  assignmentSeedData,
+  submissionSeedData,
+  feedbackSeedData,
+  gradeSeedData,
+  deadlineSeedData,
+} from "../seeders/assignmentSeedData.js";
 
 const createAssignmentTablesQuery = `
   CREATE TABLE IF NOT EXISTS assignments (

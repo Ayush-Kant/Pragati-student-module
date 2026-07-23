@@ -15,7 +15,7 @@ export const normalizeStudentId = (req) => {
 
 export const resolveAssignmentStudentId = (req) => {
   const studentId = normalizeStudentId(req);
-  return Number.isNaN(studentId) ? null : studentId;
+  return Number.isFinite(studentId) ? studentId : null;
 };
 
 export const normalizeRole = (role) => String(role || "").toLowerCase();
