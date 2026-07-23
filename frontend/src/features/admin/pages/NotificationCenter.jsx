@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import NotificationCompose from "../components/NotificationCompose";
 
-
-
 export default function NotificationCenter() {
   const navigate = useNavigate();
   const [isComposeOpen, setIsComposeOpen] = useState(false);
@@ -41,8 +39,7 @@ export default function NotificationCenter() {
   } = useNotifications();
 
   return (
-    <div className="p-6">
-
+    <div className="p-4 sm:p-6">
       {/* ===========================
           Header
       =========================== */}
@@ -60,49 +57,36 @@ export default function NotificationCenter() {
         "
       >
         <div>
-
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
             Notification Center
           </h1>
 
           <p className="text-gray-500 mt-1">
             View and manage all notifications
           </p>
-
         </div>
 
         <button
           onClick={() => setIsComposeOpen(true)}
           className="
-            bg-teal-600
-            hover:bg-teal-700
-            text-white
-            px-5
-            py-2.5
-            rounded-lg
-            transition
+           w-full md:w-auto bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg transition
           "
         >
           + Compose Notification
         </button>
-
       </div>
 
       {/* ===========================
           Tabs
       =========================== */}
 
-      <NotificationTabs
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      <NotificationTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* ===========================
           Search
       =========================== */}
 
       <div className="mt-6 mb-5">
-
         <input
           type="text"
           placeholder="Search by subject or recipient..."
@@ -120,7 +104,6 @@ export default function NotificationCenter() {
             focus:ring-teal-500
           "
         />
-
       </div>
 
       {/* ===========================
@@ -128,13 +111,9 @@ export default function NotificationCenter() {
       =========================== */}
 
       {error && (
-
         <div className="bg-red-100 text-red-700 rounded-lg p-4 mb-5">
-
           {error}
-
         </div>
-
       )}
 
       {/* ===========================
@@ -142,9 +121,7 @@ export default function NotificationCenter() {
       =========================== */}
 
       {loading ? (
-
         <div className="space-y-4">
-
           <div className="h-14 rounded-lg bg-gray-200 animate-pulse"></div>
 
           <div className="h-14 rounded-lg bg-gray-200 animate-pulse"></div>
@@ -152,55 +129,37 @@ export default function NotificationCenter() {
           <div className="h-14 rounded-lg bg-gray-200 animate-pulse"></div>
 
           <div className="h-14 rounded-lg bg-gray-200 animate-pulse"></div>
-
         </div>
-
       ) : (
-
         <>
-
           {/* ===========================
               Empty State
           =========================== */}
 
           {notifications.length === 0 ? (
-
             <div className="bg-white rounded-xl shadow p-12 text-center">
-
               <h2 className="text-xl font-semibold text-gray-700">
-
                 No Notifications Found
-
               </h2>
 
               <p className="text-gray-500 mt-2">
-
                 Try changing your search or filters.
-
               </p>
-
             </div>
-
           ) : (
-
             <NotificationLogTable
               notifications={notifications}
               onViewNotification={openNotification}
-
               currentPage={currentPage}
               totalPages={totalPages}
               nextPage={nextPage}
               previousPage={previousPage}
-
               sortField={sortField}
               sortOrder={sortOrder}
               handleSort={handleSort}
             />
-
           )}
-
         </>
-
       )}
 
       {/* ===========================
@@ -213,11 +172,9 @@ export default function NotificationCenter() {
         onClose={closeNotification}
       />
 
-     {isComposeOpen && (
-  <NotificationCompose
-    onClose={() => setIsComposeOpen(false)}
-  />
-)}
+      {isComposeOpen && (
+        <NotificationCompose onClose={() => setIsComposeOpen(false)} />
+      )}
     </div>
   );
 }

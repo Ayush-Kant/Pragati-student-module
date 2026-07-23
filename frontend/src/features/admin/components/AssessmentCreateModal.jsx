@@ -88,9 +88,9 @@ const AssessmentCreateModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
-        <h2 className="text-2xl font-bold mb-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl bg-white p-4 md:p-6 shadow-lg">
+        <h2 className="mb-5 text-xl font-bold md:text-2xl">
           Create Assessment
         </h2>
 
@@ -104,14 +104,14 @@ const AssessmentCreateModal = ({
             placeholder="Assessment Title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full border rounded-lg p-3"
+            className="w-full rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
           />
 
           <select
             name="type"
             value={formData.type}
             onChange={handleChange}
-            className="w-full border rounded-lg p-3"
+            className="w-full rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
           >
             <option value="">
               Select Type
@@ -132,7 +132,7 @@ const AssessmentCreateModal = ({
               formData.difficulty
             }
             onChange={handleChange}
-            className="w-full border rounded-lg p-3"
+            className="w-full rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
           >
             <option value="">
               Select Difficulty
@@ -159,7 +159,7 @@ const AssessmentCreateModal = ({
               formData.timeLimit
             }
             onChange={handleChange}
-            className="w-full border rounded-lg p-3"
+            className="w-full rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
           />
 
           <input
@@ -170,21 +170,21 @@ const AssessmentCreateModal = ({
               formData.totalMarks
             }
             onChange={handleChange}
-            className="w-full border rounded-lg p-3"
+            className="w-full rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
           />
 
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+              className="px-3 py-2 text-sm md:px-4 md:text-base border rounded-lg hover:bg-gray-100"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-3 py-2 text-sm md:px-4 md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Create Assessment
             </button>

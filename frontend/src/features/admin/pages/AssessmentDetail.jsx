@@ -101,7 +101,7 @@ function AssessmentDetail() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         Loading assessment...
       </div>
     );
@@ -109,25 +109,25 @@ function AssessmentDetail() {
 
   if (!assessment) {
     return (
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         Assessment not found
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       {/* Header */}
       <div
         className={`${
           darkMode
             ? "bg-gray-800"
             : "bg-white"
-        } shadow rounded-lg p-6`}
+        } shadow rounded-lg p-4 md:p-6`}
       >
         <div className="flex flex-col md:flex-row md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-xl md:text-2xl font-bold">
               {assessment.title}
             </h1>
 
@@ -142,14 +142,14 @@ function AssessmentDetail() {
             </div>
           </div>
 
-          <div className="flex gap-2 flex-wrap">
-            <button className="px-4 py-2 bg-blue-500 text-white rounded">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <button className="px-3 py-2 text-sm md:px-4 md:text-base bg-blue-500 text-white rounded">
               Edit
             </button>
 
             <button
               onClick={() => navigate(`/admin/assessments/${id}/publish`)}
-              className="px-4 py-2 bg-green-600 text-white rounded"
+              className="px-3 py-2 text-sm md:px-4 md:text-base bg-green-600 text-white rounded"
             >
              Publish
             </button>
@@ -158,12 +158,12 @@ function AssessmentDetail() {
               onClick={() =>
                 navigate(`/admin/assessments/${id}/assign`)
               }
-              className="px-4 py-2 bg-purple-500 text-white rounded"
+              className="px-3 py-2 text-sm md:px-4 md:text-base bg-purple-500 text-white rounded"
             >
               Assign To Drive
             </button>
 
-            <button className="px-4 py-2 bg-red-500 text-white rounded">
+            <button className="px-3 py-2 text-sm md:px-4 md:text-base bg-red-500 text-white rounded">
               Archive
             </button>
           </div>
@@ -171,7 +171,7 @@ function AssessmentDetail() {
 
         <div className="grid md:grid-cols-4 gap-4 mt-6">
           <div>
-            <p className="text-gray-500">
+            <p className="text-sm text-gray-500 md:text-base">
               Difficulty
             </p>
             <p>
@@ -180,7 +180,7 @@ function AssessmentDetail() {
           </div>
 
           <div>
-            <p className="text-gray-500">
+            <p className="text-sm text-gray-500 md:text-base">
               Duration
             </p>
             <p>
@@ -192,7 +192,7 @@ function AssessmentDetail() {
           </div>
 
           <div>
-            <p className="text-gray-500">
+            <p className="text-sm text-gray-500 md:text-base">
               Total Marks
             </p>
             <p>
@@ -201,7 +201,7 @@ function AssessmentDetail() {
           </div>
 
           <div>
-            <p className="text-gray-500">
+            <p className="text-sm text-gray-500 md:text-base">
               Questions
             </p>
             <p>
@@ -220,19 +220,19 @@ function AssessmentDetail() {
           darkMode
             ? "bg-gray-800"
             : "bg-white"
-        } shadow rounded-lg p-6`}
+        } shadow rounded-lg p-4 md:p-6`}
       >
-        <div className="flex justify-between items-center mb-5">
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold">
             Questions
           </h2>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <button
               onClick={
                 handleAddMCQQuestion
               }
-              className="px-4 py-2 bg-blue-500 text-white rounded"
+              className="px-3 py-2 text-sm md:px-4 md:text-base bg-blue-500 text-white rounded"
             >
               + Add MCQ
             </button>
@@ -241,7 +241,7 @@ function AssessmentDetail() {
               onClick={
                 handleAddCodingQuestion
               }
-              className="px-4 py-2 bg-purple-500 text-white rounded"
+              className="px-3 py-2 text-sm md:px-4 md:text-base bg-purple-500 text-white rounded"
             >
               + Add Coding
             </button>
