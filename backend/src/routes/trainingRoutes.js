@@ -2,7 +2,7 @@ import express from "express";
 import { authenticateJWT } from "../middleware/authenticateJWT.js";
 import authorizeStudent from "../middleware/authorizeStudent.js";
 import { validateRequest } from "../middleware/validateRequest.js";
-import { validateCourse, validateTrainingList } from "../../validators/trainingValidator.js";
+import { validateCourse, validateTrainingList } from "../validators/trainingValidator.js";
 import {
     getAllCourses,
     getCourseById,

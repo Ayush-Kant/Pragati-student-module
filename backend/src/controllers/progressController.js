@@ -1,6 +1,6 @@
 import * as progressService from "../services/progressService.js";
 
-const getStudentId = (req) => req.user?.userId ?? req.user?.id ?? null;
+const getStudentId = (req) => req.user?.id ?? req.user?.userId ?? null;
 
 export const getCourseProgress = async (req, res, next) => {
     try {

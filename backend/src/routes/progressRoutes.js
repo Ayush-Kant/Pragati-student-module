@@ -2,8 +2,8 @@ import express from "express";
 import { authenticateJWT } from "../middleware/authenticateJWT.js";
 import authorizeStudent from "../middleware/authorizeStudent.js";
 import { validateRequest } from "../middleware/validateRequest.js";
-import { validateProgress } from "../../validators/progressValidator.js";
-import { validateCourse } from "../../validators/trainingValidator.js";
+import { validateProgress } from "../validators/progressValidator.js";
+import { validateCourse } from "../validators/trainingValidator.js";
 import {
     getCourseProgress,
     getCourseProgressById,

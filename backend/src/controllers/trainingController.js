@@ -1,6 +1,6 @@
 import * as trainingService from "../services/trainingService.js";
 
-const getStudentId = (req) => req.user?.userId ?? req.user?.id ?? null;
+const getStudentId = (req) => req.user?.id ?? req.user?.userId ?? null;
 
 export const getAllCourses = async (req, res, next) => {
     try {

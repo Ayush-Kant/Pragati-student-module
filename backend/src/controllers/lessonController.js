@@ -1,6 +1,6 @@
 import * as lessonService from "../services/lessonService.js";
 
-const getStudentId = (req) => req.user?.userId ?? req.user?.id ?? null;
+const getStudentId = (req) => req.user?.id ?? req.user?.userId ?? null;
 
 export const getLessons = async (req, res, next) => {
     try {
