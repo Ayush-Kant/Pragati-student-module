@@ -1,4 +1,3 @@
-
 // API Endpoints 
 export const DASHBOARD_API = {
   GET_DASHBOARD:      "/api/students/:id/dashboard",
@@ -18,7 +17,13 @@ export const LOADING_STATES = {
   ERROR:   "error",
 };
 
-//  Leaderboard
+// Configurable Metric Thresholds & Milestones
+export const DASHBOARD_CONFIG = {
+  ATTENDANCE_THRESHOLD: 75,
+  XP_MILESTONE: 2000,
+};
+
+// Leaderboard
 export const LEADERBOARD_PREVIEW_LIMIT = 5;
 
 // Priority Colors 
@@ -36,12 +41,13 @@ export const NOTIFICATION_ICONS = {
   default:   "🔔",
 };
 
-//  Session Types 
+// Session Types 
 export const SESSION_TYPES = {
   workshop:  { label: "Workshop",  bg: "bg-blue-50",   text: "text-blue-600" },
   interview: { label: "Interview", bg: "bg-purple-50", text: "text-purple-600" },
   default:   { label: "Session",   bg: "bg-gray-50",   text: "text-gray-600" },
 };
+
 // Rank Badges 
 export const RANK_BADGE = {
   1: {

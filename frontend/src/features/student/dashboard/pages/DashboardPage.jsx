@@ -32,19 +32,40 @@ const DashboardPage = () => {
     refetch,
   } = useDashboardData();
 
+  // Handle click events for Quick Action items
+  const handleQuickAction = (actionId) => {
+    switch (actionId) {
+      case "drives":
+        console.log("Navigating to Active Drives...");
+        break;
+      case "mock":
+        console.log("Opening Mock Call Scheduler...");
+        break;
+      case "resume":
+        console.log("Navigating to Resume Builder...");
+        break;
+      default:
+        console.log("Action triggered:", actionId);
+    }
+  };
+
+  // Safely extract student name for Welcome Banner
+  const studentName = activeDrive?.studentName || quickStats?.studentName || "Student";
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
 
         {/* ── Page Header ── */}
-        <WelcomeBanner />
+        <WelcomeBanner studentName={studentName} />
 
         {/* ── Global Error Banner ── */}
         {error && (
-          <div className="mb-5 flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 text-sm font-medium px-4 py-3 rounded-xl">
+          <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 text-sm font-medium px-4 py-3 rounded-xl">
             <span className="flex items-center gap-2">⚠ {error}</span>
             <button 
               onClick={refetch} 
+              type="button"
               className="text-xs font-semibold underline hover:text-red-800 transition-colors cursor-pointer"
             >
               Retry
@@ -63,34 +84,30 @@ const DashboardPage = () => {
             <StatisticsCards data={quickStats} loading={loading} />
 
             {/* ── Placement Drives & Quick Actions ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               <div className="lg:col-span-2">
                 <ActiveDriveCard data={activeDrive} loading={loading} />
               </div>
               <div className="lg:col-span-1">
-                <QuickActions />
+                <QuickActions onActionClick={handleQuickAction} />
               </div>
             </div>
 
             {/* ── Progress Metrics Section ── */}
             <ProgressOverview data={progressRing} loading={loading} />
 
-            {/* ── Middle Row (Schedules, Deliverables & Logs) ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+            {/* ── Upcoming Schedules & Deliverables ── */}
+            <UpcomingActivities 
+              sessions={upcomingSessions} 
+              tasks={pendingTasks} 
+              loading={loading} 
+            />
+
+            {/* ── Bottom Row (Notifications & Leaderboard) ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               <div className="lg:col-span-2">
-                <UpcomingActivities 
-                  sessions={upcomingSessions} 
-                  tasks={pendingTasks} 
-                  loading={loading} 
-                />
-              </div>
-              <div className="lg:col-span-1">
                 <NotificationPanel data={recentNotifications} loading={loading} />
               </div>
-            </div>
-
-            {/* ── Bottom Row (Leaderboard Evaluation) ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               <div className="lg:col-span-1">
                 <LeaderboardPreview
                   leaderboard={leaderboard}
@@ -98,7 +115,6 @@ const DashboardPage = () => {
                   error={error}
                 />
               </div>
-              <div className="hidden lg:block lg:col-span-2" />
             </div>
           </>
         )}
