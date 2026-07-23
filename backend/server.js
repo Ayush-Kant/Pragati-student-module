@@ -33,6 +33,7 @@ import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
 import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 import nominationRoutes from "./routes/collegeStudentNominations.routes.js";
 import collegeReportsGenerationRoutes from "./routes/collegeReportsGeneration.routes.js";
+import collegeAnalyticsDashboardRouter from "./routes/collegeAnalyticsDashboard.routes.js";
 
 
 import departmentRoutes from "./routes/college.department.routes.js";
@@ -54,6 +55,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
@@ -110,6 +112,7 @@ app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
 app.use("/api", collegeCommunicationAnnouncementsRoutes);
 app.use("/api/reports", collegeReportsGenerationRoutes);
+app.use("/api/analytics", collegeAnalyticsDashboardRouter);
 
 // Health Check
 app.get("/", (req, res) => {
