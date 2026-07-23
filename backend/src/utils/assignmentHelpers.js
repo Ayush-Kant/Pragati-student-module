@@ -8,7 +8,32 @@ export const sanitizeInput = (value) => {
 
 export const normalizeStudentId = (req) => {
   const fallback = req.user?.id || req.headers["x-user-id"] || req.query.studentId;
-  return Number(fallback || 101);
+  const normalized = Number(fallback ?? 101);
+  return Number.isFinite(normalized) ? normalized : 101;
+};
+
+export const resolveAssignmentStudentId = async (user, fallbackStudentId = null, dbClient = null) => {
+  if (!user) {
+    return fallbackStudentId ?? 101;
+  }
+
+  const client = dbClient || (await import("../../config/db.js")).pool;
+  const authUserId = user.id ?? user.authUserId ?? user.auth_user_id;
+
+  if (!authUserId) {
+    return fallbackStudentId ?? 101;
+  }
+
+  const result = await client.query(
+    `SELECT id FROM users WHERE auth_user_id = $1 LIMIT 1`,
+    [authUserId]
+  );
+
+  if (result.rows?.[0]?.id) {
+    return result.rows[0].id;
+  }
+
+  return fallbackStudentId ?? 101;
 };
 
 export const createError = (message, statusCode = 500) => {
@@ -20,5 +45,6 @@ export const createError = (message, statusCode = 500) => {
 export default {
   sanitizeInput,
   normalizeStudentId,
+  resolveAssignmentStudentId,
   createError,
 };
