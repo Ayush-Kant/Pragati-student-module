@@ -1,5 +1,6 @@
 import { pool } from "../../../config/db.js";
 import { assignmentSeedData, submissionSeedData, feedbackSeedData, gradeSeedData, deadlineSeedData } from "../seeders/assignmentSeedData.js";
+import { seedAssignments } from "../seedAssignments.js";
 
 const createAssignmentTablesQuery = `
   CREATE TABLE IF NOT EXISTS assignments (
@@ -68,77 +69,11 @@ export const createAssignmentTables = async () => {
 };
 
 export const seedAssignmentData = async () => {
-  const assignmentCount = await pool.query("SELECT COUNT(*)::int AS count FROM assignments");
-  if (assignmentCount.rows[0].count > 0) {
+  if (!assignmentSeedData?.length && !submissionSeedData?.length && !feedbackSeedData?.length && !gradeSeedData?.length && !deadlineSeedData?.length) {
     return;
   }
 
-  await pool.query(
-    `
-      INSERT INTO assignments (title, subject, description, due_date, total_marks, status)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      ON CONFLICT DO NOTHING
-    `,
-    [
-      assignmentSeedData[0].title,
-      assignmentSeedData[0].subject,
-      assignmentSeedData[0].description,
-      assignmentSeedData[0].dueDate,
-      assignmentSeedData[0].totalMarks,
-      assignmentSeedData[0].status,
-    ]
-  );
-
-  const firstAssignmentResult = await pool.query(
-    `SELECT id FROM assignments ORDER BY id ASC LIMIT 1`
-  );
-  const firstAssignment = firstAssignmentResult.rows[0]?.id;
-
-  if (!firstAssignment) {
-    return;
-  }
-
-  if (submissionSeedData.length > 0) {
-    await pool.query(
-      `INSERT INTO assignment_submissions (assignment_id, student_id, content, file_url, status, submitted_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())
-       ON CONFLICT (assignment_id, student_id) DO NOTHING`,
-      [
-        firstAssignment,
-        submissionSeedData[0].studentId,
-        submissionSeedData[0].content,
-        submissionSeedData[0].fileUrl,
-        submissionSeedData[0].status,
-      ]
-    );
-  }
-
-  if (feedbackSeedData.length > 0) {
-    await pool.query(
-      `INSERT INTO assignment_feedback (assignment_id, student_id, remarks, grade)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (assignment_id, student_id) DO NOTHING`,
-      [firstAssignment, feedbackSeedData[0].studentId, feedbackSeedData[0].remarks, feedbackSeedData[0].grade]
-    );
-  }
-
-  if (gradeSeedData.length > 0) {
-    await pool.query(
-      `INSERT INTO assignment_grades (assignment_id, student_id, score, remarks)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (assignment_id, student_id) DO NOTHING`,
-      [firstAssignment, gradeSeedData[0].studentId, gradeSeedData[0].score, gradeSeedData[0].remarks]
-    );
-  }
-
-  if (deadlineSeedData.length > 0) {
-    await pool.query(
-      `INSERT INTO assignment_deadlines (assignment_id, due_date, status)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (assignment_id) DO NOTHING`,
-      [firstAssignment, deadlineSeedData[0].dueDate, deadlineSeedData[0].status]
-    );
-  }
+  await seedAssignments();
 };
 
 export const initializeAssignmentModule = async () => {

@@ -7,8 +7,13 @@ export const sanitizeInput = (value) => {
 };
 
 export const normalizeStudentId = (req) => {
-  const fallback = req.user?.id || req.headers["x-user-id"] || req.query.studentId;
-  return Number(fallback || 101);
+  const fallback = req?.user?.id ?? req?.headers?.["x-user-id"] ?? req?.query?.studentId;
+  return Number(fallback ?? 101);
+};
+
+export const resolveAssignmentStudentId = (req) => {
+  const studentId = normalizeStudentId(req);
+  return Number.isNaN(studentId) ? null : studentId;
 };
 
 export const normalizeRole = (role) => String(role || "").toLowerCase();
@@ -26,6 +31,7 @@ export const createError = (message, statusCode = 500) => {
 export default {
   sanitizeInput,
   normalizeStudentId,
+  resolveAssignmentStudentId,
   normalizeRole,
   isStudentRole,
   isInstructorOrAdmin,
