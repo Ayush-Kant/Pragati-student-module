@@ -4,6 +4,7 @@ import ProfileEditForm from '../../components/profile/ProfileEditForm';
 import ProjectCard from '../../components/profile/ProjectCard';
 import ValidationAlert from '../../components/profile/ValidationAlert';
 
+// Basic URL validation used for social links
 const validateSocialLinks = (links = {}) => {
   const errors = {};
   const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
@@ -163,6 +164,7 @@ const ProfilePage = () => {
                 <div className="absolute -right-10 top-4 w-40 h-40 rounded-full bg-orange-100 opacity-40" />
                 <div className="absolute right-4 bottom-0 w-32 h-32 rounded-full bg-green-100 opacity-30" />
               </div>
+
               <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6 relative z-10">
                 <div className="relative shrink-0 mx-auto sm:mx-0">
                   <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-2xl font-bold text-orange-400 border-4 border-white shadow">

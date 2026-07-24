@@ -40,6 +40,21 @@ const ProjectCard = ({ project = {}, onEdit, onDelete }) => {
           </button>
         </div>
       </div>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        {tags.length > 0 ? (
+          tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-3 py-1 text-xs bg-gray-100 rounded-full text-gray-600"
+            >
+              {tag}
+            </span>
+          ))
+        ) : (
+          <span className="text-xs text-gray-400">No skills added</span>
+        )}
+      </div>
     </div>
   );
 };

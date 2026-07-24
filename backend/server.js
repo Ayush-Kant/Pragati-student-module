@@ -4,7 +4,6 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
-
 import { connectDB, pool } from "./config/db.js";
 import { initializeLiveSessionModule } from "./src/database/migrations/liveSessionSchema.js";
 import initializeAssignmentModule from "./src/database/migrations/assignmentSchema.js";
