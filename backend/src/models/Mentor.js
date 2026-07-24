@@ -14,7 +14,7 @@ Mentor.init(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: "user_id",
+      columnName: "user_id",
       references: {
         model: User,
         key: "id",
@@ -25,7 +25,7 @@ Mentor.init(
     },
     expertiseTags: {
       type: DataTypes.ARRAY(DataTypes.STRING),
-      field: "expertise_tags",
+      columnName: "expertise_tags",
     },
   },
   {
