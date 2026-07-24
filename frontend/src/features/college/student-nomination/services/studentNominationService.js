@@ -71,20 +71,15 @@ export const nominateStudent = async (data) => {
       message: response.data.message,
     };
   } catch (err) {
-  console.log("POST ERROR", err.response?.data);
+    console.log("POST ERROR", err.response?.data);
 
-  return {
-    success: false,
-    message:
-      err.response?.data?.message || "Failed to nominate student",
-  };
-}
     return {
       success: false,
       message:
         err.response?.data?.message || "Failed to nominate student",
     };
   }
+};
 
 
 export const updateNomination = async (id, data) => {

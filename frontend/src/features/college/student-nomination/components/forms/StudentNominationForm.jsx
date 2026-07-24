@@ -36,16 +36,7 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
     return
   }
 
-  const companyMap = {
-    "Google": 1,
-    "Microsoft": 2,
-    "Amazon": 3,
-    "Adobe": 4,
-    "Salesforce": 5,
-    "Oracle": 6,
-    "Infosys": 7,
-    "TCS": 8,
-  }
+  const selectedCompany = companies.find(c => c.company === formData.company)
 
   const newNomination = {
     // for frontend validation
@@ -56,7 +47,7 @@ const StudentNominationForm = ({ student, onClose, onSave }) => {
 
     // for backend API
     student_id: student.id,
-    company_id: companyMap[formData.company] || 1,
+    company_id: selectedCompany?.id || 1,
     company_name: formData.company,
   }
 

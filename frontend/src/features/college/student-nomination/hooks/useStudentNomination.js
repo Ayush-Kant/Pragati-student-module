@@ -103,6 +103,8 @@ const useStudentNomination = () => {
         student_id: studentData.student_id,
         company_id: studentData.company_id,
         company_name: studentData.company_name,
+        role: studentData.role || '',
+        package: studentData.package || 0,
         remarks: studentData.remarks || '',
       }
 
