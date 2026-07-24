@@ -1,51 +1,32 @@
-import axios from "axios";
+import api from "../../../services/api";
 
-const API = axios.create({
-  baseURL: "http://localhost:5000",
-});
+// ─── Feature Flags ────────────────────────────────────────────────────────────
+// Set VITE_USE_MOCK_DATA=true in .env.local for local dev without a backend.
+// NEVER set this to true in production (.env or CI).
+const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === "true";
+const USE_MOCK_LMS  = import.meta.env.VITE_USE_MOCK_LMS  === "true";
 
-API.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
-
-API.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error?.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  },
-);
-
-const getConfig = () => ({
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-});
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin Profile
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const getAdminProfile = async () => {
-  const response = await API.get("/profile");
+  const response = await api.get("/api/v1/admin/profile");
   return response.data;
 };
 
 export const updateAdminProfile = async (profileData) => {
-  const response = await API.put("/profile", profileData);
+  const response = await api.put("/api/v1/admin/profile", profileData);
   return response.data;
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Students
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const getStudentById = async (id) => {
   try {
-    const response = await API.get(`/api/v1/admin/students/${id}`);
-
+    const response = await api.get(`/api/v1/admin/students/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -54,8 +35,7 @@ export const getStudentById = async (id) => {
 
 export const getStudentProgress = async (id) => {
   try {
-    const response = await API.get(`/api/v1/admin/students/${id}/progress`);
-
+    const response = await api.get(`/api/v1/admin/students/${id}/progress`);
     return response.data;
   } catch (error) {
     throw error;
@@ -64,7 +44,7 @@ export const getStudentProgress = async (id) => {
 
 export const getStudents = async (params = {}) => {
   try {
-    const response = await API.get("/api/v1/admin/students", { params });
+    const response = await api.get("/api/v1/admin/students", { params });
     return response.data;
   } catch (error) {
     console.error("Error fetching students:", error);
@@ -74,7 +54,7 @@ export const getStudents = async (params = {}) => {
 
 export const verifyStudent = async (studentId) => {
   try {
-    const response = await API.patch(
+    const response = await api.patch(
       `/api/v1/admin/students/${studentId}/verify`,
     );
     return response.data;
@@ -86,7 +66,7 @@ export const verifyStudent = async (studentId) => {
 
 export const blockStudent = async (studentId, reason) => {
   try {
-    const response = await API.patch(
+    const response = await api.patch(
       `/api/v1/admin/students/${studentId}/block`,
       { reason },
     );
@@ -99,7 +79,7 @@ export const blockStudent = async (studentId, reason) => {
 
 export const unblockStudent = async (studentId) => {
   try {
-    const response = await API.patch(
+    const response = await api.patch(
       `/api/v1/admin/students/${studentId}/unblock`,
     );
     return response.data;
@@ -111,7 +91,7 @@ export const unblockStudent = async (studentId) => {
 
 export const resetStudentPassword = async (studentId) => {
   try {
-    const response = await API.post(
+    const response = await api.post(
       `/api/v1/admin/students/${studentId}/reset-pw`,
     );
     return response.data;
@@ -123,11 +103,10 @@ export const resetStudentPassword = async (studentId) => {
 
 export const exportStudents = async (params = {}) => {
   try {
-    const response = await API.get("/api/v1/admin/students/export", {
+    const response = await api.get("/api/v1/admin/students/export", {
       params,
       responseType: "blob",
     });
-
     return response.data;
   } catch (error) {
     console.error("Error exporting students:", error);
@@ -135,131 +114,14 @@ export const exportStudents = async (params = {}) => {
   }
 };
 
-const mockPrograms = [
-  {
-    id: "course_201",
-    title: "MERN Full Stack",
-    targetRole: "Web Developer",
-    mentor: {
-      id: "mentor_001",
-      name: "Rohit Sharma",
-    },
-    modulesCount: 8,
-    enrollment: 48,
-    completionRate: "78%",
-    status: "active",
-  },
-];
+// ─────────────────────────────────────────────────────────────────────────────
+// Colleges
+// ─────────────────────────────────────────────────────────────────────────────
 
-const USE_MOCK_LMS = true;
-
-export const adminService = {
-
-  async getTrainingAnalytics(programId) {
-    const response = await API.get(
-      `/api/v1/admin/courses/${programId}/analytics`,
-      getConfig(),
-    );
-
-    return response.data;
-  },
-
-  async createTrainingProgram(payload) {
-    const response = await API.post(
-      "/api/v1/admin/courses",
-      payload,
-      getConfig(),
-    );
-
-    return response.data;
-  },
-
-  async getTrainingPrograms() {
-    if (USE_MOCK_LMS) {
-      return {
-        courses: mockPrograms,
-        total: mockPrograms.length,
-        page: 1,
-        limit: 20,
-      };
-    }
-
-    const response = await API.get("/api/v1/admin/courses", getConfig());
-    return response.data;
-  },
-
-  async getTrainingProgramById(programId) {
-    const response = await API.get(
-      `/api/v1/admin/courses/${programId}`,
-      getConfig(),
-    );
-
-    return response.data;
-  },
-
-  async updateTrainingProgram(programId, payload) {
-    const response = await API.put(
-      `/api/v1/admin/courses/${programId}`,
-      payload,
-      getConfig(),
-    );
-
-    return response.data;
-  },
-
-  async assignMentor(programId, mentorId) {
-    const response = await API.patch(
-      `/api/v1/admin/courses/${programId}/assign-mentor`,
-      { mentorId },
-      getConfig(),
-    );
-
-    return response.data;
-  },
-
-  async archiveTrainingProgram(programId) {
-    const response = await API.delete(
-      `/api/v1/admin/courses/${programId}`,
-      getConfig(),
-    );
-
-    return response.data;
-  },
-
-  async addModule(programId, moduleData) {
-    const response = await API.post(
-      `/api/v1/admin/courses/${programId}/modules`,
-      moduleData,
-      getConfig(),
-    );
-
-    return response.data;
-  },
-
-  async updateModule(programId, moduleId, payload) {
-    const response = await API.put(
-      `/api/v1/admin/courses/${programId}/modules/${moduleId}`,
-      payload,
-      getConfig(),
-    );
-
-    return response.data;
-  },
-
-  async deleteModule(programId, moduleId) {
-    const response = await API.delete(
-      `/api/v1/admin/courses/${programId}/modules/${moduleId}`,
-      getConfig(),
-    );
-
-    return response.data;
-  },
-};
-
-//For college needing recruitment
+// For colleges needing recruitment
 export const getNeedsRecruitment = async () => {
   try {
-    const response = await API.get("/api/v1/admin/colleges/needs-recruitment");
+    const response = await api.get("/api/v1/admin/colleges/needs-recruitment");
     return response.data;
   } catch (error) {
     console.log(error);
@@ -267,10 +129,10 @@ export const getNeedsRecruitment = async () => {
   }
 };
 
-//To fetch rankings of college
+// Fetch rankings of colleges
 export const getCollegeRankings = async () => {
   try {
-    const response = await API.get("/api/v1/admin/colleges/rankings");
+    const response = await api.get("/api/v1/admin/colleges/rankings");
     return response.data;
   } catch (error) {
     console.log(error);
@@ -280,7 +142,7 @@ export const getCollegeRankings = async () => {
 
 export const approveCollege = async (id) => {
   try {
-    const response = await API.put(`/api/v1/admin/colleges/${id}/approve`);
+    const response = await api.put(`/api/v1/admin/colleges/${id}/approve`);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -290,64 +152,60 @@ export const approveCollege = async (id) => {
 
 export const rejectCollege = async (id, reason) => {
   try {
-    const response = await API.put(`/api/v1/admin/colleges/${id}/reject`, {
+    const response = await api.put(`/api/v1/admin/colleges/${id}/reject`, {
       reason,
     });
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
 
 export const suspendCollege = async (id, reason) => {
   try {
-    const response = await API.put(`/api/v1/admin/colleges/${id}/suspend`, {
+    const response = await api.put(`/api/v1/admin/colleges/${id}/suspend`, {
       reason,
     });
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dashboard
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const fetchDashboardStats = async () => {
-  const response = await API.get("/api/v1/admin/dashboard/stats", getConfig());
+  const response = await api.get("/api/v1/admin/dashboard/stats");
   return response.data;
 };
 
 export const fetchDashboardFunnel = async () => {
-  const response = await API.get("/api/v1/admin/dashboard/funnel", getConfig());
+  const response = await api.get("/api/v1/admin/dashboard/funnel");
   return response.data;
 };
 
 export const fetchCompanyStats = async () => {
-  const response = await API.get(
-    "/api/v1/admin/dashboard/company-stats",
-    getConfig(),
-  );
+  const response = await api.get("/api/v1/admin/dashboard/company-stats");
   return response.data;
 };
 
 export const fetchCollegePerformance = async () => {
-  const response = await API.get(
-    "/api/v1/admin/dashboard/college-performance",
-    getConfig(),
-  );
+  const response = await api.get("/api/v1/admin/dashboard/college-performance");
   return response.data;
 };
 
 export const fetchActivityFeed = async () => {
-  const response = await API.get(
-    "/api/v1/admin/dashboard/activity-feed",
-    getConfig(),
-  );
+  const response = await api.get("/api/v1/admin/dashboard/activity-feed");
   return response.data;
 };
 
-// Mock Drive Data - Fallback when backend is unavailable
+// ─────────────────────────────────────────────────────────────────────────────
+// Drives — Mock fallback data
+// ─────────────────────────────────────────────────────────────────────────────
 
 const mockDrives = [
   {
@@ -434,24 +292,28 @@ export const PIPELINE_STAGES = [
   "selection",
 ];
 
-// Feature Flag: Use mock data instead of backend APIs
-// Set to false to use real backend APIs (when available)
-const USE_MOCK_DATA = true;
+// Feature Flag: controlled via VITE_USE_MOCK_DATA env variable (see top of file)
+
+export const getDrives = async () => {
+  try {
+    const response = await api.get("/api/v1/admin/drives");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return mockDrives;
+  }
+};
+
 export const getDriveById = async (driveId) => {
   if (USE_MOCK_DATA) {
     return mockDriveDetail;
   }
 
   try {
-    const response = await API.get(
-      `/api/v1/admin/drives/${driveId}`,
-      getConfig(),
-    );
-
+    const response = await api.get(`/api/v1/admin/drives/${driveId}`);
     return response.data;
   } catch (error) {
     console.log(error);
-
     return mockDriveDetail;
   }
 };
@@ -462,293 +324,189 @@ export const getCandidates = async (driveId) => {
   }
 
   try {
-    const response = await API.get(
-      `/api/v1/admin/drives/${driveId}/candidates`,
-      getConfig(),
-    );
-
+    const response = await api.get(`/api/v1/admin/drives/${driveId}/candidates`);
     return response.data;
   } catch (error) {
     console.log(error);
-
     return mockCandidates;
   }
 };
 
 export const advanceDrive = async (driveId) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      message: "Drive advanced successfully",
-    };
+    return { success: true, message: "Drive advanced successfully" };
   }
 
   try {
-    const response = await API.patch(
-      `/api/v1/admin/drives/${driveId}/advance`,
-      {},
-      getConfig(),
-    );
-
+    const response = await api.patch(`/api/v1/admin/drives/${driveId}/advance`, {});
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
 
 export const freezeDrive = async (driveId) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      status: "frozen",
-    };
+    return { success: true, status: "frozen" };
   }
 
   try {
-    const response = await API.patch(
-      `/api/v1/admin/drives/${driveId}/freeze`,
-      {},
-      getConfig(),
-    );
-
+    const response = await api.patch(`/api/v1/admin/drives/${driveId}/freeze`, {});
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
 
 export const unfreezeDrive = async (driveId) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      status: "active",
-    };
+    return { success: true, status: "active" };
   }
 
   try {
-    const response = await API.patch(
-      `/api/v1/admin/drives/${driveId}/unfreeze`,
-      {},
-      getConfig(),
-    );
-
+    const response = await api.patch(`/api/v1/admin/drives/${driveId}/unfreeze`, {});
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
 
 export const moveCandidate = async (driveId, payload) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      ...payload,
-    };
+    return { success: true, ...payload };
   }
 
   try {
-    const response = await API.patch(
+    const response = await api.patch(
       `/api/v1/admin/drives/${driveId}/move-candidate`,
       payload,
-      getConfig(),
     );
-
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
 
 export const shortlistCandidates = async (driveId, payload) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      shortlistedCount: payload.topN,
-    };
+    return { success: true, shortlistedCount: payload.topN };
   }
 
   try {
-    const response = await API.patch(
+    const response = await api.patch(
       `/api/v1/admin/drives/${driveId}/shortlist`,
       payload,
-      getConfig(),
     );
-
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
 
 export const assignTest = async (driveId, payload) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      assignedTest: payload,
-    };
+    return { success: true, assignedTest: payload };
   }
 
   try {
-    const response = await API.post(
+    const response = await api.post(
       `/api/v1/admin/drives/${driveId}/assign-test`,
       payload,
-      getConfig(),
     );
-
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
 
 export const assignCourse = async (driveId, payload) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      assignedCourse: payload,
-    };
+    return { success: true, assignedCourse: payload };
   }
 
   try {
-    const response = await API.post(
+    const response = await api.post(
       `/api/v1/admin/drives/${driveId}/assign-course`,
       payload,
-      getConfig(),
     );
-
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
 
 export const updateDrive = async (driveId, payload) => {
   if (USE_MOCK_DATA) {
-    return {
-      success: true,
-      updatedDrive: payload,
-    };
+    return { success: true, updatedDrive: payload };
   }
 
   try {
-    const response = await API.put(
-      `/api/v1/admin/drives/${driveId}`,
-      payload,
-      getConfig(),
-    );
-
+    const response = await api.put(`/api/v1/admin/drives/${driveId}`, payload);
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
 
-const getToken = () => localStorage.getItem("token");
+// ─────────────────────────────────────────────────────────────────────────────
+// Assessments
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const getAssessmentById = async (assessmentId) => {
-  const response = await API.get(`/api/v1/admin/assessments/${assessmentId}`, {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
-  });
-
+  const response = await api.get(`/api/v1/admin/assessments/${assessmentId}`);
   return response.data;
 };
 
 export const addQuestion = async (assessmentId, payload) => {
-  const response = await API.post(
+  const response = await api.post(
     `/api/v1/admin/assessments/${assessmentId}/questions`,
     payload,
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    },
   );
-
   return response.data;
 };
 
 export const updateQuestion = async (assessmentId, questionId, payload) => {
-  const response = await API.put(
+  const response = await api.put(
     `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
     payload,
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    },
   );
-
   return response.data;
 };
 
 export const deleteQuestion = async (assessmentId, questionId) => {
-  const response = await API.delete(
+  const response = await api.delete(
     `/api/v1/admin/assessments/${assessmentId}/questions/${questionId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    },
   );
-
   return response.data;
 };
 
 export const publishAssessment = async (assessmentId) => {
-  const response = await API.patch(
+  const response = await api.patch(
     `/api/v1/admin/assessments/${assessmentId}/publish`,
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    },
   );
-
-  return response.data;
-};
-
-export const getDrives = async () => {
-  const response = await API.get("/api/v1/admin/drives", {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
-  });
-
   return response.data;
 };
 
 export const assignAssessment = async (assessmentId, payload) => {
-  const response = await API.post(
+  const response = await api.post(
     `/api/v1/admin/assessments/${assessmentId}/assign`,
     payload,
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    },
   );
-
   return response.data;
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mentors
+// ─────────────────────────────────────────────────────────────────────────────
 
 // Mock Mentor Data - Fallback when backend is unavailable
 const mockMentors = [
@@ -818,15 +576,13 @@ const mockMentorPerformance = {
   ],
 };
 
-// Mentor Management APIs
-
 export const getMentors = async () => {
   if (USE_MOCK_DATA) {
     return mockMentors;
   }
 
   try {
-    const response = await API.get("/api/v1/admin/mentors");
+    const response = await api.get("/api/v1/admin/mentors");
     return response.data;
   } catch (error) {
     return mockMentors;
@@ -840,7 +596,7 @@ export const getMentorById = async (mentorId) => {
   }
 
   try {
-    const response = await API.get(`/api/v1/admin/mentors/${mentorId}`);
+    const response = await api.get(`/api/v1/admin/mentors/${mentorId}`);
     return response.data;
   } catch (error) {
     const mentor = mockMentors.find((m) => m.id === mentorId);
@@ -860,7 +616,7 @@ export const getMentorPerformance = async (mentorId) => {
   }
 
   try {
-    const response = await API.get(
+    const response = await api.get(
       `/api/v1/admin/mentors/${mentorId}/performance`,
     );
     return response.data;
@@ -881,7 +637,7 @@ export const createMentor = async (mentorData) => {
   }
 
   try {
-    const response = await API.post("/api/v1/admin/mentors", mentorData);
+    const response = await api.post("/api/v1/admin/mentors", mentorData);
     return response.data;
   } catch (error) {
     return { success: true, data: mentorData };
@@ -894,7 +650,7 @@ export const assignMentor = async (mentorId, batchId) => {
   }
 
   try {
-    const response = await API.patch(
+    const response = await api.patch(
       `/api/v1/admin/mentors/${mentorId}/assign`,
       { batchId },
     );
@@ -910,7 +666,7 @@ export const replaceMentor = async (mentorId, newMentorId) => {
   }
 
   try {
-    const response = await API.patch(
+    const response = await api.patch(
       `/api/v1/admin/mentors/${mentorId}/replace`,
       { newMentorId },
     );
@@ -926,79 +682,52 @@ export const deleteMentor = async (mentorId) => {
   }
 
   try {
-    const response = await API.delete(`/api/v1/admin/mentors/${mentorId}`);
+    const response = await api.delete(`/api/v1/admin/mentors/${mentorId}`);
     return response.data;
   } catch (error) {
     return { success: true, mentorId };
   }
 };
+
 /* ===========================================
    Disputes
 =========================================== */
 
 export const getDisputes = async (params = {}) => {
-  const response = await API.get(
-    "/api/v1/admin/disputes",
-    {
-      ...getConfig(),
-      params,
-    }
-  );
-
+  const response = await api.get("/api/v1/admin/disputes", { params });
   return response.data;
 };
 
 export const getDisputeById = async (id) => {
-  const response = await API.get(
-    `/api/v1/admin/disputes/${id}`,
-    getConfig()
-  );
-
+  const response = await api.get(`/api/v1/admin/disputes/${id}`);
   return response.data;
 };
 
 export const reviewDispute = async (id) => {
-  const response = await API.patch(
-    `/api/v1/admin/disputes/${id}/review`,
-    {},
-    getConfig()
-  );
-
+  const response = await api.patch(`/api/v1/admin/disputes/${id}/review`, {});
   return response.data;
 };
 
 export const resolveDispute = async (id, resolution) => {
-  const response = await API.patch(
-    `/api/v1/admin/disputes/${id}/resolve`,
-    { resolution },
-    getConfig()
-  );
-
+  const response = await api.patch(`/api/v1/admin/disputes/${id}/resolve`, { resolution });
   return response.data;
 };
 
 export const escalateDispute = async (id, reason) => {
-  const response = await API.patch(
-    `/api/v1/admin/disputes/${id}/escalate`,
-    { reason },
-    getConfig()
-  );
-
+  const response = await api.patch(`/api/v1/admin/disputes/${id}/escalate`, { reason });
   return response.data;
 };
 
 export const addDisputeNote = async (id, note) => {
-  const response = await API.post(
-    `/api/v1/admin/disputes/${id}/notes`,
-    { note },
-    getConfig()
-  );
-
+  const response = await api.post(`/api/v1/admin/disputes/${id}/notes`, { note });
   return response.data;
 };
 
-// Mock Notification Data
+// ─────────────────────────────────────────────────────────────────────────────
+// Notifications
+// ─────────────────────────────────────────────────────────────────────────────
 
+// Mock Notification Data
 const mockNotifications = [
   {
     id: "notif_501",
@@ -1016,10 +745,6 @@ const mockTemplates = [
   },
 ];
 
-// =========================
-// Notification APIs
-// =========================
-
 export const sendNotification = async (payload) => {
   if (USE_MOCK_DATA) {
     return {
@@ -1034,12 +759,10 @@ export const sendNotification = async (payload) => {
   }
 
   try {
-    const response = await API.post(
+    const response = await api.post(
       "/api/v1/admin/notifications/send",
       payload,
-      getConfig(),
     );
-
     return response.data;
   } catch (error) {
     console.log(error);
@@ -1061,12 +784,10 @@ export const scheduleNotification = async (payload) => {
   }
 
   try {
-    const response = await API.post(
+    const response = await api.post(
       "/api/v1/admin/notifications/schedule",
       payload,
-      getConfig(),
     );
-
     return response.data;
   } catch (error) {
     console.log(error);
@@ -1082,15 +803,10 @@ export const getNotificationTemplates = async () => {
   }
 
   try {
-    const response = await API.get(
-      "/api/v1/admin/notifications/templates",
-      getConfig(),
-    );
-
+    const response = await api.get("/api/v1/admin/notifications/templates");
     return response.data;
   } catch (error) {
     console.log(error);
-
     return {
       templates: mockTemplates,
     };
@@ -1109,15 +825,112 @@ export const createNotificationTemplate = async (payload) => {
   }
 
   try {
-    const response = await API.post(
+    const response = await api.post(
       "/api/v1/admin/notifications/templates",
       payload,
-      getConfig(),
     );
-
     return response.data;
   } catch (error) {
     console.log(error);
     throw error;
   }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LMS / Training Programs
+// ─────────────────────────────────────────────────────────────────────────────
+
+const mockPrograms = [
+  {
+    id: "course_201",
+    title: "MERN Full Stack",
+    targetRole: "Web Developer",
+    mentor: {
+      id: "mentor_001",
+      name: "Rohit Sharma",
+    },
+    modulesCount: 8,
+    enrollment: 48,
+    completionRate: "78%",
+    status: "active",
+  },
+];
+
+// USE_MOCK_LMS: controlled via VITE_USE_MOCK_LMS env variable (see top of file)
+
+export const adminService = {
+  async getTrainingAnalytics(programId) {
+    const response = await api.get(
+      `/api/v1/admin/courses/${programId}/analytics`,
+    );
+    return response.data;
+  },
+
+  async createTrainingProgram(payload) {
+    const response = await api.post("/api/v1/admin/courses", payload);
+    return response.data;
+  },
+
+  async getTrainingPrograms() {
+    if (USE_MOCK_LMS) {
+      return {
+        courses: mockPrograms,
+        total: mockPrograms.length,
+        page: 1,
+        limit: 20,
+      };
+    }
+
+    const response = await api.get("/api/v1/admin/courses");
+    return response.data;
+  },
+
+  async getTrainingProgramById(programId) {
+    const response = await api.get(`/api/v1/admin/courses/${programId}`);
+    return response.data;
+  },
+
+  async updateTrainingProgram(programId, payload) {
+    const response = await api.put(
+      `/api/v1/admin/courses/${programId}`,
+      payload,
+    );
+    return response.data;
+  },
+
+  async assignMentor(programId, mentorId) {
+    const response = await api.patch(
+      `/api/v1/admin/courses/${programId}/assign-mentor`,
+      { mentorId },
+    );
+    return response.data;
+  },
+
+  async archiveTrainingProgram(programId) {
+    const response = await api.delete(`/api/v1/admin/courses/${programId}`);
+    return response.data;
+  },
+
+  async addModule(programId, moduleData) {
+    const response = await api.post(
+      `/api/v1/admin/courses/${programId}/modules`,
+      moduleData,
+    );
+    return response.data;
+  },
+
+  async updateModule(programId, moduleId, payload) {
+    const response = await api.put(
+      `/api/v1/admin/courses/${programId}/modules/${moduleId}`,
+      payload,
+    );
+    return response.data;
+  },
+
+  async deleteModule(programId, moduleId) {
+    const response = await api.delete(
+      `/api/v1/admin/courses/${programId}/modules/${moduleId}`,
+    );
+    return response.data;
+  },
 };

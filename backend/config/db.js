@@ -1,8 +1,9 @@
 import pg from "pg";
 import dotenv from "dotenv";
-import dns from "dns";
+import { setDefaultResultOrder } from "node:dns";
 
-dns.setDefaultResultOrder("ipv4first");
+setDefaultResultOrder("ipv4first");
+
 dotenv.config();
 
 const { Pool } = pg;
