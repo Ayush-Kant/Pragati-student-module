@@ -13,12 +13,12 @@ export const getAllCourses = async (studentId) => {
       tc.updated_at,
       COUNT(DISTINCT cm.id)::INT AS module_count,
       COUNT(DISTINCT l.id)::INT AS lesson_count,
-      COALESCE(scp.progress, 0)::INT AS progress_percent
+      COALESCE(MAX(scp.progress), 0)::INT AS progress_percent
     FROM training_courses tc
     LEFT JOIN course_modules cm ON cm.course_id = tc.id
     LEFT JOIN lessons l ON l.module_id = cm.id
     LEFT JOIN student_course_progress scp ON scp.course_id = tc.id AND scp.student_id = $1
-    GROUP BY tc.id, scp.progress
+    GROUP BY tc.id
     ORDER BY tc.id;
   `;
 
@@ -39,13 +39,13 @@ export const getCourseById = async (id, studentId) => {
       tc.updated_at,
       COUNT(DISTINCT cm.id)::INT AS module_count,
       COUNT(DISTINCT l.id)::INT AS lesson_count,
-      COALESCE(scp.progress, 0)::INT AS progress_percent
+      COALESCE(MAX(scp.progress), 0)::INT AS progress_percent
     FROM training_courses tc
     LEFT JOIN course_modules cm ON cm.course_id = tc.id
     LEFT JOIN lessons l ON l.module_id = cm.id
     LEFT JOIN student_course_progress scp ON scp.course_id = tc.id AND scp.student_id = $2
     WHERE tc.id = $1
-    GROUP BY tc.id, scp.progress;
+    GROUP BY tc.id;
   `;
 
   const { rows } = await pool.query(query, [id, studentId]);

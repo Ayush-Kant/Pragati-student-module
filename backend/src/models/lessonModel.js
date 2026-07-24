@@ -139,7 +139,7 @@ export const updateLessonProgress = async (lessonId, studentId, completed) => {
   }
 
   const courseQuery = `
-    totals AS (
+    WITH totals AS (
       SELECT course_id, COUNT(*)::INT AS total_lessons
       FROM lessons l
       JOIN course_modules cm ON cm.id = l.module_id

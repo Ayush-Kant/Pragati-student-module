@@ -1,6 +1,10 @@
 import * as trainingService from "../services/trainingService.js";
 
-const getStudentId = (req) => req.user?.id ?? req.user?.userId ?? null;
+const getStudentId = (req) => {
+    const studentId = req.user?.id;
+    const parsed = Number(studentId);
+    return Number.isFinite(parsed) ? parsed : null;
+};
 
 export const getAllCourses = async (req, res, next) => {
     try {
