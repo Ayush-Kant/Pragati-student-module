@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
-import { useOutletContext } from "react-router-dom"; 
-import { Filter, X } from "lucide-react"; 
+import { useOutletContext } from "react-router-dom";
+import { Filter, X } from "lucide-react";
 import Pagination from "../components/common/Pagination";
 
 import BatchFilter from "../components/filters/BatchFilter";
@@ -21,18 +21,26 @@ import NominatedTable from "../components/nomination/NominatedTable";
 import EditNominationForm from "../components/forms/EditNominationForm";
 import RemoveNominationModal from "../components/forms/RemoveNominationModal";
 
-import {
-  eligibleStudents,
-  nominatedStudents,
-} from "../types/studentNominationDummyData";
+
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import EmptyState from "../components/common/EmptyState";
 import ErrorState from "../components/common/ErrorState";
 import NominationCard from "../components/nomination/NominationCard";
+import useStudentNomination from "../hooks/useStudentNomination";
+
 
 const StudentNominationPage = () => {
   const { darkMode } = useOutletContext();
-
+  const {
+    eligibleStudents,
+    nominatedStudents,
+    loading,
+    error,
+    nominateStudent,
+    updateNomination,
+    removeNomination,
+    refreshData,
+  } = useStudentNomination()
   /* =====================================================
                         Page State
   ===================================================== */
@@ -40,10 +48,9 @@ const StudentNominationPage = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [localError, setLocalError] = useState(null);
   /* =====================================================
                         Filter States
   ===================================================== */
@@ -81,12 +88,9 @@ const StudentNominationPage = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  /* =====================================================
-                        Data States
-  ==================================================== */
-  const [eligibleData, setEligibleData] = useState(eligibleStudents);
-  const [nominatedData, setNominatedData] = useState(nominatedStudents);
 
+  const eligibleData = eligibleStudents;
+  const nominatedData = nominatedStudents;
   /* =====================================================
                         Handlers
   ===================================================== */
@@ -95,7 +99,7 @@ const StudentNominationPage = () => {
     setCurrentPage(1);
     setSelectedStudent(null);
     setIsDetailOpen(false);
-    setError(null);
+    setLocalError(null);
     setSearchQuery("");
     setSelectedCompany("");
     setSelectedDepartment("");
@@ -108,32 +112,27 @@ const StudentNominationPage = () => {
     setCurrentPage(1);
   };
 
-  const handleReNominate = (student) => {
+  const handleReNominate = async (student) => {
     try {
-      setError(null);
-      setNominatedData((prev) =>
-        prev.map((s) => (s.id === student.id ? { ...s, status: "Waiting", remarks: "Re-nominated by Admin" } : s))
-      );
+      setLocalError(null);
+      await refreshData();
     } catch (err) {
-      setError("Failed to execute re-nomination workflow action.");
+      setLocalError("Failed to execute re-nomination workflow action.");
     }
   };
 
-  const handleMarkSelected = (student) => {
+  const handleMarkSelected = async (student) => {
     try {
-      setError(null);
-      setNominatedData((prev) =>
-        prev.map((s) => (s.id === student.id ? { ...s, status: "Selected" } : s))
-      );
+      setLocalError(null);
+      await refreshData();
     } catch (err) {
-      setError("Failed to change student eligibility criteria status flag.");
+      setLocalError("Failed to change student eligibility criteria status flag.");
     }
   };
 
-  const handleRetryFetch = () => {
-    setError(null);
-    setEligibleData(eligibleStudents);
-    setNominatedData(nominatedStudents);
+  const handleRetryFetch = async () => {
+    setLocalError(null);
+    await refreshData();
   };
 
   const hasActiveFilters = selectedCompany !== "" || selectedDepartment !== "" || selectedBatch !== "" || (activeTab === "nominated" && selectedStatus !== "");
@@ -142,10 +141,10 @@ const StudentNominationPage = () => {
   /* =====================================================
                         Filtering Logic
   ===================================================== */
-  const baseStudents = activeTab === "eligible" ? eligibleData : nominatedData;
+  const students = activeTab === "eligible" ? eligibleStudents : nominatedStudents
 
   const filteredStudents = useMemo(() => {
-    return baseStudents.filter((student) => {
+    return students.filter((student) => {
       if (searchQuery.trim() !== "") {
         const query = searchQuery.toLowerCase();
         const matchesName = student.name?.toLowerCase().startsWith(query);
@@ -160,7 +159,7 @@ const StudentNominationPage = () => {
 
       return true;
     });
-  }, [baseStudents, searchQuery, selectedCompany, selectedDepartment, selectedBatch, selectedStatus, activeTab]);
+  }, [students, searchQuery, selectedCompany, selectedDepartment, selectedBatch, selectedStatus, activeTab]);
 
   /* =====================================================
                         Pagination Computation
@@ -170,7 +169,10 @@ const StudentNominationPage = () => {
   const indexOfLastStudent = currentPage * itemsPerPage;
   const indexOfFirstStudent = indexOfLastStudent - itemsPerPage;
   const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
-
+  console.log("Eligible:", eligibleStudents);
+  console.log("Nominated:", nominatedStudents);
+  console.log("Loading:", loading);
+  console.log("Error:", error);
   return (
     <div className="flex w-full max-w-full min-w-0 flex-col gap-6 px-2 py-4 sm:px-4 lg:px-6 overflow-hidden">
       <NominationStatistics />
@@ -178,40 +180,38 @@ const StudentNominationPage = () => {
       <NominationTabs
         activeTab={activeTab}
         setActiveTab={handleTabChange}
-        eligibleCount={eligibleData.length}
-        nominatedCount={nominatedData.length}
+        eligibleCount={eligibleStudents.length}
+        nominatedCount={nominatedStudents.length}
       />
 
       <div className="mt-2 flex gap-3 items-center w-full">
         <div className="flex-1 min-w-0">
-          <SearchStudent 
-            value={searchQuery} 
-            onChange={handleFilterChange(setSearchQuery)} 
+          <SearchStudent
+            value={searchQuery}
+            onChange={handleFilterChange(setSearchQuery)}
           />
         </div>
-        
-                <button
-                  onClick={() => setIsMobileFilterOpen(true)}
-                  aria-label="Toggle structural filters drawer grid"
-                  className={`md:hidden flex items-center justify-center p-3.5 rounded-2xl border relative shrink-0 transition-all duration-200 ${
-                    darkMode
-                      ? "border-[#3D3D3D] bg-[#2D2D2D] hover:bg-[#3D3D3D] text-gray-300"
-                      : "border-slate-300 bg-white hover:bg-slate-50 text-slate-600"
-                  }`}
-                >
-                  <Filter size={18} strokeWidth={2.2} />
-                  {hasActiveFilters && (
-                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#ff7a00] ring-2 ring-[#ff7a00]/30 animate-pulse" />
-                  )}
-                </button>
+
+        <button
+          onClick={() => setIsMobileFilterOpen(true)}
+          aria-label="Toggle structural filters drawer grid"
+          className={`md:hidden flex items-center justify-center p-3.5 rounded-2xl border relative shrink-0 transition-all duration-200 ${darkMode
+            ? "border-[#3D3D3D] bg-[#2D2D2D] hover:bg-[#3D3D3D] text-gray-300"
+            : "border-slate-300 bg-white hover:bg-slate-50 text-slate-600"
+            }`}
+        >
+          <Filter size={18} strokeWidth={2.2} />
+          {hasActiveFilters && (
+            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#ff7a00] ring-2 ring-[#ff7a00]/30 animate-pulse" />
+          )}
+        </button>
       </div>
 
-      <div 
-        className={`hidden md:grid grid-cols-1 gap-4 w-full ${
-          activeTab === "eligible" 
-            ? "md:grid-cols-3" 
-            : "md:grid-cols-2 xl:grid-cols-4"
-        }`}
+      <div
+        className={`hidden md:grid grid-cols-1 gap-4 w-full ${activeTab === "eligible"
+          ? "md:grid-cols-3"
+          : "md:grid-cols-2 xl:grid-cols-4"
+          }`}
       >
         <CompanyFilter value={selectedCompany} onChange={handleFilterChange(setSelectedCompany)} />
         <DepartmentFilter value={selectedDepartment} onChange={handleFilterChange(setSelectedDepartment)} />
@@ -223,10 +223,9 @@ const StudentNominationPage = () => {
 
       {isMobileFilterOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs md:hidden animate-fade-in">
-          <div 
-            className={`w-full max-w-md rounded-t-3xl border-t shadow-2xl transition-all duration-300 transform translate-y-0 flex flex-col max-h-[85vh] ${
-              darkMode ? "bg-[#1A1A1A] border-[#3D3D3D] text-white" : "bg-white border-slate-200 text-slate-800"
-            }`}
+          <div
+            className={`w-full max-w-md rounded-t-3xl border-t shadow-2xl transition-all duration-300 transform translate-y-0 flex flex-col max-h-[85vh] ${darkMode ? "bg-[#1A1A1A] border-[#3D3D3D] text-white" : "bg-white border-slate-200 text-slate-800"
+              }`}
           >
             <div className={`flex items-center justify-between border-b p-5 shrink-0 ${darkMode ? "border-[#3D3D3D]" : "border-slate-100"}`}>
               <div className="flex items-center gap-2">
@@ -235,8 +234,8 @@ const StudentNominationPage = () => {
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#ff7a00]/10 text-[#ff7a00] border border-[#ff7a00]/20">Active</span>
                 )}
               </div>
-              <button 
-                onClick={() => setIsMobileFilterOpen(false)} 
+              <button
+                onClick={() => setIsMobileFilterOpen(false)}
                 className={`p-1.5 rounded-xl border transition-colors ${darkMode ? "border-[#3D3D3D] bg-[#2D2D2D] text-gray-400 hover:text-white" : "border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-800"}`}
               >
                 <X size={16} />
@@ -248,19 +247,19 @@ const StudentNominationPage = () => {
                 <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Company</span>
                 <CompanyFilter value={selectedCompany} onChange={handleFilterChange(setSelectedCompany)} />
               </div>
-              
+
               <div className="flex flex-col gap-1.5">
                 <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Department</span>
                 <DepartmentFilter value={selectedDepartment} onChange={handleFilterChange(setSelectedDepartment)} />
               </div>
-              
+
               {activeTab === "nominated" && (
                 <div className="flex flex-col gap-1.5">
                   <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Status Flag</span>
                   <StatusFilter value={selectedStatus} onChange={handleFilterChange(setSelectedStatus)} />
                 </div>
               )}
-              
+
               <div className="flex flex-col gap-1.5">
                 <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Batch Year</span>
                 <BatchFilter value={selectedBatch} onChange={handleFilterChange(setSelectedBatch)} />
@@ -268,22 +267,21 @@ const StudentNominationPage = () => {
             </div>
 
             <div className={`grid grid-cols-2 gap-3 p-4 border-t shrink-0 ${darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-100 bg-white"}`}>
-              <button 
-                onClick={() => { 
-                  setSelectedCompany(""); 
-                  setSelectedDepartment(""); 
-                  setSelectedBatch(""); 
-                  setSelectedStatus(""); 
-                  setIsMobileFilterOpen(false); 
-                }} 
-                className={`w-full py-3 text-sm font-semibold rounded-xl border transition-colors ${
-                  darkMode ? "border-[#3D3D3D] text-gray-400 hover:text-white hover:bg-[#2D2D2D]" : "border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-                }`}
+              <button
+                onClick={() => {
+                  setSelectedCompany("");
+                  setSelectedDepartment("");
+                  setSelectedBatch("");
+                  setSelectedStatus("");
+                  setIsMobileFilterOpen(false);
+                }}
+                className={`w-full py-3 text-sm font-semibold rounded-xl border transition-colors ${darkMode ? "border-[#3D3D3D] text-gray-400 hover:text-white hover:bg-[#2D2D2D]" : "border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                  }`}
               >
                 Clear Filters
               </button>
-              <button 
-                onClick={() => setIsMobileFilterOpen(false)} 
+              <button
+                onClick={() => setIsMobileFilterOpen(false)}
                 className="w-full py-3 text-sm font-semibold rounded-xl bg-[#ff7a00] hover:bg-[#e06b00] text-white shadow-lg shadow-[#ff7a00]/15 active:scale-[0.98] transition-all"
               >
                 Apply Filters
@@ -296,11 +294,32 @@ const StudentNominationPage = () => {
       {error ? (
         <ErrorState message={error} onRetry={handleRetryFetch} />
       ) : showNominationForm ? (
-        <StudentNominationForm student={nominatingStudent} onClose={() => { setShowNominationForm(false); setNominatingStudent(null); }} onSave={(newNomination) => { try { setEligibleData((prev) => prev.filter((student) => student.id !== newNomination.id)); setNominatedData((prev) => [newNomination, ...prev]); setShowNominationForm(false); setNominatingStudent(null); } catch (err) { setError("An error occurred while saving the new student nomination mapping."); } }} />
+        <StudentNominationForm
+          student={nominatingStudent}
+          onClose={() => {
+            setShowNominationForm(false)
+            setNominatingStudent(null)
+          }}
+          onSave={async (data) => {
+            const res = await nominateStudent(data)
+            if (res.isValid) {
+              setShowNominationForm(false)
+              setNominatingStudent(null)
+            } else {
+              alert(res.errors?.service || res.errors?.student || 'Failed to nominate')
+            }
+          }}
+        />
       ) : showEditForm ? (
-        <EditNominationForm student={editingStudent} onClose={() => { setShowEditForm(false); setEditingStudent(null); }} onSave={(updatedNomination) => { try { setNominatedData((prev) => prev.map((student) => student.id === updatedNomination.id ? updatedNomination : student)); setEditingStudent(updatedNomination); setShowEditForm(false); } catch (err) { setError("An error occurred during updating specific student records data values."); } }} />
+        <EditNominationForm student={editingStudent} onClose={() => { setShowEditForm(false); setEditingStudent(null); }} onSave={async (updatedNomination) => {
+          try {
+            await refreshData();
+            setEditingStudent(updatedNomination);
+            setShowEditForm(false); setEditingStudent(updatedNomination); setShowEditForm(false);
+          } catch (err) { setLocalError("An error occurred during updating specific student records data values."); }
+        }} />
       ) : showRemoveModal ? (
-        <RemoveNominationModal student={removingStudent} onClose={() => { setShowRemoveModal(false); setRemovingStudent(null); }} onRemove={(updatedStudent) => { try { setNominatedData((prev) => prev.filter((student) => student.id !== updatedStudent.id)); const eligibleStudent = { ...updatedStudent, company: "--", role: "--", package: "--", remarks: "", shortlistedDate: "--", status: "Eligible", }; setEligibleData((prev) => [...prev, eligibleStudent]); setShowRemoveModal(false); setRemovingStudent(null); } catch (err) { setError("Failed to cleanly shift back to active eligible pool array index values."); } }} />
+        <RemoveNominationModal student={removingStudent} onClose={() => { setShowRemoveModal(false); setRemovingStudent(null); }} onRemove={async (updatedStudent) => { try { await refreshData(); const eligibleStudent = { ...updatedStudent, company: "--", role: "--", package: "--", remarks: "", shortlistedDate: "--", status: "Eligible", }; setEligibleData((prev) => [...prev, eligibleStudent]); setShowRemoveModal(false); setRemovingStudent(null); } catch (err) { setLocalError("Failed to cleanly shift back to active eligible pool array index values."); } }} />
       ) : (
         <>
           {totalStudents === 0 ? (
@@ -313,7 +332,18 @@ const StudentNominationPage = () => {
                   {activeTab === "eligible" ? (
                     <NominationTable students={currentStudents} totalStudents={totalStudents} selectedStudent={selectedStudent} isDetailOpen={isDetailOpen} setSelectedStudent={setSelectedStudent} setIsDetailOpen={setIsDetailOpen} onNominate={(student) => { setNominatingStudent(student); setShowNominationForm(true); }} />
                   ) : (
-                    <NominatedTable students={currentStudents} totalStudents={totalStudents} selectedStudent={selectedStudent} isDetailOpen={isDetailOpen} setSelectedStudent={setSelectedStudent} setIsDetailOpen={setIsDetailOpen} onEditNomination={(student) => { setEditingStudent(student); setShowEditForm(true); }} onRemoveNomination={(student) => { setRemovingStudent(student); setShowRemoveModal(true); }} onReNominate={handleReNominate} onMarkSelected={handleMarkSelected} />
+                    <NominatedTable students={currentStudents} totalStudents={totalStudents} selectedStudent={selectedStudent} isDetailOpen={isDetailOpen} setSelectedStudent={setSelectedStudent} setIsDetailOpen={setIsDetailOpen} onEditNomination={async (student) => {
+                      const res = await updateNomination(student.id, { status: 'Nominated', remarks: '' }, student)
+                      if (!res.isValid) console.error(res.message)
+                    }}
+                      onRemoveNomination={async (student) => {
+                        const res = await removeNomination(student.id)
+                        if (!res.success) console.error(res.message)
+                      }}
+                      onReNominate={(student) => {
+                        setNominatingStudent(student)
+                        setShowNominationForm(true)
+                      }} onMarkSelected={handleMarkSelected} />
                   )}
                 </div>
 
@@ -326,7 +356,7 @@ const StudentNominationPage = () => {
               <div className="block md:hidden">
                 <NominationCard
                   students={currentStudents}
-                  hasSearched={true} 
+                  hasSearched={true}
                   activeTab={activeTab}
                   onNominate={(student) => {
                     setNominatingStudent(student);

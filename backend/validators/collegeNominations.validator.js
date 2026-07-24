@@ -5,7 +5,6 @@ export const validateNomination = (data) => {
   if (!data.company_id) errors.company_id = 'Company ID is required'
   if (!data.company_name || data.company_name.trim().length < 2)
     errors.company_name = 'Company name is required'
-  if (!data.nominated_by) errors.nominated_by = 'Nominated by is required'
 
   return { isValid: Object.keys(errors).length === 0, errors }
 }

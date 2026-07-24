@@ -61,21 +61,31 @@ export const getShortlistedStudents = async (params = {}) => {
 };
 
 export const nominateStudent = async (data) => {
+  console.log("SERVICE CALLED", data);
   try {
     const response = await api.post("/nominations", data);
+    console.log("POST SUCCESS", response);
     return {
       success: true,
       data: response.data.data,
       message: response.data.message,
     };
   } catch (err) {
+  console.log("POST ERROR", err.response?.data);
+
+  return {
+    success: false,
+    message:
+      err.response?.data?.message || "Failed to nominate student",
+  };
+}
     return {
       success: false,
       message:
         err.response?.data?.message || "Failed to nominate student",
     };
   }
-};
+
 
 export const updateNomination = async (id, data) => {
   try {
