@@ -1,6 +1,7 @@
 -- Assumes these tables already exist (created by earlier interns):
 --   users, recruitment_drives, student_drive_progress
 
+-- TABLE: colleges
 CREATE TABLE IF NOT EXISTS colleges (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id),
@@ -33,6 +34,7 @@ DO $$ BEGIN
     CHECK (status IN ('pending','approved','rejected','suspended'));
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
+
 
 -- TABLE: college_stats
 -- Aggregated performance data per college
