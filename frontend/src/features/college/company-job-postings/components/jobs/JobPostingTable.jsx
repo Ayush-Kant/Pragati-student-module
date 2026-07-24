@@ -5,13 +5,14 @@ const JobPostingTable = ({
   onEdit,
   onDelete,
   onToggleStatus,
+  darkMode,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-md">
+    <div className={`rounded-xl shadow-md ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white'}`}>
 
-      <div className="border-b px-6 py-4">
+      <div className={`border-b px-6 py-4 ${darkMode ? 'border-[#3D3D3D]' : ''}`}>
 
-        <h2 className="text-xl font-semibold text-slate-700">
+        <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-slate-700'}`}>
           Job Postings
         </h2>
 
@@ -26,6 +27,7 @@ const JobPostingTable = ({
             onEdit={onEdit}
             onDelete={onDelete}
             onToggleStatus={onToggleStatus}
+            darkMode={darkMode}
           />
         ))}
 

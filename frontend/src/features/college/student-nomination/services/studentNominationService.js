@@ -1,101 +1,157 @@
+import api from "../../../../services/api";
 import {
   eligibleStudents,
   nominatedStudents,
-  shortlistedStudents,
 } from "../types/studentNominationDummyData";
 
+const USE_DUMMY = false;
 
-const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const successResponse = (data, message = "Success") => ({
-  success: true,
-  message,
-  data,
-});
-
-const errorResponse = (message) => ({
-  success: false,
-  message,
-});
-
-export const getEligibleStudents = async () => {
-  await delay();
-  return successResponse([...eligibleStudents]);
-};
-
-export const getNominatedStudents = async () => {
-  await delay();
-  return successResponse([...nominatedStudents]);
-};
-
-export const getShortlistedStudents = async () => {
-  await delay();
-  return successResponse([...shortlistedStudents]);
-};
-
-
-export const nominateStudent = async (student) => {
-  await delay(500);
-  if (!student) {
-    return errorResponse("Student data is required.");
+export const getEligibleStudents = async (params = {}) => {
+  if (USE_DUMMY) {
+    return { success: true, data: eligibleStudents };
   }
 
-  // Hydrate object structure matching schema requirements
-  const newNomination = {
-    ...student,
-    id: student.id || Date.now(),
-    status: "Waiting",
-    nominatedDate: new Date().toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }),
-    timeline: {
-      nominated: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
-      waiting: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
-      Shortlisted: null,
-      rejected: null,
-    }
-  };
-
-  // Prevent record collisions in working memory context reference arrays
-  const exists = nominatedStudents.some(s => s.id === student.id);
-  if (!exists) {
-    nominatedStudents.push(newNomination);
+  try {
+    const response = await api.get("/nominations/eligible", { params });
+    return {
+      success: true,
+      data: response.data.data,
+      pagination: response.data.pagination,
+    };
+  } catch (err) {
+    console.error("Error fetching eligible students:", err);
+    return { success: true, data: eligibleStudents };
   }
-
-  return successResponse(newNomination, "Student nominated successfully.");
 };
 
-export const updateNomination = async (studentId, updatedData) => {
-  await delay(500);
-  const index = nominatedStudents.findIndex((student) => student.id === studentId);
-
-  if (index === -1) {
-    return errorResponse("Student nomination record not found.");
+export const getNominations = async (params = {}) => {
+  if (USE_DUMMY) {
+    return { success: true, data: nominatedStudents };
   }
 
-  nominatedStudents[index] = {
-    ...nominatedStudents[index],
-    ...updatedData,
-  };
-
-  return successResponse(nominatedStudents[index], "Nomination updated successfully.");
+  try {
+    const response = await api.get("/nominations", { params });
+    return {
+      success: true,
+      data: response.data.data,
+      pagination: response.data.pagination,
+    };
+  } catch (err) {
+    console.error("Error fetching nominations:", err);
+    return { success: true, data: nominatedStudents };
+  }
 };
 
-/**
- * Drops candidate assignment allocations
- */
-export const removeNomination = async (studentId) => {
-  await delay(450);
-  const index = nominatedStudents.findIndex((student) => student.id === studentId);
-
-  if (index === -1) {
-    return errorResponse("Student nomination record not found.");
+export const getShortlistedStudents = async (params = {}) => {
+  try {
+    const response = await api.get("/shortlists", { params });
+    return {
+      success: true,
+      data: response.data.data,
+      pagination: response.data.pagination,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message:
+        err.response?.data?.message || "Failed to fetch shortlisted students",
+      data: [],
+    };
   }
+};
 
-  const removedStudent = nominatedStudents[index];
-  nominatedStudents.splice(index, 1);
+export const nominateStudent = async (data) => {
+  console.log("SERVICE CALLED", data);
+  try {
+    const response = await api.post("/nominations", data);
+    console.log("POST SUCCESS", response);
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
+  } catch (err) {
+    console.log("POST ERROR", err.response?.data);
 
-  return successResponse(removedStudent, "Nomination removed successfully.");
+    return {
+      success: false,
+      message:
+        err.response?.data?.message || "Failed to nominate student",
+    };
+  }
+};
+
+
+export const updateNomination = async (id, data) => {
+  try {
+    const response = await api.put(`/nominations/${id}`, data);
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message:
+        err.response?.data?.message || "Failed to update nomination",
+    };
+  }
+};
+
+export const removeNomination = async (id) => {
+  try {
+    const response = await api.delete(`/nominations/${id}`);
+    return {
+      success: true,
+      message: response.data.message,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message:
+        err.response?.data?.message || "Failed to remove nomination",
+    };
+  }
+};
+
+export const getCompanyShortlist = async (
+  companyId,
+  params = {}
+) => {
+  try {
+    const response = await api.get(
+      `/shortlists/company/${companyId}`,
+      { params }
+    );
+
+    return {
+      success: true,
+      data: response.data.data,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message:
+        err.response?.data?.message ||
+        "Failed to fetch company shortlist",
+      data: [],
+    };
+  }
+};
+
+export const getNominationStatistics = async () => {
+  try {
+    const response = await api.get("/nominations/statistics");
+
+    return {
+      success: true,
+      data: response.data.data,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      data: null,
+    };
+  }
 };

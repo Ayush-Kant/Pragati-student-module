@@ -1,6 +1,7 @@
 const LoadingSpinner = ({
     size = "md",
     text = "Loading...",
+    darkMode,
   }) => {
     const spinnerSize = {
       sm: "h-5 w-5",
@@ -15,13 +16,12 @@ const LoadingSpinner = ({
             animate-spin
             rounded-full
             border-4
-            border-[#ff7a00]
-            border-t-transparent
+            ${darkMode ? 'border-[#3D3D3D] border-t-[#ff6d34]' : 'border-[#ff7a00] border-t-transparent'}
             ${spinnerSize[size]}
           `}
         />
   
-        <p className="mt-4 text-sm text-gray-500">
+        <p className={`mt-4 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
           {text}
         </p>
       </div>

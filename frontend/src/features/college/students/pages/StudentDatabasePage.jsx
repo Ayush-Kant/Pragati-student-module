@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useOutletContext } from "react-router-dom"
 import useStudentData from "../hooks/useStudentData"
 import useStudentFilters from "../hooks/useStudentFilters"
 import usePagination from "../hooks/usePagination"
@@ -20,6 +21,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner"
 import ErrorState from "../components/common/ErrorState"
 
 const StudentDatabasePage = () => {
+  const { darkMode } = useOutletContext()
   const { students, loading, error, fetchStudents, addStudent, editStudent, removeStudent } = useStudentData()
   const filters = useStudentFilters(students)
   const pagination = usePagination(filters.filteredStudents)
@@ -67,43 +69,45 @@ const StudentDatabasePage = () => {
     setShowDeleteModal(false)
   }
 
-  if (loading) return <LoadingSpinner message="Loading students..." />
-  if (error) return <ErrorState message={error} onRetry={fetchStudents} />
+  if (loading) return <LoadingSpinner message="Loading students..." darkMode={darkMode} />
+  if (error) return <ErrorState message={error} onRetry={fetchStudents} darkMode={darkMode} />
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Student Database</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Manage and track all student records</p>
+          <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Student Database</h1>
+          <p className={`text-sm mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>Manage and track all student records</p>
         </div>
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white rounded-xl px-5 py-2.5 text-sm font-semibold hover:bg-blue-700 cursor-pointer"
+          className="flex items-center gap-2 bg-[#ff6d34] text-white rounded-xl px-5 py-2.5 text-sm font-semibold hover:bg-[#e85d2b] cursor-pointer"
         >
           <span className="text-lg">+</span> Add Student
         </button>
       </div>
 
       {/* Stats */}
-      <StudentStatisticsCard students={students} />
+      <StudentStatisticsCard students={students} darkMode={darkMode} />
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
+      <div className={`rounded-2xl p-4 mb-4 ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white border border-gray-100'}`}>
         <div className="flex flex-wrap gap-3 items-center">
-          <SearchStudent value={filters.search} onChange={filters.setSearch} />
-          <DepartmentFilter value={filters.department} onChange={filters.setDepartment} />
-          <CourseFilter value={filters.course} onChange={filters.setCourse} />
-          <BatchFilter value={filters.batch} onChange={filters.setBatch} />
-          <StatusFilter value={filters.placementStatus} onChange={filters.setPlacementStatus} />
+          <SearchStudent value={filters.search} onChange={filters.setSearch} darkMode={darkMode} />
+          <DepartmentFilter value={filters.department} onChange={filters.setDepartment} darkMode={darkMode} />
+          <CourseFilter value={filters.course} onChange={filters.setCourse} darkMode={darkMode} />
+          <BatchFilter value={filters.batch} onChange={filters.setBatch} darkMode={darkMode} />
+          <StatusFilter value={filters.placementStatus} onChange={filters.setPlacementStatus} darkMode={darkMode} />
 
           {/* Semester filter inline */}
           <select
             value={filters.semester}
             onChange={(e) => filters.setSemester(e.target.value)}
-            className="h-10 px-3 bg-white border border-gray-200 rounded-xl text-sm outline-none text-gray-600 cursor-pointer"
+            className={`h-10 px-3 rounded-xl text-sm outline-none cursor-pointer ${
+              darkMode ? 'bg-[#1A1A1A] border border-[#3D3D3D] text-gray-300 focus:border-[#ff6d34]' : 'bg-white border border-gray-200 text-gray-600'
+            }`}
           >
             {["All", "1", "2", "3", "4", "5", "6", "7", "8"].map((s) => (
               <option key={s} value={s}>{s === "All" ? "All Semesters" : `Sem ${s}`}</option>
@@ -113,22 +117,32 @@ const StudentDatabasePage = () => {
           {/* Reset filters */}
           <button
             onClick={filters.resetFilters}
-            className="h-10 px-4 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer"
+            className={`h-10 px-4 text-sm rounded-xl cursor-pointer ${
+              darkMode ? 'text-gray-400 border border-[#3D3D3D] hover:bg-[#3D3D3D]' : 'text-gray-500 border border-gray-200 hover:bg-gray-50'
+            }`}
           >
             Reset
           </button>
 
           {/* View toggle */}
-          <div className="ml-auto flex bg-gray-100 rounded-xl p-1 gap-1">
+          <div className={`ml-auto flex rounded-xl p-1 gap-1 ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`}>
             <button
               onClick={() => setView("table")}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${view === "table" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"}`}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${
+                view === "table"
+                  ? darkMode ? 'bg-[#2D2D2D] text-[#ff6d34] shadow-sm' : 'bg-white text-blue-600 shadow-sm'
+                  : darkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}
             >
               Table
             </button>
             <button
               onClick={() => setView("card")}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${view === "card" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"}`}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${
+                view === "card"
+                  ? darkMode ? 'bg-[#2D2D2D] text-[#ff6d34] shadow-sm' : 'bg-white text-blue-600 shadow-sm'
+                  : darkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}
             >
               Cards
             </button>
@@ -137,7 +151,7 @@ const StudentDatabasePage = () => {
       </div>
 
       {/* Results count */}
-      <p className="text-xs text-gray-400 mb-3">
+      <p className={`text-xs mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
         Showing {filters.filteredStudents.length} of {students.length} students
       </p>
 
@@ -148,6 +162,7 @@ const StudentDatabasePage = () => {
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          darkMode={darkMode}
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -158,6 +173,7 @@ const StudentDatabasePage = () => {
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              darkMode={darkMode}
             />
           ))}
         </div>
@@ -171,6 +187,7 @@ const StudentDatabasePage = () => {
         pageSize={pagination.pageSize}
         onPageChange={pagination.goToPage}
         onPageSizeChange={pagination.handlePageSizeChange}
+        darkMode={darkMode}
       />
 
       {/* Modals */}
@@ -179,6 +196,7 @@ const StudentDatabasePage = () => {
           student={selectedStudent}
           onClose={() => setShowProfile(false)}
           onEdit={() => handleEdit(selectedStudent)}
+          darkMode={darkMode}
         />
       )}
 
@@ -187,6 +205,7 @@ const StudentDatabasePage = () => {
           onSubmit={handleAddSubmit}
           onCancel={() => setShowAddForm(false)}
           loading={formLoading}
+          darkMode={darkMode}
         />
       )}
 
@@ -196,6 +215,7 @@ const StudentDatabasePage = () => {
           onSubmit={handleEditSubmit}
           onCancel={() => setShowEditForm(false)}
           loading={formLoading}
+          darkMode={darkMode}
         />
       )}
 
@@ -204,6 +224,7 @@ const StudentDatabasePage = () => {
           student={selectedStudent}
           onConfirm={handleDeleteConfirm}
           onCancel={() => setShowDeleteModal(false)}
+          darkMode={darkMode}
         />
       )}
     </div>

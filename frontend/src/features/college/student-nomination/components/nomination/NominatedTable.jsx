@@ -38,9 +38,9 @@ const NominatedTable = ({
   if (isLoading) {
     return (
       <div className={`w-full h-80 flex flex-col items-center justify-center rounded-3xl border gap-4 ${
-        darkMode ? "bg-[#151D30] border-slate-700/60 text-white" : "bg-white border-slate-200 text-slate-800"
+        darkMode ? "bg-[#2D2D2D] border-[#3D3D3D] text-white" : "bg-white border-slate-200 text-slate-800"
       }`}>
-        <Loader2 className="animate-spin text-blue-500" size={36} />
+        <Loader2 className="animate-spin text-[#ff7a00]" size={36} />
         <span className="text-sm font-medium opacity-70">Processing student data pipeline...</span>
       </div>
     );
@@ -85,7 +85,7 @@ const NominatedTable = ({
   const requestAction = (student, type) => {
     let title = "";
     let description = "";
-    let actionColor = "bg-blue-600 hover:bg-blue-700";
+    let actionColor = "bg-[#ff7a00] hover:bg-[#e06b00]";
 
     if (type === "renominate") {
       title = "Confirm Re-Nomination";
@@ -120,14 +120,14 @@ const NominatedTable = ({
   const compactGrid = "grid grid-cols-[2.2fr_1.4fr_1.4fr]";
 
   const headerClass = `h-14 px-5 flex items-center text-xs font-semibold uppercase tracking-wider ${
-    darkMode ? "bg-slate-800/40 text-slate-300 border-b border-slate-700/60" : "bg-slate-50 text-slate-500 border-b border-slate-200"
+    darkMode ? "bg-[#1A1A1A]/60 text-gray-300 border-b border-[#3D3D3D]" : "bg-slate-50 text-slate-500 border-b border-slate-200"
   }`;
 
-  const rowClass = `h-16 px-5 flex items-center min-w-0 ${darkMode ? "border-b border-slate-700/50" : "border-b border-slate-200"}`;
+  const rowClass = `h-16 px-5 flex items-center min-w-0 ${darkMode ? "border-b border-[#3D3D3D]" : "border-b border-slate-200"}`;
 
   return (
     <div className={`w-full overflow-hidden rounded-3xl border transition-all duration-300 ${
-      darkMode ? "bg-[#151D30] border-slate-700/60 shadow-lg shadow-black/20" : "bg-white border-slate-200 shadow-lg"
+      darkMode ? "bg-[#2D2D2D] border-[#3D3D3D] shadow-lg shadow-black/20" : "bg-white border-slate-200 shadow-lg"
     }`}>
       {/* Table Header Wrapper */}
       <div className="px-6 py-5">
@@ -141,7 +141,7 @@ const NominatedTable = ({
         className={`h-142 overflow-y-auto overflow-x-hidden
           [&::-webkit-scrollbar]:w-2
           ${darkMode 
-            ? "[&::-webkit-scrollbar-track]:bg-[#151D30] [&::-webkit-scrollbar-thumb]:bg-slate-700 hover:[&::-webkit-scrollbar-thumb]:bg-slate-600 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:#334155_#151D30]" 
+            ? "[&::-webkit-scrollbar-track]:bg-[#2D2D2D] [&::-webkit-scrollbar-thumb]:bg-[#3D3D3D] hover:[&::-webkit-scrollbar-thumb]:bg-[#4D4D4D] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:#3D3D3D_#2D2D2D]" 
             : "[&::-webkit-scrollbar-track]:bg-white [&::-webkit-scrollbar-thumb]:bg-slate-200 hover:[&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:#e2e8f0_#ffffff]"
           }`}
       >
@@ -204,8 +204,8 @@ const NominatedTable = ({
                       title="View Details"
                       className={`flex h-9 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200 ${
                         selectedStudent?.id === student.id && isDetailOpen
-                          ? "bg-blue-600 text-white"
-                          : darkMode ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          ? `${darkMode ? "bg-[#ff6d34] text-white" : "bg-[#ff7a00] text-white"}`
+                          : darkMode ? "bg-[#2D2D2D] text-gray-300 hover:bg-[#3D3D3D]" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
                       <Eye size={16} />
@@ -284,10 +284,10 @@ const NominatedTable = ({
           />
           
           <div className={`relative w-full max-w-md p-6 rounded-3xl shadow-2xl transition-all duration-200 transform scale-100 border
-            ${darkMode ? "bg-[#1e293b] border-slate-700 text-white" : "bg-white border-slate-100 text-slate-800"}`}
+            ${darkMode ? "bg-[#2D2D2D] border-[#3D3D3D] text-white" : "bg-white border-slate-100 text-slate-800"}`}
           >
             <div className="flex items-start gap-4">
-              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500`}>
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${darkMode ? "bg-[#ff6d34]/10 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"}`}>
                 <HelpCircle size={24} />
               </div>
               <div className="flex-1">
@@ -303,7 +303,7 @@ const NominatedTable = ({
                 type="button"
                 onClick={() => setConfirmConfig((prev) => ({ ...prev, isOpen: false }))}
                 className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors
-                  ${darkMode ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+                  ${darkMode ? "bg-[#2D2D2D] text-gray-300 hover:bg-[#1A1A1A]" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
               >
                 Cancel
               </button>

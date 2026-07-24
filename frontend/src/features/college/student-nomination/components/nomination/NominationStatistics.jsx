@@ -13,32 +13,24 @@ const stats = [
     value: 87,
     trend: "+8 this week",
     icon: Users,
-    iconBg: "bg-emerald-500/10",
-    iconColor: "text-emerald-500",
   },
   {
     title: "Nominated Students",
     value: 42,
     trend: "+5 this week",
     icon: UserCheck,
-    iconBg: "bg-blue-500/10",
-    iconColor: "text-blue-500",
   },
   {
     title: "Waiting",
     value: 11,
     trend: "+2 this week",
     icon: Clock3,
-    iconBg: "bg-amber-500/10",
-    iconColor: "text-amber-500",
   },
   {
     title: "Shortlisted",
     value: 28,
     trend: "+3 this week",
     icon: BadgeCheck,
-    iconBg: "bg-violet-500/10",
-    iconColor: "text-violet-500",
   },
 ];
 
@@ -58,27 +50,27 @@ const NominationStatistics = () => {
             ${
               darkMode
                 ? `
-                  bg-gradient-to-br from-[#1a2336] via-[#182133] to-[#141c2c]
-                  border border-slate-700/60
+                  bg-[#2D2D2D]
+                  border border-[#3D3D3D]
                   shadow-lg shadow-black/20
-                  hover:border-blue-500/20
+                  hover:border-[#ff6d34]/30
                   hover:shadow-2xl
-                  hover:shadow-blue-500/10
+                  hover:shadow-[#ff6d34]/10
                 `
                 : `
-                  bg-gradient-to-br from-white via-white to-slate-50
+                  bg-white
                   border border-slate-200
                   shadow-sm
-                  hover:border-slate-300
+                  hover:border-[#ff7a00]/30
                   hover:shadow-xl
-                  hover:shadow-slate-300/40
+                  hover:shadow-[#ff7a00]/20
                 `
             }`}
           >
             {/* subtle top highlight */}
             <div
               className={`absolute inset-x-0 top-0 h-px ${
-                darkMode ? "bg-white/10" : "bg-white"
+                darkMode ? "bg-white/5" : "bg-slate-100"
               }`}
             />
 
@@ -97,12 +89,15 @@ const NominationStatistics = () => {
 
                 {/* Scaled icon container size for mobile layout */}
                 <div
-                  className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-105 ${stat.iconBg}`}
+                  className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-105 ${
+                    darkMode ? "bg-[#ff6d34]/10" : "bg-[#ff7a00]/10"
+                  }`}
                 >
-                  {/* Scaled Lucide Icon size using responsive widths */}
                   <Icon
                     strokeWidth={2.2}
-                    className={`w-4 h-4 md:w-6 md:h-6 ${stat.iconColor}`}
+                    className={`w-4 h-4 md:w-6 md:h-6 ${
+                      darkMode ? "text-[#ff6d34]" : "text-[#ff7a00]"
+                    }`}
                   />
                 </div>
               </div>

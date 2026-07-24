@@ -59,13 +59,13 @@ export const getNominationById = async (id) => {
   return result.rows[0] || null
 }
 
-export const createNomination = async ({ student_id, company_id, company_name, nominated_by, remarks }) => {
+export const createNomination = async ({ student_id, company_id, company_name, role, package: pkg, nominated_by, remarks }) => {
   const result = await pool.query(
     `INSERT INTO student_nominations
-      (student_id, company_id, company_name, nominated_by, remarks)
-    VALUES ($1, $2, $3, $4, $5)
+      (student_id, company_id, company_name, role, package, nominated_by, remarks)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`,
-    [student_id, company_id, company_name, nominated_by, remarks]
+    [student_id, company_id, company_name, role, pkg, nominated_by, remarks]
   )
   return result.rows[0]
 }

@@ -29,10 +29,10 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
   return (
     <div
       className={`mx-auto w-full max-w-5xl rounded-3xl border shadow-xl ${
-        darkMode ? "border-slate-700 bg-[#151D30]" : "border-slate-200 bg-white"
+        darkMode ? "border-[#3D3D3D] bg-[#2D2D2D]" : "border-slate-200 bg-white"
       }`}
     >
-      <div className={`flex items-center justify-between border-b px-8 py-6 ${darkMode ? "border-slate-700" : "border-slate-200"}`}>
+      <div className={`flex items-center justify-between border-b px-8 py-6 ${darkMode ? "border-[#3D3D3D]" : "border-slate-200"}`}>
         <div className="flex items-center gap-4">
           <div
             className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
@@ -55,7 +55,7 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
           <h3 className="mb-5 text-lg font-semibold">Nomination Details</h3>
           <div
             className={`rounded-3xl border p-6 ${
-              darkMode ? "border-slate-700 bg-slate-800/30" : "border-slate-200 bg-slate-50"
+              darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-200 bg-slate-50"
             }`}
           >
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5">
@@ -86,8 +86,8 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
         <div>
           <h3 className="mb-5 text-lg font-semibold">Status Transition</h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className={`rounded-2xl border p-5 ${darkMode ? "border-slate-700 bg-slate-800/30" : "border-slate-200 bg-slate-50"}`}>
-              <p className={`text-xs uppercase tracking-wider ${darkMode ? "text-slate-500" : "text-slate-400"}`}>Current Status</p>
+<div className={`rounded-2xl border p-5 ${darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-200 bg-slate-50"}`}>
+               <p className={`text-xs uppercase tracking-wider ${darkMode ? "text-slate-500" : "text-slate-400"}`}>Current Status</p>
               <div className="mt-4"><StatusBadge status={student?.status} /></div>
             </div>
             <div className={`rounded-2xl border p-5 ${darkMode ? "border-emerald-700 bg-emerald-500/10" : "border-emerald-200 bg-emerald-50"}`}>
@@ -142,12 +142,12 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
           />
         </div>
 
-        <div className={`flex items-center justify-end gap-4 border-t pt-6 ${darkMode ? "border-slate-700" : "border-slate-200"}`}>
+        <div className={`flex items-center justify-end gap-4 border-t pt-6 ${darkMode ? "border-[#3D3D3D]" : "border-slate-200"}`}>
           <button
             type="button"
             onClick={onClose}
             className={`rounded-xl border px-6 py-3 font-medium transition ${
-              darkMode ? "border-slate-700 text-slate-300 hover:bg-slate-800" : "border-slate-300 text-slate-700 hover:bg-slate-100"
+              darkMode ? "border-[#3D3D3D] text-gray-300 hover:bg-[#1A1A1A]" : "border-slate-300 text-slate-700 hover:bg-slate-100"
             }`}
           >
             Cancel

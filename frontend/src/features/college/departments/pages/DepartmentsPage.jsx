@@ -1,3 +1,4 @@
+import { useOutletContext } from "react-router-dom";
 import { useDepartmentData } from "../hooks/useDepartmentData";
 
 import DepartmentOverview from "../components/department/DepartmentOverview";
@@ -27,6 +28,7 @@ import {
 } from "../constants/departmentConstants";
 
 const DepartmentsPage = () => {
+  const { darkMode } = useOutletContext();
   const {
     departments,
     filteredDepartments,
@@ -83,25 +85,25 @@ const DepartmentsPage = () => {
   } = useDepartmentData();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className={`min-h-screen p-6 ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
 
       {/* Header */}
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
 
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
   {DEPARTMENT_PAGE.TITLE}
 </h1>
 
-<p className="text-gray-500 mt-1">
+<p className={`mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
   {DEPARTMENT_PAGE.SUBTITLE}
 </p>
         </div>
 
         <button
           onClick={openDepartmentForm}
-          className="mt-4 md:mt-0 bg-[#f97316] hover:bg-[#ea580c] text-white px-5 py-3 rounded-lg font-semibold transition"
+          className="mt-4 md:mt-0 bg-[#ff6d34] hover:bg-[#e85d2b] text-white px-5 py-3 rounded-lg font-semibold transition"
         >
          {DEPARTMENT_PAGE.ADD_BUTTON}
         </button>
@@ -112,6 +114,7 @@ const DepartmentsPage = () => {
 
       <DepartmentOverview
         departments={departments}
+        darkMode={darkMode}
       />
 
       {/* Search */}
@@ -122,12 +125,14 @@ const DepartmentsPage = () => {
           value={search}
           onChange={setSearch}
           placeholder={SEARCH_PLACEHOLDER}
+          darkMode={darkMode}
         />
 
         <DepartmentFilter
           value={filter}
           onChange={setFilter}
           options={departments}
+          darkMode={darkMode}
         />
 
       </div>
@@ -135,7 +140,7 @@ const DepartmentsPage = () => {
       {/* Loading */}
 
       {loading ? (
-        <DepartmentSkeleton />
+        <DepartmentSkeleton darkMode={darkMode} />
       ) : (
         <>
 
@@ -146,6 +151,7 @@ const DepartmentsPage = () => {
             onView={handleViewDepartment}
             onEdit={openEditDepartment}
             onDelete={openDeleteDepartment}
+            darkMode={darkMode}
           />
 
           {/* Mobile */}
@@ -155,6 +161,7 @@ const DepartmentsPage = () => {
             onView={handleViewDepartment}
             onEdit={openEditDepartment}
             onDelete={openDeleteDepartment}
+            darkMode={darkMode}
           />
 
         </>
@@ -168,6 +175,7 @@ const DepartmentsPage = () => {
           <DepartmentDetails
             department={selectedDepartment}
             onClose={handleCloseDepartment}
+            darkMode={darkMode}
           />
         )}
 
@@ -178,18 +186,18 @@ const DepartmentsPage = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
 
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
   {COURSE_SECTION.TITLE}
 </h2>
 
-<p className="text-gray-500 mt-1">
+<p className={`mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
   {COURSE_SECTION.SUBTITLE}
 </p>
           </div>
 
           <button
             onClick={() => openCourseForm()}
-            className="mt-4 md:mt-0 bg-[#f97316] hover:bg-[#ea580c] text-white px-5 py-3 rounded-lg font-semibold transition"
+            className="mt-4 md:mt-0 bg-[#ff6d34] hover:bg-[#e85d2b] text-white px-5 py-3 rounded-lg font-semibold transition"
           >
            {COURSE_SECTION.ADD_BUTTON}
           </button>
@@ -198,6 +206,7 @@ const DepartmentsPage = () => {
 
         <CourseOverview
           courses={courses}
+          darkMode={darkMode}
         />
 
         <CourseTable
@@ -205,6 +214,7 @@ const DepartmentsPage = () => {
           onView={handleViewCourse}
           onEdit={openCourseForm}
           onDelete={openCourseDelete}
+          darkMode={darkMode}
         />
 
       </div>
@@ -217,19 +227,19 @@ const DepartmentsPage = () => {
 
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-            <div className="bg-white rounded-xl shadow-lg w-[95%] max-w-2xl">
+            <div className={`rounded-xl shadow-lg w-[95%] max-w-2xl ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white'}`}>
 
               {/* Header */}
 
-              <div className="flex justify-between items-center border-b px-6 py-4">
+              <div className={`flex justify-between items-center border-b px-6 py-4 ${darkMode ? 'border-[#3D3D3D]' : ''}`}>
 
                 <div>
 
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
   {COURSE_DETAILS.TITLE}
 </h2>
 
-<p className="text-gray-500 text-sm mt-1">
+<p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
   {COURSE_DETAILS.SUBTITLE}
 </p>
 
@@ -248,49 +258,49 @@ const DepartmentsPage = () => {
 
               <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <div className="border rounded-lg p-4 bg-gray-50">
+                <div className={`border rounded-lg p-4 ${darkMode ? 'bg-[#1A1A1A] border-[#3D3D3D]' : 'bg-gray-50'}`}>
 
-                  <p className="text-sm text-gray-500 mb-1">
+                  <p className={`text-sm mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                    {COURSE_DETAILS.NAME_LABEL}
                   </p>
 
-                  <p className="font-semibold">
+                  <p className={`font-semibold ${darkMode ? 'text-white' : ''}`}>
                     {selectedCourse.courseName}
                   </p>
 
                 </div>
 
-                <div className="border rounded-lg p-4 bg-gray-50">
+                <div className={`border rounded-lg p-4 ${darkMode ? 'bg-[#1A1A1A] border-[#3D3D3D]' : 'bg-gray-50'}`}>
 
-                  <p className="text-sm text-gray-500 mb-1">
+                  <p className={`text-sm mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                    {COURSE_DETAILS.CODE_LABEL}
                   </p>
 
-                  <p className="font-semibold">
+                  <p className={`font-semibold ${darkMode ? 'text-white' : ''}`}>
                     {selectedCourse.courseCode}
                   </p>
 
                 </div>
 
-                <div className="border rounded-lg p-4 bg-gray-50">
+                <div className={`border rounded-lg p-4 ${darkMode ? 'bg-[#1A1A1A] border-[#3D3D3D]' : 'bg-gray-50'}`}>
 
-                  <p className="text-sm text-gray-500 mb-1">
+                  <p className={`text-sm mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                    {COURSE_DETAILS.SEMESTER_LABEL}
                   </p>
 
-                  <p className="font-semibold">
+                  <p className={`font-semibold ${darkMode ? 'text-white' : ''}`}>
                     {selectedCourse.semester}
                   </p>
 
                 </div>
 
-                <div className="border rounded-lg p-4 bg-gray-50">
+                <div className={`border rounded-lg p-4 ${darkMode ? 'bg-[#1A1A1A] border-[#3D3D3D]' : 'bg-gray-50'}`}>
 
-                  <p className="text-sm text-gray-500 mb-1">
+                  <p className={`text-sm mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     {COURSE_DETAILS.CREDITS_LABEL}
                   </p>
 
-                  <p className="font-semibold">
+                  <p className={`font-semibold ${darkMode ? 'text-white' : ''}`}>
                     {selectedCourse.credits}
                   </p>
 
@@ -300,11 +310,11 @@ const DepartmentsPage = () => {
 
               {/* Footer */}
 
-              <div className="flex justify-end border-t px-6 py-4">
+              <div className={`flex justify-end border-t px-6 py-4 ${darkMode ? 'border-[#3D3D3D]' : ''}`}>
 
                 <button
                   onClick={closeCourseView}
-                  className="px-6 py-2 bg-[#f97316] hover:bg-[#ea580c] text-white rounded-lg"
+                  className="px-6 py-2 bg-[#ff6d34] hover:bg-[#e85d2b] text-white rounded-lg"
                 >
                   {BUTTON_LABELS.CLOSE}
                 </button>
@@ -321,11 +331,12 @@ const DepartmentsPage = () => {
       {showDepartmentForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
 
-          <div className="bg-white rounded-xl w-full max-w-3xl">
+          <div className={`rounded-xl w-full max-w-3xl ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white'}`}>
 
             <DepartmentForm
               onSubmit={handleAddDepartment}
               onCancel={closeDepartmentForm}
+              darkMode={darkMode}
             />
 
           </div>
@@ -338,12 +349,13 @@ const DepartmentsPage = () => {
       {showEditForm && selectedDepartment && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
 
-          <div className="bg-white rounded-xl w-full max-w-3xl">
+          <div className={`rounded-xl w-full max-w-3xl ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white'}`}>
 
             <EditDepartmentForm
               department={selectedDepartment}
               onSubmit={handleEditDepartment}
               onCancel={closeEditDepartment}
+              darkMode={darkMode}
             />
 
           </div>
@@ -358,6 +370,7 @@ const DepartmentsPage = () => {
         department={departmentToDelete}
         onConfirm={handleDeleteDepartment}
         onCancel={closeDeleteDepartment}
+        darkMode={darkMode}
       />
 
       {/* ================= Course Modal ================= */}
@@ -368,6 +381,7 @@ const DepartmentsPage = () => {
         departments={departments}
         onSubmit={handleCourseSubmit}
         onClose={closeCourseForm}
+        darkMode={darkMode}
       />
 
       {/* ================= Delete Course ================= */}
@@ -375,13 +389,13 @@ const DepartmentsPage = () => {
       {showCourseDeleteModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
 
-          <div className="bg-white rounded-xl p-6 w-[90%] max-w-md">
+          <div className={`rounded-xl p-6 w-[90%] max-w-md ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white'}`}>
 
-            <h2 className="text-xl font-semibold mb-3">
+            <h2 className={`text-xl font-semibold mb-3 ${darkMode ? 'text-white' : ''}`}>
               {DELETE_COURSE.TITLE}
             </h2>
 
-            <p className="text-gray-600">
+            <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               {DELETE_COURSE.MESSAGE}
               <strong>
                 {courseToDelete?.courseName}
@@ -393,7 +407,7 @@ const DepartmentsPage = () => {
 
               <button
                 onClick={closeCourseDelete}
-                className="border px-4 py-2 rounded-lg"
+                className={`border px-4 py-2 rounded-lg ${darkMode ? 'border-[#3D3D3D] text-gray-300 hover:bg-[#3D3D3D]' : ''}`}
               >
                 {BUTTON_LABELS.CANCEL}
               </button>

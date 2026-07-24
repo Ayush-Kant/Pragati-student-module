@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { SlidersHorizontal, RefreshCw, Grid, List, Sparkles, X, Check } from "lucide-react";
 
 // Hooks
@@ -32,6 +33,7 @@ import ErrorState from "../components/common/ErrorState";
 import ConfirmationModal from "../components/common/ConfirmationModal";
 
 export const ReportsPage = () => {
+  const { darkMode } = useOutletContext();
   // Tab control: "dashboard" | "database"
   const [activeTab, setActiveTab] = useState("dashboard");
   // Layout control: "table" | "grid"
@@ -159,7 +161,7 @@ export const ReportsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className={`min-h-screen flex flex-col font-sans ${darkMode ? 'bg-[#1A1A1A]' : 'bg-slate-50'}`}>
       <style>{`
         :root {
           --color-primary: #ff6d34;
@@ -247,9 +249,9 @@ export const ReportsPage = () => {
       `}</style>
 
       {/* New Header */}
-      <div className="bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-4">
+      <div className={`px-4 sm:px-6 lg:px-8 py-4 ${darkMode ? 'bg-[#2D2D2D] border-b border-[#3D3D3D]' : 'bg-white border-b border-slate-200'}`}>
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-slate-800">Reports</h1>
+          <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-800'}`}>Reports</h1>
         </div>
       </div>
 
@@ -257,10 +259,10 @@ export const ReportsPage = () => {
       {notification && (
         <div className="fixed top-6 right-6 z-50 animate-slide-in">
           <div className={`flex items-center space-x-2.5 px-4.5 py-3 rounded-2xl shadow-xl border text-sm font-semibold ${notification.type === "success"
-            ? "bg-emerald-50 border-emerald-100 text-emerald-800"
-            : "bg-red-50 border-red-100 text-red-800"
+            ? (darkMode ? "bg-emerald-900/80 border-emerald-700 text-emerald-200" : "bg-emerald-50 border-emerald-100 text-emerald-800")
+            : (darkMode ? "bg-red-900/80 border-red-700 text-red-200" : "bg-red-50 border-red-100 text-red-800")
             }`}>
-            <span className={`p-1 rounded-full text-white ${notification.type === "success" ? "bg-emerald-500" : "bg-red-500"}`}>
+            <span className={`p-1 rounded-full text-white ${notification.type === "success" ? (darkMode ? "bg-emerald-600" : "bg-emerald-500") : (darkMode ? "bg-red-600" : "bg-red-500")}`}>
               {notification.type === "success" ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
             </span>
             <span>{notification.message}</span>
@@ -269,14 +271,14 @@ export const ReportsPage = () => {
       )}
 
       {/* 3. Navigation Bar (No-Print) */}
-      <nav className="bg-white border-b border-slate-200/80 no-print">
+      <nav className={`no-print ${darkMode ? 'bg-[#2D2D2D] border-b border-[#3D3D3D]' : 'bg-white border-b border-slate-200/80'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-14">
           <div className="flex space-x-6 h-full">
             <button
               onClick={() => setActiveTab("dashboard")}
               className={`h-full px-1 border-b-2 flex items-center text-sm font-bold transition duration-150 cursor-pointer ${activeTab === "dashboard"
                 ? "border-primary text-primary"
-                : "border-transparent text-slate-500 hover:text-slate-700"
+                : `border-transparent ${darkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-700'}`
                 }`}
             >
               Dashboard Overview
@@ -285,7 +287,7 @@ export const ReportsPage = () => {
               onClick={() => setActiveTab("database")}
               className={`h-full px-1 border-b-2 flex items-center text-sm font-bold transition duration-150 cursor-pointer ${activeTab === "database"
                 ? "border-primary text-primary"
-                : "border-transparent text-slate-500 hover:text-slate-700"
+                : `border-transparent ${darkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-700'}`
                 }`}
             >
               Reports Database ({reports.length})
@@ -297,7 +299,7 @@ export const ReportsPage = () => {
               fetchReports();
               triggerToast("Synchronized with reports database.");
             }}
-            className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-50 border border-slate-100 transition cursor-pointer"
+            className={`p-2 rounded-xl border transition cursor-pointer ${darkMode ? 'text-gray-400 hover:text-white hover:bg-[#1A1A1A] border-[#3D3D3D]' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50 border-slate-100'}`}
             title="Refresh database cache"
           >
             <RefreshCw className="w-4 h-4" />
@@ -308,10 +310,10 @@ export const ReportsPage = () => {
       {/* 4. Main Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        {reportsError && <ErrorState message={reportsError} onRetry={fetchReports} />}
+        {reportsError && <ErrorState message={reportsError} onRetry={fetchReports} darkMode={darkMode} />}
 
         {isLoading ? (
-          <div className="py-20"><LoadingSpinner message="Accessing secure database servers..." /></div>
+          <div className="py-20"><LoadingSpinner message="Accessing secure database servers..." darkMode={darkMode} /></div>
         ) : (
           <>
             {/* TAB 1: DASHBOARD VIEW */}
@@ -323,6 +325,7 @@ export const ReportsPage = () => {
                 onDownloadReport={(r) => downloadReportFile(r)}
                 downloadingId={exportingId}
                 onNavigateToReports={() => setActiveTab("database")}
+                darkMode={darkMode}
               />
             )}
 
@@ -331,15 +334,15 @@ export const ReportsPage = () => {
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
 
                 {/* A. Left Sidebar Filter Panel (Desktop View) (No-Print) */}
-                <aside className="hidden lg:flex flex-col space-y-5 bg-white border border-slate-100 p-5 rounded-2xl shadow-sm no-print">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <h4 className="font-extrabold text-slate-800 text-sm flex items-center space-x-1.5">
+                <aside className={`hidden lg:flex flex-col space-y-5 p-5 rounded-2xl shadow-sm no-print ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white border border-slate-100'}`}>
+                  <div className={`flex items-center justify-between pb-3 ${darkMode ? 'border-b border-[#3D3D3D]' : 'border-b border-slate-100'}`}>
+                    <h4 className={`font-extrabold text-sm flex items-center space-x-1.5 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
                       <SlidersHorizontal className="w-4 h-4 text-primary" />
                       <span>Search & Filters</span>
                     </h4>
                     <button
                       onClick={resetFilters}
-                      className="text-[11px] font-bold text-slate-400 hover:text-primary transition cursor-pointer"
+                      className={`text-[11px] font-bold transition cursor-pointer ${darkMode ? 'text-gray-400 hover:text-[#ff6d34]' : 'text-slate-400 hover:text-[#ff7a00]'}`}
                     >
                       Clear All
                     </button>
@@ -348,18 +351,22 @@ export const ReportsPage = () => {
                   <SearchReport
                     value={filters.search}
                     onChange={(val) => setFilter("search", val)}
+                    darkMode={darkMode}
                   />
                   <DepartmentFilter
                     value={filters.department}
                     onChange={(val) => setFilter("department", val)}
+                    darkMode={darkMode}
                   />
                   <CompanyFilter
                     value={filters.company}
                     onChange={(val) => setFilter("company", val)}
+                    darkMode={darkMode}
                   />
                   <BatchFilter
                     value={filters.batch}
                     onChange={(val) => setFilter("batch", val)}
+                    darkMode={darkMode}
                   />
                   <DateRangeFilter
                     startDate={filters.startDate}
@@ -367,21 +374,22 @@ export const ReportsPage = () => {
                     onStartChange={(val) => setFilter("startDate", val)}
                     onEndChange={(val) => setFilter("endDate", val)}
                     error={filterErrors?.dateRange}
+                    darkMode={darkMode}
                   />
                 </aside>
 
                 {/* B. Mobile filters slide toggler */}
-                <div className="lg:hidden flex items-center justify-between bg-white border border-slate-150 p-3 rounded-xl shadow-sm no-print">
+                <div className={`lg:hidden flex items-center justify-between p-3 rounded-xl shadow-sm no-print ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white border border-slate-150'}`}>
                   <button
                     onClick={() => setShowMobileFilters(!showMobileFilters)}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 cursor-pointer"
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border cursor-pointer ${darkMode ? 'bg-[#1A1A1A] hover:bg-[#3D3D3D] text-gray-300 border-[#3D3D3D]' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'}`}
                   >
                     <SlidersHorizontal className="w-3.5 h-3.5" />
                     <span>{showMobileFilters ? "Hide Filters" : "Show Filters"}</span>
                   </button>
                   <button
                     onClick={resetFilters}
-                    className="text-xs font-bold text-slate-400 hover:text-primary transition cursor-pointer"
+                    className={`text-xs font-bold transition cursor-pointer ${darkMode ? 'text-gray-400 hover:text-[#ff6d34]' : 'text-slate-400 hover:text-[#ff7a00]'}`}
                   >
                     Clear All
                   </button>
@@ -389,17 +397,18 @@ export const ReportsPage = () => {
 
                 {/* Mobile filters expansion panel */}
                 {showMobileFilters && (
-                  <div className="lg:hidden flex flex-col space-y-4 bg-white border border-slate-200 p-4 rounded-xl shadow-sm no-print">
-                    <SearchReport value={filters.search} onChange={(val) => setFilter("search", val)} />
-                    <DepartmentFilter value={filters.department} onChange={(val) => setFilter("department", val)} />
-                    <CompanyFilter value={filters.company} onChange={(val) => setFilter("company", val)} />
-                    <BatchFilter value={filters.batch} onChange={(val) => setFilter("batch", val)} />
+                  <div className={`lg:hidden flex flex-col space-y-4 p-4 rounded-xl shadow-sm no-print ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white border border-slate-200'}`}>
+                    <SearchReport value={filters.search} onChange={(val) => setFilter("search", val)} darkMode={darkMode} />
+                    <DepartmentFilter value={filters.department} onChange={(val) => setFilter("department", val)} darkMode={darkMode} />
+                    <CompanyFilter value={filters.company} onChange={(val) => setFilter("company", val)} darkMode={darkMode} />
+                    <BatchFilter value={filters.batch} onChange={(val) => setFilter("batch", val)} darkMode={darkMode} />
                     <DateRangeFilter
                       startDate={filters.startDate}
                       endDate={filters.endDate}
                       onStartChange={(val) => setFilter("startDate", val)}
                       onEndChange={(val) => setFilter("endDate", val)}
                       error={filterErrors?.dateRange}
+                      darkMode={darkMode}
                     />
                   </div>
                 )}
@@ -407,17 +416,18 @@ export const ReportsPage = () => {
                 {/* C. Right Main list Area */}
                 <div className="lg:col-span-3 space-y-4">
                   {/* List Header control bar */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white border border-slate-100/80 p-4 rounded-2xl shadow-sm no-print gap-4">
+                  <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-2xl shadow-sm no-print gap-4 ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white border border-slate-100/80'}`}>
                     <ReportTypeFilter
                       activeType={filters.type}
                       onChange={(val) => setFilter("type", val)}
+                      darkMode={darkMode}
                     />
 
                     {/* Layout Toggler buttons */}
-                    <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200/50 p-1.5 rounded-xl self-end sm:self-auto">
+                    <div className={`flex items-center space-x-2 p-1.5 rounded-xl self-end sm:self-auto ${darkMode ? 'bg-[#1A1A1A] border border-[#3D3D3D]' : 'bg-slate-50 border border-slate-200/50'}`}>
                       <button
                         onClick={() => setLayoutMode("table")}
-                        className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${layoutMode === "table" ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
+                        className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${layoutMode === "table" ? (darkMode ? "bg-[#2D2D2D] text-[#ff6d34]" : "bg-white text-[#ff7a00] shadow-sm") : (darkMode ? "text-gray-400 hover:text-white" : "text-slate-400 hover:text-slate-600")
                           }`}
                         title="Tabular List"
                       >
@@ -425,7 +435,7 @@ export const ReportsPage = () => {
                       </button>
                       <button
                         onClick={() => setLayoutMode("grid")}
-                        className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${layoutMode === "grid" ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
+                        className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${layoutMode === "grid" ? (darkMode ? "bg-[#2D2D2D] text-[#ff6d34]" : "bg-white text-[#ff7a00] shadow-sm") : (darkMode ? "text-gray-400 hover:text-white" : "text-slate-400 hover:text-slate-600")
                           }`}
                         title="Grid Layout"
                       >
@@ -436,7 +446,7 @@ export const ReportsPage = () => {
 
                   {/* List Content */}
                   {filteredReportsList.length === 0 ? (
-                    <EmptyState onReset={resetFilters} />
+                    <EmptyState onReset={resetFilters} darkMode={darkMode} />
                   ) : layoutMode === "table" ? (
                     <ReportTable
                       reports={filteredReportsList}
@@ -444,6 +454,7 @@ export const ReportsPage = () => {
                       onDelete={(id) => setDeletingReportId(id)}
                       onDownload={(r) => downloadReportFile(r)}
                       downloadingId={exportingId}
+                      darkMode={darkMode}
                     />
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -455,6 +466,7 @@ export const ReportsPage = () => {
                           onDelete={(id) => setDeletingReportId(id)}
                           onDownload={(r) => downloadReportFile(r)}
                           downloadingId={exportingId}
+                          darkMode={darkMode}
                         />
                       ))}
                     </div>
@@ -471,23 +483,23 @@ export const ReportsPage = () => {
 
       {/* modal A: Generate Report Form Modal */}
       {isGenModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto no-print">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg border border-slate-100 overflow-hidden animate-scale-up">
+        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto no-print ${darkMode ? 'bg-black/70' : 'bg-slate-900/60 backdrop-blur-sm'}`}>
+          <div className={`rounded-2xl shadow-xl w-full max-w-lg border overflow-hidden animate-scale-up ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D]' : 'bg-white border-slate-100'}`}>
 
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/50">
+            <div className={`flex items-center justify-between p-5 ${darkMode ? 'border-b border-[#3D3D3D] bg-[#1A1A1A]' : 'border-b border-slate-100 bg-slate-50/50'}`}>
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-orange-50 text-primary rounded-xl">
+                <div className={`p-2 rounded-xl ${darkMode ? 'bg-[#ff6d34]/10 text-[#ff6d34]' : 'bg-orange-50 text-[#ff7a00]'}`}>
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-800">Generate Academic Report</h3>
-                  <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Parameters and scope definition</p>
+                  <h3 className={`text-base font-bold ${darkMode ? 'text-white' : 'text-slate-800'}`}>Generate Academic Report</h3>
+                  <p className={`text-[10px] font-semibold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-slate-400'}`}>Parameters and scope definition</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsGenModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition cursor-pointer"
+                className={`p-1 rounded-lg transition cursor-pointer ${darkMode ? 'text-gray-400 hover:bg-[#1A1A1A] hover:text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -498,16 +510,13 @@ export const ReportsPage = () => {
 
               {/* Report Name */}
               <div className="flex flex-col space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase">Report Name *</label>
+                <label className={`text-xs font-bold uppercase ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Report Name *</label>
                 <input
                   type="text"
                   value={formData.reportName}
                   onChange={(e) => handleInputChange("reportName", e.target.value)}
                   placeholder="e.g. Placement Report 2026 Batch CSE"
-                  className={`w-full px-3 py-2.5 bg-slate-50 focus:bg-white text-slate-800 text-sm font-medium rounded-xl border focus:ring-4 transition outline-none ${formErrors.reportName
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-slate-200 focus:border-primary focus:ring-orange-500/10"
-                    }`}
+                  className={`w-full px-3 py-2.5 text-sm font-medium rounded-xl border focus:ring-4 transition outline-none ${formErrors.reportName ? "border-red-300 focus:border-red-500 focus:ring-red-500/10" : (darkMode ? "border-[#3D3D3D] bg-[#1A1A1A] text-gray-300 focus:border-[#ff6d34] focus:ring-[#ff6d34]/10" : "border-slate-200 bg-slate-50 focus:bg-white text-slate-800 focus:border-primary focus:ring-orange-500/10")}`}
                 />
                 {formErrors.reportName && (
                   <span className="text-[10px] font-semibold text-red-500">{formErrors.reportName}</span>
@@ -518,11 +527,11 @@ export const ReportsPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 {/* Type */}
                 <div className="flex flex-col space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase">Report Type *</label>
+                  <label className={`text-xs font-bold uppercase ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Report Type *</label>
                   <select
                     value={formData.type}
                     onChange={(e) => handleInputChange("type", e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 text-slate-800 text-sm font-semibold rounded-xl border border-slate-200 outline-none cursor-pointer"
+                    className={`w-full px-3 py-2 text-sm font-semibold rounded-xl border outline-none cursor-pointer ${darkMode ? 'bg-[#1A1A1A] text-gray-300 border-[#3D3D3D]' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                   >
                     {REPORT_TYPES.map((t) => (
                       <option key={t} value={t}>{t} Report</option>
@@ -532,11 +541,11 @@ export const ReportsPage = () => {
 
                 {/* Batch */}
                 <div className="flex flex-col space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase">Target Batch *</label>
+                  <label className={`text-xs font-bold uppercase ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Target Batch *</label>
                   <select
                     value={formData.batch}
                     onChange={(e) => handleInputChange("batch", e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 text-slate-800 text-sm font-semibold rounded-xl border border-slate-200 outline-none cursor-pointer"
+                    className={`w-full px-3 py-2 text-sm font-semibold rounded-xl border outline-none cursor-pointer ${darkMode ? 'bg-[#1A1A1A] text-gray-300 border-[#3D3D3D]' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                   >
                     {BATCHES.map((b) => (
                       <option key={b} value={b}>Batch of {b}</option>
@@ -548,11 +557,11 @@ export const ReportsPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 {/* Department */}
                 <div className="flex flex-col space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase">Department Scope *</label>
+                  <label className={`text-xs font-bold uppercase ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Department Scope *</label>
                   <select
                     value={formData.department}
                     onChange={(e) => handleInputChange("department", e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 text-slate-800 text-sm font-semibold rounded-xl border border-slate-200 outline-none cursor-pointer"
+                    className={`w-full px-3 py-2 text-sm font-semibold rounded-xl border outline-none cursor-pointer ${darkMode ? 'bg-[#1A1A1A] text-gray-300 border-[#3D3D3D]' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                   >
                     {DEPARTMENTS.map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -562,11 +571,11 @@ export const ReportsPage = () => {
 
                 {/* Company */}
                 <div className="flex flex-col space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase">Hiring Company *</label>
+                  <label className={`text-xs font-bold uppercase ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Hiring Company *</label>
                   <select
                     value={formData.company}
                     onChange={(e) => handleInputChange("company", e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 text-slate-800 text-sm font-semibold rounded-xl border border-slate-200 outline-none cursor-pointer"
+                    className={`w-full px-3 py-2 text-sm font-semibold rounded-xl border outline-none cursor-pointer ${darkMode ? 'bg-[#1A1A1A] text-gray-300 border-[#3D3D3D]' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                   >
                     {COMPANIES.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -578,13 +587,12 @@ export const ReportsPage = () => {
               {/* Date Ranges */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase">Start Date *</label>
+                  <label className={`text-xs font-bold uppercase ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Start Date *</label>
                   <input
                     type="date"
                     value={formData.startDate}
                     onChange={(e) => handleInputChange("startDate", e.target.value)}
-                    className={`w-full px-3 py-2 bg-slate-50 focus:bg-white text-slate-800 text-sm font-semibold rounded-xl border outline-none ${formErrors.startDate ? "border-red-300" : "border-slate-200"
-                      }`}
+                    className={`w-full px-3 py-2 text-sm font-semibold rounded-xl border outline-none ${darkMode ? 'bg-[#1A1A1A] text-gray-300' : 'bg-slate-50 focus:bg-white text-slate-800'} ${formErrors.startDate ? "border-red-300" : (darkMode ? "border-[#3D3D3D]" : "border-slate-200")}`}
                   />
                   {formErrors.startDate && (
                     <span className="text-[10px] font-semibold text-red-500">{formErrors.startDate}</span>
@@ -592,13 +600,12 @@ export const ReportsPage = () => {
                 </div>
 
                 <div className="flex flex-col space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase">End Date *</label>
+                  <label className={`text-xs font-bold uppercase ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>End Date *</label>
                   <input
                     type="date"
                     value={formData.endDate}
                     onChange={(e) => handleInputChange("endDate", e.target.value)}
-                    className={`w-full px-3 py-2 bg-slate-50 focus:bg-white text-slate-800 text-sm font-semibold rounded-xl border outline-none ${formErrors.endDate ? "border-red-300" : "border-slate-200"
-                      }`}
+                    className={`w-full px-3 py-2 text-sm font-semibold rounded-xl border outline-none ${darkMode ? 'bg-[#1A1A1A] text-gray-300' : 'bg-slate-50 focus:bg-white text-slate-800'} ${formErrors.endDate ? "border-red-300" : (darkMode ? "border-[#3D3D3D]" : "border-slate-200")}`}
                   />
                   {formErrors.endDate && (
                     <span className="text-[10px] font-semibold text-red-500">{formErrors.endDate}</span>
@@ -608,29 +615,29 @@ export const ReportsPage = () => {
 
               {/* Description */}
               <div className="flex flex-col space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase font-sans">Report Description</label>
+                <label className={`text-xs font-bold uppercase font-sans ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Report Description</label>
                 <textarea
                   rows="3"
                   value={formData.description}
                   onChange={(e) => handleInputChange("description", e.target.value)}
                   placeholder="Summarize context or purpose of report generation..."
-                  className="w-full px-3 py-2 bg-slate-50 focus:bg-white text-slate-800 text-sm font-medium rounded-xl border border-slate-200 focus:border-primary focus:ring-4 focus:ring-orange-500/10 transition outline-none resize-none"
+                  className={`w-full px-3 py-2 text-sm font-medium rounded-xl border transition outline-none resize-none ${darkMode ? 'bg-[#1A1A1A] text-gray-300 border-[#3D3D3D] focus:border-[#ff6d34] focus:ring-4 focus:ring-[#ff6d34]/10' : 'bg-slate-50 focus:bg-white text-slate-800 border-slate-200 focus:border-primary focus:ring-4 focus:ring-orange-500/10'}`}
                 />
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
+              <div className={`flex items-center justify-end space-x-3 pt-3 ${darkMode ? 'border-t border-[#3D3D3D]' : 'border-t border-slate-100'}`}>
                 <button
                   type="button"
                   onClick={() => setIsGenModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${darkMode ? 'bg-[#2D2D2D] hover:bg-[#1A1A1A] text-gray-300 border border-[#3D3D3D]' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isGenerating}
-                  className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl transition shadow-md shadow-orange-500/10 active:scale-97 cursor-pointer flex items-center space-x-1.5"
+                  className={`px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl transition shadow-md active:scale-97 cursor-pointer flex items-center space-x-1.5 ${darkMode ? 'shadow-[#ff6d34]/20' : 'shadow-orange-500/10'}`}
                 >
                   {isGenerating ? (
                     <span className="flex items-center space-x-1">
@@ -660,6 +667,7 @@ export const ReportsPage = () => {
           downloadReportFile(r);
           setInspectingReport(null);
         }}
+        darkMode={darkMode}
       />
 
       {/* modal C: Interactive Preview Modal */}
@@ -671,6 +679,7 @@ export const ReportsPage = () => {
         onExportExcel={(r) => exportExcel(r)}
         onExportCSV={(r) => exportCSV(r)}
         exportingId={exportingId}
+        darkMode={darkMode}
       />
 
       {/* modal D: Deletion Confirmation Alert */}
@@ -682,6 +691,7 @@ export const ReportsPage = () => {
         cancelLabel="Keep Report"
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeletingReportId(null)}
+        darkMode={darkMode}
       />
     </div>
   );

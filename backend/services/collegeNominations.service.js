@@ -21,12 +21,28 @@ export const getStudentsService = async (query) => {
 }
 
 export const nominateStudentService = async (data) => {
-  const { student_id, company_id, company_name, nominated_by, remarks } = data
+  const {
+    student_id,
+    company_id,
+    company_name,
+    role,
+    package: pkg,
+    nominated_by,
+    remarks
+} = data;
 
   const eligible = await checkEligibility(student_id)
   if (!eligible) throw new Error('Student is not eligible for nomination')
 
-  const nomination = await createNomination({ student_id, company_id, company_name, nominated_by, remarks })
+  const nomination = await createNomination({
+    student_id,
+    company_id,
+    company_name,
+    role,
+    package: pkg,
+    nominated_by,
+    remarks
+});
   return nomination
 }
 

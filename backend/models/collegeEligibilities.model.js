@@ -2,7 +2,14 @@ import { pool } from '../config/db.js'
 import { MIN_CGPA_FOR_ELIGIBILITY } from '../constants/collegeStudentNominations.constants.js'
 
 export const getEligibleStudents = async ({ department, batch, limit, offset }) => {
-  let whereClause = `WHERE cgpa >= $1 AND placement_status != 'Placed'`
+  let whereClause = `
+  WHERE cgpa >= $1 
+  AND placement_status != 'Placed'
+  AND id NOT IN (
+    SELECT student_id FROM student_nominations 
+    WHERE status NOT IN ('Rejected', 'Withdrawn')
+  )
+`
   const params = [MIN_CGPA_FOR_ELIGIBILITY]
   let paramCount = 1
 

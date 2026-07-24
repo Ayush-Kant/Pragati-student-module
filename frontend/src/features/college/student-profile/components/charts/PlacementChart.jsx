@@ -16,7 +16,7 @@ const STATUS_COLORS = {
   Pending: "#F59E0B"             // Amber
 };
 
-export const PlacementChart = ({ placements = [] }) => {
+export const PlacementChart = ({ placements = [], darkMode }) => {
   // Aggregate application statuses
   const statusCounts = placements.reduce((acc, curr) => {
     const status = curr.status || "Pending";
@@ -33,9 +33,9 @@ export const PlacementChart = ({ placements = [] }) => {
   const totalApplications = placements.length;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.015)] flex flex-col justify-between">
+    <div className={`rounded-2xl border p-5 shadow-[0_4px_20px_rgba(0,0,0,0.015)] flex flex-col justify-between ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D]' : 'bg-white border-gray-100'}`}>
       <div>
-        <h3 className="text-sm font-bold text-gray-800">Application Funnel</h3>
+        <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Application Funnel</h3>
         <p className="text-xs text-gray-400">Status breakdown of applied companies</p>
       </div>
 
@@ -46,7 +46,7 @@ export const PlacementChart = ({ placements = [] }) => {
           <>
             {/* Center Label */}
             <div className="absolute text-center">
-              <span className="block text-2xl font-black text-gray-800">{totalApplications}</span>
+              <span className={`block text-2xl font-black ${darkMode ? 'text-white' : 'text-gray-800'}`}>{totalApplications}</span>
               <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Applied</span>
             </div>
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
@@ -68,9 +68,9 @@ export const PlacementChart = ({ placements = [] }) => {
                   content={({ active, payload }) => {
                     if (!active || !payload?.length) return null;
                     return (
-                      <div className="bg-white rounded-lg p-2 border border-gray-100 shadow-md text-xs">
-                        <span className="font-semibold text-gray-800">{payload[0].name}:</span>{" "}
-                        <span className="font-bold text-indigo-600">{payload[0].value}</span>
+                      <div className={`rounded-lg p-2 border shadow-md text-xs ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D]' : 'bg-white border-gray-100'}`}>
+                        <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{payload[0].name}:</span>{" "}
+                        <span className="font-bold text-[#ff6d34]">{payload[0].value}</span>
                       </div>
                     );
                   }}
@@ -84,7 +84,7 @@ export const PlacementChart = ({ placements = [] }) => {
       {/* Custom Legend */}
       <div className="flex flex-wrap gap-x-4 gap-y-1.5 justify-center mt-2">
         {chartData.map((item, index) => (
-          <div key={index} className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+          <div key={index} className={`flex items-center gap-1.5 text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></span>
             {item.name} ({item.value})
           </div>

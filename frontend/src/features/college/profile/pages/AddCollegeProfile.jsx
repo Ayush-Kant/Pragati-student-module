@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useOutletContext } from 'react-router-dom';
 import { addProfile, getProfile, updateProfile } from "../../services/collegeService";
 import { useNavigate } from 'react-router-dom';
 import toast from "react-hot-toast";
 
-
 const OrganizationProfile = () => {
+    const { darkMode } = useOutletContext() || {};
     const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -74,15 +75,25 @@ const OrganizationProfile = () => {
     }
   };
 
+  const inputClass = `w-full border rounded-lg p-3 text-sm ${
+    darkMode
+      ? "bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500"
+      : "bg-white border-gray-300 text-gray-900 placeholder-gray-400"
+  } focus:outline-none focus:ring-2 focus:ring-[#ff6d34]/50 focus:border-[#ff6d34] transition-all`;
+  const labelClass = "block text-sm font-medium mb-2";
+  const sectionClass = `rounded-lg p-6 ${
+    darkMode ? "bg-[#2D2D2D] border border-[#3D3D3D]" : "bg-white shadow border border-gray-100"
+  }`;
+
   return (
     <div>
         {
             profile ? (
                 <div className="mb-6">
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className={`text-xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
                   College Profile
                 </h1>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className={`text-xs mt-0.5 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
                   Dashboard &rsaquo; Profile &rsaquo; Add
                 </p>
               </div>
@@ -96,61 +107,61 @@ const OrganizationProfile = () => {
           className="space-y-8"
         >
           {/* Organization Profile */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-6">
+          <div className={sectionClass}>
+            <h2 className={`text-xl font-semibold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
               Organization Profile
             </h2>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Organization Name
                 </label>
                 <input
                   type="text"
                   name="name"
-                  defaultValue={profile?.name || ''}   
+                  defaultValue={profile?.name || ''}
                   required
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                   placeholder="Enter organization name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Profile Code
                 </label>
                 <input
                   type="text"
                   name="profileCode"
                   defaultValue={profile?.profile_code || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                   placeholder="UTS2021"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Established Year
                 </label>
                 <input
                   type="number"
                   name="established"
                   defaultValue={profile?.established || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                   placeholder="2021"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Category
                 </label>
                 <input
                   type="text"
                   name="category"
                   defaultValue={profile?.category || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                   placeholder="EdTech Organization"
                 />
               </div>
@@ -158,127 +169,127 @@ const OrganizationProfile = () => {
           </div>
 
           {/* Contact Person */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-6">
+          <div className={sectionClass}>
+            <h2 className={`text-xl font-semibold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
               Contact Person
             </h2>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Contact Person Name
                 </label>
                 <input
                   type="text"
                   name="contactPerson"
                   defaultValue={profile?.contact_person || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Designation
                 </label>
                 <input
                   type="text"
                   name="designation"
                   defaultValue={profile?.designation || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                 />
               </div>
             </div>
           </div>
 
           {/* Organization Details */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-6">
+          <div className={sectionClass}>
+            <h2 className={`text-xl font-semibold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
               Organization Details
             </h2>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Address
                 </label>
                 <input
                   type="text"
                   name="address"
                   defaultValue={profile?.address || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Contact Lead
                 </label>
                 <input
                   type="text"
                   name="contactLead"
                   defaultValue={profile?.contact_lead || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Website
                 </label>
                 <input
                   type="url"
                   name="website"
                   defaultValue={profile?.website || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Email
                 </label>
                 <input
                   type="email"
                   name="email"
                   defaultValue={profile?.email || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Phone
                 </label>
                 <input
                   type="tel"
                   name="phone"
                   defaultValue={profile?.phone || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   Learners Guided
                 </label>
                 <input
                   type="number"
                   name="learners_guided"
                   defaultValue={profile?.learners_guided || ''}
-                  className="w-full border rounded-lg p-3"
+                  className={inputClass}
                 />
               </div>
             </div>
 
             <div className="mt-6">
-              <label className="block text-sm font-medium mb-2">
+              <label className={`${labelClass} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                 About Organization
               </label>
               <textarea
                 rows={5}
                 name="about"
                 defaultValue={profile?.about || ''}
-                className="w-full border rounded-lg p-3"
+                className={inputClass + " resize-none"}
               />
             </div>
           </div>
@@ -286,9 +297,9 @@ const OrganizationProfile = () => {
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="bg-[#ff6d34] hover:bg-[#e55a2b] text-white px-6 py-3 rounded-lg font-bold transition-all disabled:opacity-50 shadow-sm"
           >
-            {loading ? "Saving..." : profile ? 'Update Profile' : 'Add Profile '}
+            {loading ? "Saving..." : profile ? 'Update Profile' : 'Add Profile'}
           </button>
         </form>
       </div>

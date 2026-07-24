@@ -22,15 +22,18 @@ CREATE TABLE IF NOT EXISTS student_nominations (
   student_id INTEGER NOT NULL REFERENCES eligible_students(id) ON DELETE CASCADE,
   company_id INTEGER NOT NULL,
   company_name VARCHAR(100) NOT NULL,
+
+  role VARCHAR(100) NOT NULL,
+  package DECIMAL(6,2) NOT NULL,
+
   nominated_by INTEGER NOT NULL,
-  status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected', 'Withdrawn')),
+  status VARCHAR(20) DEFAULT 'Pending',
   nomination_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   remarks TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(student_id, company_id)
 );
-
 -- Shortlisted Students Table
 CREATE TABLE IF NOT EXISTS shortlisted_students (
   id SERIAL PRIMARY KEY,

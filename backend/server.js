@@ -32,6 +32,7 @@ import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
 import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 import nominationRoutes from "./routes/collegeStudentNominations.routes.js";
 import collegeReportsGenerationRoutes from "./routes/collegeReportsGeneration.routes.js";
+import collegeAnalyticsDashboardRouter from "./routes/collegeAnalyticsDashboard.routes.js";
 
 // Department Module Routes
 import departmentRoutes from "./routes/college.department.routes.js";
@@ -43,21 +44,20 @@ import collegeCommunicationAnnouncementsRoutes from "./routes/collegeCommunicati
 // Company Assessment
 import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 
-// Error Middleware
+// Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
-
 
 dotenv.config();
 
 console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ================= MIDDLEWARE =================
 
-// Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
@@ -69,14 +69,12 @@ app.use(
         origin.startsWith("http://localhost")
       ) {
         callback(null, true);
-      } 
-      else {
+      } else {
         const clientUrl = process.env.CLIENT_URL;
 
         if (clientUrl && origin === clientUrl) {
           callback(null, true);
-        } 
-        else {
+        } else {
           callback(new Error("Not allowed by CORS"), false);
         }
       }
@@ -85,19 +83,15 @@ app.use(
   })
 );
 
-
 // ================= ROUTES =================
-
 
 // Authentication
 app.use("/api/auth", authRouter);
-
 
 // Student
 app.use("/api/students", studentRoutes);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
-
 
 // Admin
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
@@ -111,11 +105,9 @@ app.use("/api/v1/admin/company", adminCompanyRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 
-
 // Mentor
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
-
 
 // Company
 app.use("/api/v1/company", companyProfileRoutes);
@@ -125,30 +117,28 @@ app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/v1/company/jobs", collegeJobsRoutes);
 app.use("/api/v1/company/assessments", companyAssessmentRoutes);
 
-
 // College
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
 
 app.use("/api", nominationRoutes);
 
+// Reports & Analytics
 app.use("/api/reports", collegeReportsGenerationRoutes);
-
+app.use("/api/analytics", collegeAnalyticsDashboardRouter);
 
 // Departments, Courses & Statistics
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 console.log("✅ Department Statistics Route Registered");
+
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
-
 
 // Placement
 app.use("/api/placement-drives", placementDriveRoutes);
 
-
 // Communication
 app.use("/api", collegeCommunicationAnnouncementsRoutes);
-
 
 // Health Check
 app.get("/", (req, res) => {
@@ -157,21 +147,16 @@ app.get("/", (req, res) => {
   });
 });
 
-
 // Error Handler (LAST)
 app.use(errorMiddleware);
 
-
 // ================= DATABASE CONNECTION =================
-
 
 connectDB()
   .then(async () => {
-
     try {
       await initializeLiveSessionModule();
       console.log("✅ Live session module initialized");
-
     } catch (error) {
       console.error(
         "⚠️ Live session module initialization failed:",
@@ -179,19 +164,11 @@ connectDB()
       );
     }
 
-
     app.listen(PORT, () => {
       console.log(`✅ Server running on PORT : ${PORT}`);
     });
-
   })
   .catch((err) => {
-
-    console.error(
-      "❌ PostgreSQL connection failed:",
-      err.message
-    );
-
+    console.error("❌ PostgreSQL connection failed:", err.message);
     process.exit(1);
-
   });

@@ -33,7 +33,7 @@ const formReducer = (state, action) => {
   }
 };
 
-const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
+const JobPostingForm = ({ onSubmit, editingJob, jobs = [], darkMode }) => {
   const [formData, dispatch] = useReducer(
     formReducer,
     editingJob,
@@ -131,8 +131,8 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-bold mb-6">
+    <div className={`rounded-xl shadow-md p-6 ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white'}`}>
+      <h2 className={`text-xl font-bold mb-6 ${darkMode ? 'text-white' : ''}`}>
         {editingJob ? "Edit Job Posting" : "Create Job Posting"}
       </h2>
 
@@ -145,9 +145,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             placeholder="Job Role"
             value={formData.role}
             onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.role ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                : 'border'
+            } ${errors.role ? "border-red-500" : darkMode ? '' : "border"}`}
           />
 
           {errors.role && (
@@ -164,9 +166,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             placeholder="Company"
             value={formData.company}
             onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.company ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                : 'border'
+            } ${errors.company ? "border-red-500" : darkMode ? '' : "border"}`}
           />
 
           {errors.company && (
@@ -182,9 +186,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             name="department"
             value={formData.department}
             onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 bg-white ${
-              errors.department ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white'
+                : 'bg-white border'
+            } ${errors.department ? "border-red-500" : darkMode ? '' : "border"}`}
           >
             <option value="">Select Department</option>
             {DEPARTMENTS.map((dept) => (
@@ -208,9 +214,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             placeholder="Location"
             value={formData.location}
             onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.location ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                : 'border'
+            } ${errors.location ? "border-red-500" : darkMode ? '' : "border"}`}
           />
 
           {errors.location && (
@@ -227,9 +235,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             placeholder="Package (e.g., 12 LPA)"
             value={formData.package}
             onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.package ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                : 'border'
+            } ${errors.package ? "border-red-500" : darkMode ? '' : "border"}`}
           />
 
           {errors.package && (
@@ -248,9 +258,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             placeholder="CGPA Limit (0-10)"
             value={formData.cgpa}
             onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.cgpa ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                : 'border'
+            } ${errors.cgpa ? "border-red-500" : darkMode ? '' : "border"}`}
           />
 
           {errors.cgpa && (
@@ -266,9 +278,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             name="batch"
             value={formData.batch}
             onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 bg-white ${
-              errors.batch ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white'
+                : 'bg-white border'
+            } ${errors.batch ? "border-red-500" : darkMode ? '' : "border"}`}
           >
             <option value="">Select Batch</option>
             {BATCHES.map((b) => (
@@ -287,7 +301,7 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
 
         {/* Deadline */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>
             Application Deadline
           </label>
           <input
@@ -295,9 +309,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             name="deadline"
             value={formData.deadline}
             onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.deadline ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white'
+                : 'border'
+            } ${errors.deadline ? "border-red-500" : darkMode ? '' : "border"}`}
           />
 
           {errors.deadline && (
@@ -315,9 +331,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             value={formData.jobDescription}
             onChange={handleChange}
             rows={3}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.jobDescription ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                : 'border'
+            } ${errors.jobDescription ? "border-red-500" : darkMode ? '' : "border"}`}
           />
 
           {errors.jobDescription && (
@@ -335,9 +353,11 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
             value={formData.hiringProcess}
             onChange={handleChange}
             rows={3}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.hiringProcess ? "border border-red-500" : "border"
-            }`}
+            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+              darkMode
+                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                : 'border'
+            } ${errors.hiringProcess ? "border-red-500" : darkMode ? '' : "border"}`}
           />
 
           {errors.hiringProcess && (
@@ -350,7 +370,7 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [] }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full bg-green-600 hover:bg-green-700 text-white rounded-lg py-3 flex justify-center items-center gap-2 ${
+          className={`w-full bg-[#00bea3] hover:bg-[#00bea3]/90 text-white rounded-lg py-3 flex justify-center items-center gap-2 ${
             isSubmitting ? "opacity-75 cursor-not-allowed" : ""
           }`}
         >

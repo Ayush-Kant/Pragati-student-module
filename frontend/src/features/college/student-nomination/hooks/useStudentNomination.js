@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   getEligibleStudents,
-  getNominatedStudents,
+  getNominations,
   nominateStudent as nominateStudentService,
   updateNomination as updateNominationService,
   removeNomination as removeNominationService,
@@ -25,17 +25,45 @@ const useStudentNomination = () => {
       setError(null);
       const [eligibleResponse, nominatedResponse] = await Promise.all([
         getEligibleStudents(),
-        getNominatedStudents(),
+        getNominations(),
       ]);
 
       if (eligibleResponse.success) {
-        setEligibleStudents(eligibleResponse.data);
+        setEligibleStudents(
+          (eligibleResponse.data || []).map((s) => ({
+            ...s,
+            id: s.id,
+            enrollmentNo: s.enrollment_no || s.enrollmentNo,
+            placementStatus: s.placement_status || s.placementStatus,
+            company: s.company_name || s.company || "—",
+            status: s.placement_status || "Eligible",
+            timeline: {
+              nominated: s.nomination_date
+                ? new Date(s.nomination_date).toLocaleDateString("en-IN")
+                : "—",
+            },
+          }))
+        );
       }
+
       if (nominatedResponse.success) {
-        setNominatedStudents(nominatedResponse.data);
+        setNominatedStudents(
+          (nominatedResponse.data || []).map((n) => ({
+            ...n,
+            name: n.student_name || n.name,
+            enrollmentNo: n.enrollment_no || n.enrollmentNo,
+            company: n.company_name || n.company,
+            status: n.status || 'Pending',
+            timeline: {
+              nominated: n.nomination_date
+                ? new Date(n.nomination_date).toLocaleDateString("en-IN")
+                : "—",
+            },
+          }))
+        );
       }
     } catch (err) {
-      setError(err.message || "Failed to synchronize placement nomination pools.");
+      setError(err.message || "Failed to load nomination data.");
     } finally {
       setLoading(false);
     }
@@ -45,13 +73,22 @@ const useStudentNomination = () => {
     fetchNominationData();
   }, [fetchNominationData]);
 
-
   const nominateStudent = async (studentData) => {
+    console.log("HOOK START", studentData);
 
     const validation = validateNomination(studentData);
-    if (!validation.isValid) return validation;
+    console.log("VALIDATION", validation);
 
-    const duplicate = validateDuplicateNomination(studentData.id, nominatedStudentsList);
+    if (!validation.isValid) {
+      console.log("VALIDATION FAILED", validation.errors);
+      return validation;
+    }
+
+    const duplicate = validateDuplicateNomination(
+      studentData.student_id,
+      nominatedStudentsList
+    );
+
     if (duplicate.isDuplicate) {
       return {
         isValid: false,
@@ -61,20 +98,36 @@ const useStudentNomination = () => {
 
     try {
       setLoading(true);
-      const response = await nominateStudentService(studentData);
-      if (response.success) {
 
-        setNominatedStudents((prev) => [...prev, response.data]);
+      const apiPayload = {
+        student_id: studentData.student_id,
+        company_id: studentData.company_id,
+        company_name: studentData.company_name,
+        role: studentData.role || '',
+        package: studentData.package || 0,
+        remarks: studentData.remarks || '',
       }
+
+      console.log("CALLING SERVICE WITH", apiPayload);
+      const response = await nominateStudentService(apiPayload);
+      console.log("SERVICE RESPONSE", response);
+
+      if (response.success) {
+        // setNominatedStudents((prev) => [...prev, response.data]);
+      }
+
       return {
         isValid: response.success,
         data: response.data,
         message: response.message,
       };
     } catch (err) {
+      console.log("SERVICE ERROR:", err);
       return {
         isValid: false,
-        errors: { service: err.message || "Unable to complete nomination pipeline request." },
+        errors: {
+          service: err.message || "Unable to complete nomination.",
+        },
       };
     } finally {
       setLoading(false);
@@ -82,7 +135,6 @@ const useStudentNomination = () => {
   };
 
   const updateNomination = async (studentId, formData, originalData) => {
-
     const validation = validateEditNomination(formData, originalData);
     if (!validation.isValid) return validation;
 
@@ -91,7 +143,9 @@ const useStudentNomination = () => {
       const response = await updateNominationService(studentId, formData);
       if (response.success) {
         setNominatedStudents((prev) =>
-          prev.map((student) => (student.id === studentId ? response.data : student))
+          prev.map((student) =>
+            student.id === studentId ? response.data : student
+          )
         );
       }
       return {
@@ -102,7 +156,9 @@ const useStudentNomination = () => {
     } catch (err) {
       return {
         isValid: false,
-        errors: { service: err.message || "Unable to save modified nomination options." },
+        errors: {
+          service: err.message || "Unable to update nomination.",
+        },
       };
     } finally {
       setLoading(false);
@@ -114,13 +170,15 @@ const useStudentNomination = () => {
       setLoading(true);
       const response = await removeNominationService(studentId);
       if (response.success) {
-        setNominatedStudents((prev) => prev.filter((student) => student.id !== studentId));
+        setNominatedStudents((prev) =>
+          prev.filter((student) => student.id !== studentId)
+        );
       }
       return response;
     } catch (err) {
       return {
         success: false,
-        message: err.message || "Unable to truncate nomination entry.",
+        message: err.message || "Unable to remove nomination.",
       };
     } finally {
       setLoading(false);

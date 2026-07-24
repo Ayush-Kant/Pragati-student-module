@@ -23,18 +23,24 @@ const defaultActivities = [
   },
 ];
 
-const ActivityFeed = ({ activities = [] }) => {
+const ActivityFeed = ({ darkMode, activities = [] }) => {
   const displayActivities = activities.length > 0 ? activities : defaultActivities;
 
   return (
-    <div className="bg-white rounded-xl shadow border p-5">
-      <h2 className="text-lg font-semibold mb-5">
+    <div className={`rounded-xl border p-5 ${
+      darkMode
+        ? "bg-[#2D2D2D] border-[#3D3D3D]"
+        : "bg-white border-gray-200 shadow"
+    }`}>
+      <h2 className={`text-lg font-semibold mb-5 ${
+        darkMode ? "text-white" : "text-[#2D3436]"
+      }`}>
         Recent Activities
       </h2>
 
       <div className="space-y-4">
         {displayActivities.map((item, index) => (
-          <ActivityCard key={index} {...item} />
+          <ActivityCard key={index} darkMode={darkMode} {...item} />
         ))}
       </div>
     </div>

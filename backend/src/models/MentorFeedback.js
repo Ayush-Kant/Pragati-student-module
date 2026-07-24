@@ -11,12 +11,12 @@ MentorFeedback.init(
     feedbackId: {
       type: DataTypes.STRING,
       primaryKey: true,
-      field: "feedback_id",
+      columnName: "feedback_id",
     },
     trainingId: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: "training_id",
+      columnName: "training_id",
       references: {
         model: Training,
         key: "training_id",
@@ -25,7 +25,7 @@ MentorFeedback.init(
     mentorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: "mentor_id",
+      columnName: "mentor_id",
       references: {
         model: Mentor,
         key: "id",
@@ -34,7 +34,7 @@ MentorFeedback.init(
     candidateId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: "candidate_id",
+      columnName: "candidate_id",
       references: {
         model: Student,
         key: "id",

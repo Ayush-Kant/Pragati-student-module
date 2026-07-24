@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Layers, Award, Building2, Calendar, ClipboardList } from "lucide-react";
 
-export const StudentStatistics = ({ student, academics = [], placements = [] }) => {
+export const StudentStatistics = ({ student, academics = [], placements = [], darkMode }) => {
   const safeStudent = student || {};
   
   // Performance Optimization: Memoize all metric calculations
@@ -32,35 +32,35 @@ export const StudentStatistics = ({ student, academics = [], placements = [] }) 
       value: semestersCompleted,
       caption: "Completed",
       icon: Layers,
-      color: "from-blue-50 to-indigo-50 text-indigo-600 border-indigo-100/80"
+      color: darkMode ? "bg-[#1A1A1A] text-[#ff6d34] border-[#3D3D3D]" : "from-blue-50 to-indigo-50 text-indigo-600 border-indigo-100/80"
     },
     {
       title: "Skills Acquired",
       value: totalSkills,
       caption: `${techSkillsCount} Tech, ${softSkillsCount} Soft`,
       icon: Award,
-      color: "from-emerald-50 to-teal-50 text-emerald-600 border-emerald-100/80"
+      color: darkMode ? "bg-[#1A1A1A] text-[#00bea3] border-[#3D3D3D]" : "from-emerald-50 to-teal-50 text-emerald-600 border-emerald-100/80"
     },
     {
       title: "Applications",
       value: totalApplied,
       caption: "Applied companies",
       icon: Building2,
-      color: "from-violet-50 to-fuchsia-50 text-violet-600 border-violet-100/80"
+      color: darkMode ? "bg-[#1A1A1A] text-[#ff6d34] border-[#3D3D3D]" : "from-violet-50 to-fuchsia-50 text-violet-600 border-violet-100/80"
     },
     {
       title: "Interviews",
       value: interviewsScheduled,
       caption: "Scheduled sessions",
       icon: Calendar,
-      color: "from-amber-50 to-orange-50 text-amber-600 border-amber-100/80"
+      color: darkMode ? "bg-[#1A1A1A] text-[#00bea3] border-[#3D3D3D]" : "from-amber-50 to-orange-50 text-amber-600 border-amber-100/80"
     },
     {
       title: "Job Offers",
       value: activeOffers,
       caption: "Offers received",
       icon: ClipboardList,
-      color: "from-sky-50 to-blue-50 text-sky-600 border-sky-100/80"
+      color: darkMode ? "bg-[#1A1A1A] text-[#ff6d34] border-[#3D3D3D]" : "from-sky-50 to-blue-50 text-sky-600 border-sky-100/80"
     }
   ];
 
@@ -71,7 +71,7 @@ export const StudentStatistics = ({ student, academics = [], placements = [] }) 
         return (
           <div
             key={idx}
-            className="bg-white rounded-2xl border border-gray-100 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.015)] flex flex-col justify-between hover:shadow-[0_6px_25px_rgba(0,0,0,0.04)] transition-all duration-300"
+            className={`rounded-2xl border p-4 shadow-[0_4px_20px_rgba(0,0,0,0.015)] flex flex-col justify-between transition-all duration-300 ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D] hover:shadow-[0_6px_25px_rgba(0,0,0,0.2)]' : 'bg-white border-gray-100 hover:shadow-[0_6px_25px_rgba(0,0,0,0.04)]'}`}
           >
             <div className="flex justify-between items-start mb-2">
               <span className="text-[10px] font-bold text-gray-400 tracking-wider uppercase">
@@ -82,7 +82,7 @@ export const StudentStatistics = ({ student, academics = [], placements = [] }) 
               </div>
             </div>
             <div>
-              <span className="block text-2xl font-extrabold text-gray-900 leading-tight">
+              <span className={`block text-2xl font-extrabold leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 {stat.value}
               </span>
               <span className="text-[10px] font-semibold text-gray-400">

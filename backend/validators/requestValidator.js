@@ -1,5 +1,7 @@
 export const validatePlacementDrive = (req, res, next) => {
-  const { company, role, package: pkg, drive_date, deadline, status } = req.body;
+  const { company, role, package: pkg, drive_date, driveDate, deadline, status } = req.body;
+
+  const actualDriveDate = drive_date || driveDate;
 
   if (!company || typeof company !== "string" || company.trim().length === 0) {
     return res.status(400).json({
@@ -13,7 +15,7 @@ export const validatePlacementDrive = (req, res, next) => {
     });
   }
 
-  if (drive_date && isNaN(Date.parse(drive_date))) {
+  if (actualDriveDate && isNaN(Date.parse(actualDriveDate))) {
     return res.status(400).json({
       error: "Valid drive date is required",
     });
@@ -25,15 +27,16 @@ export const validatePlacementDrive = (req, res, next) => {
     });
   }
 
-  if (drive_date && deadline && new Date(deadline) > new Date(drive_date)) {
+  if (actualDriveDate && deadline && new Date(deadline) > new Date(actualDriveDate)) {
     return res.status(400).json({
       error: "Deadline cannot be after drive date",
     });
   }
 
-  const validStatuses = ["Upcoming", "Open", "Closed", "Completed"];
+  const validStatuses = ["Upcoming", "Open", "Closed", "Completed", "Cancelled"];
+  const currentStatus = status || "Upcoming";
 
-  if (!status || !validStatuses.includes(status)) {
+  if (!validStatuses.includes(currentStatus)) {
     return res.status(400).json({
       error: "Status must be one of: " + validStatuses.join(", "),
     });
@@ -41,6 +44,8 @@ export const validatePlacementDrive = (req, res, next) => {
 
   req.body.company = company.trim();
   req.body.role = role.trim();
+  req.body.drive_date = actualDriveDate;
+  req.body.status = currentStatus;
 
   next();
 };

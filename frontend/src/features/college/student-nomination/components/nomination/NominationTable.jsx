@@ -29,14 +29,14 @@ const NominationTable = ({
   const compactGrid = "grid grid-cols-[3fr_1.5fr_1fr]";
 
   const headerClass = `h-14 px-5 flex items-center text-xs font-semibold uppercase tracking-wider ${
-    darkMode ? "bg-slate-800/40 text-slate-300 border-b border-slate-700/60" : "bg-slate-50 text-slate-500 border-b border-slate-200"
+    darkMode ? "bg-[#1A1A1A]/60 text-gray-300 border-b border-[#3D3D3D]" : "bg-slate-50 text-slate-500 border-b border-slate-200"
   }`;
 
-  const rowClass = `h-16 px-5 flex items-center min-w-0 ${darkMode ? "border-b border-slate-700/50" : "border-b border-slate-200"}`;
+  const rowClass = `h-16 px-5 flex items-center min-w-0 ${darkMode ? "border-b border-[#3D3D3D]" : "border-b border-slate-200"}`;
 
   return (
     <div className={`w-full overflow-hidden rounded-3xl border transition-all duration-300 ${
-      darkMode ? "bg-[#151D30] border-slate-700/60 shadow-lg shadow-black/20" : "bg-white border-slate-200 shadow-lg"
+      darkMode ? "bg-[#2D2D2D] border-[#3D3D3D] shadow-lg shadow-black/20" : "bg-white border-slate-200 shadow-lg"
     }`}>
       <div className="px-6 py-5">
         <h2 className="text-xl font-bold">Eligible Students</h2>
@@ -102,8 +102,8 @@ const NominationTable = ({
                       title="View Details"
                       className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
                         selectedStudent?.id === student.id && isDetailOpen
-                          ? "bg-blue-600 text-white"
-                          : darkMode ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          ? `${darkMode ? "bg-[#ff6d34] text-white" : "bg-[#ff7a00] text-white"}`
+                          : darkMode ? "bg-[#2D2D2D] text-gray-300 hover:bg-[#3D3D3D]" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
                       <Eye size={17} />
@@ -111,7 +111,7 @@ const NominationTable = ({
                     <button
                       onClick={() => onNominate(student)}
                       title="Nominate Student"
-                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff7a00] text-white hover:bg-[#e06b00] transition-all duration-200"
                     >
                       <UserPlus size={17} />
                     </button>

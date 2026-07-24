@@ -102,7 +102,7 @@ const NominationCard = ({
 
         // Dynamic base backgrounds and side/bottom borders
         const baseThemeClass = darkMode 
-          ? "border-slate-800 bg-[#151D30]" 
+          ? "border-[#3D3D3D] bg-[#2D2D2D]" 
           : "border-slate-200 bg-white";
 
         return (
@@ -118,7 +118,7 @@ const NominationCard = ({
               <div className="flex items-center gap-4 min-w-0">
                 <div
                   className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-bold ${
-                    darkMode ? "bg-blue-500/15 text-blue-400" : "bg-blue-100 text-blue-600"
+                    darkMode ? "bg-[#ff6d34]/15 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"
                   }`}
                 >
                   {getInitials(student.name)}
@@ -142,7 +142,7 @@ const NominationCard = ({
             {/* Expandable Table Values Section */}
             {isExpanded && (
               <div className={`px-5 pb-5 pt-4 border-t flex flex-col gap-4 transition-all duration-200 ${
-                darkMode ? "border-slate-800 bg-[#121929]/40" : "border-slate-100 bg-slate-50/60"
+                darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]/40" : "border-slate-100 bg-slate-50/60"
               }`}>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex items-center gap-3">
@@ -216,18 +216,18 @@ const NominationCard = ({
                 )}
 
                 {student.nominatedDate && (
-                  <div className={`flex items-center gap-2 text-xs border-t pt-3 ${darkMode ? "border-slate-700/60 text-slate-500" : "border-slate-200 text-slate-400"}`}>
+                  <div className={`flex items-center gap-2 text-xs border-t pt-3 ${darkMode ? "border-[#3D3D3D] text-slate-500" : "border-slate-200 text-slate-400"}`}>
                     <CalendarDays size={14} />
                     <span>Nominated on {formatDate(student.nominatedDate)}</span>
                   </div>
                 )}
 
                 {/* Bottom Action Footer Row */}
-                <div className={`flex items-center justify-end gap-2 pt-4 border-t ${darkMode ? "border-slate-800" : "border-slate-100"}`}>
+                <div className={`flex items-center justify-end gap-2 pt-4 border-t ${darkMode ? "border-[#3D3D3D]" : "border-slate-100"}`}>
                   {activeTab === "eligible" ? (
                     <button
                       onClick={(e) => { e.stopPropagation(); onNominate?.(student); }}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all shadow-xs"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold bg-[#ff7a00] hover:bg-[#e06b00] text-white rounded-xl transition-all shadow-xs"
                     >
                       <UserPlus size={15} /> Nominate Student
                     </button>

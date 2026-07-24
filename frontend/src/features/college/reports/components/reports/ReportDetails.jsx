@@ -2,28 +2,28 @@ import { X, Calendar, User, HardDrive, Download, FileText, CheckCircle2 } from "
 import StatusBadge from "../common/StatusBadge";
 import { formatDate } from "../../utils/reportsHelpers";
 
-export const ReportDetails = ({ report, isOpen, onClose, onDownload }) => {
+export const ReportDetails = ({ report, isOpen, onClose, onDownload, darkMode }) => {
   if (!isOpen || !report) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex justify-end bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+    <div className={`fixed inset-0 z-40 flex justify-end animate-fade-in ${darkMode ? 'bg-black/70' : 'bg-slate-900/60 backdrop-blur-xs'}`}>
       {/* Backdrop area click to close */}
       <div className="flex-grow" onClick={onClose}></div>
       
       {/* Details Panel */}
-      <div className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col border-l border-slate-100 animate-slide-in">
+      <div className={`w-full max-w-md h-full shadow-2xl flex flex-col animate-slide-in ${darkMode ? 'bg-[#2D2D2D] border-l border-[#3D3D3D]' : 'bg-white border-l border-slate-100'}`}>
         
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/50">
+        <div className={`flex items-center justify-between p-5 ${darkMode ? 'border-b border-[#3D3D3D] bg-[#1A1A1A]' : 'border-b border-slate-100 bg-slate-50/50'}`}>
           <div>
             <span className="text-[10px] font-bold tracking-wider uppercase bg-primary-light text-primary px-2 py-0.5 rounded">
               Report Details
             </span>
-            <h3 className="text-lg font-bold text-slate-800 mt-1"># {report.id} Meta Inspect</h3>
+            <h3 className={`text-lg font-bold mt-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}># {report.id} Meta Inspect</h3>
           </div>
           <button 
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition cursor-pointer"
+            className={`p-1.5 rounded-lg transition cursor-pointer ${darkMode ? 'text-gray-400 hover:bg-[#1A1A1A] hover:text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -34,97 +34,97 @@ export const ReportDetails = ({ report, isOpen, onClose, onDownload }) => {
           
           {/* Main Info */}
           <div className="space-y-2">
-            <h4 className="text-lg font-extrabold text-slate-800 leading-tight">
+            <h4 className={`text-lg font-extrabold leading-tight ${darkMode ? 'text-white' : 'text-slate-800'}`}>
               {report.reportName}
             </h4>
-            <p className="text-sm text-slate-500 leading-relaxed font-medium">
+            <p className={`text-sm leading-relaxed font-medium ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
               {report.description}
             </p>
           </div>
 
-          <div className="border-t border-slate-100 pt-5 space-y-4">
-            <h5 className="text-xs font-bold text-slate-400 uppercase tracking-widest">General Spec</h5>
+          <div className={`pt-5 space-y-4 ${darkMode ? 'border-t border-[#3D3D3D]' : 'border-t border-slate-100'}`}>
+            <h5 className={`text-xs font-bold uppercase tracking-widest ${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>General Spec</h5>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                <div className="text-[10px] font-bold text-slate-400 uppercase">Type</div>
-                <div className="text-sm font-semibold text-slate-700 mt-0.5">{report.type}</div>
+              <div className={`p-3 rounded-xl border ${darkMode ? 'bg-[#1A1A1A] border-[#3D3D3D]' : 'bg-slate-50 border-slate-100'}`}>
+                <div className={`text-[10px] font-bold uppercase ${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>Type</div>
+                <div className={`text-sm font-semibold mt-0.5 ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>{report.type}</div>
               </div>
-              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                <div className="text-[10px] font-bold text-slate-400 uppercase">Status</div>
+              <div className={`p-3 rounded-xl border ${darkMode ? 'bg-[#1A1A1A] border-[#3D3D3D]' : 'bg-slate-50 border-slate-100'}`}>
+                <div className={`text-[10px] font-bold uppercase ${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>Status</div>
                 <div className="mt-1"><StatusBadge status={report.status} /></div>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-slate-100 pt-5 space-y-4">
-            <h5 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Metadata Values</h5>
+          <div className={`pt-5 space-y-4 ${darkMode ? 'border-t border-[#3D3D3D]' : 'border-t border-slate-100'}`}>
+            <h5 className={`text-xs font-bold uppercase tracking-widest ${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>Metadata Values</h5>
             
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-sm">
-                <Calendar className="w-4 h-4 text-slate-400" />
-                <span className="text-slate-500 font-medium">Generated On:</span>
-                <span className="text-slate-700 font-semibold">{formatDate(report.generatedOn)}</span>
+                <Calendar className={`w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`} />
+                <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Generated On:</span>
+                <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>{formatDate(report.generatedOn)}</span>
               </div>
               
               <div className="flex items-center space-x-3 text-sm">
-                <User className="w-4 h-4 text-slate-400" />
-                <span className="text-slate-500 font-medium">Generated By:</span>
-                <span className="text-slate-700 font-semibold">{report.generatedBy}</span>
+                <User className={`w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`} />
+                <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Generated By:</span>
+                <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>{report.generatedBy}</span>
               </div>
               
               <div className="flex items-center space-x-3 text-sm">
-                <HardDrive className="w-4 h-4 text-slate-400" />
-                <span className="text-slate-500 font-medium">File Size:</span>
-                <span className="text-slate-700 font-semibold">{report.size || "1.2 MB"}</span>
+                <HardDrive className={`w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`} />
+                <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>File Size:</span>
+                <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>{report.size || "1.2 MB"}</span>
               </div>
               
               <div className="flex items-center space-x-3 text-sm">
-                <Download className="w-4 h-4 text-slate-400" />
-                <span className="text-slate-500 font-medium">Download Count:</span>
-                <span className="text-slate-700 font-semibold">{report.downloadCount || 0} times</span>
+                <Download className={`w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`} />
+                <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Download Count:</span>
+                <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>{report.downloadCount || 0} times</span>
               </div>
             </div>
           </div>
 
           {/* Applied Scope Filters */}
-          <div className="border-t border-slate-100 pt-5 space-y-4">
-            <h5 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Applied Parameters</h5>
+          <div className={`pt-5 space-y-4 ${darkMode ? 'border-t border-[#3D3D3D]' : 'border-t border-slate-100'}`}>
+            <h5 className={`text-xs font-bold uppercase tracking-widest ${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>Applied Parameters</h5>
             
-            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-2.5">
+            <div className={`rounded-xl p-4 space-y-2.5 ${darkMode ? 'bg-[#1A1A1A] border border-[#3D3D3D]' : 'bg-slate-50 border border-slate-100'}`}>
               <div className="flex justify-between text-xs font-medium">
-                <span className="text-slate-400">Department Scope:</span>
-                <span className="text-slate-700 font-semibold">{report.department || "All Departments"}</span>
+                <span className={`${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>Department Scope:</span>
+                <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>{report.department || "All Departments"}</span>
               </div>
               <div className="flex justify-between text-xs font-medium">
-                <span className="text-slate-400">Target Company:</span>
-                <span className="text-slate-700 font-semibold">{report.company || "All Companies"}</span>
+                <span className={`${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>Target Company:</span>
+                <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>{report.company || "All Companies"}</span>
               </div>
               <div className="flex justify-between text-xs font-medium">
-                <span className="text-slate-400">Target Batch:</span>
-                <span className="text-slate-700 font-semibold">Batch of {report.batch || "All"}</span>
+                <span className={`${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>Target Batch:</span>
+                <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>Batch of {report.batch || "All"}</span>
               </div>
             </div>
           </div>
 
           {/* Audit History Log */}
-          <div className="border-t border-slate-100 pt-5 space-y-4">
-            <h5 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Operator Audit Log</h5>
+          <div className={`pt-5 space-y-4 ${darkMode ? 'border-t border-[#3D3D3D]' : 'border-t border-slate-100'}`}>
+            <h5 className={`text-xs font-bold uppercase tracking-widest ${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>Operator Audit Log</h5>
             
-            <div className="relative pl-6 space-y-4 border-l border-slate-150 ml-2">
+            <div className={`relative pl-6 space-y-4 ml-2 ${darkMode ? 'border-l border-[#3D3D3D]' : 'border-l border-slate-150'}`}>
               <div className="relative">
-                <div className="absolute -left-[30px] top-0.5 bg-emerald-50 text-emerald-500 rounded-full p-0.5 border border-white">
+                <div className={`absolute -left-[30px] top-0.5 rounded-full p-0.5 ${darkMode ? 'bg-emerald-900/30 text-emerald-400 border-[#2D2D2D]' : 'bg-emerald-50 text-emerald-500 border-white'}`}>
                   <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
-                <div className="text-xs font-bold text-slate-700">Report Compiled & Locked</div>
-                <div className="text-[10px] text-slate-400 font-semibold mt-0.5">{formatDate(report.generatedOn)}</div>
+                <div className={`text-xs font-bold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>Report Compiled & Locked</div>
+                <div className={`text-[10px] font-semibold mt-0.5 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>{formatDate(report.generatedOn)}</div>
               </div>
               <div className="relative">
-                <div className="absolute -left-[30px] top-0.5 bg-blue-50 text-blue-500 rounded-full p-0.5 border border-white">
+                <div className={`absolute -left-[30px] top-0.5 rounded-full p-0.5 ${darkMode ? 'bg-blue-900/30 text-blue-400 border-[#2D2D2D]' : 'bg-blue-50 text-blue-500 border-white'}`}>
                   <FileText className="w-3.5 h-3.5" />
                 </div>
-                <div className="text-xs font-bold text-slate-700">Metadata schema validated</div>
-                <div className="text-[10px] text-slate-400 font-semibold mt-0.5">{formatDate(report.generatedOn)}</div>
+                <div className={`text-xs font-bold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>Metadata schema validated</div>
+                <div className={`text-[10px] font-semibold mt-0.5 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>{formatDate(report.generatedOn)}</div>
               </div>
             </div>
           </div>
@@ -132,10 +132,10 @@ export const ReportDetails = ({ report, isOpen, onClose, onDownload }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex space-x-3">
+        <div className={`p-5 flex space-x-3 ${darkMode ? 'border-t border-[#3D3D3D] bg-[#1A1A1A]' : 'border-t border-slate-100 bg-slate-50/50'}`}>
           <button
             onClick={() => onDownload(report)}
-            className="flex-1 flex items-center justify-center space-x-2 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-semibold rounded-xl transition duration-150 shadow-md shadow-orange-500/10 active:scale-97 cursor-pointer"
+            className={`flex-1 flex items-center justify-center space-x-2 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-semibold rounded-xl transition duration-150 shadow-md active:scale-97 cursor-pointer ${darkMode ? 'shadow-[#ff6d34]/20' : 'shadow-orange-500/10'}`}
           >
             <Download className="w-4 h-4" />
             <span>Download CSV Document</span>

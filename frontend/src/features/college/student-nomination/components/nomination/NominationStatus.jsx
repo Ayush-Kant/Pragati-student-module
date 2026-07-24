@@ -88,7 +88,7 @@ const NominationStatus = ({ status, timeline = {} }) => {
   return (
     <div
       className={`rounded-3xl border p-6 ${
-        darkMode ? "border-slate-700 bg-[#151D30]" : "border-slate-200 bg-white"
+        darkMode ? "border-[#3D3D3D] bg-[#2D2D2D]" : "border-slate-200 bg-white"
       }`}
     >
       {/* Current Status Header Card */}
