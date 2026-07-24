@@ -26,7 +26,7 @@ export const nominateStudentService = async (data) => {
     company_id,
     company_name,
     role,
-    package,
+    package: pkg,
     nominated_by,
     remarks
 } = data;
@@ -39,7 +39,7 @@ export const nominateStudentService = async (data) => {
     company_id,
     company_name,
     role,
-    package,
+    package: pkg,
     nominated_by,
     remarks
 });
