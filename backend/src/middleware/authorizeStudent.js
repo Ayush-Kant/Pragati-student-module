@@ -1,10 +1,23 @@
+/**
+ * authorizeStudent
+ * ─────────────────
+ * Guards routes to student-role users only.
+ * Requires authenticateJWT to have run first.
+ */
 export const authorizeStudent = (req, res, next) => {
-  const role = req.user?.role || req.headers["x-user-role"] || "student";
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: 'Authentication required.',
+      error: {},
+    });
+  }
 
-  if (role !== "student" && role !== "admin") {
+  if (req.user.role !== 'student') {
     return res.status(403).json({
       success: false,
-      message: "Student access required",
+      message: 'Access denied. This resource is only available to students.',
+      error: {},
     });
   }
 

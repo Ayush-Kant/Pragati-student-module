@@ -7,34 +7,22 @@ export const sanitizeInput = (value) => {
 };
 
 export const normalizeStudentId = (req) => {
-  const fallback = req.user?.id || req.headers["x-user-id"] || req.query.studentId;
-  const normalized = Number(fallback ?? 101);
-  return Number.isFinite(normalized) ? normalized : 101;
+  const fallback = req?.user?.id ?? req?.headers?.["x-user-id"] ?? req?.query?.studentId;
+  const studentId = Number(fallback ?? 101);
+
+  return Number.isFinite(studentId) ? studentId : 101;
 };
 
-export const resolveAssignmentStudentId = async (user, fallbackStudentId = null, dbClient = null) => {
-  if (!user) {
-    return fallbackStudentId ?? 101;
-  }
-
-  const client = dbClient || (await import("../../config/db.js")).pool;
-  const authUserId = user.id ?? user.authUserId ?? user.auth_user_id;
-
-  if (!authUserId) {
-    return fallbackStudentId ?? 101;
-  }
-
-  const result = await client.query(
-    `SELECT id FROM users WHERE auth_user_id = $1 LIMIT 1`,
-    [authUserId]
-  );
-
-  if (result.rows?.[0]?.id) {
-    return result.rows[0].id;
-  }
-
-  return fallbackStudentId ?? 101;
+export const resolveAssignmentStudentId = (req) => {
+  const studentId = normalizeStudentId(req);
+  return Number.isFinite(studentId) ? studentId : null;
 };
+
+export const normalizeRole = (role) => String(role || "").toLowerCase();
+
+export const isStudentRole = ({ role }) => role === "student";
+
+export const isInstructorOrAdmin = ({ role }) => role === "instructor" || role === "admin";
 
 export const createError = (message, statusCode = 500) => {
   const error = new Error(message);
@@ -46,5 +34,8 @@ export default {
   sanitizeInput,
   normalizeStudentId,
   resolveAssignmentStudentId,
+  normalizeRole,
+  isStudentRole,
+  isInstructorOrAdmin,
   createError,
 };

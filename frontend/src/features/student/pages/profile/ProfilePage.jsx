@@ -1,6 +1,8 @@
-import { useState } from "react";
-import ProfileEditForm from "../../components/profile/ProfileEditForm";
-import ProjectCard from "../../components/profile/ProjectCard";
+import { useState } from 'react';
+
+import ProfileEditForm from '../../components/profile/ProfileEditForm';
+import ProjectCard from '../../components/profile/ProjectCard';
+import ValidationAlert from '../../components/profile/ValidationAlert';
 
 // Basic URL validation used for social links
 const validateSocialLinks = (links = {}) => {
@@ -8,65 +10,50 @@ const validateSocialLinks = (links = {}) => {
   const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
 
   if (links.github && !urlRegex.test(links.github)) {
-    errors.github = "Please enter a valid GitHub URL (e.g., https://github.com/username)";
+    errors.github = 'Please enter a valid GitHub URL (e.g., https://github.com/username)';
   }
   if (links.linkedin && !urlRegex.test(links.linkedin)) {
-    errors.linkedin = "Please enter a valid LinkedIn profile link";
+    errors.linkedin = 'Please enter a valid LinkedIn profile link';
   }
   if (links.website && !urlRegex.test(links.website)) {
-    errors.website = "Please enter a valid website portfolio domain URL";
+    errors.website = 'Please enter a valid website portfolio domain URL';
   }
 
   return { isValid: Object.keys(errors).length === 0, errors };
 };
 
-const ValidationAlert = ({ message }) => {
-  if (!message) return null;
-
-  return (
-    <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-500 text-xs font-semibold px-3 py-2 rounded-xl mt-1.5">
-      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span>{message}</span>
-    </div>
-  );
-};
-
 const DUMMY_PROFILE = {
-  name: "Vaishnavi Chaudhari",
-  phone: "9876543210",
-  city: "Pune",
-  department: "Computer Engineering",
+  name: 'Vaishnavi Chaudhari',
+  phone: '9876543210',
+  city: 'Pune',
+  department: 'Computer Engineering',
   cgpa: 8.7,
-  skills: ["React", "Node.js", "Python", "SQL", "Git"],
-  email: "vaishnavi@college.edu",
-  rollNo: "2021CE047",
-  batch: "2021–2025",
-  status: "eligible",
+  skills: ['React', 'Node.js', 'Python', 'SQL', 'Git'],
+  email: 'vaishnavi@college.edu',
+  rollNo: '2021CE047',
+  batch: '2021–2025',
+  status: 'eligible',
   resumeUrl: null,
   portfolioLinks: {
-    github: "https://github.com/mounikag",
-    linkedin: "https://linkedin.com/in/mounikag",
-    website: "https://mounikaportfolio.com",
+    github: 'https://github.com/mounikag',
+    linkedin: 'https://linkedin.com/in/mounikag',
+    website: 'https://mounikaportfolio.com',
   },
 };
 
 const SKILL_ICONS = {
-  React: { bg: "bg-blue-50", text: "text-blue-600", icon: "⚛️" },
-  "Node.js": { bg: "bg-green-50", text: "text-green-600", icon: "🟢" },
-  Python: { bg: "bg-yellow-50", text: "text-yellow-600", icon: "🐍" },
-  SQL: { bg: "bg-gray-100", text: "text-gray-700", icon: "🗄️" },
-  Git: { bg: "bg-red-50", text: "text-red-600", icon: "🔀" },
-  default: { bg: "bg-gray-50", text: "text-gray-600", icon: "💡" },
+  React: { bg: 'bg-blue-50', text: 'text-blue-600', icon: '⚛️' },
+  'Node.js': { bg: 'bg-green-50', text: 'text-green-600', icon: '🟢' },
+  Python: { bg: 'bg-yellow-50', text: 'text-yellow-600', icon: '🐍' },
+  SQL: { bg: 'bg-gray-100', text: 'text-gray-700', icon: '🗄️' },
+  Git: { bg: 'bg-red-50', text: 'text-red-600', icon: '🔀' },
+  default: { bg: 'bg-gray-50', text: 'text-gray-600', icon: '💡' },
 };
 
 const InfoField = ({ label, value }) => (
   <div className="flex flex-col gap-1">
     <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">{label}</span>
-    <span className="text-sm font-semibold text-gray-800">
-      {value || <span className="text-gray-300 italic font-normal">Not provided</span>}
-    </span>
+    <span className="text-sm font-semibold text-gray-800">{value || <span className="text-gray-300 italic font-normal">Not provided</span>}</span>
   </div>
 );
 
@@ -80,11 +67,11 @@ const ProfilePage = () => {
   const [projects, setProjects] = useState([
     {
       id: 1,
-      title: "Student Dashboard Feature",
+      title: 'Student Dashboard Feature',
       description:
-        "Designed and built responsive layout forms for handling portfolio inputs, social links validation helpers, and project entries dynamically.",
-      liveLink: "#",
-      codeLink: "#",
+        'Designed and built responsive layout forms for handling portfolio inputs, social links validation helpers, and project entries dynamically.',
+      liveLink: '#',
+      codeLink: '#',
     },
   ]);
 
@@ -103,7 +90,7 @@ const ProfilePage = () => {
 
     if (!validation.isValid) {
       setValidationErrors(validation.errors);
-      setValidationError("Please fix the social links before saving.");
+      setValidationError('Please fix the social links before saving.');
       return;
     }
 
@@ -119,9 +106,9 @@ const ProfilePage = () => {
     const newProject = {
       id: Date.now(),
       title: `New Project #${projects.length + 1}`,
-      description: "Add a short project description",
-      liveLink: "#",
-      codeLink: "#",
+      description: 'Add a short project description',
+      liveLink: '#',
+      codeLink: '#',
     };
     setProjects((prev) => [...prev, newProject]);
   };
@@ -131,9 +118,9 @@ const ProfilePage = () => {
   };
 
   const initials = profile?.name
-    ?.split(" ")
+    ?.split(' ')
     .map((word) => word[0])
-    .join("")
+    .join('')
     .slice(0, 2)
     .toUpperCase();
 
@@ -154,8 +141,9 @@ const ProfilePage = () => {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-            <p className="text-sm text-gray-400 mt-1">{isEditing ? "Update your details below" : "View and manage your profile"}</p>
+            <p className="text-sm text-gray-400 mt-1">{isEditing ? 'Update your details below' : 'View and manage your profile'}</p>
           </div>
+
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
@@ -187,15 +175,9 @@ const ProfilePage = () => {
                 <div className="text-center sm:text-left w-full">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 leading-tight">{profile?.name}</h2>
                   <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-3">
-                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">
-                      {profile?.rollNo}
-                    </span>
-                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">
-                      {profile?.department}
-                    </span>
-                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">
-                      Batch {profile?.batch}
-                    </span>
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">{profile?.rollNo}</span>
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">{profile?.department}</span>
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">Batch {profile?.batch}</span>
                   </div>
                 </div>
               </div>
@@ -240,9 +222,9 @@ const ProfilePage = () => {
                     <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">GitHub Profile</label>
                     <input
                       type="url"
-                      value={profile?.portfolioLinks?.github || ""}
-                      onChange={(e) => handleLinkChange("github", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.github ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-green-500"}`}
+                      value={profile?.portfolioLinks?.github || ''}
+                      onChange={(e) => handleLinkChange('github', e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.github ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`}
                     />
                     <ValidationAlert message={validationErrors.github} />
                   </div>
@@ -250,9 +232,9 @@ const ProfilePage = () => {
                     <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">LinkedIn Profile</label>
                     <input
                       type="url"
-                      value={profile?.portfolioLinks?.linkedin || ""}
-                      onChange={(e) => handleLinkChange("linkedin", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.linkedin ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-green-500"}`}
+                      value={profile?.portfolioLinks?.linkedin || ''}
+                      onChange={(e) => handleLinkChange('linkedin', e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.linkedin ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`}
                     />
                     <ValidationAlert message={validationErrors.linkedin} />
                   </div>
@@ -260,9 +242,9 @@ const ProfilePage = () => {
                     <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Personal Website</label>
                     <input
                       type="url"
-                      value={profile?.portfolioLinks?.website || ""}
-                      onChange={(e) => handleLinkChange("website", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.website ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-green-500"}`}
+                      value={profile?.portfolioLinks?.website || ''}
+                      onChange={(e) => handleLinkChange('website', e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 bg-gray-50/50 font-semibold text-gray-700 ${validationErrors.website ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500'}`}
                     />
                     <ValidationAlert message={validationErrors.website} />
                   </div>
@@ -282,7 +264,7 @@ const ProfilePage = () => {
                     <ProjectCard
                       key={project.id}
                       project={project}
-                      onEdit={() => {}}
+                      onEdit={() => { }}
                       onDelete={() => handleDeleteProject(project.id)}
                     />
                   ))}

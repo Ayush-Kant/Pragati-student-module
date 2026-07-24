@@ -32,7 +32,7 @@ const COMPLETION_THRESHOLD = 0.9;
  *   calculateWatchPercentage(350, 300)  // → 100  (capped)
  */
 const calculateWatchPercentage = (watchSeconds, durationSeconds) => {
-    const watched  = Number(watchSeconds)    || 0;
+    const watched = Number(watchSeconds) || 0;
     const duration = Number(durationSeconds) || 0;
 
     if (duration <= 0) return 0;
@@ -66,7 +66,7 @@ const calculateLessonCompletion = (lessonProgressRows) => {
         return { completed: 0, total: 0, percentage: 0 };
     }
 
-    const total     = lessonProgressRows.length;
+    const total = lessonProgressRows.length;
     const completed = lessonProgressRows.filter((r) => r.status === 'completed').length;
     const percentage = total > 0 ? Number(((completed / total) * 100).toFixed(1)) : 0;
 
@@ -136,7 +136,7 @@ const calculateCourseProgress = (moduleProgressArray) => {
     }
 
     const completed = moduleProgressArray.reduce((sum, m) => sum + (m.completed || 0), 0);
-    const total     = moduleProgressArray.reduce((sum, m) => sum + (m.total || 0), 0);
+    const total = moduleProgressArray.reduce((sum, m) => sum + (m.total || 0), 0);
     const percentage = total > 0 ? Number(((completed / total) * 100).toFixed(1)) : 0;
 
     return { completed, total, percentage };
@@ -186,12 +186,12 @@ const calculateContinueLearning = (enrichedCourses, progressMap, limit = 5) => {
 
                 if (progress && progress.status === 'in_progress') {
                     candidates.push({
-                        courseId       : course.courseId,
-                        courseTitle    : course.courseTitle,
-                        moduleTitle   : mod.moduleTitle,
-                        lessonId      : lesson.lessonId,
-                        lessonTitle   : lesson.title,
-                        contentType   : lesson.contentType,
+                        courseId: course.courseId,
+                        courseTitle: course.courseTitle,
+                        moduleTitle: mod.moduleTitle,
+                        lessonId: lesson.lessonId,
+                        lessonTitle: lesson.title,
+                        contentType: lesson.contentType,
                         watchPercentage: calculateWatchPercentage(
                             progress.watchSeconds,
                             lesson.durationSeconds,
@@ -247,27 +247,35 @@ const serializeLearningData = (data) => {
         'total',
     ];
 
-    const sanitize = (record) => {
-        if (record === null || typeof record !== 'object') return record;
+    const sanitizeValue = (value) => {
+        if (value === null || value === undefined) {
+            return value;
+        }
 
-        const out = { ...record };
+        if (Array.isArray(value)) {
+            return value.map((item) => sanitizeValue(item));
+        }
 
-        // Remove sensitive fields
-        STRIP_FIELDS.forEach((field) => {
-            delete out[field];
-        });
+        if (typeof value === 'object') {
+            const out = {};
+            for (const [key, nestedValue] of Object.entries(value)) {
+                if (STRIP_FIELDS.includes(key)) {
+                    continue;
+                }
 
-        // Coerce numeric-string fields returned by pg
-        NUMERIC_FIELDS.forEach((field) => {
-            if (out[field] !== undefined && out[field] !== null) {
-                out[field] = Number(out[field]);
+                if (NUMERIC_FIELDS.includes(key) && nestedValue !== null && nestedValue !== undefined) {
+                    out[key] = Number(nestedValue);
+                } else {
+                    out[key] = sanitizeValue(nestedValue);
+                }
             }
-        });
+            return out;
+        }
 
-        return out;
+        return value;
     };
 
-    return Array.isArray(data) ? data.map(sanitize) : sanitize(data);
+    return sanitizeValue(data);
 };
 
 export {
