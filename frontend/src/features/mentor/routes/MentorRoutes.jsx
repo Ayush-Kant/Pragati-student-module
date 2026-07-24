@@ -20,6 +20,8 @@ import Courses from "../../../pages/mentor/CoursesPage";
 import CreateCourse from "../../../pages/mentor/CreateCoursePage";
 import ProjectCreationPage from "../pages/ProjectCreationPage";
 import CertificateTemplatePage from "../pages/CertificateTemplatePage";
+import CoursePreview from "../courses/pages/CoursePreview";
+import EditCourse from "../courses/pages/EditCourse";
 
 // --- Activities ---
 import { ActivityProvider } from "../context/ActivityContext";
@@ -64,6 +66,8 @@ const mentorRoute = (
         {/* Courses & Projects */}
         <Route path="courses" element={<Courses />} />
         <Route path="courses/create" element={<CreateCourse />} />
+        <Route path="courses/:courseId/preview" element={<CoursePreview />} />
+        <Route path="courses/:courseId/edit" element={<EditCourse />} />
         <Route path="projects/create" element={<ProjectCreationPage />} />
         <Route
           path="certificates/template"
