@@ -6,6 +6,7 @@ const CourseModal = ({
   onClose,
   course,
   onSubmit,
+  departments,
 }) => {
   if (!isOpen) return null;
 
@@ -42,6 +43,7 @@ const CourseModal = ({
           <CourseForm
   initialData={course}
   isEdit={!!course}
+  departments={departments}
   onSubmit={(data) => {
     onSubmit?.(data);
     onClose?.();

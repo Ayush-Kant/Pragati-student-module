@@ -25,9 +25,9 @@ const CollegeLayout = () => {
       try {
         const result = await getProfile();
         // If the API returns success:true but data is null, or if it outright fails
-        if (!result || !result.data) {
-          navigate("/college/add-profile", { replace: true });
-        }
+        //if (!result || !result.data) {
+         // navigate("/college/add-profile", { replace: true });
+        //}
       } catch (err) {
         console.error("Failed to fetch profile during layout mount:", err);
       }
