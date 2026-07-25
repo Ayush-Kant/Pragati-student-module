@@ -53,6 +53,7 @@ import submissionRoutes from "./src/routes/submissionRoutes.js";
 import feedbackRoutes from "./src/routes/feedbackRoutes.js";
 import gradeRoutes from "./src/routes/gradeRoutes.js";
 import deadlineRoutes from "./src/routes/deadlineRoutes.js";
+import projectRoutes from "./src/routes/projectRoutes.js";
 
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
@@ -162,6 +163,7 @@ app.use("/api/student/assignments", submissionRoutes);
 app.use("/api/student/assignments", feedbackRoutes);
 app.use("/api/student/assignments", gradeRoutes);
 app.use("/api/student/assignments", deadlineRoutes);
+app.use("/api/student/projects",    projectRoutes);
 
 // Health check endpoint (used by Docker HEALTHCHECK and load balancers)
 app.get("/", (req, res) => {
