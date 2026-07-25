@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getDashboardData } from "../services/dashboardService";
 import { LOADING_STATES } from "../constants/dashboardConstants";
+import { validateDashboardData } from "../validation/dashboardValidation";
 
 // ── Demo student ID — replace with auth context later ─
 const DEMO_STUDENT_ID = "demo-student-01";
@@ -23,44 +24,84 @@ const useDashboardData = (studentId = DEMO_STUDENT_ID) => {
     try {
       const data = await getDashboardData(studentId);
 
-      // 1. Map Active Drive / Student Info
-      setActiveDrive(data?.student || data?.activeDrive || null);
+      // Validate response structure using the dashboard validation module
+      const validation = validateDashboardData(data);
+      if (!validation.isValid) {
+        throw new Error(validation.error || "Invalid dashboard API payload format.");
+      }
 
-      // 2. Map Quick Stats with robust default fallbacks
+      // 1. Map Active Placement Drive / Student Profile
+      setActiveDrive(data?.activeDrive || data?.student || data?.currentDrive || null);
+
+      // 2. Map Quick Stats with robust fallback chains matching StatisticsCards requirements
       const rawStats = data?.statistics || data?.quickStats || {};
       setQuickStats({
-        applicationsSubmitted: rawStats.applicationsSubmitted ?? rawStats.applications ?? 0,
-        interviewsScheduled: rawStats.interviewsScheduled ?? rawStats.interviews ?? 0,
-        offersReceived: rawStats.offersReceived ?? rawStats.offers ?? 0,
-        profileCompletion: rawStats.profileCompletion ?? rawStats.completion ?? 0,
+        appliedDrives: rawStats.appliedDrives ?? rawStats.applicationsSubmitted ?? rawStats.applications ?? 0,
+        shortlistedDrives: rawStats.shortlistedDrives ?? rawStats.shortlisted ?? 0,
+        upcomingInterviews: rawStats.upcomingInterviews ?? rawStats.interviewsScheduled ?? rawStats.interviews ?? 0,
+        placementRate: rawStats.placementRate ?? "0%",
+        attendancePercentage: rawStats.attendancePercentage ?? rawStats.attendance ?? 0,
+        xp: rawStats.xp ?? rawStats.totalXp ?? rawStats.points ?? 0,
+        studentName: data?.studentName || data?.student?.name || rawStats?.studentName || "Student",
       });
 
-      // 3. Map Progress Metrics
+      // 3. Map Progress Metrics matching ProgressOverview requirements
       const rawProgress = data?.progress || data?.progressRing || {};
       setProgressRing({
-        courseProgress: rawProgress.courseProgress ?? rawProgress.completionRate ?? 0,
-        attendanceRate: rawProgress.attendanceRate ?? rawProgress.attendance ?? 0,
-        totalXp: rawProgress.totalXp ?? rawProgress.xp ?? 0,
+        courseProgress: rawProgress.courseProgress ?? rawProgress.completionRate ?? rawProgress.overallProgress ?? 0,
+        attendanceRate: rawProgress.attendanceRate ?? rawProgress.attendance ?? rawStats.attendancePercentage ?? 0,
+        totalXp: rawProgress.totalXp ?? rawProgress.xp ?? rawStats.xp ?? 0,
+        overallProgress: rawProgress.overallProgress ?? rawProgress.courseProgress ?? 0,
       });
 
-      // 4. Map Schedules & Tasks (Checks nested & flat structures)
+      // 4. Map Activities & Deliverables (Safely handling direct array vs nested object formats)
+      let sessionsList = [];
+      let tasksList = [];
+
+      if (Array.isArray(data?.upcomingActivities)) {
+        // Handle when upcomingActivities is an array of mixed items
+        sessionsList = data.upcomingActivities.filter(
+          (item) => item.type === "Session" || item.type === "Workshop" || item.type === "Interview" || item.mentor || item.speaker
+        );
+        tasksList = data.upcomingActivities.filter(
+          (item) => item.type === "Assignment" || item.type === "Task" || item.dueDate || item.status !== "completed"
+        );
+      } else if (data?.upcomingActivities && typeof data.upcomingActivities === "object") {
+        // Handle when upcomingActivities is an object with nested arrays
+        sessionsList = data.upcomingActivities.sessions || [];
+        tasksList = data.upcomingActivities.tasks || [];
+      }
+
+      // Populate sessions with secondary fallback keys
       setUpcomingSessions(
-        data?.upcomingActivities?.sessions || data?.upcomingSessions || data?.sessions || []
+        sessionsList.length > 0
+          ? sessionsList
+          : data?.upcomingSessions || data?.sessions || []
       );
-      
+
+      // Populate tasks with secondary fallback keys
       setPendingTasks(
-        data?.upcomingActivities?.tasks || data?.pendingTasks || data?.tasks || []
+        tasksList.length > 0
+          ? tasksList
+          : data?.pendingTasks || data?.tasks || []
       );
 
-      // 5. Map Achievements & Leaderboard
-      setLeaderboard(
-        data?.achievements?.leaderboard || data?.leaderboard || []
-      );
+      // 5. Map Leaderboard (Handling nested achievements object or flat array)
+      const leaderboardData =
+        data?.leaderboard ||
+        data?.achievements?.leaderboard ||
+        data?.rankings ||
+        [];
+      
+      setLeaderboard(Array.isArray(leaderboardData) ? leaderboardData : []);
 
-      // 6. Map Notifications
-      setRecentNotifications(
-        data?.notifications || data?.recentNotifications || []
-      );
+      // 6. Map Notifications Feed
+      const notificationsData =
+        data?.notifications ||
+        data?.recentNotifications ||
+        [];
+
+      setRecentNotifications(Array.isArray(notificationsData) ? notificationsData : []);
 
       setLoadingState(LOADING_STATES.SUCCESS);
     } catch (err) {
@@ -74,7 +115,7 @@ const useDashboardData = (studentId = DEMO_STUDENT_ID) => {
   }, [fetchDashboard]);
 
   return {
-    // Data
+    // Data Outputs
     activeDrive,
     quickStats,
     progressRing,
@@ -83,7 +124,7 @@ const useDashboardData = (studentId = DEMO_STUDENT_ID) => {
     leaderboard,
     recentNotifications,
 
-    // States
+    // State Flags
     loading: loadingState === LOADING_STATES.LOADING,
     loadingState,
     error,
