@@ -1,103 +1,104 @@
-import { pool } from '../config/db.js'
-import { MIN_CGPA_FOR_ELIGIBILITY } from '../constants/collegeStudentNominations.constants.js'
+import { pool } from '../config/db.js';
+import { MIN_CGPA_FOR_ELIGIBILITY } from '../constants/collegeStudentNominations.constants.js';
 
-export const getEligibleStudents = async ({ department, batch, limit, offset }) => {
-  let whereClause = `
-  WHERE cgpa >= $1 
-  AND placement_status != 'Placed'
-  AND id NOT IN (
-    SELECT student_id FROM student_nominations 
-    WHERE status NOT IN ('Rejected', 'Withdrawn')
-  )
-`
-  const params = [MIN_CGPA_FOR_ELIGIBILITY]
-  let paramCount = 1
+// ─── Get eligible students (non-drive-scoped, global pool) ───────────────────
+// eligible_students is a VIEW over the students table.
+// No manual sync needed — every student in the student database is automatically
+// visible here as soon as they meet the CGPA threshold.
+export const getEligibleStudents = async ({ department, batch, collegeId, limit, offset }) => {
+  const params = [MIN_CGPA_FOR_ELIGIBILITY];
+  let idx = 1;
+
+  // Base conditions
+  let conditions = [
+    `cgpa >= $${idx}`,
+    `placement_status != 'Placed'`,
+    // Exclude students already actively nominated (non-rejected/withdrawn)
+    `id NOT IN (
+       SELECT student_id FROM student_nominations
+       WHERE status NOT IN ('Rejected', 'Withdrawn')
+     )`,
+  ];
+
+  if (collegeId) {
+    idx++;
+    conditions.push(`college_id = $${idx}`);
+    params.push(collegeId);
+  }
 
   if (department && department !== 'All') {
-    paramCount++
-    whereClause += ` AND department = $${paramCount}`
-    params.push(department)
+    idx++;
+    conditions.push(`department = $${idx}`);
+    params.push(department);
   }
 
   if (batch && batch !== 'All') {
-    paramCount++
-    whereClause += ` AND batch = $${paramCount}`
-    params.push(batch)
+    idx++;
+    conditions.push(`batch = $${idx}`);
+    params.push(batch);
   }
 
-  // Count query — separate and clean
+  const whereClause = `WHERE ${conditions.join(' AND ')}`;
+
   const countResult = await pool.query(
     `SELECT COUNT(*) FROM eligible_students ${whereClause}`,
     params
-  )
-  const total = parseInt(countResult.rows[0].count)
+  );
+  const total = parseInt(countResult.rows[0].count);
 
-  // Data query with pagination
-  const dataParams = [...params]
-
-  paramCount++
-  dataParams.push(limit)
-  const limitClause = `$${paramCount}`
-
-  paramCount++
-  dataParams.push(offset)
-  const offsetClause = `$${paramCount}`
+  const dataParams = [...params, limit, offset];
 
   const result = await pool.query(
     `SELECT * FROM eligible_students
      ${whereClause}
      ORDER BY cgpa DESC
-     LIMIT ${limitClause} OFFSET ${offsetClause}`,
+     LIMIT $${dataParams.length - 1} OFFSET $${dataParams.length}`,
     dataParams
-  )
+  );
 
-  return { rows: result.rows, total }
-}
+  return { rows: result.rows, total };
+};
 
+// ─── Check if a single student is eligible ───────────────────────────────────
 export const checkEligibility = async (studentId) => {
   const result = await pool.query(
-    'SELECT * FROM eligible_students WHERE id = $1 AND cgpa >= $2',
+    `SELECT * FROM eligible_students
+     WHERE id = $1 AND cgpa >= $2 AND placement_status != 'Placed'`,
     [studentId, MIN_CGPA_FOR_ELIGIBILITY]
-  )
-  return result.rows[0] || null
-}
+  );
+  return result.rows[0] || null;
+};
 
-export const getEligibleDepartments = async () => {
+// ─── Distinct departments from the eligible pool ─────────────────────────────
+export const getEligibleDepartments = async (collegeId = null) => {
+  const params = [];
+  let where = '';
+  if (collegeId) {
+    params.push(collegeId);
+    where = 'WHERE college_id = $1';
+  }
   const result = await pool.query(
-    'SELECT DISTINCT department FROM eligible_students ORDER BY department'
-  )
-  return result.rows.map(r => r.department)
-}
+    `SELECT DISTINCT department FROM eligible_students ${where} ORDER BY department`,
+    params
+  );
+  return result.rows.map((r) => r.department);
+};
 
-export const getEligibleBatches = async () => {
+// ─── Distinct batches from the eligible pool ─────────────────────────────────
+export const getEligibleBatches = async (collegeId = null) => {
+  const params = [];
+  let where = '';
+  if (collegeId) {
+    params.push(collegeId);
+    where = 'WHERE college_id = $1';
+  }
   const result = await pool.query(
-    'SELECT DISTINCT batch FROM eligible_students ORDER BY batch DESC'
-  )
-  return result.rows.map(r => r.batch)
-}
+    `SELECT DISTINCT batch FROM eligible_students ${where} ORDER BY batch DESC`,
+    params
+  );
+  return result.rows.map((r) => r.batch);
+};
 
-export const createEligibleStudent = async (data) => {
-  const {
-    student_id,
-    enrollment_no,
-    name,
-    email,
-    department,
-    course,
-    semester,
-    batch,
-    cgpa,
-    placement_status = 'Eligible',
-    skills = [],
-  } = data
-
-  const result = await pool.query(
-    `INSERT INTO eligible_students 
-      (student_id, enrollment_no, name, email, department, course, semester, batch, cgpa, placement_status, skills)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-     RETURNING *`,
-    [student_id, enrollment_no, name, email, department, course, semester, batch, cgpa, placement_status, skills]
-  )
-
-  return result.rows[0]
-}
+// NOTE: createEligibleStudent is intentionally removed.
+// eligible_students is a view — students enter the pool automatically
+// when added to the students table with sufficient CGPA.

@@ -49,6 +49,7 @@ const migrationFiles = [
   "collegeStudentNominations.sql",
   "collegeAnalyticsDashboard.sql",
   "student_module.sql",
+  "020_drive_student_nominations.sql",
 ];
 
 async function runMigrationsFresh() {

@@ -42,6 +42,8 @@ import departmentStatisticsRoutes from "./routes/college.departmentstatistics.ro
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
 import collegeCommunicationAnnouncementsRoutes from "./routes/collegeCommunicationAnnouncements.routes.js";
 
+import companiesRoutes from "./routes/companies.routes.js";
+
 // company Assessment route
 import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 // Middleware
@@ -102,11 +104,12 @@ app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
-app.use("/api", nominationRoutes); 
+app.use("/api", nominationRoutes);
 app.use("/api/v1/company/jobs", collegeJobsRoutes);
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/companies", companiesRoutes);
 app.use("/api/v1/company/assessments", companyAssessmentRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
