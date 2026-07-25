@@ -378,6 +378,7 @@ const DepartmentsPage = () => {
       <CourseModal
         isOpen={showCourseModal}
         course={selectedCourse}
+        departments={departments}
         onSubmit={handleCourseSubmit}
         onClose={closeCourseForm}
         darkMode={darkMode}

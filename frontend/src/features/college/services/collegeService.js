@@ -5,8 +5,8 @@ export const getProfile = async () => {
     const response = await api.get('/college/profile');
     return response.data;
   } catch (error) {
-    const errro_message =  error.response?.data?.message || 'Network error';
-    return { success: false, message: errro_message };
+    const error_message =  error.response?.data?.message || 'Network error';
+    return { success: false, message: error_message };
   }
 };
 

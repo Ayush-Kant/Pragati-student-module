@@ -1,104 +1,69 @@
-import {
-  departmentList,
-  courseList,
-} from "../types/departmentDummyData";
+import api from "../../../../services/api";
 
-// ================= Departments =================
+// =======================
+// Department APIs
+// =======================
 
 export const getDepartments = async () => {
-  return Promise.resolve([...departmentList]);
+  const response = await api.get("/departments");
+  return response.data;
 };
 
-export const addDepartment = async (departments, newDepartment) => {
-  return Promise.resolve([
-    ...departments,
-    {
-      id: Date.now(),
-      ...newDepartment,
-    },
-  ]);
+export const getDepartment = async (id) => {
+  const response = await api.get(`/departments/${id}`);
+  return response.data;
 };
 
-export const updateDepartment = async (
-  departments,
-  updatedDepartment
-) => {
-  return Promise.resolve(
-    departments.map((department) =>
-      department.id === updatedDepartment.id
-        ? {
-            ...department,
-            ...updatedDepartment,
-          }
-        : department
-    )
-  );
+export const addDepartment = async (departmentData) => {
+  const response = await api.post("/departments", departmentData);
+  return response.data;
 };
 
-export const deleteDepartment = async (
-  departments,
-  departmentId
-) => {
-  return Promise.resolve(
-    departments.filter(
-      (department) => department.id !== departmentId
-    )
-  );
+export const updateDepartment = async (id, departmentData) => {
+  const response = await api.put(`/departments/${id}`, departmentData);
+  return response.data;
 };
 
-// ================= Courses =================
+export const deleteDepartment = async (id) => {
+  const response = await api.delete(`/departments/${id}`);
+  return response.data;
+};
+
+export const searchDepartments = async (query) => {
+  const response = await api.get(`/departments/search?q=${query}`);
+  return response.data;
+};
+
+// =======================
+// Course APIs
+// =======================
 
 export const getCourses = async () => {
-  return Promise.resolve([...courseList]);
+  const response = await api.get("/courses");
+  return response.data;
 };
 
-export const addCourse = async (courses, newCourse) => {
-  return Promise.resolve([
-    ...courses,
-    {
-      id: Date.now(),
-      ...newCourse,
-    },
-  ]);
+export const getCourse = async (id) => {
+  const response = await api.get(`/courses/${id}`);
+  return response.data;
 };
 
-export const updateCourse = async (
-  courses,
-  updatedCourse
-) => {
-  return Promise.resolve(
-    courses.map((course) =>
-      course.id === updatedCourse.id
-        ? {
-            ...course,
-            ...updatedCourse,
-          }
-        : course
-    )
-  );
+export const addCourse = async (courseData) => {
+  const response = await api.post("/courses", courseData);
+  return response.data;
 };
 
-export const deleteCourse = async (
-  courses,
-  courseId
-) => {
-  return Promise.resolve(
-    courses.filter(
-      (course) => course.id !== courseId
-    )
-  );
+export const updateCourse = async (id, courseData) => {
+  const response = await api.put(`/courses/${id}`, courseData);
+  return response.data;
 };
 
-/*
-Future Backend Integration
+export const deleteCourse = async (id) => {
+  const response = await api.delete(`/courses/${id}`);
+  return response.data;
+};
 
-export const getDepartments = () => axios.get("/departments");
-export const addDepartment = (data) => axios.post("/departments", data);
-export const updateDepartment = (id, data) => axios.put(`/departments/${id}`, data);
-export const deleteDepartment = (id) => axios.delete(`/departments/${id}`);
-
-export const getCourses = () => axios.get("/courses");
-export const addCourse = (data) => axios.post("/courses", data);
-export const updateCourse = (id, data) => axios.put(`/courses/${id}`, data);
-export const deleteCourse = (id) => axios.delete(`/courses/${id}`);
-*/
+export const getDepartmentCourses = async (departmentId) => {
+  const response = await api.get(`/departments/${departmentId}/courses`);
+  return response.data;
+};
