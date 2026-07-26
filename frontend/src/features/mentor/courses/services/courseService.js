@@ -1,10 +1,12 @@
-import api from "../../../../../services/api";
+import api from "../../../../services/api";
 
 const mockData = {
   courseId: "mock-999",
   title: "Advanced Full-Stack Web Development",
-  shortDescription: "Master the art of building scalable enterprise applications.",
-  fullDescription: "<h2>Course Description</h2><p>Learn to architect systems...</p>",
+  shortDescription:
+    "Master the art of building scalable enterprise applications.",
+  fullDescription:
+    "<h2>Course Description</h2><p>Learn to architect systems...</p>",
   category: "tech",
   subcategory: "backend",
   level: "Intermediate",
@@ -24,10 +26,15 @@ const mockData = {
       status: "Published",
       duration: "1h 20m",
       lectures: [
-        { id: "lec-1", title: "Advanced Component Lifecycle", type: "Video", duration: "20:15" }
-      ]
-    }
-  ]
+        {
+          id: "lec-1",
+          title: "Advanced Component Lifecycle",
+          type: "Video",
+          duration: "20:15",
+        },
+      ],
+    },
+  ],
 };
 
 export const getCourseDetails = async (courseId) => {
@@ -55,7 +62,10 @@ export const updateCourseDetails = async (courseId, updateData) => {
       throw error;
     }
     return new Promise((resolve) => {
-      setTimeout(() => resolve({ success: true, data: { ...mockData, ...updateData } }), 1000);
+      setTimeout(
+        () => resolve({ success: true, data: { ...mockData, ...updateData } }),
+        1000,
+      );
     });
   }
 };
