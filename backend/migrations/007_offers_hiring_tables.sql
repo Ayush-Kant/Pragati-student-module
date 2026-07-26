@@ -1,6 +1,7 @@
 -- 007_offers_hiring_tables.sql
 -- Dependency-ordered tables for the offers/hiring module
 
+
 -- 1. COMPANIES V2 (independent table)
 CREATE TABLE IF NOT EXISTS companies_v2 (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
@@ -58,6 +59,7 @@ CREATE TABLE IF NOT EXISTS candidates (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
 
 -- 3. RECRUITMENT DRIVES V2 (depends on companies_v2)
 CREATE TABLE IF NOT EXISTS recruitment_drives_v2 (
@@ -195,3 +197,5 @@ CREATE INDEX idx_offers_v2_status ON offers_v2 (offer_status);
 CREATE INDEX idx_offers_joining_date ON offers_v2 (joining_date);
 CREATE INDEX idx_offer_amendments_offer ON offer_amendments (offer_id);
 CREATE INDEX idx_offer_amendments_created ON offer_amendments (created_at DESC);
+
+
