@@ -30,6 +30,7 @@ router.get("/:projectId", getProjectDetails);
 
 // ── Milestone Submission ───────────────────────────────────────────────────
 router.post("/:projectId/milestones/:milestoneId/submit", submitMilestone);
+router.post("/:projectId/milestones/:milestoneId", submitMilestone);
 
 // ── Final Project Submission (optional PDF via multipart/form-data) ────────
 router.post("/:projectId/submit", uploadReportMiddleware, submitFinalProject);
