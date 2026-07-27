@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
+import NotificationBell from '../../components/NotificationBell'; 
 import { jwtDecode } from "jwt-decode";
 import {
   LayoutDashboard,
@@ -267,12 +268,8 @@ export default function MentorLayout() {
 
           {/* User Profile */}
           <div className="flex items-center gap-6 shrink-0">
-            <button
-              onClick={() => navigate("/mentor/notifications")}
-              className="text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              <Bell className="h-5 w-5" />
-            </button>
+             {/* Added the notification bell option */}
+            <NotificationBell/>
 
             <div className="relative" ref={dropdownRef}>
               <button
