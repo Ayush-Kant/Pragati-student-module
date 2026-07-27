@@ -1,15 +1,14 @@
-import express from "express";
+﻿import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
-
 import { connectDB, pool } from "./config/db.js";
 import { initializeLiveSessionModule } from "./src/database/migrations/liveSessionSchema.js";
 import initializeAssignmentModule from "./src/database/migrations/assignmentSchema.js";
 
-// Admin Routes
+// Admin routes
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
 import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
@@ -21,7 +20,7 @@ import adminStudentRoutes from "./routes/admin.student.routes.js";
 import adminMentorRoutes from "./routes/admin.mentor.routes.js";
 import adminCompanyRoutes from "./routes/admin.company.routes.js";
 
-// Standard & Role-Specific Routes
+// Standard and role-specific routes
 import authRouter from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import contentRoutes from "./routes/content.routes.js";
@@ -46,6 +45,18 @@ import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
+
+// Student training / learning routes
+import studentTrainingRoutes from "./src/routes/trainingRoutes.js";
+import studentCourseRoutes from "./src/routes/courseRoutes.js";
+import studentLessonRoutes from "./src/routes/lessonRoutes.js";
+import studentResourceRoutes from "./src/routes/resourceRoutes.js";
+import studentProgressRoutes from "./src/routes/progressRoutes.js";
+import learningRoutes from "./routes/learningRoutes.js";
+import challengeRoutes from "./routes/challenge.routes.js";
+import questionBankRouter from "./routes/questionBank.routes.js";
+
+// Live sessions and student assignment endpoints
 import liveSessionRoutes from "./src/routes/liveSessionRoutes.js";
 import studentAssessmentRoutes from "./src/modules/student/assessments-quizzes/routes/assessments.routes.js";
 import assignmentRoutes from "./src/routes/assignmentRoutes.js";
@@ -55,26 +66,29 @@ import gradeRoutes from "./src/routes/gradeRoutes.js";
 import deadlineRoutes from "./src/routes/deadlineRoutes.js";
 import projectRoutes from "./src/routes/projectRoutes.js";
 
-// Middleware
-import errorMiddleware from "./middleware/errorMiddleware.js";
+// Student profile routes
 import studentProfileRouter from "./src/routes/index.js";
 
-// ─── Bootstrap ────────────────────────────────────────────────────────────────
+// Middleware
+import errorMiddleware from "./middleware/errorMiddleware.js";
+
+// Bootstrap
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ─── Security Middleware ───────────────────────────────────────────────────────
-
-// Helmet: sets secure HTTP headers (XSS protection, clickjacking, MIME sniffing, etc.)
+// Security and general middleware
 app.use(helmet());
-
-// CORS: dynamic allowlist — localhost in dev, CLIENT_URL in production
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) {
+      if (
+        !origin ||
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:") ||
+        origin.startsWith("http://localhost")
+      ) {
         return callback(null, true);
       }
       const clientUrl = process.env.CLIENT_URL;
@@ -86,27 +100,17 @@ app.use(
     credentials: true,
   }),
 );
-
-// ─── General Middleware ────────────────────────────────────────────────────────
-
-// HTTP request logger — "combined" in production (Apache format), "dev" locally
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
-
-// Body parser with 10kb limit to prevent payload-bomb attacks
 app.use(express.json({ limit: "10kb" }));
 
-// ─── Rate Limiting ─────────────────────────────────────────────────────────────
-
-// Strict limiter for auth routes — prevents brute-force on login/register
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20,                   // 20 attempts per window per IP
-  standardHeaders: true,     // Return rate limit info in RateLimit-* headers
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, message: "Too many requests. Please try again later." },
 });
 
-// General API limiter — protects all other endpoints
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 500,
@@ -116,16 +120,18 @@ const generalLimiter = rateLimit({
 });
 
 app.use("/api/v1/auth", authLimiter);
-app.use("/api/auth",    authLimiter);
-app.use("/api",         generalLimiter);
+app.use("/api/auth", authLimiter);
+app.use("/api", generalLimiter);
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// Routes
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
-app.use("/api/student/live-sessions", liveSessionRoutes);
+app.use("/api/student/notifications", notificationRoutes);
+app.use("/api/students", studentRoutes);
+app.use("/api/mentor", contentRoutes);
+app.use("/api/mentor", mentorRoutes);
+app.use("/api/mentor", questionBankRouter);
 
-// Student Module Routes
-app.use("/api/student/assessments", studentAssessmentRoutes);
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
 app.use("/api/v1/admin/assessments", adminAssessmentRoutes);
@@ -137,8 +143,15 @@ app.use("/api/v1/admin/company", adminCompanyRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
-app.use("/api/mentor", contentRoutes);
-app.use("/api/mentor", mentorRoutes);
+
+app.use("/api/college/profile", collegeProfileRoutes);
+app.use("/api/college/dashboard", collegeDashboardRoutes);
+app.use("/api/departments/statistics", departmentStatisticsRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/placement-drives", placementDriveRoutes);
+app.use("/api/v1/company/jobs", collegeJobsRoutes);
+
 app.use("/api/v1/company", companyProfileRoutes);
 app.use("/api/v1/company/candidates", companyCandidateRoutes);
 app.use("/api/v1/company/dashboard", companyDashboardRoutes);
@@ -149,15 +162,17 @@ app.use("/api/v1/company/interviews", companyInterviewRoutes);
 app.use("/api/v1/company/notifications", companyNotificationRoutes);
 app.use("/api/v1/company/offers", companyOfferRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
-app.use("/api/v1/company/jobs", collegeJobsRoutes);
-app.use("/api/student/notifications", notificationRoutes);
-app.use("/api/students", studentRoutes);
-app.use("/api/college/profile", collegeProfileRoutes);
-app.use("/api/college/dashboard", collegeDashboardRoutes);
-app.use("/api/departments/statistics", departmentStatisticsRoutes);
-app.use("/api/departments", departmentRoutes);
-app.use("/api/courses", courseRoutes);
-app.use("/api/placement-drives", placementDriveRoutes);
+
+app.use("/api/student/assessments", studentAssessmentRoutes);
+app.use("/api/student/training", studentTrainingRoutes);
+app.use("/api/student/training", studentCourseRoutes);
+app.use("/api/student/training", studentLessonRoutes);
+app.use("/api/student/training", studentResourceRoutes);
+app.use("/api/student/training", studentProgressRoutes);
+app.use("/api/student/learning", learningRoutes);
+app.use("/api/student/challenges", challengeRoutes);
+app.use("/api/student/live-sessions", liveSessionRoutes);
+
 app.use("/api/student/assignments", assignmentRoutes);
 app.use("/api/student/assignments", submissionRoutes);
 app.use("/api/student/assignments", feedbackRoutes);
@@ -165,17 +180,14 @@ app.use("/api/student/assignments", gradeRoutes);
 app.use("/api/student/assignments", deadlineRoutes);
 app.use("/api/student/projects",    projectRoutes);
 
-// Health check endpoint (used by Docker HEALTHCHECK and load balancers)
+app.use(studentProfileRouter);
+
 app.get("/", (req, res) => {
   res.json({ success: true, message: "Backend is running" });
 });
 
-app.use(studentProfileRouter);
-
 // Global error handler — must be registered last
 app.use(errorMiddleware);
-
-// ─── Graceful Shutdown ────────────────────────────────────────────────────────
 
 let server;
 
@@ -192,7 +204,6 @@ const shutdown = async (signal) => {
     process.exit(0);
   });
 
-  // Force exit if graceful shutdown takes more than 10s
   setTimeout(() => {
     console.error("❌ Forced shutdown after timeout");
     process.exit(1);
@@ -200,9 +211,8 @@ const shutdown = async (signal) => {
 };
 
 process.on("SIGTERM", () => shutdown("SIGTERM"));
-process.on("SIGINT",  () => shutdown("SIGINT"));
+process.on("SIGINT", () => shutdown("SIGINT"));
 
-// ─── Start ────────────────────────────────────────────────────────────────────
 connectDB()
   .then(async () => {
     try {
@@ -228,3 +238,5 @@ connectDB()
     console.error("❌ PostgreSQL connection failed:", err.message);
     process.exit(1);
   });
+
+export default app;
