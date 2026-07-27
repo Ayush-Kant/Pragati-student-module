@@ -4,7 +4,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles --forceExit",
+    "test": "node --test tests/quiz*.test.js",
     "dev": "nodemon server.js"
   },
   "author": "",
@@ -33,11 +33,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.6.0",
-    "jest": "^30.4.2",
     "nodemon": "^3.1.14",
-    "prettier": "^3.9.4",
     "supertest": "^7.2.2"
   }
 }
