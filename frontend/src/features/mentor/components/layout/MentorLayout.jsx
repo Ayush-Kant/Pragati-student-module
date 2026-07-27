@@ -11,6 +11,7 @@ import {
   Bell,
   HelpCircle,
   Briefcase,
+  GitBranch,
   MessageSquare,
   BookOpen,
   Activity,
@@ -114,6 +115,11 @@ export default function MentorLayout() {
       name: "Notifications",
       path: "/mentor/notifications",
       icon: <Bell className="w-5 h-5" />,
+    },
+    {
+      name: "Hiring Pipeline",
+      path: "/mentor/hiring-pipeline",
+      icon: <GitBranch className="w-5 h-5" />,
     },
     {
       name: "Settings",

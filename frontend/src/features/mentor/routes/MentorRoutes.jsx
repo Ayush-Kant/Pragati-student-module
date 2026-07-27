@@ -3,6 +3,7 @@ import { Route, Navigate } from "react-router-dom";
 // --- Layouts & Guards ---
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
+
 import MentorLayout from "../components/layout/MentorLayout";
 
 // --- Core Mentor Pages ---
@@ -36,9 +37,12 @@ import QuestionPreviewPage from "../pages/QuestionPreviewPage";
 import QuestionBankPageQuizBuilder from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
 
-// --- Challenges, Submissions & Grading ---
+// --- Challenges, Submissions, Hiring & Grading ---
 import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
-import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage.jsx";
+import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage";
+
+import HiringPipelinePage from "../pages/HiringPipelinePage";
+
 import SubmissionMonitoringPage from "../pages/SubmissionMonitoringPage";
 import ReviewGradingPage from "../pages/ReviewGradingPage";
 
@@ -60,7 +64,11 @@ const mentorRoute = (
       <Route path="mentor" element={<MentorLayout />}>
         {/* Core */}
         <Route index element={<Navigate to="dashboard" replace />} />
+
         <Route path="dashboard" element={<Dashboard />} />
+
+        <Route path="hiring-pipeline" element={<HiringPipelinePage />} />
+
         <Route path="settings" element={<SettingsPage />} />
 
         {/* Courses & Projects */}
