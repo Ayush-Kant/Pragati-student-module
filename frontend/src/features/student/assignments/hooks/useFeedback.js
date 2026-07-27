@@ -30,12 +30,12 @@ const useFeedback = () => {
     }
   };
 
-  const fetchGrades = async () => {
+  const fetchGrades = async (id) => {
     try {
       setLoading(true);
       setError("");
 
-      const response = await getGrades();
+      const response = await getGrades(id);;
 
       if (response.success) {
         setGrades(response.data);

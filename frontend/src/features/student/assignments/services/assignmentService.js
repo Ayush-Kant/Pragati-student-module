@@ -40,23 +40,37 @@ export const updateSubmission = async (id, submissionData) => {
   };
 };
 
-export const getSubmissionHistory = async () => {
+export const getSubmissionHistory = async (id) => {
+  const assignment = assignments.find(
+    (assignment) => assignment.id === Number(id)
+  );
+
   return {
     success: true,
-    data: [],
+    data: assignment?.submissionHistory || [],
   };
 };
 
-export const getFeedback = async () => {
+
+export const getFeedback = async (id) => {
+  const assignment = assignments.find(
+    (assignment) => assignment.id === Number(id)
+  );
+
   return {
     success: true,
-    data: null,
+    data: assignment?.feedback || null,
   };
 };
 
-export const getGrades = async () => {
+
+export const getGrades = async (id) => {
+  const assignment = assignments.find(
+    (assignment) => assignment.id === Number(id)
+  );
+
   return {
     success: true,
-    data: [],
+    data: assignment?.grades || [],
   };
 };

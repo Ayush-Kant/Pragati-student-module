@@ -46,6 +46,7 @@ export const validateSubmission = (submissionData) => {
   return errors;
 };
 
+
 export const validateUpload = (file) => {
   const errors = {};
 
@@ -54,7 +55,25 @@ export const validateUpload = (file) => {
     return errors;
   }
 
-  if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+  const allowedExtensions = [
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".zip",
+    ".rar",
+  ];
+
+  const fileExtension = file.name
+    ?.substring(file.name.lastIndexOf("."))
+    .toLowerCase();
+
+  const validMimeType =
+    file.type && ALLOWED_FILE_TYPES.includes(file.type);
+
+  const validExtension =
+    fileExtension && allowedExtensions.includes(fileExtension);
+
+  if (!validMimeType && !validExtension) {
     errors.file = ERROR_MESSAGES.INVALID_FILE;
   }
 
@@ -64,6 +83,7 @@ export const validateUpload = (file) => {
 
   return errors;
 };
+
 
 export const validateFeedback = (feedback) => {
   const errors = {};

@@ -2,7 +2,7 @@ import { FILTERS } from "../../constants/assignmentConstants";
 import { BookOpen } from "lucide-react";
 
 const SubjectFilter = ({ value, onChange, subjects = [], darkMode = false }) => {
-  const options = [FILTERS.ALL, ...subjects];
+  const options = [...new Set([FILTERS.ALL, ...subjects])];
 
   return (
     <div className="filter-container relative flex items-center">

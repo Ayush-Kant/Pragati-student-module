@@ -42,10 +42,30 @@ export const getStatusColor = (status) => {
 
 //   Sort assignments by due date.
  
-export const sortAssignmentsByDeadline = (assignments = []) => {
-  return [...assignments].sort(
-    (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
-  );
+export const sortAssignmentsByDeadline = (
+  assignments = [],
+  deadline = "upcoming"
+) => {
+  const sortedAssignments = [...assignments].sort((a, b) => {
+    const dateA = new Date(a?.dueDate);
+    const dateB = new Date(b?.dueDate);
+
+    if (isNaN(dateA) || isNaN(dateB)) return 0;
+
+    switch (deadline) {
+      case "latest":
+        return dateB - dateA;
+
+      case "overdue":
+        return dateA - dateB;
+
+      case "upcoming":
+      default:
+        return dateA - dateB;
+    }
+  });
+
+  return sortedAssignments;
 };
 
 

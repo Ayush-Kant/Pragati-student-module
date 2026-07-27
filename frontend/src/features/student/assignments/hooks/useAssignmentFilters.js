@@ -11,6 +11,7 @@ const useAssignmentFilters = (assignments = []) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState(FILTERS.ALL);
   const [subject, setSubject] = useState(FILTERS.ALL);
+  const [deadline, setDeadline] = useState("upcoming");
 
   const filteredAssignments = useMemo(() => {
     let filteredData = [...assignments];
@@ -19,8 +20,10 @@ const useAssignmentFilters = (assignments = []) => {
     filteredData = filterAssignmentsByStatus(filteredData, status);
     filteredData = filterAssignmentsBySubject(filteredData, subject);
 
-    return sortAssignmentsByDeadline(filteredData);
-  }, [assignments, searchTerm, status, subject]);
+    filteredData = sortAssignmentsByDeadline(filteredData, deadline);
+
+    return filteredData;
+  }, [assignments, searchTerm, status, subject,deadline]);
 
   return {
     searchTerm,
@@ -30,6 +33,8 @@ const useAssignmentFilters = (assignments = []) => {
     setSearchTerm,
     setStatus,
     setSubject,
+    deadline,
+    setDeadline,
   };
 };
 

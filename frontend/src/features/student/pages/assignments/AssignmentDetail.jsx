@@ -108,7 +108,7 @@ const AssignmentDetail = () => {
     if (id) {
       fetchSubmissionHistory(id);
       fetchFeedback(id);
-      fetchGrades();
+      fetchGrades(id);
     }
   }, [id]);
 

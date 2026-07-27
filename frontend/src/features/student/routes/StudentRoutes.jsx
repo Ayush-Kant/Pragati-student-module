@@ -12,6 +12,8 @@ import CoursesPage from "../pages/training/CoursesPage";
 import CourseDetailPage from "../pages/training/CourseDetailPage";
 import LiveSessionsPage from "../live-sessions/pages/LiveSessionsPage";
 import AssignmentsPage from "../pages/assignments/AssignmentsPage";
+import SessionsPage from "../pages/sessions/SessionsPage";
+import AssignmentsPage from "../assignments/pages/AssignmentsPage";
 import AssignmentDetail from "../pages/assignments/AssignmentDetail";
 import QuizzesPage from "../pages/quizzes/QuizzesPage";
 import CodingChallengePage from "../pages/coding/CodingChallengePage";

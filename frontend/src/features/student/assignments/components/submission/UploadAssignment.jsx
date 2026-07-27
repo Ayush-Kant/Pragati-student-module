@@ -22,6 +22,11 @@ const UploadAssignment = ({ file, onFileChange, error, darkMode = false }) => {
     if (dropped) handleFileSelect(dropped);
   };
 
+  const handleBrowseClick = () => {
+  if (file) return; // Don't reopen picker when a file is already selected
+  inputRef.current?.click();
+  };
+
   const handleDragOver = (e) => e.preventDefault();
 
   return (
@@ -29,7 +34,7 @@ const UploadAssignment = ({ file, onFileChange, error, darkMode = false }) => {
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        onClick={() => inputRef.current?.click()}
+        onClick={handleBrowseClick}
         className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all duration-200 ${
           error
             ? darkMode
