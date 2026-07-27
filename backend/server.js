@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -65,6 +65,8 @@ import feedbackRoutes from "./src/routes/feedbackRoutes.js";
 import gradeRoutes from "./src/routes/gradeRoutes.js";
 import deadlineRoutes from "./src/routes/deadlineRoutes.js";
 import projectRoutes from "./src/routes/projectRoutes.js";
+import quizRoutes from "./routes/quizRoutes.js";
+import { initializeQuizModule } from "./models/quizModel.js";
 
 // Student profile routes
 import studentProfileRouter from "./src/routes/index.js";
@@ -178,7 +180,8 @@ app.use("/api/student/assignments", submissionRoutes);
 app.use("/api/student/assignments", feedbackRoutes);
 app.use("/api/student/assignments", gradeRoutes);
 app.use("/api/student/assignments", deadlineRoutes);
-app.use("/api/student/projects",    projectRoutes);
+app.use("/api/student/projects", projectRoutes);
+app.use("/api/student", quizRoutes);
 
 app.use(studentProfileRouter);
 
@@ -217,21 +220,25 @@ connectDB()
   .then(async () => {
     try {
       await initializeLiveSessionModule();
-      console.log("✅ Live session module initialized");
     } catch (error) {
-      console.error("⚠️ Live session module initialization failed:", error.message);
+      console.error("Live session module initialization failed:", error.message);
     }
 
     try {
       await initializeAssignmentModule();
-      console.log("✅ Assignment module initialized");
     } catch (error) {
-      console.error("⚠️ Assignment module initialization failed:", error.message);
+      console.error("Assignment module initialization failed:", error.message);
+    }
+
+    try {
+      await initializeQuizModule();
+    } catch (error) {
+      console.error("Quiz module initialization failed:", error.message);
     }
 
     server = app.listen(PORT, () => {
-      console.log(`✅ Server running on PORT : ${PORT}`);
-      console.log(`   Environment : ${process.env.NODE_ENV || "development"}`);
+      console.info(`Server running on port ${PORT}`);
+      console.info(`Environment: ${process.env.NODE_ENV || "development"}`);
     });
   })
   .catch((err) => {
