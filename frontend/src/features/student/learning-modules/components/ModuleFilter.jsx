@@ -33,20 +33,20 @@ const ModuleFilter = ({ categories = [], onFilterChange }) => {
   const hasFilters = query || selectedCategory !== "All";
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+    <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-4 shadow-sm">
       <div className="flex flex-col md:flex-row gap-3">
         {/* Search input */}
         <div className="relative flex-1">
           <Search
             size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
           />
           <input
             type="text"
             value={query}
             onChange={handleSearchChange}
             placeholder="Search modules..."
-            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-700 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:ring-offset-2 focus:ring-offset-[#050505] bg-[#0a0a0a] text-gray-200 placeholder-gray-500 transition-all duration-300"
           />
           {query && (
             <button
@@ -54,7 +54,7 @@ const ModuleFilter = ({ categories = [], onFilterChange }) => {
                 setQuery("");
                 onFilterChange?.({ category: selectedCategory, query: "" });
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-400 transition-colors duration-200"
             >
               <X size={16} />
             </button>
@@ -66,7 +66,7 @@ const ModuleFilter = ({ categories = [], onFilterChange }) => {
           <select
             value={selectedCategory}
             onChange={handleCategoryChange}
-            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            className="w-full px-3 py-2.5 border border-gray-700 rounded-lg text-sm focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 focus:ring-offset-2 focus:ring-offset-[#050505] bg-[#0a0a0a] text-gray-200 hover:border-orange-500/30 transition-all duration-200"
           >
             <option value="All">All Categories</option>
             {Object.values(MODULE_CATEGORIES).map((category) => (
@@ -81,7 +81,7 @@ const ModuleFilter = ({ categories = [], onFilterChange }) => {
         {hasFilters && (
           <button
             onClick={handleReset}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-300 bg-[#0a0a0a] rounded-lg hover:bg-[#111111] hover:border-orange-500/30 border border-gray-700 transition-all duration-300 cursor-pointer"
           >
             <X size={16} />
             Reset

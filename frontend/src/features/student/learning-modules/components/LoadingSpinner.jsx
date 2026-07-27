@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
  * @param {string} [props.color] - Tailwind text color class.
  * @returns {JSX.Element}
  */
-const LoadingSpinner = ({ size = "md", color = "text-blue-600" }) => {
+const LoadingSpinner = ({ size = "md", color = "text-orange-500" }) => {
   const sizeClasses = {
     sm: "w-4 h-4",
     md: "w-8 h-8",
@@ -18,7 +18,7 @@ const LoadingSpinner = ({ size = "md", color = "text-blue-600" }) => {
   return (
     <div className="flex items-center justify-center py-8">
       <Loader2
-        className={`${sizeClasses[size]} ${color} animate-spin`}
+        className={`${sizeClasses[size]} ${color} animate-spin drop-shadow-lg drop-shadow-orange-500/50`}
         aria-label="Loading"
       />
     </div>

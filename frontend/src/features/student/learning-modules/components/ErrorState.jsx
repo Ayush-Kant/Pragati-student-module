@@ -11,17 +11,17 @@ import { AlertTriangle, RotateCcw } from "lucide-react";
 const ErrorState = ({ error, onRetry }) => {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="bg-red-50 rounded-full p-4 mb-4">
-        <AlertTriangle className="w-10 h-10 text-red-500" />
+      <div className="bg-orange-500/10 rounded-full p-4 mb-4">
+        <AlertTriangle className="w-10 h-10 text-orange-500/50" />
       </div>
-      <h3 className="text-xl font-semibold text-slate-900 mb-2">
+      <h3 className="text-xl font-semibold text-gray-100 mb-2">
         Something went wrong
       </h3>
-      <p className="text-slate-500 max-w-md mb-6">{error}</p>
+      <p className="text-gray-400 max-w-md mb-6">{error}</p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
         >
           <RotateCcw size={16} />
           Try Again

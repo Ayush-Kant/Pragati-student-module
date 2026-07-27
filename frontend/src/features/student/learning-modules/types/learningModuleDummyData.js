@@ -1,8 +1,8 @@
-import reactImage from "@assets/learning-modules/react-fundamentals.jpg";
-import nodeImage from "@assets/learning-modules/nodejs-api.jpg";
-import pythonImage from "@assets/learning-modules/python-analysis.jpg";
-import awsImage from "@assets/learning-modules/aws-cloud.jpg";
-import dockerImage from "@assets/learning-modules/docker-containers.jpg";
+const reactImage = "https://via.placeholder.com/400x200/FF6B35/FFFFFF?text=React+Fundamentals";
+const nodeImage = "https://via.placeholder.com/400x200/14B8A6/FFFFFF?text=Node.js+API";
+const pythonImage = "https://via.placeholder.com/400x200/FF6B35/FFFFFF?text=Python+Data";
+const awsImage = "https://via.placeholder.com/400x200/14B8A6/FFFFFF?text=AWS+Cloud";
+const dockerImage = "https://via.placeholder.com/400x200/FF6B35/FFFFFF?text=Docker";
 
 const today = new Date("2026-07-27T00:00:00+05:30");
 const yesterday = new Date(today);

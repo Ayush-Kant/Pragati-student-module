@@ -25,7 +25,7 @@ const ModuleCard = ({ module, onClick }) => {
   return (
     <div
       onClick={handleClick}
-      className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-300 cursor-pointer group"
+      className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-5 shadow-xl hover:shadow-2xl hover:shadow-orange-500/20 hover:border-orange-500/60 hover:-translate-y-2 hover:scale-[1.02] hover:ring-1 hover:ring-orange-500/20 transition-all duration-300 cursor-pointer group"
     >
       {/* Header: badges */}
       <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -42,12 +42,12 @@ const ModuleCard = ({ module, onClick }) => {
       </div>
 
       {/* Title */}
-      <h3 className="text-lg font-semibold text-slate-900 mb-2 group-hover:text-blue-700 transition-colors">
+      <h3 className="text-lg font-semibold text-gray-100 mb-2 group-hover:text-orange-400 transition-colors">
         {module.title}
       </h3>
 
       {/* Description */}
-      <p className="text-sm text-slate-500 mb-4 line-clamp-2">
+      <p className="text-sm text-gray-400 mb-4 line-clamp-2">
         {module.description}
       </p>
 
@@ -57,12 +57,12 @@ const ModuleCard = ({ module, onClick }) => {
       </div>
 
       {/* Footer stats */}
-      <div className="flex items-center justify-between text-sm text-slate-500">
+      <div className="flex items-center justify-between text-sm text-gray-400">
         <div className="flex items-center gap-1">
           <Clock size={14} />
           <span>{formatDuration(module.duration)}</span>
         </div>
-        <div className="flex items-center gap-1 text-blue-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 text-orange-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
           <Play size={14} />
           <span>Continue</span>
         </div>

@@ -42,9 +42,9 @@ export const PROGRESS_STATUS = {
  * @type {Record<string, string>}
  */
 export const LEVEL_COLORS = {
-  [MODULE_LEVELS.BEGINNER]: "bg-green-100 text-green-800",
-  [MODULE_LEVELS.INTERMEDIATE]: "bg-yellow-100 text-yellow-800",
-  [MODULE_LEVELS.ADVANCED]: "bg-red-100 text-red-800",
+  [MODULE_LEVELS.BEGINNER]: "bg-gradient-to-r from-teal-500/20 to-teal-600/20 text-teal-400 border border-teal-500/30 shadow-lg shadow-teal-500/10",
+  [MODULE_LEVELS.INTERMEDIATE]: "bg-gradient-to-r from-orange-500/20 to-orange-600/20 text-orange-400 border border-orange-500/30 shadow-lg shadow-orange-500/10",
+  [MODULE_LEVELS.ADVANCED]: "bg-gradient-to-r from-orange-600/20 to-red-500/20 text-orange-500 border border-orange-600/30 shadow-lg shadow-orange-600/10",
 };
 
 /**
@@ -52,10 +52,10 @@ export const LEVEL_COLORS = {
  * @type {Record<string, string>}
  */
 export const CATEGORY_COLORS = {
-  [MODULE_CATEGORIES.FRONTEND]: "bg-blue-100 text-blue-800",
-  [MODULE_CATEGORIES.BACKEND]: "bg-purple-100 text-purple-800",
-  [MODULE_CATEGORIES.DEVOPS]: "bg-orange-100 text-orange-800",
-  [MODULE_CATEGORIES.DATABASE]: "bg-teal-100 text-teal-800",
-  [MODULE_CATEGORIES.CLOUD]: "bg-indigo-100 text-indigo-800",
-  [MODULE_CATEGORIES.MOBILE]: "bg-pink-100 text-pink-800",
+  [MODULE_CATEGORIES.FRONTEND]: "bg-gradient-to-r from-orange-500/20 to-orange-600/20 text-orange-400 border border-orange-500/30 shadow-lg shadow-orange-500/10",
+  [MODULE_CATEGORIES.BACKEND]: "bg-gradient-to-r from-teal-500/20 to-teal-600/20 text-teal-400 border border-teal-500/30 shadow-lg shadow-teal-500/10",
+  [MODULE_CATEGORIES.DEVOPS]: "bg-gradient-to-r from-orange-500/20 to-orange-600/20 text-orange-400 border border-orange-500/30 shadow-lg shadow-orange-500/10",
+  [MODULE_CATEGORIES.DATABASE]: "bg-gradient-to-r from-teal-500/20 to-teal-600/20 text-teal-400 border border-teal-500/30 shadow-lg shadow-teal-500/10",
+  [MODULE_CATEGORIES.CLOUD]: "bg-gradient-to-r from-orange-400/20 to-orange-500/20 text-orange-300 border border-orange-400/30 shadow-lg shadow-orange-400/10",
+  [MODULE_CATEGORIES.MOBILE]: "bg-gradient-to-r from-teal-400/20 to-teal-500/20 text-teal-300 border border-teal-400/30 shadow-lg shadow-teal-400/10",
 };

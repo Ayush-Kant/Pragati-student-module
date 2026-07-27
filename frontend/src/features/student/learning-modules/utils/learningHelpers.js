@@ -37,9 +37,9 @@ export const formatDate = (dateString) => {
  * @returns {string} Tailwind text color class.
  */
 export const getProgressColor = (percentage) => {
-  if (percentage <= 30) return 'text-red-500';
-  if (percentage <= 70) return 'text-yellow-500';
-  return 'text-green-500';
+  if (percentage <= 30) return 'text-orange-500';
+  if (percentage <= 70) return 'text-orange-400';
+  return 'text-teal-500';
 };
 
 /**
@@ -48,9 +48,9 @@ export const getProgressColor = (percentage) => {
  * @returns {string} Tailwind background color class.
  */
 export const getProgressBarColor = (percentage) => {
-  if (percentage <= 30) return 'bg-red-500';
-  if (percentage <= 70) return 'bg-yellow-500';
-  return 'bg-green-500';
+  if (percentage <= 30) return 'bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 shadow-lg shadow-orange-500/30';
+  if (percentage <= 70) return 'bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 shadow-lg shadow-orange-500/30';
+  return 'bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 shadow-lg shadow-teal-500/30';
 };
 
 /**
@@ -90,7 +90,7 @@ export const getTotalLessonsCount = (lessons) => {
  * @returns {string} Tailwind color classes.
  */
 export const getLevelBadgeColor = (level) => {
-  return LEVEL_COLORS[level] || 'bg-gray-100 text-gray-800';
+  return LEVEL_COLORS[level] || 'bg-gray-800 text-gray-300 border border-gray-700';
 };
 
 /**
@@ -99,7 +99,7 @@ export const getLevelBadgeColor = (level) => {
  * @returns {string} Tailwind color classes.
  */
 export const getCategoryBadgeColor = (category) => {
-  return CATEGORY_COLORS[category] || 'bg-gray-100 text-gray-800';
+  return CATEGORY_COLORS[category] || 'bg-gray-800 text-gray-300 border border-gray-700';
 };
 
 /**
