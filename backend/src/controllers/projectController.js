@@ -4,7 +4,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import projectService from "../services/projectService.js";
-import { successResponse, errorResponse } from "../utils/projectHelpers.js";
+import { normalizeStudentId } from "../utils/assignmentHelpers.js";
 
 /**
  * GET /api/student/projects/:projectId
@@ -12,12 +12,16 @@ import { successResponse, errorResponse } from "../utils/projectHelpers.js";
  */
 export const getProjectDetails = async (req, res, next) => {
   try {
-    const studentId = req.user.id;
+    const studentId = normalizeStudentId(req);
     const { projectId } = req.params;
 
     const data = await projectService.fetchProjectDetails(studentId, projectId);
 
-    return successResponse(res, data, "Project details fetched successfully");
+    res.status(200).json({
+      success: true,
+      message: "Project details fetched successfully",
+      data,
+    });
   } catch (error) {
     next(error);
   }
@@ -29,7 +33,7 @@ export const getProjectDetails = async (req, res, next) => {
  */
 export const submitMilestone = async (req, res, next) => {
   try {
-    const studentId = req.user.id;
+    const studentId = normalizeStudentId(req);
     const { projectId, milestoneId } = req.params;
 
     const data = await projectService.createMilestoneSubmission(
@@ -39,7 +43,11 @@ export const submitMilestone = async (req, res, next) => {
       req.body
     );
 
-    return successResponse(res, data, "Milestone submitted successfully", 201);
+    res.status(201).json({
+      success: true,
+      message: "Milestone submitted successfully",
+      data,
+    });
   } catch (error) {
     next(error);
   }
@@ -51,7 +59,7 @@ export const submitMilestone = async (req, res, next) => {
  */
 export const submitFinalProject = async (req, res, next) => {
   try {
-    const studentId = req.user.id;
+    const studentId = normalizeStudentId(req);
     const { projectId } = req.params;
 
     const data = await projectService.createFinalSubmission(
@@ -61,7 +69,11 @@ export const submitFinalProject = async (req, res, next) => {
       req.file || null
     );
 
-    return successResponse(res, data, "Final project submitted successfully", 201);
+    res.status(201).json({
+      success: true,
+      message: "Final project submitted successfully",
+      data,
+    });
   } catch (error) {
     next(error);
   }
