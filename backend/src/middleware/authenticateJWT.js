@@ -1,45 +1,55 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
+/**
+ * authenticateJWT
+ * ────────────────
+ * Express middleware that validates the Authorization header.
+ *
+ * Expected header format:
+ *   Authorization: Bearer <token>
+ */
 export const authenticateJWT = (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const userId = req.headers["x-user-id"] || req.query.studentId;
-    const role = req.headers["x-user-role"] || req.query.role || "student";
+  const authHeader = req.headers['authorization'] ?? req.headers['Authorization'];
 
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      const token = authHeader.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || "dev-secret");
-      req.user = {
-        id: decoded.id || decoded.userId || decoded.sub,
-        role: decoded.role || role,
-      };
-      return next();
-    }
-
-    if (userId) {
-      req.user = {
-        id: Number(userId),
-        role,
-      };
-      return next();
-    }
-
-    if (process.env.NODE_ENV !== "production") {
-      req.user = {
-        id: 101,
-        role: "student",
-      };
-      return next();
-    }
-
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
       success: false,
-      message: "Authentication required",
+      message: 'Authentication required. Please provide a valid Bearer token.',
     });
-  } catch (error) {
+  }
+
+  const token = authHeader.slice(7).trim(); // strip "Bearer "
+
+  if (!token) {
     return res.status(401).json({
       success: false,
-      message: "Invalid token",
+      message: 'Authentication token is missing.',
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Attach the decoded payload to the request for downstream handlers
+    req.user = {
+      id: decoded.id || decoded.uid, // Preserve the integer ID for Projects Backend DB queries
+      userId: decoded.userId, // auth_users.uuid_id
+      email: decoded.email,
+      role: decoded.role,
+    };
+
+    next();
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Session expired. Please log in again.',
+      });
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid authentication token.',
     });
   }
 };

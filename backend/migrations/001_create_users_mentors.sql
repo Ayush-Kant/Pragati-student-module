@@ -17,8 +17,9 @@ CREATE TABLE IF NOT EXISTS users (
                 REFERENCES auth_users(id)
                 ON DELETE CASCADE,
   email         VARCHAR(255) UNIQUE NOT NULL,
-  role          VARCHAR(50) NOT NULL,
-  username      VARCHAR(255),
+  role          VARCHAR(20) NOT NULL
+                CHECK (role IN ('mentor','student','company','admin','college')),
+  username      VARCHAR(100),
   phone         VARCHAR(20),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -39,7 +40,9 @@ CREATE TABLE IF NOT EXISTS mentors (
 CREATE TABLE IF NOT EXISTS drives (
   id                SERIAL PRIMARY KEY,
   mentor_id         INTEGER NOT NULL REFERENCES mentors(id),
-  title             VARCHAR(500) NOT NULL
+  company_id        INTEGER,
+  title             VARCHAR(500) NOT NULL,
+  status            VARCHAR(50) NOT NULL DEFAULT 'active'
 );
 
 -- INDEX: fast tag search

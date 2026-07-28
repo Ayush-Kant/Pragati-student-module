@@ -36,7 +36,21 @@ export const validateAssignmentId = (req, res, next) => {
   next();
 };
 
+export const validateAssignmentParams = (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id || Number.isNaN(Number(id))) {
+    return res.status(400).json({
+      success: false,
+      message: "Valid assignment id is required",
+    });
+  }
+
+  next();
+};
+
 export default {
   validateAssignment,
   validateAssignmentId,
+  validateAssignmentParams,
 };
