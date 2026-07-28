@@ -1,14 +1,17 @@
 import { pool } from "../config/db.js";
 
-// Get all announcements
+// Safe SQL to join creator/publisher without assuming user column names
 export const getAllAnnouncements = async () => {
   const { rows } = await pool.query(
     `SELECT
         a.*,
-        c.name AS category_name
+        c.name AS category_name,
+        COALESCE(u_create.email, 'Admin (' || a.created_by || ')') AS creator_name,
+        COALESCE(u_pub.email, 'Admin') AS publisher_name
      FROM announcements a
-     LEFT JOIN announcement_categories c
-     ON a.category_id = c.id
+     LEFT JOIN announcement_categories c ON a.category_id = c.id
+     LEFT JOIN users u_create ON a.created_by = u_create.id
+     LEFT JOIN users u_pub ON a.published_by = u_pub.id
      ORDER BY a.created_at DESC`
   );
 
@@ -20,10 +23,13 @@ export const getAnnouncementById = async (id) => {
   const { rows } = await pool.query(
     `SELECT
         a.*,
-        c.name AS category_name
+        c.name AS category_name,
+        COALESCE(u_create.email, 'Admin (' || a.created_by || ')') AS creator_name,
+        COALESCE(u_pub.email, 'Admin') AS publisher_name
      FROM announcements a
-     LEFT JOIN announcement_categories c
-     ON a.category_id = c.id
+     LEFT JOIN announcement_categories c ON a.category_id = c.id
+     LEFT JOIN users u_create ON a.created_by = u_create.id
+     LEFT JOIN users u_pub ON a.published_by = u_pub.id
      WHERE a.id = $1`,
     [id]
   );
@@ -37,16 +43,37 @@ export const createAnnouncement = async ({
   description,
   category_id,
   created_by,
+  priority = "Medium",
+  target_audience = "All Students",
+  announcement_type = "General",
+  visibility = "Public",
+  tags = [],
+  expiry_date = null,
+  attachment_url = null,
+  image_url = null,
 }) => {
   const { rows } = await pool.query(
     `INSERT INTO announcements
-      (title, description, category_id, created_by)
-     VALUES ($1, $2, $3, $4)
-     RETURNING *`,
-    [title, description, category_id, created_by]
+      (title, description, category_id, created_by, priority, target_audience, announcement_type, visibility, tags, expiry_date, attachment_url, image_url)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+     RETURNING id`,
+    [
+      title,
+      description,
+      category_id || null,
+      created_by || 1,
+      priority,
+      target_audience,
+      announcement_type,
+      visibility,
+      tags,
+      expiry_date,
+      attachment_url,
+      image_url,
+    ]
   );
 
-  return rows[0];
+  return getAnnouncementById(rows[0].id);
 };
 
 // Update announcement
@@ -69,12 +96,11 @@ export const updateAnnouncement = async (id, data) => {
     UPDATE announcements
     SET ${fields.join(", ")}
     WHERE id = $${index}
-    RETURNING *;
+    RETURNING id;
   `;
 
   const { rows } = await pool.query(query, values);
-
-  return rows[0];
+  return getAnnouncementById(rows[0].id);
 };
 
 // Delete announcement
@@ -90,31 +116,32 @@ export const deleteAnnouncement = async (id) => {
 };
 
 // Publish announcement
-export const publishAnnouncement = async (id) => {
-  const { rows } = await pool.query(
+export const publishAnnouncement = async (id, userId = null) => {
+  await pool.query(
     `UPDATE announcements
-     SET status='Published',
-         updated_at=CURRENT_TIMESTAMP
-     WHERE id=$1
-     RETURNING *`,
-    [id]
+     SET status = 'Published',
+         published_date = CURRENT_TIMESTAMP,
+         published_by = $2,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE id = $1`,
+    [id, userId]
   );
 
-  return rows[0];
+  return getAnnouncementById(id);
 };
 
 // Unpublish announcement
 export const unpublishAnnouncement = async (id) => {
-  const { rows } = await pool.query(
+  await pool.query(
     `UPDATE announcements
-     SET status='Draft',
-         updated_at=CURRENT_TIMESTAMP
-     WHERE id=$1
-     RETURNING *`,
+     SET status = 'Draft',
+         published_date = NULL,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE id = $1`,
     [id]
   );
 
-  return rows[0];
+  return getAnnouncementById(id);
 };
 
 export default {

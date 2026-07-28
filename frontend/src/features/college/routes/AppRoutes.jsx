@@ -38,7 +38,7 @@ import { Navigate, Route } from "react-router-dom";
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
 import CollegeLayout from "../layouts/CollegeLayout";
-
+import AnnouncementsPage from "../communication/pages/AnnouncementsPage";
 import DashboardPage from "../dashboard/pages/DashboardPage";
 import CollegeProfilePage from "../profile/pages/CollegeProfilePage";
 import OrganizationProfile from "../profile/pages/AddCollegeProfile";
@@ -72,7 +72,7 @@ const collegeRoute = (
         
         <Route path="company-job-postings" element={<CompanyJobPostingsPage />} />
         <Route path="companies" element={<CompanyJobPostingsPage />} />
-        
+        <Route path="announcements" element={<AnnouncementsPage />} />
         <Route path="drives" element={<PlacementDrivesPage />} />
         <Route path="reports" element={<ReportsPage />} />
         {/* Render a blank page with sidebar/footer if page is not created yet */}

@@ -35,13 +35,7 @@ export const validateAnnouncement = (req, res, next) => {
     });
   }
 
-  if (
-    !Number.isInteger(Number(category_id))
-  ) {
-    return res.status(400).json({
-      error: "category_id must be a valid integer.",
-    });
-  }
+ 
 
   if (
     !Number.isInteger(Number(created_by))
