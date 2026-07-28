@@ -195,6 +195,7 @@
 
 .table-wrapper {
   overflow-x: auto;
+  min-height: 60vh;
 }
 
 .assessment-table {
@@ -781,6 +782,12 @@
   animation:popup .25s ease;
 }
 
+.edit-assessment-btn {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 20px;
+}
+
 @keyframes popup{
   from{
     opacity:0;
@@ -998,4 +1005,4 @@
   .cancel-btn {
     width: 100% !important;
   }
-}
+}
