@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -64,16 +64,12 @@ import submissionRoutes from "./src/routes/submissionRoutes.js";
 import feedbackRoutes from "./src/routes/feedbackRoutes.js";
 import gradeRoutes from "./src/routes/gradeRoutes.js";
 import deadlineRoutes from "./src/routes/deadlineRoutes.js";
-<<<<<<< HEAD
+import projectRoutes from "./src/routes/projectRoutes.js";
+import quizRoutes from "./routes/quizRoutes.js";
+import { initializeQuizModule } from "./models/quizModel.js";
 
 // Student profile routes
-=======
-import quizRoutes from "./routes/quizRoutes.js";
-import errorMiddleware from "./middleware/errorMiddleware.js";
->>>>>>> 2d9ae574 (Implement quizzes backend module)
 import studentProfileRouter from "./src/routes/index.js";
-import { initializeQuizModule } from "./models/quizModel.js";
-import quizRoutes from "./routes/quizRoutes.js";
 
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
@@ -184,6 +180,7 @@ app.use("/api/student/assignments", submissionRoutes);
 app.use("/api/student/assignments", feedbackRoutes);
 app.use("/api/student/assignments", gradeRoutes);
 app.use("/api/student/assignments", deadlineRoutes);
+app.use("/api/student/projects", projectRoutes);
 app.use("/api/student", quizRoutes);
 
 app.use(studentProfileRouter);

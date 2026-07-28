@@ -6,6 +6,21 @@ export const sanitizeInput = (value) => {
   return value.trim();
 };
 
+export const normalizeRole = (role) => {
+  if (!role) return "";
+  return String(role).toLowerCase().trim();
+};
+
+export const isInstructorOrAdmin = ({ role }) => {
+  const normalizedRole = normalizeRole(role);
+  return ["admin", "instructor", "college_admin"].includes(normalizedRole);
+};
+
+export const isStudentRole = ({ role }) => {
+  const normalizedRole = normalizeRole(role);
+  return normalizedRole === "student";
+};
+
 export const normalizeStudentId = (req) => {
   const fallback = req?.user?.id ?? req?.headers?.["x-user-id"] ?? req?.query?.studentId;
   const studentId = Number(fallback ?? 101);
