@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import StatisticsCard from "../components/StatisticsCard";
 import ProjectProgressOverview from "../components/ProjectProgressOverview";
 import RecentActivityFeed from "../components/RecentActivityFeed";
@@ -7,6 +8,7 @@ import UpcomingDeadlinesTimeline from "../components/UpcomingDeadlinesTimeline";
 import MentorResourcesSection from "../components/MentorResourcesSection";
 
 export default function ProjectsDashboard() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#f9f9ff] p-6 space-y-8">
 
@@ -41,18 +43,19 @@ export default function ProjectsDashboard() {
           </button>
 
           <button
-            className="
-              px-5
-              py-2.5
-              rounded-xl
-              bg-[#004ac6]
-              text-white
-              hover:bg-blue-700
-              transition
-            "
-          >
-            + New Project
-          </button>
+  onClick={() => navigate("/mentor/projects/create")}
+  className="
+    px-5
+    py-2.5
+    rounded-xl
+    bg-[#004ac6]
+    text-white
+    hover:bg-blue-700
+    transition
+  "
+>
+  + New Project
+</button>
 
         </div>
 

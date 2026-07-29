@@ -66,7 +66,7 @@ export default function MentorLayout() {
     },
     {
       name: "Projects",
-      path: "/mentor/projects/create",
+      path: "/mentor/projects-dashboard",
       icon: <Briefcase className="w-5 h-5" />,
     },
     {
