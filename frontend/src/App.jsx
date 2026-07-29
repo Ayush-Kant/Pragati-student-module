@@ -2,8 +2,9 @@ import { Toaster } from "react-hot-toast";
 
 import { Routes, Route, Navigate } from "react-router-dom";
 
+
 import ToastContainer from "./features/mentor/components/ToastContainer";
-import { Routes, Route, Navigate } from 'react-router-dom';
+
 
 
 
@@ -23,12 +24,17 @@ import CompanyRoute from "./features/company/routes/CompanyRoute";
 
 
 function App() {
-  return (
-  
-    <AuthProvider>
-  <Toaster />
 
-  <ToastContainer />
+
+
+  return (
+    <AuthProvider>
+
+      <Toaster />
+
+      <ToastContainer
+       
+      />
 
   
       <Routes>

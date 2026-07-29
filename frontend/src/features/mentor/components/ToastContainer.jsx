@@ -1,27 +1,24 @@
 import Toast from "./Toast";
 import useToast from "../hooks/useToast";
 
-
 export default function ToastContainer() {
-
   const {
     notifications,
     dismissToast,
   } = useToast();
 
-
   if (!notifications.length) {
     return null;
   }
 
-
   return (
-
     <div
       className="
         fixed
-        top-5
-        right-5
+        top-4
+        right-4
+        sm:top-5
+        sm:right-5
         z-[9999]
         flex
         flex-col
@@ -30,9 +27,7 @@ export default function ToastContainer() {
         max-w-md
       "
     >
-
-      {notifications.map((notification)=>(
-
+      {notifications.map((notification) => (
         <Toast
           key={notification.id}
           id={notification.id}
@@ -41,10 +36,7 @@ export default function ToastContainer() {
           message={notification.message}
           onDismiss={dismissToast}
         />
-
       ))}
-
     </div>
-
   );
 }
