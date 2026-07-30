@@ -9,13 +9,15 @@ import MentorLayout from "../components/layout/MentorLayout";
 // --- Core Mentor Pages ---
 import Dashboard from "../pages/Dashboard";
 import SettingsPage from "../../../pages/mentor/SettingsPage";
-
+import ProjectsDashboard from "../pages/ProjectsDashboard";
 // --- Onboarding Pages ---
 import BasicInfo from "../pages/BasicInfo";
 import ProfessionalProfile from "../pages/ProfessionalProfile";
 import ExperienceLinks from "../pages/ExperienceLinks";
 import Availability from "../pages/Availability";
 
+// --- Existing Mentor Pages ---
+import MenteeManagementPage from "../pages/MenteeManagementPage";
 // --- Courses & Projects ---
 import Courses from "../../../pages/mentor/CoursesPage";
 import CreateCourse from "../../../pages/mentor/CreateCoursePage";
@@ -66,7 +68,32 @@ const mentorRoute = (
         <Route index element={<Navigate to="dashboard" replace />} />
 
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="projects-dashboard" element={<ProjectsDashboard />} />
 
+        {/* Existing Mentee Route */}
+        <Route path="mentees" element={<MenteeManagementPage />} />
+
+        {/* Courses */}
+        <Route path="courses" element={<Courses />} />
+        <Route path="courses/create" element={<CreateCourse />} />
+
+        {/* Settings */}
+        <Route path="settings" element={<SettingsPage />} />
+
+        {/* Reports */}
+        <Route path="export-report" element={<ExportReport />} />
+
+        {/* Projects */}
+        <Route path="projects/create" element={<ProjectCreationPage />} />
+
+        {/* Challenges */}
+        <Route path="challenge-creator" element={<ChallengeCreatorPage />} />
+        <Route
+          path="challenge-workspace"
+          element={<ChallengeWorkspacePage />}
+        />
+
+        {/* Submission */}
         <Route path="hiring-pipeline" element={<HiringPipelinePage />} />
 
         <Route path="settings" element={<SettingsPage />} />
@@ -81,6 +108,8 @@ const mentorRoute = (
           path="certificates/template"
           element={<CertificateTemplatePage />}
         />
+        <Route path="review-grading" element={<ReviewGradingPage />} />
+        <Route path="project-analytics" element={<AnalyticsDashboardPage />} />
 
         {/* Activities */}
         <Route element={<ActivityProvider />}>
