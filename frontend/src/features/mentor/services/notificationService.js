@@ -61,7 +61,7 @@ export const fetchNotificationsAPI = async () => {
   }
 
   try {
-    const response = await fetch("/api/v1/notifications", {
+    const response = await fetch("/api/student/notifications", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -75,17 +75,25 @@ export const fetchNotificationsAPI = async () => {
     }
 
     if (!response.ok) {
-      throw new Error("Failed to fetch notifications");
+      throw new Error(
+        `Failed to fetch notifications: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    // CHECK 1: Ensure the response is actually JSON before parsing
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      throw new Error(`Expected JSON but received: ${text.slice(0, 100)}...`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error("API Error:", error);
+    console.error("API Error:", error.message || error);
     // Return a clean copy of the mock data for development while backend is building
     return mockNotificationData.map((item) => ({ ...item }));
   }
 };
-
 /**
  * Main API function to mark/dismiss a notification as read.
  */

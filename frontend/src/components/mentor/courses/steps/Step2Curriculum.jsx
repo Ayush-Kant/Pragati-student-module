@@ -79,7 +79,7 @@ export default function Step2Curriculum({
     }
   };
 
-  const handleSectionDelete = async (moduleId) => {
+  const handleDeleteSection = async (moduleId) => {
     await handleDeleteModule(moduleId);
 
     handleUpdateModules(modules.filter((m) => m.id !== moduleId));
