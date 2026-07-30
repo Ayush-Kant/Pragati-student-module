@@ -142,38 +142,41 @@ export const nominateStudentsToDrive = async (driveId, studentIds, nominatedBy) 
   try {
     await client.query('BEGIN');
 
-    const inserted = [];
-    const skipped = [];
+    const result = await client.query(
+      `INSERT INTO drive_nominations (drive_id, student_id, nominated_by, status)
+       SELECT $1, unnest($2::int[]), $3, 'Nominated'
+       ON CONFLICT (drive_id, student_id) DO NOTHING
+       RETURNING *`,
+      [driveId, studentIds, nominatedBy]
+    );
 
-    for (const studentId of studentIds) {
-      const existing = await client.query(
-        `SELECT id, status FROM drive_nominations
-         WHERE drive_id = $1 AND student_id = $2`,
-        [driveId, studentId]
-      );
+    const inserted = result.rows;
 
-      if (existing.rows.length > 0) {
-        skipped.push({
-          studentId,
-          reason: 'Already nominated',
-          existingStatus: existing.rows[0].status,
-        });
-        continue;
-      }
+    const allResult = await client.query(
+      `SELECT student_id, status FROM drive_nominations WHERE drive_id = $1`,
+      [driveId]
+    );
+    const nominatedIds = new Set(inserted.map(r => r.student_id));
+    const skipped = allResult.rows
+      .filter(r => !nominatedIds.has(r.student_id))
+      .map(r => ({
+        studentId: r.student_id,
+        reason: 'Already nominated',
+        existingStatus: r.status,
+      }));
 
-      const row = await client.query(
-        `INSERT INTO drive_nominations (drive_id, student_id, nominated_by, status)
-         VALUES ($1, $2, $3, 'Nominated')
-         RETURNING *`,
-        [driveId, studentId, nominatedBy]
-      );
-      inserted.push(row.rows[0]);
-    }
+    await client.query(
+      `UPDATE drive_statistics SET total_applied = (
+         SELECT COUNT(*) FROM drive_nominations WHERE drive_id = $1 AND status != 'Withdrawn'
+       ) WHERE drive_id = $1`,
+      [driveId]
+    );
 
     await client.query('COMMIT');
     return { inserted, skipped };
   } catch (err) {
     await client.query('ROLLBACK');
+    console.error('nominateStudentsToDrive error:', err.message, err.stack?.split('\n')[1]);
     throw err;
   } finally {
     client.release();
@@ -186,44 +189,51 @@ export const shortlistStudentsForDrive = async (driveId, studentIds, shortlisted
   try {
     await client.query('BEGIN');
 
+    const existingRes = await client.query(
+      `SELECT student_id, id AS nomination_id FROM drive_nominations
+       WHERE drive_id = $1 AND student_id = ANY($2::int[]) AND status = 'Nominated'`,
+      [driveId, studentIds]
+    );
+
+    const existingIds = new Set(existingRes.rows.map(r => r.student_id));
+
     const shortlisted = [];
     const skipped = [];
 
-    for (const studentId of studentIds) {
-      const nomRes = await client.query(
-        `SELECT * FROM drive_nominations
-         WHERE drive_id = $1 AND student_id = $2`,
-        [driveId, studentId]
-      );
-
-      if (nomRes.rows.length === 0) {
-        skipped.push({ studentId, reason: 'No nomination found for this drive' });
-        continue;
-      }
-
-      const nomination = nomRes.rows[0];
-
+    if (existingRes.rows.length > 0) {
       await client.query(
         `UPDATE drive_nominations
          SET status = 'Shortlisted', updated_at = NOW()
-         WHERE id = $1`,
-        [nomination.id]
+         WHERE drive_id = $1 AND student_id = ANY($2::int[]) AND status = 'Nominated'`,
+        [driveId, studentIds]
       );
 
-      const sl = await client.query(
-        `INSERT INTO drive_shortlists
-           (drive_id, nomination_id, student_id, shortlisted_by, status)
-         VALUES ($1, $2, $3, $4, 'Shortlisted')
+      const slResult = await client.query(
+        `INSERT INTO drive_shortlists (drive_id, nomination_id, student_id, shortlisted_by, status)
+         SELECT $1, dn.id, dn.student_id, $2, 'Shortlisted'
+         FROM drive_nominations dn
+         WHERE dn.drive_id = $1 AND dn.student_id = ANY($3::int[]) AND dn.status = 'Shortlisted'
          ON CONFLICT (drive_id, student_id)
-         DO UPDATE SET
-           status         = 'Shortlisted',
-           shortlisted_by = EXCLUDED.shortlisted_by,
-           updated_at     = NOW()
+         DO UPDATE SET status = 'Shortlisted', shortlisted_by = EXCLUDED.shortlisted_by, updated_at = NOW()
          RETURNING *`,
-        [driveId, nomination.id, studentId, shortlistedBy]
+        [driveId, shortlistedBy, studentIds]
       );
-      shortlisted.push(sl.rows[0]);
+
+      shortlisted.push(...slResult.rows);
     }
+
+    for (const studentId of studentIds) {
+      if (!existingIds.has(studentId)) {
+        skipped.push({ studentId, reason: 'No nomination found for this drive' });
+      }
+    }
+
+    await client.query(
+      `UPDATE drive_statistics SET total_selected = (
+         SELECT COUNT(*) FROM drive_nominations WHERE drive_id = $1 AND status = 'Selected'
+       ) WHERE drive_id = $1`,
+      [driveId]
+    );
 
     await client.query('COMMIT');
     return { shortlisted, skipped };

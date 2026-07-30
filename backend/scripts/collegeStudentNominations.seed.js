@@ -7,19 +7,20 @@ const seedData = async () => {
   try {
     await client.query('BEGIN');
 
-    // Clear existing dummy data for fresh seeding
-    await client.query('TRUNCATE TABLE eligible_students, student_nominations, shortlisted_students, company_shortlists, nomination_statistics RESTART IDENTITY CASCADE');
+    // Clear existing dummy data for fresh seeding (eligible_students is a view, skip it)
+    await client.query('TRUNCATE TABLE student_nominations, shortlisted_students, company_shortlists, nomination_statistics RESTART IDENTITY CASCADE');
 
-    console.log('Inserting eligible students...');
+    console.log('Inserting eligible students (into students table — eligible_students is a view)...');
     await client.query(`
-      INSERT INTO eligible_students
-        (student_id, enrollment_no, name, email, department, course, semester, batch, cgpa, placement_status, skills)
+      INSERT INTO students
+        (id, enrollment_no, name, email, department, course, semester, batch, cgpa, placement_status, skills)
       VALUES
         (1, '2023CS001', 'Rahul Sharma', 'rahul@college.edu', 'Computer Science', 'B.Tech', 5, '2023', 8.72, 'Eligible', ARRAY['React', 'Node.js', 'Python']),
         (2, '2023IT012', 'Anjali Singh', 'anjali@college.edu', 'Information Technology', 'B.Tech', 5, '2023', 9.12, 'Eligible', ARRAY['Java', 'Spring Boot', 'MySQL']),
         (3, '2022CS045', 'Priya Mehta', 'priya@college.edu', 'Computer Science', 'B.Tech', 7, '2022', 9.45, 'Eligible', ARRAY['ML', 'Python', 'TensorFlow']),
         (4, '2022EC033', 'Arjun Verma', 'arjun@college.edu', 'Electronics', 'B.Tech', 7, '2022', 8.20, 'Eligible', ARRAY['Embedded C', 'VLSI', 'Arduino']),
         (5, '2022IT018', 'Rohit Joshi', 'rohit@college.edu', 'Information Technology', 'B.Tech', 7, '2022', 7.55, 'Eligible', ARRAY['PHP', 'Laravel', 'MySQL'])
+      ON CONFLICT (id) DO NOTHING
     `);
 
     console.log('Inserting company shortlists...');

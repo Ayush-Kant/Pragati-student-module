@@ -125,7 +125,7 @@ app.use("/api/v1/company/assessments", companyAssessmentRoutes);
 // College
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
-app.use("/api/college/nominations", nominationRoutes);
+app.use("/api/college", nominationRoutes);
 app.use("/api/v1/company/jobs", collegeJobsRoutes);
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);

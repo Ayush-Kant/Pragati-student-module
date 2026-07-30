@@ -45,7 +45,7 @@ export const setStudentEligibility = async (req, res, next) => {
       return errorResponse(res, '"approved" field (true/false) is required', 400);
     }
 
-    const userId = req.user?.userId || req.user?.id || null;
+    const userId = req.user?.authUserId || req.user?.id || null;
     const result = await setEligibilityService(driveId, studentId, Boolean(approved), userId);
     return successResponse(res, result, `Student eligibility ${approved ? 'approved' : 'rejected'}`);
   } catch (err) {
@@ -69,6 +69,7 @@ export const getDriveNominations = async (req, res, next) => {
 // POST /api/placement-drives/:id/nominate
 // Body: { studentIds: number[] }
 export const nominateStudents = async (req, res, next) => {
+  console.log('🔥 NOMINATE REQUEST RECEIVED:', req.params.id, req.body?.studentIds, req.user?.authUserId);
   try {
     const driveId = req.params.id;
     const { studentIds } = req.body;
@@ -77,7 +78,7 @@ export const nominateStudents = async (req, res, next) => {
       return errorResponse(res, 'studentIds must be a non-empty array', 400);
     }
 
-    const nominatedBy = req.user?.userId || req.user?.id || null;
+    const nominatedBy = req.user?.authUserId || req.user?.id || null;
     const result = await nominateStudentsService(driveId, studentIds, nominatedBy);
 
     return successResponse(
@@ -106,7 +107,7 @@ export const shortlistStudents = async (req, res, next) => {
       return errorResponse(res, 'studentIds must be a non-empty array', 400);
     }
 
-    const shortlistedBy = req.user?.userId || req.user?.id || null;
+    const shortlistedBy = req.user?.authUserId || req.user?.id || null;
     const result = await shortlistStudentsService(driveId, studentIds, shortlistedBy);
 
     return successResponse(

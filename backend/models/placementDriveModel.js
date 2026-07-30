@@ -76,7 +76,8 @@ export const createPlacementDrive = async (data) => {
       }
       await client.query(
         `INSERT INTO drive_eligibility (drive_id, cgpa_cutoff, allowed_branches)
-         VALUES ($1, $2, $3)`,
+         VALUES ($1, $2, $3)
+         ON CONFLICT (drive_id) DO NOTHING`,
         [newDrive.id, cgpa, branches]
       );
     }
@@ -122,23 +123,30 @@ export const updatePlacementDrive = async (id, data) => {
   try {
     await client.query("BEGIN");
 
-    const driveResult = await client.query(
-      `UPDATE placement_drives
-       SET company = $1,
-           role = $2,
-           package = $3,
-           drive_date = $4,
-           deadline = $5,
-           status = $6,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = $7
-       RETURNING *`,
-      [company, role, pkg, drive_date, deadline, status, id]
-    );
+    const setClauses = [];
+    const values = [];
+    let idx = 1;
 
-    if (driveResult.rows.length === 0) {
-      await client.query("ROLLBACK");
-      return null;
+    if (company !== undefined) { setClauses.push(`company = $${idx++}`); values.push(company); }
+    if (role !== undefined) { setClauses.push(`role = $${idx++}`); values.push(role); }
+    if (pkg !== undefined) { setClauses.push(`package = $${idx++}`); values.push(pkg); }
+    if (drive_date !== undefined) { setClauses.push(`drive_date = $${idx++}`); values.push(drive_date); }
+    if (deadline !== undefined) { setClauses.push(`deadline = $${idx++}`); values.push(deadline); }
+    if (status !== undefined) { setClauses.push(`status = $${idx++}`); values.push(status); }
+
+    let driveResult;
+    if (setClauses.length > 0) {
+      setClauses.push(`updated_at = CURRENT_TIMESTAMP`);
+      values.push(id);
+      driveResult = await client.query(
+        `UPDATE placement_drives SET ${setClauses.join(', ')} WHERE id = $${idx} RETURNING *`,
+        values
+      );
+
+      if (driveResult.rows.length === 0) {
+        await client.query("ROLLBACK");
+        return null;
+      }
     }
 
     // Update eligibility if provided
@@ -151,14 +159,13 @@ export const updatePlacementDrive = async (id, data) => {
       await client.query(
         `INSERT INTO drive_eligibility (drive_id, cgpa_cutoff, allowed_branches)
          VALUES ($1, $2, $3)
-         ON CONFLICT (id) DO UPDATE SET cgpa_cutoff = EXCLUDED.cgpa_cutoff, allowed_branches = EXCLUDED.allowed_branches`,
+         ON CONFLICT (drive_id) DO UPDATE SET cgpa_cutoff = EXCLUDED.cgpa_cutoff, allowed_branches = EXCLUDED.allowed_branches`,
         [id, cgpa, branches]
       );
     }
 
-    // Re-sync rounds if provided
+    // Upsert rounds (preserve IDs and timestamps)
     if (Array.isArray(rounds)) {
-      await client.query(`DELETE FROM interview_rounds WHERE drive_id = $1`, [id]);
       for (let i = 0; i < rounds.length; i++) {
         const r = rounds[i];
         const roundName = r.round_name || r.name || `Round ${i + 1}`;
@@ -166,10 +173,17 @@ export const updatePlacementDrive = async (id, data) => {
         const order = r.round_order || r.order || (i + 1);
         await client.query(
           `INSERT INTO interview_rounds (drive_id, round_name, description, round_order)
-           VALUES ($1, $2, $3, $4)`,
+           VALUES ($1, $2, $3, $4)
+           ON CONFLICT (drive_id, round_order)
+           DO UPDATE SET round_name = EXCLUDED.round_name,
+                         description = EXCLUDED.description`,
           [id, roundName, desc, order]
         );
       }
+      await client.query(
+        `DELETE FROM interview_rounds WHERE drive_id = $1 AND round_order > $2`,
+        [id, rounds.length]
+      );
     }
 
     await client.query("COMMIT");

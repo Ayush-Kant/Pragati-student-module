@@ -27,7 +27,7 @@ export const getEligibleStudents = async (params = {}) => {
 export const getNominations = async (params = {}) => {
   if (USE_DUMMY) return { success: true, data: dummyNominated };
   try {
-    const response = await api.get("/nominations", { params });
+    const response = await api.get("/college/nominations", { params });
     return {
       success: true,
       data: response.data.data,
@@ -151,7 +151,7 @@ export const setStudentEligibility = async (driveId, studentId, approved) => {
 // ─── Legacy: single-student nomination (non-drive-scoped) ────────────────────
 export const nominateStudent = async (data) => {
   try {
-    const response = await api.post("/nominations", data);
+    const response = await api.post("/college/nominations", data);
     return {
       success: true,
       data: response.data.data,
@@ -168,7 +168,7 @@ export const nominateStudent = async (data) => {
 // ─── Legacy: update nomination status ────────────────────────────────────────
 export const updateNomination = async (id, data) => {
   try {
-    const response = await api.put(`/nominations/${id}`, data);
+    const response = await api.put(`/college/nominations/${id}`, data);
     return {
       success: true,
       data: response.data.data,
@@ -185,7 +185,7 @@ export const updateNomination = async (id, data) => {
 // ─── Legacy: remove a nomination ─────────────────────────────────────────────
 export const removeNomination = async (id) => {
   try {
-    const response = await api.delete(`/nominations/${id}`);
+    const response = await api.delete(`/college/nominations/${id}`);
     return { success: true, message: response.data.message };
   } catch (err) {
     return {
@@ -198,7 +198,7 @@ export const removeNomination = async (id) => {
 // ─── Shortlists ───────────────────────────────────────────────────────────────
 export const getShortlistedStudents = async (params = {}) => {
   try {
-    const response = await api.get("/shortlists", { params });
+    const response = await api.get("/college/shortlists", { params });
     return {
       success: true,
       data: response.data.data,
@@ -215,7 +215,7 @@ export const getShortlistedStudents = async (params = {}) => {
 
 export const getCompanyShortlist = async (companyId, params = {}) => {
   try {
-    const response = await api.get(`/shortlists/company/${companyId}`, { params });
+    const response = await api.get(`/college/shortlists/company/${companyId}`, { params });
     return { success: true, data: response.data.data };
   } catch (err) {
     return {
@@ -228,7 +228,7 @@ export const getCompanyShortlist = async (companyId, params = {}) => {
 
 export const getNominationStatistics = async () => {
   try {
-    const response = await api.get("/nominations/statistics");
+    const response = await api.get("/college/nominations/statistics");
     return { success: true, data: response.data.data };
   } catch {
     return { success: false, data: null };

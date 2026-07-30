@@ -5,9 +5,9 @@ import { resolveUserIntId } from '../utils/userResolver.js';
 import { MIN_CGPA_FOR_ELIGIBILITY } from '../constants/collegeStudentNominations.constants.js';
 
 // Helper: get college details for the logged-in user
-const getCollegeDetails = async (userId) => {
+const getCollegeDetails = async (authUserId) => {
   try {
-    const intUserId = await resolveUserIntId(userId);
+    const intUserId = Number.isInteger(Number(authUserId)) ? Number(authUserId) : await resolveUserIntId(authUserId);
     const res = await pool.query('SELECT id, name FROM colleges WHERE user_id = $1', [intUserId]);
     return res.rows[0] || null;
   } catch {
@@ -23,7 +23,7 @@ export const getStudents = async (req, res, next) => {
     let collegeFilter = req.query.college;
     let collegeIdFilter = undefined;
     if (req.user.role === 'college') {
-      const college = await getCollegeDetails(req.user.userId);
+      const college = await getCollegeDetails(req.user.authUserId);
       // If a college user doesn't have a profile yet, they should see no students
       if (!college) return res.status(200).json({ success: true, data: [], pagination: {} });
       collegeFilter = college.name;
@@ -48,7 +48,7 @@ export const getStudentById = async (req, res, next) => {
 
     // Security check: If role is college, ensure this student belongs to them
     if (req.user.role === 'college') {
-      const college = await getCollegeDetails(req.user.userId);
+      const college = await getCollegeDetails(req.user.authUserId);
       // Fallback: Check if they match either by exact college_id (preferred) or string name
       if (result.data.collegeId !== college.id && result.data.college !== college.name) {
         return res.status(403).json({ success: false, message: 'Forbidden: Student belongs to another college' });
@@ -67,7 +67,7 @@ export const createStudent = async (req, res, next) => {
     if (!validateRequestBody(req, res, validateStudent)) return;
 
     if (req.user.role === 'college') {
-      const college = await getCollegeDetails(req.user.userId);
+      const college = await getCollegeDetails(req.user.authUserId);
       if (!college) return res.status(400).json({ success: false, message: 'College profile required to add students' });
       req.body.college = college.name;
       req.body.collegeId = college.id;
@@ -87,7 +87,7 @@ export const updateStudent = async (req, res, next) => {
     if (req.user.role === 'college') {
       const result = await studentService.getStudent(parseInt(req.params.id));
       if (!result.success) return res.status(404).json(result);
-      const college = await getCollegeDetails(req.user.userId);
+      const college = await getCollegeDetails(req.user.authUserId);
       if (result.data.collegeId !== college.id && result.data.college !== college.name) return res.status(403).json({ success: false, message: 'Forbidden' });
     }
 
@@ -105,7 +105,7 @@ export const deleteStudent = async (req, res, next) => {
     if (req.user.role === 'college') {
       const result = await studentService.getStudent(parseInt(req.params.id));
       if (!result.success) return res.status(404).json(result);
-      const college = await getCollegeDetails(req.user.userId);
+      const college = await getCollegeDetails(req.user.authUserId);
       if (result.data.collegeId !== college.id && result.data.college !== college.name) return res.status(403).json({ success: false, message: 'Forbidden' });
     }
 
@@ -124,7 +124,7 @@ export const searchStudents = async (req, res, next) => {
     let collegeFilter = null;
     let collegeIdFilter = undefined;
     if (req.user.role === 'college') {
-      const college = await getCollegeDetails(req.user.userId);
+      const college = await getCollegeDetails(req.user.authUserId);
       if (!college) return res.status(200).json({ success: true, data: [], pagination: {} });
       collegeFilter = college.name;
       collegeIdFilter = college.id;
@@ -145,7 +145,7 @@ export const filterStudents = async (req, res, next) => {
     let collegeIdFilter = undefined;
 
     if (req.user.role === 'college') {
-      const collegeObj = await getCollegeDetails(req.user.userId);
+      const collegeObj = await getCollegeDetails(req.user.authUserId);
       if (!collegeObj) return res.status(200).json({ success: true, data: [], pagination: {} });
       college = collegeObj.name;
       collegeIdFilter = collegeObj.id;
@@ -172,7 +172,7 @@ export const getEligiblePool = async (req, res, next) => {
     // Build college scope
     let collegeId = null;
     if (req.user.role === 'college') {
-      const college = await getCollegeDetails(req.user.userId);
+      const college = await getCollegeDetails(req.user.authUserId);
       if (!college) return res.status(200).json({ success: true, data: [], pagination: {} });
       collegeId = college.id;
     }
@@ -272,7 +272,7 @@ export const getStudentStatistics = async (req, res, next) => {
     let collegeFilter = req.query.college;
     let collegeIdFilter = undefined;
     if (req.user.role === 'college') {
-      const college = await getCollegeDetails(req.user.userId);
+      const college = await getCollegeDetails(req.user.authUserId);
       if (!college) return res.status(200).json({ success: true, data: {} });
       collegeFilter = college.name;
       collegeIdFilter = college.id;

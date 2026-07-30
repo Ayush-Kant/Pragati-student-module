@@ -25,7 +25,7 @@ export const nominateStudent = async (req, res, next) => {
 
     const nomination = await nominateStudentService({
       ...req.body,
-      nominated_by: req.user?.userId || req.user?.id || '1',
+      nominated_by: req.user?.authUserId || req.user?.id || 1,
     })
     return successResponse(res, nomination, 'Student nominated successfully', 201)
   } catch (err) {

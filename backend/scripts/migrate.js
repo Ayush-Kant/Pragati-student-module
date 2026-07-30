@@ -50,6 +50,8 @@ const migrationFiles = [
   "collegeAnalyticsDashboard.sql",
   "student_module.sql",
   "020_drive_student_nominations.sql",
+  "021_fix_drive_data_redundancy.sql",
+  "022_seed_college_modules.sql",
 ];
 
 async function runMigrationsFresh() {
