@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 
 import { connectDB } from "./config/db.js";
 import { initializeLiveSessionModule } from "./src/database/migrations/liveSessionSchema.js";
+import { initializeAssignmentModule } from "./src/database/migrations/assignmentSchema.js";
 
 // Admin Routes
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
@@ -43,6 +44,7 @@ import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
+import assignmentRoutes from "./src/routes/assignmentRoutes.js";
 
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
@@ -106,6 +108,7 @@ app.use("/api/v1/company/interviews", companyInterviewRoutes);
 app.use("/api/v1/company/notifications", companyNotificationRoutes);
 app.use("/api/v1/company/offers", companyOfferRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
+app.use("/api/assignments", assignmentRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/students", studentRoutes);
@@ -133,6 +136,13 @@ connectDB()
       console.log("✅ Live session module initialized");
     } catch (error) {
       console.error("⚠️ Live session module initialization failed:", error.message);
+    }
+
+    try {
+      await initializeAssignmentModule();
+      console.log("✅ Assignment module initialized");
+    } catch (error) {
+      console.error("⚠️ Assignment module initialization failed:", error.message);
     }
 
     app.listen(PORT, () => {
