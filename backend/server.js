@@ -70,21 +70,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (
-        !origin ||
-        origin.startsWith("http://localhost:") ||
-        origin.startsWith("http://127.0.0.1:") ||
-        origin.startsWith("http://localhost")
-      ) {
-        callback(null, true);
-      } else {
-        const clientUrl = process.env.CLIENT_URL;
-        if (clientUrl && origin === clientUrl) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"), false);
-        }
-      }
+      callback(null, true);
     },
     credentials: true,
   }),

@@ -22,6 +22,8 @@ import {
   CalendarDays,
   FileText,
   PieChart,
+  Menu,
+  X
 } from "lucide-react";
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -32,6 +34,7 @@ export default function MentorLayout() {
   const dropdownRef = useRef(null);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -43,6 +46,11 @@ export default function MentorLayout() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Close sidebar on route change for mobile
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -199,10 +207,22 @@ export default function MentorLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 font-sans m-0 p-0 box-border">
+
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-slate-900/50 lg:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* 1. FIXED LEFT SIDEBAR */}
-      <aside className="fixed left-0 top-0 z-30 flex h-screen w-[260px] flex-col border-r border-slate-200 bg-white">
+      <aside
+        className={`fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+      >
         {/* Logo - Sticky at the top */}
-        <div className="shrink-0 p-6 pb-4">
+        <div className="shrink-0 p-6 pb-4 flex justify-between items-center">
           <div className="flex items-center gap-2.5 pl-1">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500 font-extrabold text-white">
               U
@@ -211,6 +231,12 @@ export default function MentorLayout() {
               UPTOSKILLS
             </span>
           </div>
+          <button
+            className="lg:hidden text-slate-500 hover:text-slate-700"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Menu Items - Scrollable Middle Section */}
@@ -223,11 +249,10 @@ export default function MentorLayout() {
                 <Link
                   key={idx}
                   to={item.path}
-                  className={`flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm transition-colors duration-200 ${
-                    active
-                      ? "bg-sky-50 text-sky-600 font-semibold"
-                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-medium"
-                  }`}
+                  className={`flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm transition-colors duration-200 ${active
+                    ? "bg-sky-50 text-sky-600 font-semibold"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-medium"
+                    }`}
                 >
                   {item.icon}
                   {item.name}
@@ -257,25 +282,37 @@ export default function MentorLayout() {
       </aside>
 
       {/* 2. RIGHT SIDE CONTENT CANVAS */}
-      <div className="ml-[260px] flex min-w-0 flex-1 flex-col overflow-y-auto">
+      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto w-full lg:ml-[260px]">
         {/* Top Header Navigation Bar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white p-3">
-          {/* Search */}
-          <div className="relative w-[320px]">
-            <input
-              type="text"
-              placeholder="Search for opportunities, profiles, faqs..."
-              className="w-full rounded-full border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
-            />
-            <span className="absolute left-3.5 top-2.5 text-slate-400">
-              <Search className="h-4 w-4 mt-0.5" />
-            </span>
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white p-3 lg:px-6">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 text-slate-500 hover:text-slate-700 focus:outline-none"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            {/* Search */}
+            <div className="relative hidden sm:block w-[240px] md:w-[320px]">
+              <span className="absolute left-3.5 top-2.5 text-slate-400">
+                <Search className="h-4 w-4 mt-0.5" />
+              </span>
+              <input
+                type="text"
+                placeholder="Search for opportunities, profiles..."
+                className="w-full rounded-full border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+              />
+            </div>
           </div>
 
           {/* User Profile */}
-          <div className="flex items-center gap-6 shrink-0">
-             {/* Added the notification bell option */}
-            <NotificationBell/>
+          <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+            <button
+              onClick={() => navigate("/mentor/notifications")}
+              className="text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              <Bell className="h-5 w-5" />
+            </button>
 
             <div className="relative" ref={dropdownRef}>
               <button
@@ -285,7 +322,7 @@ export default function MentorLayout() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-500 text-sm font-bold text-white">
                   {initials}
                 </div>
-                <div className="text-left">
+                <div className="text-left hidden sm:block">
                   <div className="text-sm font-bold leading-tight text-slate-800">
                     {mentorName}
                   </div>
@@ -314,7 +351,7 @@ export default function MentorLayout() {
         </header>
 
         {/* Inner Content Injection Frame */}
-        <main className="w-full p-6">
+        <main className="w-full p-4 sm:p-6">
           <Outlet />
         </main>
       </div>

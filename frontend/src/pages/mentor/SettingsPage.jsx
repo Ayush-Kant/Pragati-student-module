@@ -209,17 +209,17 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold text-slate-800">Mentor Settings</h1>
           <p className="text-sm text-slate-500 mt-1">Manage your professional profile and mentoring preferences.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex w-full sm:w-auto gap-3">
           <button
             onClick={handleDiscard}
-            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
+            className="flex flex-1 sm:flex-none justify-center items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
           >
             <RotateCcw className="w-4 h-4" />
             Discard
           </button>
           <button
             onClick={handleSave}
-            className="flex items-center gap-2 rounded-lg bg-sky-500 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-sky-600 active:scale-95 shadow-sm"
+            className="flex flex-1 sm:flex-none justify-center items-center gap-2 rounded-lg bg-sky-500 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-sky-600 active:scale-95 shadow-sm whitespace-nowrap"
           >
             <Save className="w-4 h-4" />
             Save Changes
@@ -229,37 +229,36 @@ export default function SettingsPage() {
 
       {/* Main Settings Body Layout */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        
+
         {/* Left Column Navigation Sidebar */}
-        <div className="md:col-span-1 flex flex-col gap-6">
-          <nav className="flex flex-col gap-1 bg-white border border-slate-200 rounded-xl p-2.5 shadow-sm">
+        <div className="md:col-span-1 flex flex-col gap-6 w-full max-w-full overflow-hidden">
+          <nav className="flex overflow-x-auto md:flex-col gap-1 bg-white border border-slate-200 rounded-xl p-2.5 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tabs.map((tab) => {
               const active = activeTab === tab.name;
               return (
                 <button
                   key={tab.name}
                   onClick={() => setActiveTab(tab.name)}
-                  className={`flex items-center gap-3 w-full rounded-lg px-3.5 py-3 text-sm font-medium transition-all ${
-                    active
+                  className={`flex items-center justify-center md:justify-start gap-3 whitespace-nowrap shrink-0 md:w-full rounded-lg px-3.5 py-3 text-sm font-medium transition-all ${active
                       ? tab.name === "Danger Zone"
                         ? "bg-red-50 text-red-600 font-semibold"
                         : "bg-sky-50 text-sky-600 font-semibold"
                       : tab.className || "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                  }`}
+                    }`}
                 >
                   {tab.icon}
                   <span>{tab.name}</span>
                 </button>
               );
             })}
-            
+
             {/* Divider */}
-            <div className="h-px bg-slate-100 my-2.5 mx-2"></div>
-            
+            <div className="hidden md:block h-px bg-slate-100 my-2.5 mx-2"></div>
+
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 w-full rounded-lg px-3.5 py-3 text-sm font-semibold text-red-600 transition-all hover:bg-red-50"
+              className="flex items-center justify-center md:justify-start gap-3 whitespace-nowrap shrink-0 md:w-full rounded-lg px-3.5 py-3 text-sm font-semibold text-red-600 transition-all hover:bg-red-50"
             >
               <LogOut className="w-4 h-4" />
               <span>Log Out</span>
@@ -269,7 +268,7 @@ export default function SettingsPage() {
 
         {/* Right Column Content Panel */}
         <div className="md:col-span-3 bg-white border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm">
-          
+
           {/* TAB 1: Profile */}
           {activeTab === "Profile" && (
             <div className="space-y-6">
@@ -277,7 +276,7 @@ export default function SettingsPage() {
                 <User className="w-5 h-5 text-sky-500" />
                 <h2 className="text-lg font-bold text-slate-800">Personal Profile</h2>
               </div>
-              
+
               {/* Avatar Upload */}
               <div className="flex flex-col sm:flex-row items-center gap-6 bg-slate-50 rounded-xl p-5 border border-slate-100">
                 <div className="relative">
@@ -410,7 +409,7 @@ export default function SettingsPage() {
                         </button>
                       </span>
                     ))}
-                    
+
                     {/* Add tag form */}
                     <form onSubmit={handleAddExpertise} className="flex items-center gap-1">
                       <input
@@ -433,7 +432,7 @@ export default function SettingsPage() {
                 {/* Social Links */}
                 <div className="flex flex-col gap-1.5 sm:col-span-2">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Social Links</label>
-                  
+
                   {/* Linkedin input */}
                   <div className="flex items-center gap-3 border border-slate-200 rounded-lg px-3.5 py-2 hover:border-sky-500 transition-colors focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500">
                     <Globe className="w-4 h-4 text-slate-400 shrink-0" />
@@ -499,7 +498,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Theme Mode</label>
-                  <div className="flex gap-4 mt-2">
+                  <div className="flex flex-wrap gap-4 mt-2">
                     {["Light", "Dark", "System"].map((mode) => (
                       <label key={mode} className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
                         <input
@@ -542,7 +541,7 @@ export default function SettingsPage() {
                     </label>
                   ))}
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Start Time</label>
@@ -633,7 +632,7 @@ export default function SettingsPage() {
                     type="checkbox"
                     checked={privacy.showEmail}
                     onChange={(e) => setPrivacy({ ...privacy, showEmail: e.target.checked })}
-                    className="rounded border-slate-300 text-sky-500 focus:ring-sky-500 h-4 w-4"
+                    className="rounded border-slate-300 text-sky-500 focus:ring-sky-500 h-4 w-4 shrink-0"
                   />
                 </div>
 
@@ -646,7 +645,7 @@ export default function SettingsPage() {
                     type="checkbox"
                     checked={privacy.showActivity}
                     onChange={(e) => setPrivacy({ ...privacy, showActivity: e.target.checked })}
-                    className="rounded border-slate-300 text-sky-500 focus:ring-sky-500 h-4 w-4"
+                    className="rounded border-slate-300 text-sky-500 focus:ring-sky-500 h-4 w-4 shrink-0"
                   />
                 </div>
               </div>
@@ -713,7 +712,7 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={handleDeactivate}
-                    className="rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm shrink-0"
+                    className="w-full sm:w-auto rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm shrink-0"
                   >
                     Deactivate Account
                   </button>
@@ -727,7 +726,7 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={handleDeleteAccount}
-                    className="rounded-lg bg-red-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition-colors shadow-sm shrink-0"
+                    className="w-full sm:w-auto rounded-lg bg-red-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition-colors shadow-sm shrink-0"
                   >
                     Delete Account
                   </button>
