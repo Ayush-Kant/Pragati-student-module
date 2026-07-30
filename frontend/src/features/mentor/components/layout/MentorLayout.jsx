@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
+import NotificationBell from '../../components/NotificationBell'; 
 import { jwtDecode } from "jwt-decode";
 import {
   LayoutDashboard,
@@ -10,6 +11,7 @@ import {
   Bell,
   HelpCircle,
   Briefcase,
+  GitBranch,
   MessageSquare,
   BookOpen,
   Activity,
@@ -113,6 +115,11 @@ export default function MentorLayout() {
       name: "Notifications",
       path: "/mentor/notifications",
       icon: <Bell className="w-5 h-5" />,
+    },
+    {
+      name: "Hiring Pipeline",
+      path: "/mentor/hiring-pipeline",
+      icon: <GitBranch className="w-5 h-5" />,
     },
     {
       name: "Settings",
@@ -267,12 +274,8 @@ export default function MentorLayout() {
 
           {/* User Profile */}
           <div className="flex items-center gap-6 shrink-0">
-            <button
-              onClick={() => navigate("/mentor/notifications")}
-              className="text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              <Bell className="h-5 w-5" />
-            </button>
+             {/* Added the notification bell option */}
+            <NotificationBell/>
 
             <div className="relative" ref={dropdownRef}>
               <button
