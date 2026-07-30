@@ -69,9 +69,6 @@ const mentorRoute = (
 
         <Route path="dashboard" element={<Dashboard />} />
 
-        {/* Profile */}
-        <Route path="profile" element={<MentorProfile />} />
-
         {/* Existing Mentee Route */}
         <Route path="mentees" element={<MenteeManagementPage />} />
 
@@ -111,10 +108,7 @@ const mentorRoute = (
           element={<CertificateTemplatePage />}
         />
         <Route path="review-grading" element={<ReviewGradingPage />} />
-        <Route
-          path="project-analytics"
-          element={<AnalyticsDashboardPage />}
-        />
+        <Route path="project-analytics" element={<AnalyticsDashboardPage />} />
 
         {/* Activities */}
         <Route element={<ActivityProvider />}>
@@ -125,10 +119,7 @@ const mentorRoute = (
         {/* Question Bank & Quizzes */}
         <Route path="question-bank" element={<QuestionBankPage />} />
         <Route path="question-bank/create" element={<CreateQuestionPage />} />
-        <Route
-          path="question-bank/edit/:id"
-          element={<EditQuestionPage />}
-        />
+        <Route path="question-bank/edit/:id" element={<EditQuestionPage />} />
         <Route
           path="question-bank/preview/:id"
           element={<QuestionPreviewPage />}
@@ -137,10 +128,7 @@ const mentorRoute = (
           path="question-bank/quiz-builder"
           element={<QuestionBankPageQuizBuilder />}
         />
-        <Route
-          path="question-bank/attempts"
-          element={<AttemptHistoryPage />}
-        />
+        <Route path="question-bank/attempts" element={<AttemptHistoryPage />} />
 
         {/* Challenges, Submissions & Grading */}
         <Route path="challenge-creator" element={<ChallengeCreatorPage />} />
@@ -160,10 +148,7 @@ const mentorRoute = (
 
         {/* Communication & Scheduling */}
         <Route path="notifications" element={<NotificationsPage />} />
-        <Route
-          path="discussion-forum"
-          element={<DiscussionForumPage />}
-        />
+        <Route path="discussion-forum" element={<DiscussionForumPage />} />
         <Route path="slots" element={<SlotsCalendarPage />} />
       </Route>
 
@@ -179,10 +164,7 @@ const mentorRoute = (
         path="mentor/onboarding/experience-links"
         element={<ExperienceLinks />}
       />
-      <Route
-        path="mentor/onboarding/availability"
-        element={<Availability />}
-      />
+      <Route path="mentor/onboarding/availability" element={<Availability />} />
     </Route>
   </Route>
 );
