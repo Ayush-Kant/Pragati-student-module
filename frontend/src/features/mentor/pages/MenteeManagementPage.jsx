@@ -25,7 +25,7 @@ export default function MenteeManagementPage() {
     totalPages,
     totalEntries,
     itemsPerPage,
-    filterOptions
+    filterOptions,
   } = useMentees();
 
   const {
@@ -38,18 +38,27 @@ export default function MenteeManagementPage() {
     savingNotes,
     openProfile,
     closeProfile,
-    saveNotes
+    saveNotes,
   } = useStudentProfile();
 
   // Export filtered mentees list as CSV
   const handleExportCSV = () => {
     if (rawMentees.length === 0) return;
-    
+
     // Define headers
-    const headers = ["Student Name", "Email", "Course", "Batch", "Progress %", "Attendance %", "Last Active", "Status"];
-    
+    const headers = [
+      "Student Name",
+      "Email",
+      "Course",
+      "Batch",
+      "Progress %",
+      "Attendance %",
+      "Last Active",
+      "Status",
+    ];
+
     // Create rows
-    const rows = rawMentees.map(m => [
+    const rows = rawMentees.map((m) => [
       m.name,
       m.email,
       m.course,
@@ -57,17 +66,24 @@ export default function MenteeManagementPage() {
       m.progress,
       m.attendance,
       m.lastActive,
-      m.status
+      m.status,
     ]);
 
     // Format content
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [headers.join(","), ...rows.map(e => e.map(val => `"${val}"`).join(","))].join("\n");
-    
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [
+        headers.join(","),
+        ...rows.map((e) => e.map((val) => `"${val}"`).join(",")),
+      ].join("\n");
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `mentees_report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute(
+      "download",
+      `mentees_report_${new Date().toISOString().split("T")[0]}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -82,7 +98,9 @@ export default function MenteeManagementPage() {
   return (
     <div className="w-full">
       {/* CSS Animation Injector */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
@@ -97,12 +115,16 @@ export default function MenteeManagementPage() {
         .animate-slide-in {
           animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-      `}} />
+      `,
+        }}
+      />
 
       {/* Header section */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-800">Mentees</h1>
+          <h1 className="text-2xl font-black tracking-tight text-slate-800">
+            Mentees
+          </h1>
           <p className="mt-1 text-sm font-medium text-slate-500">
             Manage, monitor, and communicate with your students.
           </p>
@@ -110,7 +132,7 @@ export default function MenteeManagementPage() {
 
         <button
           onClick={handleExportCSV}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#004ac6] px-4.5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-blue-700 cursor-pointer"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#004ac6] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-blue-700 cursor-pointer w"
         >
           <Download className="h-4.5 w-4.5" />
           Export Report
