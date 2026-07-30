@@ -8,6 +8,7 @@ export const ANNOUNCEMENT_CATEGORIES = [
   "Placement",
   "Training",
   "General",
+  "Hackathon",
 ];
 
 export const NOTIFICATION_STATUS = {
