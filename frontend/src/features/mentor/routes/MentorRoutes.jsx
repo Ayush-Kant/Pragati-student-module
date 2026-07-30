@@ -3,23 +3,28 @@ import { Route, Navigate } from "react-router-dom";
 // --- Layouts & Guards ---
 import PrivateRoute from "../../../routes/PrivateRoute";
 import RoleRoute from "../../../routes/RoleRoute";
+
 import MentorLayout from "../components/layout/MentorLayout";
 
 // --- Core Mentor Pages ---
 import Dashboard from "../pages/Dashboard";
 import SettingsPage from "../../../pages/mentor/SettingsPage";
-
+import ProjectsDashboard from "../pages/ProjectsDashboard";
 // --- Onboarding Pages ---
 import BasicInfo from "../pages/BasicInfo";
 import ProfessionalProfile from "../pages/ProfessionalProfile";
 import ExperienceLinks from "../pages/ExperienceLinks";
 import Availability from "../pages/Availability";
 
+// --- Existing Mentor Pages ---
+import MenteeManagementPage from "../pages/MenteeManagementPage";
 // --- Courses & Projects ---
 import Courses from "../../../pages/mentor/CoursesPage";
 import CreateCourse from "../../../pages/mentor/CreateCoursePage";
 import ProjectCreationPage from "../pages/ProjectCreationPage";
 import CertificateTemplatePage from "../pages/CertificateTemplatePage";
+import CoursePreview from "../courses/pages/CoursePreview";
+import EditCourse from "../courses/pages/EditCourse";
 
 // --- Activities ---
 import { ActivityProvider } from "../context/ActivityContext";
@@ -34,9 +39,12 @@ import QuestionPreviewPage from "../pages/QuestionPreviewPage";
 import QuestionBankPageQuizBuilder from "../pages/QuizBuilderPage";
 import AttemptHistoryPage from "../pages/AttemptHistoryPage";
 
-// --- Challenges, Submissions & Grading ---
+// --- Challenges, Submissions, Hiring & Grading ---
 import ChallengeCreatorPage from "../pages/mentor/ChallengeCreatorPage";
-import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage.jsx";
+import ChallengeWorkspacePage from "../pages/student/ChallengeWorkspacePage";
+
+import HiringPipelinePage from "../pages/HiringPipelinePage";
+
 import SubmissionMonitoringPage from "../pages/SubmissionMonitoringPage";
 import ReviewGradingPage from "../pages/ReviewGradingPage";
 
@@ -58,17 +66,50 @@ const mentorRoute = (
       <Route path="mentor" element={<MentorLayout />}>
         {/* Core */}
         <Route index element={<Navigate to="dashboard" replace />} />
+
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="projects-dashboard" element={<ProjectsDashboard />} />
+
+        {/* Existing Mentee Route */}
+        <Route path="mentees" element={<MenteeManagementPage />} />
+
+        {/* Courses */}
+        <Route path="courses" element={<Courses />} />
+        <Route path="courses/create" element={<CreateCourse />} />
+
+        {/* Settings */}
+        <Route path="settings" element={<SettingsPage />} />
+
+        {/* Reports */}
+        <Route path="export-report" element={<ExportReport />} />
+
+        {/* Projects */}
+        <Route path="projects/create" element={<ProjectCreationPage />} />
+
+        {/* Challenges */}
+        <Route path="challenge-creator" element={<ChallengeCreatorPage />} />
+        <Route
+          path="challenge-workspace"
+          element={<ChallengeWorkspacePage />}
+        />
+
+        {/* Submission */}
+        <Route path="hiring-pipeline" element={<HiringPipelinePage />} />
+
         <Route path="settings" element={<SettingsPage />} />
 
         {/* Courses & Projects */}
         <Route path="courses" element={<Courses />} />
         <Route path="courses/create" element={<CreateCourse />} />
+        <Route path="courses/:courseId/preview" element={<CoursePreview />} />
+        <Route path="courses/:courseId/edit" element={<EditCourse />} />
         <Route path="projects/create" element={<ProjectCreationPage />} />
         <Route
           path="certificates/template"
           element={<CertificateTemplatePage />}
         />
+        <Route path="review-grading" element={<ReviewGradingPage />} />
+        <Route path="project-analytics" element={<AnalyticsDashboardPage />} />
 
         {/* Activities */}
         <Route element={<ActivityProvider />}>

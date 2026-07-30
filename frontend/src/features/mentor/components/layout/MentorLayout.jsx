@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
+import NotificationBell from '../../components/NotificationBell'; 
 import { jwtDecode } from "jwt-decode";
 import {
   LayoutDashboard,
@@ -10,6 +11,7 @@ import {
   Bell,
   HelpCircle,
   Briefcase,
+  GitBranch,
   MessageSquare,
   BookOpen,
   Activity,
@@ -74,7 +76,7 @@ export default function MentorLayout() {
     },
     {
       name: "Projects",
-      path: "/mentor/projects/create",
+      path: "/mentor/projects-dashboard",
       icon: <Briefcase className="w-5 h-5" />,
     },
     {
@@ -121,6 +123,11 @@ export default function MentorLayout() {
       name: "Notifications",
       path: "/mentor/notifications",
       icon: <Bell className="w-5 h-5" />,
+    },
+    {
+      name: "Hiring Pipeline",
+      path: "/mentor/hiring-pipeline",
+      icon: <GitBranch className="w-5 h-5" />,
     },
     {
       name: "Settings",

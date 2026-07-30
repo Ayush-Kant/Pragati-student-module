@@ -1,5 +1,12 @@
 import { Toaster } from "react-hot-toast";
+
 import { Routes, Route, Navigate } from "react-router-dom";
+
+
+import ToastContainer from "./features/mentor/components/ToastContainer";
+
+
+
 
 // ── Auth Pages  ──
 import LoginPage from "./features/auth/LoginPage";
@@ -15,10 +22,21 @@ import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
 
+
 function App() {
+
+
+
   return (
     <AuthProvider>
+
       <Toaster />
+
+      <ToastContainer
+       
+      />
+
+  
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
 

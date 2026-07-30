@@ -110,13 +110,13 @@ const AuthPage = () => {
       });
 
       if (result.success) {
-        const userRole = result.user?.role;
+        const role = result.user?.role || result.role;
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
-        login(result.role, result.token);
-        if (result.role === 'college' && !profileData?.id) {
+        login(role, result.token);
+        if (role === 'college' && !profileData?.id) {
           navigate(`/college/add-profile`);
         } else {
-          navigate(getRedirectPath(result.role));
+          navigate(getRedirectPath(role));
         }
       } else {
         setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
