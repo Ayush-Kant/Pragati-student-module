@@ -3,6 +3,7 @@ import AdminLayout from "../adminLayout";
 import AdminDashboard from "../adminDashboard/AdminDashboard";
 import AdminCompanies from "../adminCompanies/AdminCompanies";
 import AdminCollege from "../adminColleges/AdminCollege";
+import StudentDetail from "../pages/StudentDetail";
 import CollegeDetail from "../pages/CollegeDetail";
 import AdminStudent from "../adminStudents/AdminStudent";
 import AdminMentors from "../adminMentors/AdminMentors";
@@ -29,6 +30,7 @@ const AdminRoute = (
         <Route path='colleges' element={<AdminCollege />} />
         <Route path='colleges/:id' element={<CollegeDetail />} />
         <Route path='students' element={<AdminStudent />} />
+        <Route path='students/:id' element={<StudentDetail />} />    
         <Route path='mentors' element={<AdminMentors />} />
         <Route path='assesments' element={<AdminAssesment />} />
         <Route path='training' element={<AdminTraining />} />

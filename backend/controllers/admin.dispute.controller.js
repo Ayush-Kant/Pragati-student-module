@@ -12,17 +12,62 @@ export const getDisputes = async (req, res) => {
   try {
     const { type, status, priority, page, limit } = req.query;
 
-    const result = await listDisputes({
-      type,
-      status,
-      priority,
-      page,
-      limit,
-    });
+    // Temporary dummy data as requested by Tarak
+    const dummyDisputes = {
+      disputes: [
+        {
+          id: 1,
+          filed_by_id: 3,
+          filed_by_role: 'student',
+          filed_by_name: 'Rahul Sharma',
+          against_id: 10,
+          against_role: 'mentor',
+          against_name: 'Priya Patel',
+          dispute_type: 'mentor',
+          description: 'Mentor was not responding to queries for 2 weeks.',
+          status: 'open',
+          priority: 'high',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          filed_by_id: 4,
+          filed_by_role: 'student',
+          filed_by_name: 'Sneha Gupta',
+          against_id: 15,
+          against_role: 'college',
+          against_name: 'NIT Trichy',
+          dispute_type: 'fraud',
+          description: 'College charged extra fee for placement drive.',
+          status: 'in_review',
+          priority: 'medium',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 3,
+          filed_by_id: 5,
+          filed_by_role: 'admin',
+          filed_by_name: 'Super Admin',
+          against_id: 12,
+          against_role: 'mentor',
+          against_name: 'Vikram Singh',
+          dispute_type: 'drive',
+          description: 'Mentor missed 3 scheduled sessions consecutively.',
+          status: 'resolved',
+          priority: 'low',
+          resolution: 'Mentor warned and suspended for 1 month.',
+          created_at: new Date().toISOString()
+        }
+      ],
+      total: 3,
+      page: 1,
+      limit: 10,
+      totalPages: 1
+    };
 
     return res.status(200).json({
       success: true,
-      data: result,
+      data: dummyDisputes,
     });
   } catch (error) {
     console.log(error);

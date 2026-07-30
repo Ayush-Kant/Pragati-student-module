@@ -9,7 +9,7 @@ export default function Step4AdditionalSettings({
   onBack,
 }) {
   let navigate = useNavigate();
-  const { handleCreateCourse } = useCourses();
+  const { handleUpdateCourse } = useCourses();
 
   const handleToggle = (field) => {
     onUpdate({ [field]: !courseData[field] });
@@ -17,7 +17,9 @@ export default function Step4AdditionalSettings({
 
   const handlePublishCourse = async () => {
     try {
-      const result = await handleCreateCourse(courseData);
+      await handleUpdateCourse(courseData.courseId, {
+        status: courseData.visibility.toLowerCase(),
+      });
       navigate("/mentor/courses");
     } catch (err) {
       console.log(err);
