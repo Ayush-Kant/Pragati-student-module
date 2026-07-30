@@ -10,6 +10,7 @@ import {
   Bell,
   HelpCircle,
   Briefcase,
+  GitBranch,
   MessageSquare,
   BookOpen,
   Activity,
@@ -18,6 +19,8 @@ import {
   Users,
   LogOut,
   CalendarDays,
+  FileText,
+  PieChart,
 } from "lucide-react";
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -45,6 +48,7 @@ export default function MentorLayout() {
     navigate("/login", { replace: true });
   };
 
+  // Updated to match the nested routes in your mentorRoute.jsx
   const menuItems = [
     {
       name: "Dashboard",
@@ -53,7 +57,7 @@ export default function MentorLayout() {
     },
     {
       name: "Mentees",
-      path: "/mentor/mentees",
+      path: "/mentor/mentees", // Note: Add this route to your router if it doesn't exist yet
       icon: <Users className="w-5 h-5" />,
     },
     {
@@ -63,7 +67,7 @@ export default function MentorLayout() {
     },
     {
       name: "Projects",
-      path: "/mentor/project-analytics",
+      path: "/mentor/projects/create",
       icon: <Briefcase className="w-5 h-5" />,
     },
     {
@@ -82,19 +86,9 @@ export default function MentorLayout() {
       icon: <MessageSquare className="w-5 h-5" />,
     },
     {
-      name: "Notifications",
-      path: "/mentor/notifications",
-      icon: <Bell className="w-5 h-5" />,
-    },
-    {
       name: "Question Bank",
       path: "/mentor/question-bank",
       icon: <Database className="w-5 h-5" />,
-    },
-    {
-      name: "Submission Monitoring",
-      path: "/mentor/submission-monitoring",
-      icon: <MonitorCheck className="w-5 h-5" />,
     },
     {
       name: "Challenge Creator",
@@ -102,9 +96,29 @@ export default function MentorLayout() {
       icon: <FlaskConical className="w-5 h-5" />,
     },
     {
-      name: "Reports & Analytics",
+      name: "Submissions",
+      path: "/mentor/submissions/monitoring",
+      icon: <MonitorCheck className="w-5 h-5" />,
+    },
+    {
+      name: "Analytics",
+      path: "/mentor/analytics",
+      icon: <PieChart className="w-5 h-5" />,
+    },
+    {
+      name: "Reports",
       path: "/mentor/export-report",
-      icon: <LineChart className="w-5 h-5" />,
+      icon: <FileText className="w-5 h-5" />,
+    },
+    {
+      name: "Notifications",
+      path: "/mentor/notifications",
+      icon: <Bell className="w-5 h-5" />,
+    },
+    {
+      name: "Hiring Pipeline",
+      path: "/mentor/hiring-pipeline",
+      icon: <GitBranch className="w-5 h-5" />,
     },
     {
       name: "Settings",
@@ -113,19 +127,36 @@ export default function MentorLayout() {
     },
   ];
 
+  // Updated to dynamically handle nested route highlighting
   const isItemActive = (item) => {
     const path = location.pathname;
+
     if (item.path === "#") return false;
+
     if (item.path === "/mentor/dashboard") {
       return path === "/mentor/dashboard" || path === "/mentor";
     }
-    if (
-      item.path === "/mentor/question-bank" ||
-      item.path === "/mentor/courses" ||
-      item.path === "/mentor/activities"
-    ) {
-      return path.startsWith(item.path);
+
+    // Specially handle grouping for Submissions (monitoring & review)
+    if (item.path === "/mentor/submissions/monitoring") {
+      return path.startsWith("/mentor/submissions");
     }
+
+    // Keep parent active if we navigate to a child route (e.g. /mentor/courses/create)
+    const nestedRoutes = [
+      "/mentor/courses",
+      "/mentor/activities",
+      "/mentor/question-bank",
+      "/mentor/projects",
+      "/mentor/challenge-creator",
+    ];
+
+    if (nestedRoutes.some((route) => item.path.startsWith(route))) {
+      // Split the path to check the base feature route to prevent matching overlapping strings
+      const basePath = item.path.split("/").slice(0, 3).join("/");
+      return path.startsWith(basePath);
+    }
+
     return path === item.path;
   };
 
@@ -227,7 +258,7 @@ export default function MentorLayout() {
       {/* 2. RIGHT SIDE CONTENT CANVAS */}
       <div className="ml-[260px] flex min-w-0 flex-1 flex-col overflow-y-auto">
         {/* Top Header Navigation Bar */}
-        <header className="sticky top-0 z-20 flex h-35 items-center justify-between border-b border-slate-200 bg-white p-3">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white p-3">
           {/* Search */}
           <div className="relative w-[320px]">
             <input
