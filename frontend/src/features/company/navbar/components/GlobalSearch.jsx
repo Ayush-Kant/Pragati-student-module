@@ -184,15 +184,16 @@ export const GlobalSearch = ({ isOpen, onClose, onKeyDown }) => {
 
   // Handle search
   useEffect(() => {
-    if (query.trim()) {
-      const searchResults = performSearch(query);
-      setResults(searchResults);
-      setSelectedSection(null);
-      setSelectedIndex(0);
-    } else {
+    if (!query.trim()) {
       setResults({});
       setSelectedSection(null);
+      return;
     }
+
+    const searchResults = performSearch(query);
+    setResults(searchResults);
+    setSelectedSection(null);
+    setSelectedIndex(0);
   }, [query]);
 
   // Build flat list of all results for keyboard navigation
