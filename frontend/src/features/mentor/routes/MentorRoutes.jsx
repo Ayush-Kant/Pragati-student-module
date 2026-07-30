@@ -9,7 +9,7 @@ import MentorLayout from "../components/layout/MentorLayout";
 // --- Core Mentor Pages ---
 import Dashboard from "../pages/Dashboard";
 import SettingsPage from "../../../pages/mentor/SettingsPage";
-
+import ProjectsDashboard from "../pages/ProjectsDashboard";
 // --- Onboarding Pages ---
 import BasicInfo from "../pages/BasicInfo";
 import ProfessionalProfile from "../pages/ProfessionalProfile";
@@ -68,6 +68,7 @@ const mentorRoute = (
         <Route index element={<Navigate to="dashboard" replace />} />
 
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="projects-dashboard" element={<ProjectsDashboard />} />
 
         {/* Existing Mentee Route */}
         <Route path="mentees" element={<MenteeManagementPage />} />
