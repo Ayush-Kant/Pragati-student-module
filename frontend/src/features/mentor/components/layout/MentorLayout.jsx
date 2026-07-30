@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
-import NotificationBell from '../../components/NotificationBell'; 
+import NotificationBell from "../../components/NotificationBell";
 import { jwtDecode } from "jwt-decode";
 import {
   LayoutDashboard,
@@ -23,7 +23,7 @@ import {
   FileText,
   PieChart,
   Menu,
-  X
+  X,
 } from "lucide-react";
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -207,7 +207,6 @@ export default function MentorLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 font-sans m-0 p-0 box-border">
-
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
@@ -218,8 +217,9 @@ export default function MentorLayout() {
 
       {/* 1. FIXED LEFT SIDEBAR */}
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+        className={`fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
         {/* Logo - Sticky at the top */}
         <div className="shrink-0 p-6 pb-4 flex justify-between items-center">
@@ -249,10 +249,11 @@ export default function MentorLayout() {
                 <Link
                   key={idx}
                   to={item.path}
-                  className={`flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm transition-colors duration-200 ${active
-                    ? "bg-sky-50 text-sky-600 font-semibold"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-medium"
-                    }`}
+                  className={`flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm transition-colors duration-200 ${
+                    active
+                      ? "bg-sky-50 text-sky-600 font-semibold"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-medium"
+                  }`}
                 >
                   {item.icon}
                   {item.name}
@@ -307,12 +308,8 @@ export default function MentorLayout() {
 
           {/* User Profile */}
           <div className="flex items-center gap-4 sm:gap-6 shrink-0">
-            <button
-              onClick={() => navigate("/mentor/notifications")}
-              className="text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              <Bell className="h-5 w-5" />
-            </button>
+            {/* Added the notification bell option */}
+            <NotificationBell />
 
             <div className="relative" ref={dropdownRef}>
               <button
