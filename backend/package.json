@@ -22,9 +22,13 @@
     "helmet": "^8.2.0",
     "joi": "^18.2.3",
     "jsonwebtoken": "^9.0.3",
+<<<<<<< HEAD
     "morgan": "^1.11.0",
     "multer": "^2.2.0",
     "node-fetch": "^3.3.2",
+=======
+    "multer": "^2.2.0",
+>>>>>>> b58e0407 (feat: projects backend implementation)
     "node-pg": "^1.0.1",
     "pg": "^8.21.0",
     "pg-format": "^1.0.4",
