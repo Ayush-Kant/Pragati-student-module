@@ -45,7 +45,6 @@ import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
-import projectRoutes from "./src/routes/projectRoutes.js";
 
 // Student training / learning routes
 import studentTrainingRoutes from "./src/routes/trainingRoutes.js";
@@ -165,7 +164,6 @@ app.use("/api/v1/company/interviews", companyInterviewRoutes);
 app.use("/api/v1/company/notifications", companyNotificationRoutes);
 app.use("/api/v1/company/offers", companyOfferRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
-<<<<<<< HEAD
 
 app.use("/api/student/assessments", studentAssessmentRoutes);
 app.use("/api/student/training", studentTrainingRoutes);
@@ -186,20 +184,6 @@ app.use("/api/student/projects", projectRoutes);
 app.use("/api/student", quizRoutes);
 
 app.use(studentProfileRouter);
-=======
-app.use("/api/student/notifications", notificationRoutes);
-app.use("/api/v1/admin/notifications", adminNotificationRoutes);
-app.use("/api/students", studentRoutes);
-app.use("/api/college/profile", collegeProfileRoutes);
-app.use("/api/college/dashboard", collegeDashboardRoutes);
-app.use("/api/v1/company/jobs", collegeJobsRoutes);
-app.use("/api/departments/statistics", departmentStatisticsRoutes);
-app.use("/api/departments", departmentRoutes);
-app.use("/api/courses", courseRoutes);
-app.use("/api/v1/admin/disputes", adminDisputeRoutes);
-app.use("/api/placement-drives", placementDriveRoutes);
-app.use("/api/student/projects", projectRoutes);
->>>>>>> b58e0407 (feat: projects backend implementation)
 
 app.get("/", (req, res) => {
   res.json({ success: true, message: "Backend is running" });
