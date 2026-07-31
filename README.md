@@ -14,12 +14,14 @@ Welcome to the Pragati Placement Portal. This guide details how to set up, initi
 Clone the repository and install dependencies in both the `backend` and `frontend` directories:
 
 ### Backend
+
 ```bash
 cd backend
 npm install
 ```
 
 ### Frontend
+
 ```bash
 cd ../frontend
 npm install
@@ -29,7 +31,7 @@ npm install
 
 ## 2. Environment Configuration
 
-The backend requires a `.env` configuration file to communicate with your PostgreSQL instance and sign authentication tokens. 
+The backend requires a `.env` configuration file to communicate with your PostgreSQL instance and sign authentication tokens.
 
 Create a `.env` file in the `backend/` directory:
 
@@ -47,11 +49,13 @@ RESEND_API_KEY=re_dummykey123
 Pragati uses standard SQL migrations to set up schemas. To build the database tables and populate them with test training data, run the following scripts inside the `backend/` directory:
 
 ### Run Migrations (Fresh Database Setup)
+
 ```bash
 node scripts/migrate.js
 ```
 
 ### Populate Seed Data (Pre-configured Credentials & Trainings)
+
 ```bash
 node scripts/seed.js
 ```
@@ -61,13 +65,17 @@ node scripts/seed.js
 ## 4. Running the Application
 
 ### Start the Backend Server (Port 5000)
+
 From the `backend/` directory:
+
 ```bash
 npm run dev
 ```
 
 ### Start the Frontend Server (Vite)
+
 From the `frontend/` directory:
+
 ```bash
 npm run dev
 ```
@@ -83,9 +91,38 @@ After running `seed.js`, you can log in immediately using the following accounts
 - **Corporate / Company Account**:
   - **Email**: `company@gmail.com`
   - **Password**: `Password123`
-  - *Provides access to Dashboard, Candidate Management, Assessments, Interviews, Training Coordination, and Messages.*
+  - _Provides access to Dashboard, Candidate Management, Assessments, Interviews, Training Coordination, and Messages._
 
 - **Mentor Account**:
   - **Email**: `mentor@example.com`
   - **Password**: `Password123`
-  - *Provides access to Mentor feeds, Sessions, and content.*
+  - _Provides access to Mentor feeds, Sessions, and content._
+
+---
+
+## 6. Coding Challenges Module
+
+This branch adds a backend module for a coding challenges platform.
+
+### API Endpoints
+
+- **Coding Challenges**
+  - `GET /api/student/coding-challenges` - Retrieve all coding challenges
+  - `GET /api/student/coding-challenges/:id` - Retrieve a specific coding challenge by ID
+
+- **Submissions**
+  - `POST /api/student/coding-challenges/:id/submit` - Submit a solution for a coding challenge
+  - `GET /api/student/coding-challenges/submissions` - Retrieve submission history
+  - `GET /api/student/coding-challenges/submissions/:id` - Retrieve a specific submission by ID
+
+- **Execution**
+  - `POST /api/student/coding-challenges/:id/run` - Execute code for a coding challenge
+  - `GET /api/student/coding-challenges/:id/execution-results` - Retrieve execution results
+
+- **Test Cases**
+  - `GET /api/student/coding-challenges/:id/testcases` - Retrieve test cases for a coding challenge
+  - `GET /api/student/coding-challenges/:id/testcases/hidden` - Retrieve hidden test cases
+
+- **Leaderboard**
+  - `GET /api/student/coding-challenges/leaderboard` - Retrieve leaderboard information
+  - `PATCH /api/student/coding-challenges/leaderboard` - Update leaderboard information

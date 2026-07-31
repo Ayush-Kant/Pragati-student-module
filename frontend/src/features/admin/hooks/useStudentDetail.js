@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-    mockStudentDetail,
-    mockProgress,
-} from "../adminStudentMockData";
+// import {
+//     mockStudentDetail,
+//     mockProgress,
+// } from "../adminStudentMockData";
 
 const useStudentDetail = () => {
     const [student, setStudent] = useState(null);

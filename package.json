@@ -6,6 +6,21 @@
     "build": "npm run build --prefix frontend",
     "dev:backend": "npm run dev --prefix backend",
     "lint": "npm run lint --prefix frontend",
-    "test": "npm run test --prefix frontend"
+    "test": "npm run test --prefix frontend",
+    "start:challenges": "node src/app.js",
+    "dev:challenges": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "joi": "^17.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.22.0"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6",
+    "nodemon": "^2.0.7"
   }
 }

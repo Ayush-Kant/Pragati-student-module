@@ -1,6 +1,7 @@
 import React from 'react';
+import DisputeManagement from '../pages/DisputeManagement';
 
 export default function () {
-  return <div> Component</div>;
+  return <div> <DisputeManagement /></div>;
 }
 

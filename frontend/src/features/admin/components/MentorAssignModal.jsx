@@ -50,15 +50,14 @@ const MentorAssignModal = ({
         onClose?.();
     };
 
-    const submitHandler = (data) => {
-
-        onAssign?.(data.mentorId);
-
-        reset();
-
-        handleClose();
-
-    };
+   const submitHandler = async (data) => {
+  try {
+    await onAssign?.(data.mentorId);
+    handleClose();
+  } catch (error) {
+    console.error("Failed to assign mentor:", error);
+  }
+};
 
     return (
         <Modal

@@ -168,3 +168,16 @@
     padding-left: 24px;
   }
 }
+
+/* Responsiveness fixes */
+@media (max-width: 900px) {
+  .navbar-center {
+    display: none;
+  }
+}
+
+@media (max-width: 500px) {
+  .navbar-left h2 {
+    display: none;
+  }
+}

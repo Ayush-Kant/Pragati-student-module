@@ -18,7 +18,7 @@ const ModuleList = ({
 
                 <button
                     onClick={onAddModule}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 transition cursor-pointer"
                 >
                     <Plus size={16} />
                     Add Module
