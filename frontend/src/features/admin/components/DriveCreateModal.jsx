@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { getCompanies } from "../services/companyService";
 
 export default function DriveCreateModal({
-    onClose,
-    addDrive
+  onClose,
+  addDrive,
 }) {
     const [companies, setCompanies] = useState([]);
     const [formData, setFormData] = useState({
@@ -147,7 +147,6 @@ export default function DriveCreateModal({
                 </form>
 
             </div>
-
         </div>
     );
 }

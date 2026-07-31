@@ -9,6 +9,7 @@ import AdminStudent from "../adminStudents/AdminStudent";
 import AdminMentors from "../adminMentors/AdminMentors";
 import AdminTraining from "../adminTraining/AdminTraining";
 import AdminDrives from "../adminDrives/AdminDrives";
+import DriveDetail from "../pages/DriveDetail";
 import AdminNotifications from "../adminNotifications/AdminNotifications";
 import AdminDisputes from "../adminDisputes/AdminDisputes";
 import AdminAssesment from "../adminAssesments/AdminAssesment";
@@ -35,6 +36,7 @@ const AdminRoute = (
         <Route path='assesments' element={<AdminAssesment />} />
         <Route path='training' element={<AdminTraining />} />
         <Route path='drives' element={<AdminDrives />} />
+        <Route path='drives/:id' element={<DriveDetail />} />
         <Route path='notification' element={<AdminNotifications />} />
         <Route path='disputes' element={<AdminDisputes />} />
       </Route>

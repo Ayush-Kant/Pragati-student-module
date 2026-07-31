@@ -58,9 +58,9 @@ const AdminLayout = () => {
         />
 
         {/* Main Section */}
-        <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
+        <div className="flex-1 min-w-0 md:ml-[270px] flex flex-col min-h-screen overflow-x-hidden">
           {/* Page Content */}
-          <main className="flex-1 pt-20 p-6">
+          <main className="flex-1 min-w-0 pt-20 p-6">
             <Outlet
               context={{
                 profile,

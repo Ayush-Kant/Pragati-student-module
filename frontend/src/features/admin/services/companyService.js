@@ -5,7 +5,8 @@ const normalizeCompany = (company) => {
   if (!company) return null;
   return {
     ...company,
-    id: Number(company.id),
+    // id: Number(company.id),
+    id: Number(company.id ?? company.companyId),
     status: company.status || "Pending",
     activityLogs: company.activityLogs || [],
     activeDrives: company.activeDrives || [],
@@ -47,16 +48,19 @@ const applyMockStatusUpdate = (companyId, payload) => {
 export const getCompanies = async (filters = {}) => {
   try {
     const params = new URLSearchParams();
-    
+
     if (filters.name) params.append("name", filters.name);
     if (filters.industry) params.append("industry", filters.industry);
     if (filters.status) params.append("status", filters.status);
     if (filters.page) params.append("page", filters.page);
     if (filters.limit) params.append("limit", filters.limit);
-    
+
     const queryString = params.toString();
-    const url = queryString ? `/companies?${queryString}` : "/companies";
-    
+    // const url = queryString ? `/companies?${queryString}` : "/companies";
+    const url = queryString
+      ? `/v1/admin/company?${queryString}`
+      : "/v1/admin/company";
+
     const response = await api.get(url);
     const companies = response.data?.companies ?? response.data ?? [];
     return normalizeCompanies(companies);
@@ -68,7 +72,8 @@ export const getCompanies = async (filters = {}) => {
 
 export const getCompanyById = async (id) => {
   try {
-    const response = await api.get(`/companies/${id}`);
+    // const response = await api.get(`/companies/${id}`);
+    const response = await api.get(`/v1/admin/company/${id}`);
     const company = response.data?.company ?? response.data;
     return normalizeCompany(company) ?? fallbackGetCompanyById(id);
   } catch (error) {
@@ -90,7 +95,8 @@ export const updateCompanyStatus = async (companyId, payload) => {
 
 export const getCompanyStats = async (id) => {
   try {
-    const response = await api.get(`/companies/${id}/stats`);
+    // const response = await api.get(`/companies/${id}/stats`);
+    const response = await api.get(`/v1/admin/company/${id}/stats`);
     return response.data ?? {};
   } catch (error) {
     console.warn(`Company stats API unavailable for ID ${id}`, error?.message);
@@ -100,7 +106,8 @@ export const getCompanyStats = async (id) => {
 
 export const getCompanyDrives = async (id) => {
   try {
-    const response = await api.get(`/companies/${id}/drives`);
+    // const response = await api.get(`/companies/${id}/drives`);
+    const response = await api.get(`/v1/admin/company/${id}/drives`);
     const drives = response.data?.drives ?? response.data ?? [];
     return Array.isArray(drives) ? drives : [];
   } catch (error) {
@@ -111,7 +118,8 @@ export const getCompanyDrives = async (id) => {
 
 export const getActiveDrives = async () => {
   try {
-    const response = await api.get("/companies/active-drives");
+    // const response = await api.get("/companies/active-drives");
+    const response = await api.get("/v1/admin/company/active-drives")
     return response.data?.drives ?? response.data ?? mockActiveDrives;
   } catch (error) {
     console.warn("Active drives API unavailable, using mock data", error?.message);
@@ -122,13 +130,16 @@ export const getActiveDrives = async () => {
 export const getCompanyRankings = async (filters = {}) => {
   try {
     const params = new URLSearchParams();
-    
+
     if (filters.limit) params.append("limit", filters.limit);
     if (filters.sort) params.append("sort", filters.sort);
-    
+
     const queryString = params.toString();
-    const url = queryString ? `/companies/rankings?${queryString}` : "/companies/rankings";
-    
+    // const url = queryString ? `/companies/rankings?${queryString}` : "/companies/rankings";
+    const url = queryString
+      ? `/v1/admin/company/rankings?${queryString}`
+      : "/v1/admin/company/rankings";
+
     const response = await api.get(url);
     return response.data?.rankings ?? response.data ?? mockRankings;
   } catch (error) {

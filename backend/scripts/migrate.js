@@ -50,7 +50,9 @@ const migrationFiles = [
   "collegeAnalyticsDashboard.sql",
   "student_module.sql",
   "020_drive_student_nominations.sql",
+  "020_update_student_drive_progress.sql",
   "021_fix_drive_data_redundancy.sql",
+  "021_update_interviews_table.sql",
   "022_seed_college_modules.sql",
   "015_upgrade_announcements_saas_fields.sql"
 ];

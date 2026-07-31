@@ -12,6 +12,7 @@ import {
   FiBriefcase,
 } from "react-icons/fi";
 import { FaBuilding } from "react-icons/fa";
+import { UserPlus, UserX, ToggleLeft, ToggleRight, Edit2, X } from "lucide-react";
 import "./../styles/companySettings.css";
 import {
   companySettingsSchema,
@@ -21,6 +22,10 @@ import {
   getCompanySettings,
   updateCompanySettings,
   uploadCompanyLogo,
+  getCompanyTeam,
+  addCompanyTeamMember,
+  updateCompanyTeamMember,
+  deleteCompanyTeamMember,
 } from "../services/companyService";
 
 const CompanySettings = () => {
@@ -30,6 +35,17 @@ const CompanySettings = () => {
     useState(false);
   const [logoPreview, setLogoPreview] = useState(null);
   const [errorBanner, setErrorBanner] = useState(null);
+
+  const [activeTab, setActiveTab] = useState("profile"); // 'profile' | 'team'
+  const [team, setTeam] = useState([]);
+  const [loadingTeam, setLoadingTeam] = useState(true);
+  const [showTeamModal, setShowTeamModal] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
+  const [teamForm, setTeamForm] = useState({
+    name: "",
+    email: "",
+    role: "Recruiter"
+  });
 
   const {
     control,
@@ -124,7 +140,7 @@ const CompanySettings = () => {
       setIsSaving(true);
       setErrorBanner(null);
       await updateCompanySettings(data);
-      setIsDirty(false);
+      reset(data);
       toast.success(
         "Company settings saved successfully"
       );
@@ -139,11 +155,108 @@ const CompanySettings = () => {
     }
   };
 
+  const fetchTeam = async () => {
+    try {
+      setLoadingTeam(true);
+      const res = await getCompanyTeam();
+      setTeam(res.data || []);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load team members");
+    } finally {
+      setLoadingTeam(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "team") {
+      fetchTeam();
+    }
+  }, [activeTab]);
+
+  const handleTeamFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingMember) {
+        await updateCompanyTeamMember(editingMember.id, {
+          role: teamForm.role,
+          is_active: editingMember.is_active
+        });
+        toast.success("Recruiter role updated successfully!");
+      } else {
+        await addCompanyTeamMember({
+          full_name: teamForm.name,
+          email: teamForm.email,
+          role: teamForm.role
+        });
+        toast.success("Recruiter added successfully!");
+      }
+      setShowTeamModal(false);
+      setEditingMember(null);
+      fetchTeam();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to save team member");
+    }
+  };
+
+  const handleToggleActive = async (member) => {
+    try {
+      await updateCompanyTeamMember(member.id, {
+        role: member.role,
+        is_active: !member.is_active
+      });
+      toast.success("Recruiter status updated!");
+      fetchTeam();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update status");
+    }
+  };
+
+  const handleDeleteMember = async (id) => {
+    if (!window.confirm("Are you sure you want to remove this recruiter?")) return;
+    try {
+      await deleteCompanyTeamMember(id);
+      toast.success("Recruiter removed from team");
+      fetchTeam();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove recruiter");
+    }
+  };
+
   return (
     <div className="company-settings">
       <div className="settings-header">
         <h1>Company Settings</h1>
         <p>Manage your company profile and preferences</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-gray-200 mb-6 gap-6 text-sm font-semibold">
+        <button
+          type="button"
+          onClick={() => setActiveTab("profile")}
+          className={`pb-3 px-1 transition-all ${
+            activeTab === "profile" 
+              ? "text-blue-600 border-b-2 border-blue-600 font-bold" 
+              : "text-gray-400 hover:text-gray-600"
+          } cursor-pointer`}
+        >
+          Company Profile
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("team")}
+          className={`pb-3 px-1 transition-all ${
+            activeTab === "team" 
+              ? "text-blue-600 border-b-2 border-blue-600 font-bold" 
+              : "text-gray-400 hover:text-gray-600"
+          } cursor-pointer`}
+        >
+          Team Management
+        </button>
       </div>
 
       {/* Error Banner */}
@@ -160,7 +273,8 @@ const CompanySettings = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      {activeTab === "profile" && (
+        <form onSubmit={handleSubmit(onSubmit)}>
         <div className="settings-container">
           {/* Section 1: Company Logo */}
           <div className="settings-section">
@@ -674,6 +788,185 @@ const CompanySettings = () => {
           </button>
         </div>
       </form>
+      )}
+
+      {activeTab === "team" && (
+        <div className="bg-white rounded-[24px] border border-slate-100 p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
+          <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+            <div>
+              <h2 className="text-xl font-bold text-slate-800">Recruiter & Team Management</h2>
+              <p className="text-xs text-slate-400 mt-1">Configure recruiter roles and manage organizational access.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingMember(null);
+                setTeamForm({ name: "", email: "", role: "Recruiter" });
+                setShowTeamModal(true);
+              }}
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition cursor-pointer"
+            >
+              <UserPlus size={14} />
+              Add Recruiter
+            </button>
+          </div>
+
+          {loadingTeam ? (
+            <div className="flex justify-center py-12">
+              <span className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" />
+            </div>
+          ) : team.length === 0 ? (
+            <div className="text-center py-12 space-y-2">
+              <p className="text-slate-400 text-sm">No recruiters found on your team.</p>
+              <p className="text-xs text-slate-300">Click "Add Recruiter" to invite team members.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    <th className="pb-3 pl-2">Name & Email</th>
+                    <th className="pb-3">Role</th>
+                    <th className="pb-3">Status</th>
+                    <th className="pb-3 text-right pr-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {team.map((member) => (
+                    <tr key={member.id} className="text-sm hover:bg-slate-50/50 transition">
+                      <td className="py-4 pl-2">
+                        <p className="font-semibold text-slate-800">{member.full_name}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{member.email}</p>
+                      </td>
+                      <td className="py-4 font-medium text-slate-600 capitalize">
+                        {member.role}
+                      </td>
+                      <td className="py-4">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${
+                          member.is_active 
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                            : 'bg-rose-50 text-rose-700 border border-rose-100'
+                        }`}>
+                          {member.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="py-4 text-right pr-2 space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingMember(member);
+                            setTeamForm({ name: member.full_name, email: member.email, role: member.role });
+                            setShowTeamModal(true);
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 rounded hover:bg-slate-100 transition inline-flex cursor-pointer"
+                          title="Change Role"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleActive(member)}
+                          className="p-1.5 text-slate-400 hover:text-amber-600 rounded hover:bg-slate-100 transition inline-flex cursor-pointer"
+                          title={member.is_active ? "Deactivate" : "Activate"}
+                        >
+                          {member.is_active ? <ToggleRight size={16} className="text-emerald-500" /> : <ToggleLeft size={16} />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteMember(member.id)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 rounded hover:bg-slate-100 transition inline-flex cursor-pointer"
+                          title="Remove Recruiter"
+                        >
+                          <UserX size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {showTeamModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 pt-6 pb-4 border-b border-slate-100 flex items-start justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">{editingMember ? "Edit Recruiter" : "Add Recruiter"}</h3>
+                <p className="text-xs text-slate-500 mt-1">Configure recruiter access rights</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowTeamModal(false)}
+                className="text-slate-400 hover:text-slate-600 transition"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleTeamFormSubmit}>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    disabled={!!editingMember}
+                    value={teamForm.name}
+                    onChange={(e) => setTeamForm(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="e.g. Raj Mehta"
+                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-slate-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    disabled={!!editingMember}
+                    value={teamForm.email}
+                    onChange={(e) => setTeamForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="e.g. raj@company.com"
+                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-slate-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Access Role</label>
+                  <select
+                    value={teamForm.role}
+                    onChange={(e) => setTeamForm(prev => ({ ...prev, role: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  >
+                    <option value="HR Manager">HR Manager</option>
+                    <option value="Recruiter">Recruiter</option>
+                    <option value="Interviewer">Interviewer</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowTeamModal(false)}
+                  className="px-4 py-2 border border-slate-200 text-slate-600 text-xs font-medium rounded-xl hover:bg-slate-100 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-xl transition"
+                >
+                  {editingMember ? "Save Changes" : "Invite Recruiter"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
