@@ -1,8 +1,20 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { pool } from "../config/db.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envCandidates = [
+  path.resolve(__dirname, "..", "..", ".env"),
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(process.cwd(), "..", ".env"),
+];
+
+for (const envPath of envCandidates) {
+  dotenv.config({ path: envPath });
+}
 
 if (!process.env.JWT_SECRET) {
   throw new Error(
