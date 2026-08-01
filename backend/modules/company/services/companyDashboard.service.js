@@ -16,13 +16,17 @@ export const getDashboardStats = async (companyId) => {
   const totalAppsDb = parseInt(appsRes.rows[0].count, 10);
 
   // Query interviews scheduled
+  let interviewsDb = 0;
+
+try {
   const interviewsRes = await pool.query(
-    `SELECT COUNT(*) FROM interviews i 
-     JOIN student_drive_progress sdp ON sdp.id = i.application_id 
-     WHERE sdp.company_id = $1`,
-    [companyId]
+    `SELECT COUNT(*) FROM interviews`
   );
-  const interviewsDb = parseInt(interviewsRes.rows[0].count, 10);
+
+  interviewsDb = parseInt(interviewsRes.rows[0].count, 10);
+} catch (err) {
+  interviewsDb = 0;
+}
 
   // Query offers released (stage is Offered or Selected)
   const offersRes = await pool.query(
@@ -63,28 +67,26 @@ export const getDashboardFunnel = async (companyId) => {
 
   const screenedRes = await pool.query(
     `SELECT COUNT(*) FROM student_drive_progress 
-     WHERE company_id = $1 AND current_stage IN ('screening', 'training', 'shortlist', 'interviews', 'selection')`,
+     WHERE company_id = $1 AND stage IN ('tested', 'trained', 'selected')`,
     [companyId]
   );
   const screened = parseInt(screenedRes.rows[0].count, 10);
 
   const trainedRes = await pool.query(
     `SELECT COUNT(*) FROM student_drive_progress 
-     WHERE company_id = $1 AND current_stage IN ('training', 'shortlist', 'interviews', 'selection')`,
+     WHERE company_id = $1 AND stage IN ('trained', 'selected')`,
     [companyId]
   );
   const trained = parseInt(trainedRes.rows[0].count, 10);
 
   const shortlistedRes = await pool.query(
     `SELECT COUNT(*) FROM student_drive_progress 
-     WHERE company_id = $1 AND current_stage IN ('shortlist', 'interviews', 'selection')`,
-    [companyId]
-  );
+     WHERE company_id = $1 AND stage ='selected'`,[companyId]);
   const shortlisted = parseInt(shortlistedRes.rows[0].count, 10);
 
   const selectedRes = await pool.query(
     `SELECT COUNT(*) FROM student_drive_progress 
-     WHERE company_id = $1 AND current_stage = 'selection'`,
+     WHERE company_id = $1 AND stage = 'selected'`,
     [companyId]
   );
   const selected = parseInt(selectedRes.rows[0].count, 10);
@@ -111,12 +113,17 @@ export const getDashboardFunnel = async (companyId) => {
 
 export const getCollegeStats = async (companyId) => {
   const query = `
-    SELECT s.college AS "collegeName", COUNT(*)::int AS "candidateCount"
-    FROM student_drive_progress sdp
-    JOIN students s ON s.id = sdp.student_id
-    WHERE sdp.company_id = $1 AND s.college IS NOT NULL
-    GROUP BY s.college
-    ORDER BY "candidateCount" DESC
+    SELECT
+    c.name AS "collegeName",
+    COUNT(*)::int AS "candidateCount"
+FROM student_drive_progress sdp
+JOIN students s
+    ON s.user_id = sdp.student_id
+LEFT JOIN colleges c
+    ON c.id = s.college_id
+WHERE sdp.company_id = $1
+GROUP BY c.name
+ORDER BY "candidateCount" DESC
   `;
   const result = await pool.query(query, [companyId]);
 
@@ -138,11 +145,11 @@ export const getRecentActivities = async (companyId) => {
     SELECT 
       sdp.stage AS "activity",
       s.name AS "candidateName",
-      sdp.stage_updated_at AS "time"
+      sdp.updated_at AS "time"
     FROM student_drive_progress sdp
-    JOIN students s ON s.id = sdp.student_id
+    JOIN students s ON s.user_id = sdp.student_id
     WHERE sdp.company_id = $1
-    ORDER BY sdp.stage_updated_at DESC
+    ORDER BY sdp.updated_at DESC
     LIMIT 10
   `;
   const result = await pool.query(query, [companyId]);
@@ -170,11 +177,17 @@ export const getRecentActivities = async (companyId) => {
   // Format activity messages
   return result.rows.map(row => {
     let actMessage = "Applied for role";
-    if (row.activity === "Shortlisted") actMessage = "Candidate shortlisted";
-    else if (row.activity === "Assessment") actMessage = "Completed assessment screening";
-    else if (row.activity === "Interview") actMessage = "Scheduled final interview round";
-    else if (row.activity === "Rejected") actMessage = "Recruitment application rejected";
+    if (row.activity === "tested")
+    actMessage = "Assessment completed";
 
+else if (row.activity === "trained")
+    actMessage = "Training completed";
+
+else if (row.activity === "selected")
+    actMessage = "Candidate selected";
+
+else
+    actMessage = "Candidate applied";
     return {
       activity: actMessage,
       candidateName: row.candidateName,
