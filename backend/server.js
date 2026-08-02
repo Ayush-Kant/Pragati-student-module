@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-
 import { connectDB } from "./config/db.js";
 import { initializeLiveSessionModule } from "./src/database/migrations/liveSessionSchema.js";
 
@@ -53,18 +52,16 @@ import mentorHiringRoutes from "./routes/mentorHiring.routes.js";
 import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
+import notificationsRoutes from "./routes/notifications.routes.js";
 
 dotenv.config();
 
 console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 
-
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 app.use(express.json());
 
@@ -118,6 +115,7 @@ app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
+app.use("/api/v1/notifications", notificationsRoutes);
 
 app.use("/api/v1/certificates", certificatesRouter);
 app.use("/api/v1/badges", badgesRouter);
