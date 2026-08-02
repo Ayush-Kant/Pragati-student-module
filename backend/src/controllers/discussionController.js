@@ -29,9 +29,11 @@ export const getDiscussionDetails = async (req, res, next) => {
   }
 };
 
+const getUserId = (req) => req.user?.id || req.user?.userId || req.user?.uid;
+
 export const createDiscussion = async (req, res, next) => {
   try {
-    const payload = { ...req.body, createdBy: req.user.id };
+    const payload = { ...req.body, createdBy: getUserId(req) };
     const result = await discussionService.createDiscussion(payload);
     if (!result.success) return res.status(400).json(result);
     return res.status(201).json(result);
@@ -43,7 +45,7 @@ export const createDiscussion = async (req, res, next) => {
 export const updateDiscussion = async (req, res, next) => {
   try {
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.editDiscussion(discussionId, req.body, req.user.id);
+    const result = await discussionService.editDiscussion(discussionId, req.body, getUserId(req));
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -54,7 +56,7 @@ export const updateDiscussion = async (req, res, next) => {
 export const deleteDiscussion = async (req, res, next) => {
   try {
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.removeDiscussion(discussionId, req.user.id);
+    const result = await discussionService.removeDiscussion(discussionId, getUserId(req));
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -65,7 +67,7 @@ export const deleteDiscussion = async (req, res, next) => {
 export const addDiscussionComment = async (req, res, next) => {
   try {
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.createComment(discussionId, req.user.id, req.body.content);
+    const result = await discussionService.createComment(discussionId, getUserId(req), req.body.content);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(201).json(result);
   } catch (error) {
@@ -76,7 +78,7 @@ export const addDiscussionComment = async (req, res, next) => {
 export const addCommentReply = async (req, res, next) => {
   try {
     const commentId = Number(req.params.commentId);
-    const result = await discussionService.createReply(commentId, req.user.id, req.body.content);
+    const result = await discussionService.createReply(commentId, getUserId(req), req.body.content);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(201).json(result);
   } catch (error) {
@@ -87,7 +89,7 @@ export const addCommentReply = async (req, res, next) => {
 export const updateDiscussionComment = async (req, res, next) => {
   try {
     const commentId = Number(req.params.commentId);
-    const result = await discussionService.editComment(commentId, req.user.id, req.body.content);
+    const result = await discussionService.editComment(commentId, getUserId(req), req.body.content);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -98,7 +100,7 @@ export const updateDiscussionComment = async (req, res, next) => {
 export const removeDiscussionComment = async (req, res, next) => {
   try {
     const commentId = Number(req.params.commentId);
-    const result = await discussionService.deleteComment(commentId, req.user.id);
+    const result = await discussionService.deleteComment(commentId, getUserId(req));
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -109,7 +111,7 @@ export const removeDiscussionComment = async (req, res, next) => {
 export const toggleDiscussionLike = async (req, res, next) => {
   try {
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.toggleLike(discussionId, req.user.id);
+    const result = await discussionService.toggleLike(discussionId, getUserId(req));
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -120,7 +122,7 @@ export const toggleDiscussionLike = async (req, res, next) => {
 export const toggleCommentLike = async (req, res, next) => {
   try {
     const commentId = Number(req.params.commentId);
-    const result = await discussionService.toggleCommentLike(commentId, req.user.id);
+    const result = await discussionService.toggleCommentLike(commentId, getUserId(req));
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -131,7 +133,7 @@ export const toggleCommentLike = async (req, res, next) => {
 export const reportDiscussion = async (req, res, next) => {
   try {
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.reportDiscussion(discussionId, req.user.id, req.body);
+    const result = await discussionService.reportDiscussion(discussionId, getUserId(req), req.body);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(201).json(result);
   } catch (error) {

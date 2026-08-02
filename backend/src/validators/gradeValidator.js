@@ -1,5 +1,5 @@
 export const validateGrade = (req, res, next) => {
-  const { score, remarks } = req.body;
+  const { score } = req.body;
 
   if (score === undefined || score === null) {
     return res.status(400).json({

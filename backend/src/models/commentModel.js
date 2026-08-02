@@ -31,6 +31,11 @@ DiscussionComment.init(
     tableName: "discussion_comments",
     underscored: true,
     timestamps: true,
+    indexes: [
+      { fields: ["discussion_id"] },
+      { fields: ["user_id"] },
+      { fields: ["created_at"] },
+    ],
   },
 );
 

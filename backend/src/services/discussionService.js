@@ -1,20 +1,12 @@
-import { Op, fn, col, literal } from "@sequelize/core";
-import sequelize from "../../config/sequelize.js";
+import { literal } from "@sequelize/core";
 import Discussion from "../models/discussionModel.js";
 import DiscussionComment from "../models/commentModel.js";
 import DiscussionReply from "../models/replyModel.js";
 import DiscussionReaction from "../models/reactionModel.js";
 import DiscussionReport from "../models/reportModel.js";
-
-Discussion.hasMany(DiscussionComment, { foreignKey: "discussion_id", as: "comments" });
-DiscussionComment.belongsTo(Discussion, { foreignKey: "discussion_id", as: "discussion" });
-DiscussionComment.hasMany(DiscussionReply, { foreignKey: "comment_id", as: "replies" });
-DiscussionReply.belongsTo(DiscussionComment, { foreignKey: "comment_id", as: "comment" });
-Discussion.hasMany(DiscussionReaction, { foreignKey: "discussion_id", as: "reactions" });
-DiscussionComment.hasMany(DiscussionReaction, { foreignKey: "comment_id", as: "reactions" });
-Discussion.hasMany(DiscussionReport, { foreignKey: "discussion_id", as: "reports" });
-DiscussionComment.hasMany(DiscussionReport, { foreignKey: "comment_id", as: "reports" });
-DiscussionReply.hasMany(DiscussionReport, { foreignKey: "reply_id", as: "reports" });
+import "../models/discussionAssociations.js";
+import { normalizeDiscussionQuery } from "../utils/discussionHelpers.js";
+import { DISCUSSION_DEFAULT_SORT, DISCUSSION_SORT_OPTIONS, DISCUSSION_REACTION_TYPES } from "../constants/discussionConstants.js";
 
 export const createDiscussion = async ({ title, content, category, tags, createdBy }) => {
   const discussion = await Discussion.create({ title, content, category, tags, createdBy });
@@ -22,27 +14,9 @@ export const createDiscussion = async ({ title, content, category, tags, created
 };
 
 export const listDiscussions = async (query = {}) => {
-  const { search, category, tags, sortBy = "latest", page = 1, pageSize = 20 } = query;
-  const offset = (Number(page) - 1) * Number(pageSize);
-  const where = {};
-
-  if (search) {
-    where[Op.or] = [
-      { title: { [Op.iLike]: `%${search}%` } },
-      { content: { [Op.iLike]: `%${search}%` } },
-    ];
-  }
-
-  if (category) {
-    where.category = category;
-  }
-
-  if (tags) {
-    const tagList = Array.isArray(tags) ? tags : String(tags).split(",").map((tag) => tag.trim()).filter(Boolean);
-    if (tagList.length) {
-      where.tags = { [Op.overlap]: tagList };
-    }
-  }
+  const { where, pagination, sortBy } = normalizeDiscussionQuery(query);
+  const normalizedSortBy = DISCUSSION_SORT_OPTIONS.includes(sortBy) ? sortBy : DISCUSSION_DEFAULT_SORT;
+  const { page, pageSize, offset } = pagination;
 
   const likeCountLiteral = literal(`(
       SELECT COUNT(*) FROM discussion_reactions dr
@@ -61,10 +35,10 @@ export const listDiscussions = async (query = {}) => {
         attributes: ["id"],
       },
     ],
-    order: sortBy === "popular"
-      ? [[literal("likeCount"), "DESC"], ["created_at", "DESC"]]
-      : [["created_at", "DESC"]],
-    limit: Number(pageSize),
+    order: normalizedSortBy === "popular"
+      ? [[literal("likeCount"), "DESC"], ["createdAt", "DESC"]]
+      : [["createdAt", "DESC"]],
+    limit: pageSize,
     offset,
   });
 
@@ -72,7 +46,7 @@ export const listDiscussions = async (query = {}) => {
   return {
     success: true,
     data: discussions,
-    metadata: { total, page: Number(page), pageSize: Number(pageSize) },
+    metadata: { total, page, pageSize },
   };
 };
 
@@ -167,13 +141,13 @@ export const toggleLike = async (discussionId, userId) => {
   const discussion = await Discussion.findByPk(discussionId);
   if (!discussion) return { success: false, status: 404, message: "Discussion not found" };
 
-  const reaction = await DiscussionReaction.findOne({ where: { discussionId, userId, type: "like" } });
+  const reaction = await DiscussionReaction.findOne({ where: { discussionId, userId, type: DISCUSSION_REACTION_TYPES.like } });
   if (reaction) {
     await reaction.destroy();
     return { success: true, data: { liked: false }, message: "Discussion unliked" };
   }
 
-  await DiscussionReaction.create({ discussionId, userId, type: "like" });
+  await DiscussionReaction.create({ discussionId, userId, type: DISCUSSION_REACTION_TYPES.like });
   return { success: true, data: { liked: true }, message: "Discussion liked" };
 };
 
@@ -181,19 +155,29 @@ export const toggleCommentLike = async (commentId, userId) => {
   const comment = await DiscussionComment.findByPk(commentId);
   if (!comment) return { success: false, status: 404, message: "Comment not found" };
 
-  const reaction = await DiscussionReaction.findOne({ where: { commentId, userId, type: "like" } });
+  const reaction = await DiscussionReaction.findOne({ where: { commentId, userId, type: DISCUSSION_REACTION_TYPES.like } });
   if (reaction) {
     await reaction.destroy();
     return { success: true, data: { liked: false }, message: "Comment unliked" };
   }
 
-  await DiscussionReaction.create({ commentId, userId, type: "like" });
+  await DiscussionReaction.create({ commentId, userId, type: DISCUSSION_REACTION_TYPES.like });
   return { success: true, data: { liked: true }, message: "Comment liked" };
 };
 
 export const reportDiscussion = async (discussionId, userId, { reason, reportType, commentId, replyId }) => {
   const discussion = await Discussion.findByPk(discussionId);
   if (!discussion) return { success: false, status: 404, message: "Discussion not found" };
+
+  if (reportType === "comment") {
+    const comment = await DiscussionComment.findByPk(commentId);
+    if (!comment) return { success: false, status: 404, message: "Comment not found" };
+  }
+
+  if (reportType === "reply") {
+    const reply = await DiscussionReply.findByPk(replyId);
+    if (!reply) return { success: false, status: 404, message: "Reply not found" };
+  }
 
   const reportPayload = {
     discussionId,
@@ -224,7 +208,7 @@ export const getDiscussionStatistics = async () => {
   const totalDiscussions = await Discussion.count();
   const totalComments = await DiscussionComment.count();
   const totalReplies = await DiscussionReply.count();
-  const totalLikes = await DiscussionReaction.count({ where: { type: "like" } });
+  const totalLikes = await DiscussionReaction.count({ where: { type: DISCUSSION_REACTION_TYPES.like } });
   const totalReports = await DiscussionReport.count();
 
   return {

@@ -3,7 +3,7 @@
 //  Unit and Integration tests for Projects Backend Module
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { jest, describe, it, expect, afterEach } from "@jest/globals";
+import { jest, describe, it, expect, afterEach, beforeEach } from "@jest/globals";
 import {
   validateGithubUrl,
   validateDeploymentUrl,

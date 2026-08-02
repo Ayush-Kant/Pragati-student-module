@@ -37,6 +37,12 @@ DiscussionReaction.init(
     tableName: "discussion_reactions",
     underscored: true,
     timestamps: true,
+    indexes: [
+      { unique: true, fields: ["discussion_id", "user_id", "type"] },
+      { unique: true, fields: ["comment_id", "user_id", "type"] },
+      { fields: ["user_id"] },
+      { fields: ["type"] },
+    ],
   },
 );
 

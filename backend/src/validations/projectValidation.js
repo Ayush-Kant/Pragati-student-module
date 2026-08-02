@@ -4,6 +4,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { ApiError } from "../utils/projectHelpers.js";
+
 import {
   FILE_CONSTRAINTS,
   VALIDATION_LIMITS,
@@ -29,7 +30,7 @@ export const validateGithubUrl = (url) => {
   }
 
   try {
-    const parsed = new URL(sanitized);
+    const parsed = new globalThis.URL(sanitized);
     if (parsed.hostname !== "github.com") {
       throw new ApiError(400, "GitHub URL domain must be github.com");
     }
@@ -67,7 +68,7 @@ export const validateDeploymentUrl = (url, required = false) => {
   }
 
   try {
-    const parsed = new URL(sanitized);
+    const parsed = new globalThis.URL(sanitized);
     if (parsed.protocol !== "https:") {
       throw new ApiError(400, "Deployment URL must use HTTPS protocol");
     }

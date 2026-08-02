@@ -16,15 +16,14 @@ for (const envPath of envCandidates) {
   dotenv.config({ path: envPath });
 }
 
-if (!process.env.JWT_SECRET) {
-  throw new Error(
-    "FATAL: JWT_SECRET environment variable is not set. " +
-    "The server cannot start without it."
-  );
-}
-
 const authMiddleware = async (req, res, next) => {
   try {
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "JWT secret is not configured",
+      });
+    }
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

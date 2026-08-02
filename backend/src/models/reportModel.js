@@ -46,6 +46,13 @@ DiscussionReport.init(
     tableName: "discussion_reports",
     underscored: true,
     timestamps: true,
+    indexes: [
+      { fields: ["discussion_id"] },
+      { fields: ["comment_id"] },
+      { fields: ["reply_id"] },
+      { fields: ["reported_by"] },
+      { fields: ["status"] },
+    ],
   },
 );
 

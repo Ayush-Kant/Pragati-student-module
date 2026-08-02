@@ -1,3 +1,5 @@
+import { Op } from "@sequelize/core";
+
 export const normalizeTags = (tags) => {
   if (!tags) return [];
   return Array.isArray(tags)
@@ -16,9 +18,9 @@ export const normalizeDiscussionQuery = (query = {}) => {
   const where = {};
 
   if (search) {
-    where.$or = [
-      { title: { like: `%${search}%` } },
-      { content: { like: `%${search}%` } },
+    where[Op.or] = [
+      { title: { [Op.iLike]: `%${search}%` } },
+      { content: { [Op.iLike]: `%${search}%` } },
     ];
   }
 
@@ -27,7 +29,7 @@ export const normalizeDiscussionQuery = (query = {}) => {
   }
 
   if (parsedTags.length) {
-    where.tags = { overlap: parsedTags };
+    where.tags = { [Op.overlap]: parsedTags };
   }
 
   const pageNumber = Number(page) > 0 ? Number(page) : 1;

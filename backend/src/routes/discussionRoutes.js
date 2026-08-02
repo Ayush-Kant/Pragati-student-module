@@ -5,6 +5,7 @@ import {
   validateCreateDiscussion,
   validateUpdateDiscussion,
   validateCreateComment,
+  validateUpdateComment,
   validateCreateReply,
   validateReportDiscussion,
   validateIdParam,
@@ -21,6 +22,7 @@ import {
   updateDiscussionComment,
   removeDiscussionComment,
   toggleDiscussionLike,
+  toggleCommentLike,
   reportDiscussion,
   searchDiscussions,
   getDiscussionStatistics,
@@ -54,6 +56,11 @@ router.post(
   toggleDiscussionLike,
 );
 router.post(
+  "/comments/:commentId/like",
+  validateRequest(validateCommentIdParam, "params"),
+  toggleCommentLike,
+);
+router.post(
   "/discussions/:discussionId/report",
   validateRequest(validateIdParam, "params"),
   validateRequest(validateReportDiscussion),
@@ -69,7 +76,7 @@ router.put(
 router.put(
   "/comments/:commentId",
   validateRequest(validateCommentIdParam, "params"),
-  validateRequest(validateCreateComment),
+  validateRequest(validateUpdateComment),
   updateDiscussionComment,
 );
 

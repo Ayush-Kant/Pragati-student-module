@@ -39,6 +39,11 @@ Discussion.init(
     tableName: "discussions",
     underscored: true,
     timestamps: true,
+    indexes: [
+      { fields: ["created_by"] },
+      { fields: ["category"] },
+      { fields: ["created_at"] },
+    ],
   },
 );
 

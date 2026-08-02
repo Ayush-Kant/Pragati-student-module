@@ -20,7 +20,6 @@ import { uploadReport } from "../config/aws.js";
 import {
   ApiError,
   formatProject,
-  isDeadlinePassed,
 } from "../utils/projectHelpers.js";
 import {
   PROJECT_STATUS,

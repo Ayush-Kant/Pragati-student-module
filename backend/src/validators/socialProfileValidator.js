@@ -10,7 +10,7 @@ import { sanitizeUrl } from '../utils/studentProfileHelpers.js';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const isValidUrl = (v) => {
-    try { new URL(v); return true; } catch { return false; }
+    try { new globalThis.URL(v); return true; } catch { return false; }
 };
 
 /**
@@ -31,7 +31,7 @@ const checkUrl = (raw, fieldName, { required = false, domain = null } = {}) => {
 
     if (domain) {
         try {
-            const hostname = new URL(v).hostname.toLowerCase();
+            const hostname = new globalThis.URL(v).hostname.toLowerCase();
             if (!hostname.includes(domain)) {
                 return { value: null, error: `${fieldName} must be a ${domain} URL` };
             }
