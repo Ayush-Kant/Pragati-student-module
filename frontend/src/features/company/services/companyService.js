@@ -77,3 +77,25 @@ export const uploadCompanyLogo = async (file) => {
 
   return response.data;
 };
+
+/* Company Team Members */
+
+export const getCompanyTeam = async () => {
+  const response = await API.get("/team");
+  return response.data;
+};
+
+export const addCompanyTeamMember = async (memberData) => {
+  const response = await API.post("/team", memberData);
+  return response.data;
+};
+
+export const updateCompanyTeamMember = async (id, memberData) => {
+  const response = await API.patch(`/team/${id}`, memberData);
+  return response.data;
+};
+
+export const deleteCompanyTeamMember = async (id) => {
+  const response = await API.delete(`/team/${id}`);
+  return response.data;
+};

@@ -9,10 +9,15 @@ const AssessmentTypeBadge = ({ type }) => {
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold transition-colors duration-300 ${
-        styles[type] ||
-        "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
-      }`}
+      className={`inline-flex items-center whitespace-nowrap rounded-full
+        px-2 py-1 md:px-3
+        text-xs md:text-sm
+        font-semibold
+        transition-colors duration-300
+        ${
+          styles[type] ||
+          "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
+        }`}
     >
       {type}
     </span>

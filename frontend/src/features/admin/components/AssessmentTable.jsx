@@ -3,49 +3,45 @@ import { useNavigate } from "react-router-dom";
 import AssessmentTypeBadge from "./AssessmentTypeBadge";
 import AssessmentStatusBadge from "./AssessmentStatusBadge";
 
-const AssessmentTable = ({
-  assessments,
-  onEdit,
-  onArchive,
-  onPublish,
-}) => {
+const AssessmentTable = ({ assessments, onEdit, onArchive, onPublish }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900">
-      <div className="overflow-x-auto">
-        <table className="min-w-full">
+  
+    <div className="mt-6 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
+  <div className="w-full overflow-x-auto">
+    <table className="w-full min-w-[700px]">
           {/* ========================= */}
           {/* TABLE HEADER */}
           {/* ========================= */}
 
           <thead className="bg-gray-100 dark:bg-slate-800">
             <tr className="border-b border-gray-200 dark:border-slate-700">
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-slate-200">
+              <th className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 text-left text-sm md:text-base font-semibold text-gray-700 dark:text-slate-200">
                 Assessment Title
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-slate-200">
+              <th className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 text-left text-sm md:text-base font-semibold text-gray-700 dark:text-slate-200">
                 Type
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-slate-200">
+              <th className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 text-left text-sm md:text-base font-semibold text-gray-700 dark:text-slate-200">
                 Difficulty
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-slate-200">
+              <th className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 text-left text-sm md:text-base font-semibold text-gray-700 dark:text-slate-200">
                 Duration
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-slate-200">
+              <th className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 text-left text-sm md:text-base font-semibold text-gray-700 dark:text-slate-200">
                 Questions
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-slate-200">
+              <th className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 text-left text-sm md:text-base font-semibold text-gray-700 dark:text-slate-200">
                 Status
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700 dark:text-slate-200">
+              <th className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4text-center text-sm md:text-base font-semibold  text-gray-700 dark:text-slate-200">
                 Actions
               </th>
             </tr>
@@ -64,58 +60,53 @@ const AssessmentTable = ({
                 >
                   {/* Title */}
 
-                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-100">
-                    {assessment.title}
+                  <td className=" max-w-xs px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 font-medium text-gray-900 dark:text-slate-100">
+                    <p className="truncate text-xs md:text-sm">
+                      {assessment.title}
+                    </p>
                   </td>
 
                   {/* Type */}
 
-                  <td className="px-6 py-4">
-                    <AssessmentTypeBadge
-                      type={assessment.type}
-                    />
+                  <td className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4">
+                    <AssessmentTypeBadge type={assessment.type} />
                   </td>
 
                   {/* Difficulty */}
 
-                  <td className="px-6 py-4 text-gray-700 dark:text-slate-300">
+                  <td className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 text-xs md:text-sm text-gray-700 dark:text-slate-300">
                     {assessment.difficulty}
                   </td>
 
                   {/* Duration */}
 
-                  <td className="px-6 py-4 text-gray-700 dark:text-slate-300">
+                  <td className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 text-xs md:text-sm text-gray-700 dark:text-slate-300">
                     {assessment.timeLimitMinutes} min
                   </td>
 
                   {/* Questions */}
 
-                  <td className="px-6 py-4 text-gray-700 dark:text-slate-300">
+                  <td className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4 text-xs md:text-sm text-gray-700 dark:text-slate-300">
                     {assessment.questionsCount}
                   </td>
 
                   {/* Status */}
 
-                  <td className="px-6 py-4">
-                    <AssessmentStatusBadge
-                      status={assessment.status}
-                    />
+                  <td className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4">
+                    <AssessmentStatusBadge status={assessment.status} />
                   </td>
 
                   {/* Actions */}
 
-                  <td className="px-6 py-4">
+                  <td className="px-2 py-2 sm:px-3 sm:py-3 lg:px-6 lg:py-4">
                     <div className="flex flex-wrap justify-center gap-2">
-
                       {/* View */}
 
                       <button
                         onClick={() =>
-                          navigate(
-                            `/admin/assessments/${assessment.id}`
-                          )
+                          navigate(`/admin/assessments/${assessment.id}`)
                         }
-                        className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                        className="rounded-lg bg-blue-600 px-2 py-1 md:px-3 md:py-2 text-xs md:text-sm font-medium text-white transition hover:bg-blue-700"
                       >
                         View
                       </button>
@@ -123,10 +114,8 @@ const AssessmentTable = ({
                       {/* Edit */}
 
                       <button
-                        onClick={() =>
-                          onEdit(assessment)
-                        }
-                        className="rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-amber-600"
+                        onClick={() => onEdit(assessment)}
+                        className="rounded-lg bg-amber-500 px-2 py-1 md:px-3 md:py-2 text-xs md:text-sm font-medium text-white transition hover:bg-amber-600"
                       >
                         Edit
                       </button>
@@ -134,10 +123,8 @@ const AssessmentTable = ({
                       {/* Publish */}
 
                       <button
-                        onClick={() =>
-                          onPublish(assessment)
-                        }
-                        className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+                        onClick={() => onPublish(assessment)}
+                        className="rounded-lg bg-emerald-600 px-2 py-1 md:px-3 md:py-2 text-xs md:text-sm font-medium text-white transition hover:bg-emerald-700"
                       >
                         Publish
                       </button>
@@ -145,10 +132,8 @@ const AssessmentTable = ({
                       {/* Archive */}
 
                       <button
-                        onClick={() =>
-                          onArchive(assessment)
-                        }
-                        className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+                        onClick={() => onArchive(assessment)}
+                        className="rounded-lg bg-red-600 px-2 py-1 md:px-3 md:py-2 text-xs md:text-sm font-medium text-white transition hover:bg-red-700"
                       >
                         Archive
                       </button>

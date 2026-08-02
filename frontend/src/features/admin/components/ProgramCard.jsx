@@ -90,7 +90,7 @@ const ProgramCard = ({
             <div className="flex gap-3">
                 <button
                     onClick={() => onEdit?.(program)}
-                    className="flex-1 px-4 py-2 rounded-full bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition cursor-pointer"
+                    className="flex-1 px-4 py-2 rounded-full bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 transition cursor-pointer"
                 >
                     Edit
                 </button>

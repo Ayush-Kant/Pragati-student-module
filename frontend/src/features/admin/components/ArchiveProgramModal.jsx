@@ -9,13 +9,17 @@ const ArchiveProgramModal = ({
     loading = false,
 }) => {
 
-    const handleConfirm = () => {
-
-        onConfirm?.();
-
+const handleConfirm = async () => {
+    try {
+        await onConfirm?.();
         onClose?.();
-
-    };
+    } catch (error) {
+        console.error(
+            "Failed to archive program:",
+            error
+        );
+    }
+};
 
     return (
         <Modal

@@ -15,7 +15,7 @@ export default function ActiveDrives() {
             try {
                 const data =
                     await getActiveDrives();
-                setDrives(data);
+                setDrives(data.companies);
             } catch (error) {
                 console.error(error);
             } finally {

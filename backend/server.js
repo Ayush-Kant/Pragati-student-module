@@ -26,6 +26,14 @@ import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import collegeProfileRoutes from "./routes/collage.profile.routes.js";
 import companyProfileRoutes from "./modules/company/routes/companyProfile.routes.js";
+import companyCandidateRoutes from "./modules/company/routes/companyCandidate.routes.js";
+import companyDashboardRoutes from "./modules/company/routes/companyDashboard.routes.js";
+import companyReportsRoutes from "./modules/company/routes/companyReports.routes.js";
+import companyDrivesRoutes from "./modules/company/routes/companyDrives.routes.js";
+import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
+import companyInterviewRoutes from "./modules/company/routes/companyInterview.routes.js";
+import companyNotificationRoutes from "./modules/company/routes/companyNotification.routes.js";
+import companyOfferRoutes from "./modules/company/routes/companyOffer.routes.js";
 import interviewRoutes from "./routes/interview.routes.js";
 import questionBankRouter from "./routes/questionBank.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
@@ -48,8 +56,6 @@ import authMiddleware from "./middleware/authMiddleware.js";
 import mentorHiringRoutes from "./routes/mentorHiring.routes.js";
 // -----------------------
 
-// company Assessment route
-import companyAssessmentRoutes from "./modules/company/routes/companyAssessment.routes.js";
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import notificationsRoutes from "./routes/notifications.routes.js";
@@ -96,8 +102,14 @@ app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/mentor", mentorHiringRoutes); // <-- Added from intern code
 
 app.use("/api/v1/company", companyProfileRoutes);
-// app.use("/api/v1/company", companyRoutes); // <-- Added from intern code
-app.use("/api/v1/company/interviews", interviewRoutes); // <-- Added from intern code
+app.use("/api/v1/company/candidates", companyCandidateRoutes);
+app.use("/api/v1/company/dashboard", companyDashboardRoutes);
+app.use("/api/v1/company/reports", companyReportsRoutes);
+app.use("/api/v1/company/drives", companyDrivesRoutes);
+app.use("/api/v1/company/assessments", companyAssessmentRoutes);
+app.use("/api/v1/company/interviews", companyInterviewRoutes);
+app.use("/api/v1/company/notifications", companyNotificationRoutes);
+app.use("/api/v1/company/offers", companyOfferRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/v1/company/jobs", collegeJobsRoutes);
 app.use("/api/v1/company/assessments", companyAssessmentRoutes);
@@ -114,6 +126,7 @@ app.use("/api/college/dashboard", collegeDashboardRoutes);
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
 app.use("/api/v1/notifications", notificationsRoutes);
 
