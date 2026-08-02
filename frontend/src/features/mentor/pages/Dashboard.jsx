@@ -1,10 +1,12 @@
 // MentorDashboard.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import useMentorDashboard from "../hooks/useMentorDashboard";
 import StatsRow from "../components/StatsRow";
 import UpcomingSessionsList from "../components/UpcomingSessionsList";
 import TopStudentsLeaderboard from "../components/TopStudentsLeaderboard";
 import NotificationsFeed from "../components/NotificationsFeed";
+
 import {
   PieChart,
   Pie,
@@ -21,6 +23,7 @@ const PIE_COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444"];
 const BAR_COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
 const MentorDashboard = () => {
+  const navigate = useNavigate();
   const { data, loading, error } = useMentorDashboard();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
@@ -81,7 +84,7 @@ const MentorDashboard = () => {
     <div
       style={{
         minHeight: "100%",
-        width:"100%",
+        width: "100%",
         background: "#f8f9fc",
         fontFamily: "'Segoe UI', sans-serif",
         position: "relative",
@@ -101,11 +104,7 @@ const MentorDashboard = () => {
       )}
 
       {/* Main Content */}
-      <div
-        style={{ width: "100%"}}
-      >
-
-
+      <div style={{ width: "100%" }}>
         {/* Dashboard Body */}
         <div style={{ flex: 1, overflowY: "auto", padding: "6px 8px" }}>
           {/* Welcome Banner */}

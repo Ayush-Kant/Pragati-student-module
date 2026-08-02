@@ -1,34 +1,89 @@
-import Joi from "joi";
+const VALID_TYPES = ["info", "success", "warning", "alert"];
 
-const VALID_TYPES = ['info', 'success', 'warning', 'alert'];
+export const validateSendNotification = (req, res, next) => {
+  const { userIds, title, message, type, role } = req.body;
 
-export const validateSendNotification = (data) => {
-  const schema = Joi.object({
-    userIds: Joi.array().items(Joi.number().integer().positive()).min(1).required(),
-    title: Joi.string().max(255).required(),
-    message: Joi.string().required(),
-    type: Joi.string().valid(...VALID_TYPES).default('info'),
-    linkUrl: Joi.string().uri({ allowRelative: true }).max(255).optional().allow(null, ''),
-    sendEmail: Joi.boolean().default(false)
-  });
+  if (!role && (!userIds || !Array.isArray(userIds) || userIds.length === 0)) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        error: "Provide either userIds (array) or role (string like 'student')",
+      });
+  }
 
-  return schema.validate(data);
+  if (role && typeof role !== "string") {
+    return res
+      .status(400)
+      .json({ success: false, error: "role must be a string" });
+  }
+
+  if (!title || !title.trim()) {
+    return res.status(400).json({ success: false, error: "title is required" });
+  }
+
+  if (!message || !message.trim()) {
+    return res
+      .status(400)
+      .json({ success: false, error: "message is required" });
+  }
+
+  if (type && !VALID_TYPES.includes(type)) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        error: `type must be one of: ${VALID_TYPES.join(", ")}`,
+      });
+  }
+
+  next();
 };
 
-export const validateMarkAsRead = (data) => {
-  const schema = Joi.object({
-    notificationIds: Joi.array().items(Joi.number().integer().positive()).optional(),
-    markAll: Joi.boolean().optional()
-  }).or('notificationIds', 'markAll');
+export const validateMarkAsRead = (req, res, next) => {
+  const { notificationIds, markAll } = req.body;
 
-  return schema.validate(data);
+  if (
+    !markAll &&
+    (!notificationIds ||
+      !Array.isArray(notificationIds) ||
+      notificationIds.length === 0)
+  ) {
+    return res.status(400).json({
+      success: false,
+      error: "Provide either notificationIds (array) or markAll (true)",
+    });
+  }
+
+  if (
+    notificationIds &&
+    !notificationIds.every((id) => Number.isInteger(id) || !isNaN(parseInt(id)))
+  ) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        error: "notificationIds must contain valid integers",
+      });
+  }
+
+  next();
 };
 
-export const validateGetQuery = (data) => {
-  const schema = Joi.object({
-    page: Joi.number().integer().min(1).default(1),
-    limit: Joi.number().integer().min(1).max(100).default(20)
-  });
+export const validateGetNotifications = (req, res, next) => {
+  const { page, limit } = req.query;
 
-  return schema.validate(data);
+  if (page && (isNaN(page) || parseInt(page) < 1)) {
+    return res
+      .status(400)
+      .json({ success: false, error: "page must be a positive integer" });
+  }
+
+  if (limit && (isNaN(limit) || parseInt(limit) < 1 || parseInt(limit) > 100)) {
+    return res
+      .status(400)
+      .json({ success: false, error: "limit must be between 1 and 100" });
+  }
+
+  next();
 };

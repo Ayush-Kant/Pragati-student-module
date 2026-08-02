@@ -1,14 +1,21 @@
 -- ENUM for Notification Types
 DO $$ BEGIN
-  CREATE TYPE notification_type AS ENUM ('info', 'success', 'warning', 'alert');
-EXCEPTION
-  WHEN duplicate_object THEN NULL;
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'notification_type') THEN
+    CREATE TYPE notification_type AS ENUM ('info', 'success', 'warning', 'alert');
+  END IF;
 END $$;
 
--- Ensure notifications table has all required columns from both implementations
-ALTER TABLE notifications ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE CASCADE;
-ALTER TABLE notifications ADD COLUMN IF NOT EXISTS link_url VARCHAR(255);
+-- TABLE: notifications
+CREATE TABLE IF NOT EXISTS notifications (
+  id          SERIAL PRIMARY KEY,
+  user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title       VARCHAR(255) NOT NULL,
+  message     TEXT NOT NULL,
+  type        notification_type DEFAULT 'info',
+  link_url    VARCHAR(255),
+  is_read     BOOLEAN DEFAULT false,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
--- Ensure indexes exist
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notifications(user_id, is_read);

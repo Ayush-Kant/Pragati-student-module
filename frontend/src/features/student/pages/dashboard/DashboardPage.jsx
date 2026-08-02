@@ -29,7 +29,7 @@ const DashboardPage = () => {
           onClick={() => setActiveTab("sessions")}
           className="bg-blue-500 text-white rounded-xl p-5 shadow hover:scale-105"
         >
-          📅 Sessions
+          📅 Slots
         </button>
 
 

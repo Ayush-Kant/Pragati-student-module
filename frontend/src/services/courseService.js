@@ -30,7 +30,7 @@ export const courseService = {
   // PATCH update course
   updateCourse: async (courseId, updateData) => {
     const response = await apiClient.patch(
-      `/api/mentor/courses/${courseId}`,
+      `/mentor/courses/${courseId}`,
       updateData,
     );
     return response.data;
