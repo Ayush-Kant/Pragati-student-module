@@ -57,17 +57,18 @@ export default function Step2Curriculum({
     try {
       const orderIndex = modules.length;
 
+      const title = `Section ${modules.length + 1}`;
       const newModule = await handleAddModule(
         courseData.courseId, // courseId
-        `Section ${modules.length + 1}`,
+        title,
         orderIndex,
       );
 
       handleUpdateModules([
         ...modules,
         {
-          id: newModule.id,
-          title: newModule.title,
+          id: newModule.moduleId,
+          title,
           status: "Draft",
           duration: "00m",
           lectures: [],
@@ -78,7 +79,7 @@ export default function Step2Curriculum({
     }
   };
 
-  const handleSectionDelete = async (moduleId) => {
+  const handleDeleteSection = async (moduleId) => {
     await handleDeleteModule(moduleId);
 
     handleUpdateModules(modules.filter((m) => m.id !== moduleId));
