@@ -1,4 +1,8 @@
 import assignmentModel from '../models/assignmentModel.js';
+import assignmentSubmissionModel from '../models/assignmentSubmissionModel.js';
+import assignmentFeedbackModel from '../models/assignmentFeedbackModel.js';
+import assignmentGradeModel from '../models/assignmentGradeModel.js';
+import { normalizeError } from '../utils/assignmentHelpers.js';
 
 class AssignmentService {
     static async createAssignment(input) {
@@ -12,9 +16,7 @@ class AssignmentService {
     static async getAssignmentById(id) {
         const assignment = await assignmentModel.getAssignmentById(id);
         if (!assignment) {
-            const error = new Error('Assignment not found');
-            error.status = 404;
-            throw error;
+            throw normalizeError('Assignment not found', 404);
         }
         return assignment;
     }
@@ -22,9 +24,7 @@ class AssignmentService {
     static async updateAssignment(id, input) {
         const assignment = await assignmentModel.updateAssignment(id, input);
         if (!assignment) {
-            const error = new Error('Assignment not found');
-            error.status = 404;
-            throw error;
+            throw normalizeError('Assignment not found', 404);
         }
         return assignment;
     }
@@ -32,9 +32,7 @@ class AssignmentService {
     static async deleteAssignment(id) {
         const deleted = await assignmentModel.deleteAssignment(id);
         if (!deleted) {
-            const error = new Error('Assignment not found');
-            error.status = 404;
-            throw error;
+            throw normalizeError('Assignment not found', 404);
         }
         return { success: true, message: 'Assignment deleted successfully' };
     }
@@ -42,35 +40,37 @@ class AssignmentService {
     static async submitAssignment(assignmentId, studentId, input) {
         const assignment = await assignmentModel.getAssignmentById(assignmentId);
         if (!assignment) {
-            const error = new Error('Assignment not found');
-            error.status = 404;
-            throw error;
+            throw normalizeError('Assignment not found', 404);
         }
-        return assignmentModel.submitAssignment(assignmentId, studentId, input);
+        return assignmentSubmissionModel.submitAssignment(assignmentId, studentId, input);
     }
 
     static async getSubmission(assignmentId, studentId) {
-        return assignmentModel.getSubmissionByAssignment(assignmentId, studentId);
+        return assignmentSubmissionModel.getSubmissionByAssignment(assignmentId, studentId);
+    }
+
+    static async listSubmissions(filters = {}) {
+        return assignmentSubmissionModel.listAllSubmissions(filters);
+    }
+
+    static async getStatistics(filters = {}) {
+        return assignmentModel.getAssignmentStatistics(filters);
     }
 
     static async addFeedback(assignmentId, studentId, input) {
         const assignment = await assignmentModel.getAssignmentById(assignmentId);
         if (!assignment) {
-            const error = new Error('Assignment not found');
-            error.status = 404;
-            throw error;
+            throw normalizeError('Assignment not found', 404);
         }
-        return assignmentModel.addFeedback(assignmentId, studentId, input);
+        return assignmentFeedbackModel.addFeedback(assignmentId, studentId, input);
     }
 
     static async addGrade(assignmentId, studentId, input) {
         const assignment = await assignmentModel.getAssignmentById(assignmentId);
         if (!assignment) {
-            const error = new Error('Assignment not found');
-            error.status = 404;
-            throw error;
+            throw normalizeError('Assignment not found', 404);
         }
-        return assignmentModel.addGrade(assignmentId, studentId, input);
+        return assignmentGradeModel.addGrade(assignmentId, studentId, input);
     }
 }
 

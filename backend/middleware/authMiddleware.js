@@ -32,17 +32,13 @@ const authMiddleware = async (req, res, next) => {
     next();
 
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      error: "Invalid token",
-    });
     if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ success: false, message: "Token expired" });
+      return res.status(401).json({ success: false, error: "Token expired", message: "Token expired" });
     }
     if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({ success: false, message: "Invalid token" });
+      return res.status(401).json({ success: false, error: "Invalid token", message: "Invalid token" });
     }
-    return res.status(401).json({ success: false, message: "Unauthorized" });
+    return res.status(401).json({ success: false, error: "Invalid token", message: "Unauthorized" });
   }
 };
 

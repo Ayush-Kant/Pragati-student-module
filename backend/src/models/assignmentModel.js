@@ -12,16 +12,6 @@ const normalizeAssignmentRecord = (row) => ({
     createdAt: row.created_at,
 });
 
-const normalizeSubmissionRecord = (row) => ({
-    id: row.id,
-    assignmentId: row.assignment_id,
-    studentId: row.student_id,
-    content: row.content,
-    fileUrl: row.file_url,
-    status: row.status,
-    submittedAt: row.submitted_at,
-});
-
 export const createAssignment = async (assignmentData) => {
     const { studentId, title, subject, description, dueDate, totalMarks, status } = assignmentData;
     const result = await pool.query(
@@ -118,69 +108,39 @@ export const deleteAssignment = async (id) => {
     return result.rowCount > 0;
 };
 
-export const submitAssignment = async (assignmentId, studentId, submissionData) => {
-    const { content, fileUrl } = submissionData;
-    const result = await pool.query(
-        `INSERT INTO assignment_submissions (assignment_id, student_id, content, file_url, status)
-     VALUES ($1, $2, $3, $4, 'Submitted')
-     ON CONFLICT (assignment_id, student_id)
-     DO UPDATE SET content = EXCLUDED.content, file_url = EXCLUDED.file_url, status = 'Submitted', submitted_at = NOW()
-     RETURNING id, assignment_id, student_id, content, file_url, status, submitted_at`,
-        [assignmentId, studentId, content ?? null, fileUrl ?? null],
-    );
-
-    return normalizeSubmissionRecord(result.rows[0]);
-};
-
-export const getSubmissionByAssignment = async (assignmentId, studentId) => {
-    const result = await pool.query(
-        `SELECT id, assignment_id, student_id, content, file_url, status, submitted_at
-     FROM assignment_submissions
-     WHERE assignment_id = $1 AND student_id = $2`,
-        [assignmentId, studentId],
-    );
-
-    return result.rows[0] ? normalizeSubmissionRecord(result.rows[0]) : null;
-};
-
-export const addFeedback = async (assignmentId, studentId, feedbackData) => {
-    const { remarks, grade } = feedbackData;
-    const result = await pool.query(
-        `INSERT INTO assignment_feedback (assignment_id, student_id, remarks, grade)
-     VALUES ($1, $2, $3, $4)
-     ON CONFLICT (assignment_id, student_id)
-     DO UPDATE SET remarks = EXCLUDED.remarks, grade = EXCLUDED.grade, created_at = NOW()
-     RETURNING id, assignment_id, student_id, remarks, grade, created_at`,
-        [assignmentId, studentId, remarks, grade],
-    );
-
-    return {
-        assignmentId: result.rows[0].assignment_id,
-        studentId: result.rows[0].student_id,
-        remarks: result.rows[0].remarks,
-        grade: result.rows[0].grade,
-        createdAt: result.rows[0].created_at,
-    };
-};
-
-export const addGrade = async (assignmentId, studentId, gradeData) => {
-    const { score, remarks } = gradeData;
-    const result = await pool.query(
-        `INSERT INTO assignment_grades (assignment_id, student_id, score, remarks)
-     VALUES ($1, $2, $3, $4)
-     ON CONFLICT (assignment_id, student_id)
-     DO UPDATE SET score = EXCLUDED.score, remarks = EXCLUDED.remarks, created_at = NOW()
-     RETURNING id, assignment_id, student_id, score, remarks, created_at`,
-        [assignmentId, studentId, score, remarks ?? null],
-    );
-
-    return {
-        assignmentId: result.rows[0].assignment_id,
-        studentId: result.rows[0].student_id,
-        score: result.rows[0].score,
-        remarks: result.rows[0].remarks,
-        createdAt: result.rows[0].created_at,
-    };
+export const getAssignmentStatistics = async (filters = {}) => {
+    const { studentId } = filters;
+    let query, params;
+    if (studentId) {
+        query = `
+            SELECT 
+                COUNT(*)::int AS total,
+                COUNT(CASE WHEN status = 'Closed' THEN 1 END)::int AS closed,
+                COUNT(CASE WHEN status = 'Open' THEN 1 END)::int AS open,
+                COUNT(CASE WHEN status = 'Pending' THEN 1 END)::int AS pending,
+                (SELECT COUNT(*)::int FROM assignment_submissions WHERE student_id = $1) AS submitted,
+                COALESCE(AVG(g.score), 0.0)::float AS "averageScore"
+            FROM assignments a
+            LEFT JOIN assignment_grades g ON g.assignment_id = a.id AND g.student_id = $1
+            WHERE a.student_id = $1 OR a.student_id IS NULL
+        `;
+        params = [studentId];
+    } else {
+        query = `
+            SELECT 
+                COUNT(*)::int AS total,
+                COUNT(CASE WHEN status = 'Closed' THEN 1 END)::int AS closed,
+                COUNT(CASE WHEN status = 'Open' THEN 1 END)::int AS open,
+                COUNT(CASE WHEN status = 'Pending' THEN 1 END)::int AS pending,
+                (SELECT COUNT(*)::int FROM assignment_submissions) AS submitted,
+                COALESCE(AVG(score), 0.0)::float AS "averageScore"
+            FROM assignments a
+            LEFT JOIN assignment_grades g ON g.assignment_id = a.id
+        `;
+        params = [];
+    }
+    const result = await pool.query(query, params);
+    return result.rows[0];
 };
 
 export default {
@@ -189,8 +149,5 @@ export default {
     getAssignmentById,
     updateAssignment,
     deleteAssignment,
-    submitAssignment,
-    getSubmissionByAssignment,
-    addFeedback,
-    addGrade,
+    getAssignmentStatistics,
 };
