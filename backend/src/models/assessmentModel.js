@@ -32,7 +32,7 @@ Assessment.init(
   {
     sequelize,
     modelName: "Assessment",
-    tableName: "assessments",
+    tableName: "assessment",
     timestamps: true,
     underscored: true,
   }

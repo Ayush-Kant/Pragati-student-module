@@ -21,7 +21,7 @@ AssessmentAttempt.init(
   {
     sequelize,
     modelName: "AssessmentAttempt",
-    tableName: "assessment_attempts",
+    tableName: "assessmentattempts",
     timestamps: true,
     underscored: true,
   }
