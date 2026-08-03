@@ -57,7 +57,7 @@ const ProfileAvatar = ({
       {editable && (
         <>
           <div
-            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer"
+            className="absolute inset-0 bg-black/50 opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer rounded-full"
             onClick={() => fileInputRef.current?.click()}
           >
             <Camera className="w-6 h-6 text-white" />

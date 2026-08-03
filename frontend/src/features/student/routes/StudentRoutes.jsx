@@ -8,7 +8,7 @@ import RegisterPage from '../../auth/RegisterPage';
 
 import OnboardingWizard from '../pages/onboarding/OnboardingWizard';
 import DashboardPage from '../pages/dashboard/DashboardPage';
-import ProfilePage from '../pages/profile/ProfilePage';
+import StudentProfilePage from '../profile/pages/StudentProfilePage';
 import CoursesPage from '../pages/training/CoursesPage';
 import CourseDetailPage from '../pages/training/CourseDetailPage';
 import SessionsPage from '../pages/sessions/SessionsPage';
@@ -33,6 +33,8 @@ const studentRoute = (
     <Route path="register" element={<RegisterPage />} />
     <Route path="verify/:code" element={<VerificationPage />} />
 
+    <Route path="profile" element={<StudentProfilePage />} />
+
     {/* ✅ AUTHENTICATION ENABLED - DO NOT COMMENT OUT */}
     <Route element={<PrivateRoute />}>
       <Route element={<RoleRoute allowedRoles={['student']} />}>
@@ -44,7 +46,6 @@ const studentRoute = (
           <Route path="learning-modules" element={<LearningModulesPage />} />
           
           <Route path="onboarding" element={<OnboardingWizard />} />
-          <Route path="profile" element={<ProfilePage />} />
           <Route path="courses" element={<CoursesPage />} />
           <Route path="courses/:courseId" element={<CourseDetailPage />} />
           <Route path="sessions" element={<SessionsPage />} />
