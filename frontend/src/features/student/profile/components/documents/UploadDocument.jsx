@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Upload, FileText, Check } from 'lucide-react';
-import { isDocumentValid, formatFileSize } from '../../utils/studentProfileHelpers';
+import { isDocumentValid, formatFileSize, fileToDataUrl } from '../../utils/studentProfileHelpers';
 
 const DOCUMENT_TYPES = [
   { value: 'transcript', label: 'Transcript' },
@@ -48,25 +48,31 @@ const UploadDocument = ({ onUpload, uploading = false, uploadProgress = 0 }) => 
     event.target.value = '';
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) {
       setError('Please select a file first');
       return;
     }
 
+    try {
+      const url = await fileToDataUrl(file);
     const document = {
       id: `doc-${Date.now()}`,
       name: file.name,
+      fileName: file.name,
       type: documentType,
-      url: URL.createObjectURL(file),
+      url,
       size: file.size,
       uploadedAt: new Date().toISOString()
     };
 
-    onUpload && onUpload(document);
-    setFile(null);
-    setDocumentType('other');
-    setError('');
+      onUpload && onUpload(document);
+      setFile(null);
+      setDocumentType('other');
+      setError('');
+    } catch (err) {
+      setError(err.message || 'Failed to process file');
+    }
   };
 
   const handleClick = () => {

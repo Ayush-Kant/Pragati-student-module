@@ -1,5 +1,6 @@
 import { studentProfileData, studentProfileApiResponse } from '../types/studentProfileDummyData.js';
 import { API_ENDPOINTS } from '../constants/studentProfileConstants';
+import { fileToDataUrl } from '../utils/studentProfileHelpers';
 
 const wrapSuccess = (data) => ({ success: true, data, error: null });
 
@@ -29,8 +30,9 @@ export const updateStudentProfile = async (data) => {
 export const uploadResume = async (file) => {
   try {
     await simulateDelay();
+    const fileUrl = await fileToDataUrl(file);
     return wrapSuccess({
-      fileUrl: URL.createObjectURL(file),
+      fileUrl,
       fileName: file.name
     });
   } catch (error) {
@@ -41,11 +43,12 @@ export const uploadResume = async (file) => {
 export const uploadDocument = async (file, documentType) => {
   try {
     await simulateDelay();
+    const url = await fileToDataUrl(file);
     return wrapSuccess({
       id: `doc-${Date.now()}`,
       name: file.name,
       type: documentType || 'other',
-      url: URL.createObjectURL(file)
+      url
     });
   } catch (error) {
     return wrapError(error.message || 'Failed to upload document');

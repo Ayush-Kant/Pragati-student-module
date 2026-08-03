@@ -13,7 +13,7 @@ const ResumeUpload = ({ resumeFile, onUpload, uploading = false, uploadProgress 
   const fileInputRef = useRef(null);
 
   const isFile = resumeFile instanceof File;
-  const fileName = isFile ? resumeFile.name : resumeFile?.fileName;
+  const fileName = isFile ? resumeFile.name : resumeFile?.fileName || resumeFile?.name;
   const fileSize = isFile ? resumeFile.size : resumeFile?.size;
 
   const handleFileChange = (event) => {

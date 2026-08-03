@@ -59,7 +59,7 @@ const FieldInput = ({ label, name, value, onChange, error, type = 'text', requir
 
 const EducationHistory = ({ profile = {}, isEditing = false, onUpdate, validationErrors = {} }) => {
   const educationHistory = profile.educationHistory || [];
-  const historyEntry = Array.isArray(educationHistory) ? educationHistory[0] : (educationHistory || {});
+  const historyEntry = Array.isArray(educationHistory) ? (educationHistory[0] || {}) : (educationHistory || {});
   const [form, setForm] = useState({
     previousEducation: historyEntry.previousEducation || '',
     schoolName: historyEntry.schoolName || '',

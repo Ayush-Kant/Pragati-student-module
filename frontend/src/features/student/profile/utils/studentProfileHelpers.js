@@ -297,6 +297,23 @@ export const validateCGPA = (cgpa) => {
  * @param {number} bytes - The file size in bytes
  * @returns {string} Formatted file size (e.g., "2.5 MB")
  */
+/**
+ * Converts a File object to a data URL string for persistent storage.
+ * @param {File} file - The file to convert
+ * @returns {Promise<string>} The data URL string
+ */
+export const fileToDataUrl = (file) => {
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      return reject(new Error('No file provided'));
+    }
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+};
+
 export const formatFileSize = (bytes) => {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;

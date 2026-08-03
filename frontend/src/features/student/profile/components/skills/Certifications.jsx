@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import { Award, Plus, X, Calendar, FileText, Eye, Trash2 } from 'lucide-react';
+import { Award, Plus, Calendar, FileText, Eye, Trash2 } from 'lucide-react';
+import { fileToDataUrl } from '../../utils/studentProfileHelpers';
 
 const validateCertifications = (certifications) => {
   const errors = {};
@@ -93,19 +94,25 @@ const Certifications = ({ certifications = [], isEditing = false, onAdd, onRemov
 
   const handleDocumentUpload = async (certId, file) => {
     setUploadingDoc(true);
-    const document = {
-      id: `doc-${Date.now()}`,
-      name: file.name,
-      url: URL.createObjectURL(file),
-      size: file.size,
-      type: file.type
-    };
-    const cert = certifications.find(c => c.id === certId);
-    if (cert) {
-      onAdd && onRemove(certId);
-      onAdd && onAdd({ ...cert, document });
+    try {
+      const url = await fileToDataUrl(file);
+      const document = {
+        id: `doc-${Date.now()}`,
+        name: file.name,
+        url,
+        size: file.size,
+        type: file.type
+      };
+      const cert = certifications.find(c => c.id === certId);
+      if (cert) {
+        onAdd && onRemove(certId);
+        onAdd && onAdd({ ...cert, document });
+      }
+    } catch (err) {
+      console.error('Failed to upload certification document:', err);
+    } finally {
+      setUploadingDoc(false);
     }
-    setUploadingDoc(false);
   };
 
   const errors = { ...localErrors, ...validationErrors };

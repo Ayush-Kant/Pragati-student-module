@@ -53,9 +53,12 @@ export const useStudentProfile = () => {
       if (response.success) {
         setProfile(response.data);
         setIsEditing(false);
+        setError(null);
         return { success: true, data: response.data };
       }
-      return { success: false, error: response.error || 'Failed to update profile' };
+      const errorMessage = response.error || 'Failed to update profile';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
     } catch (err) {
       const errorMessage = err.message || 'An error occurred while updating the profile';
       setError(errorMessage);

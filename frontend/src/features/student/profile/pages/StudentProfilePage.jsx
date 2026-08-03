@@ -5,7 +5,7 @@ import { useStudentProfile } from '../hooks/useStudentProfile';
 import { useProfileCompletion } from '../hooks/useProfileCompletion';
 import { useDocumentUpload } from '../hooks/useDocumentUpload';
 import { useSkills } from '../hooks/useSkills';
-import { getCompletionStepStatus } from '../utils/studentProfileHelpers';
+import { getCompletionStepStatus, fileToDataUrl } from '../utils/studentProfileHelpers';
 
 import ProfileCard from '../components/profile/ProfileCard';
 import ProfileCompletion from '../components/profile/ProfileCompletion';
@@ -60,6 +60,7 @@ const StudentProfilePage = () => {
     SECTIONS.reduce((acc, section) => ({ ...acc, [section.id]: true }), {})
   );
   const [savedProfile, setSavedProfile] = useState(null);
+  const [saveError, setSaveError] = useState(null);
 
   const {
     profile,
@@ -102,6 +103,7 @@ const StudentProfilePage = () => {
 
   const handleEdit = () => {
     setIsEditing(true);
+    setSaveError(null);
   };
 
   const handleCancel = () => {
@@ -110,14 +112,21 @@ const StudentProfilePage = () => {
   };
 
   const handleProfilePhotoUpload = useCallback(async (file) => {
-    const photoUrl = URL.createObjectURL(file);
-    const updated = await updateProfile({ ...currentProfile, profilePhoto: photoUrl });
-    if (updated.success) {
-      setSavedProfile(updated.data);
+    try {
+      const photoUrl = await fileToDataUrl(file);
+      const updated = await updateProfile({ ...currentProfile, profilePhoto: photoUrl });
+      if (updated.success) {
+        setSavedProfile(updated.data);
+      } else {
+        setSaveError(updated.error || 'Failed to upload profile photo');
+      }
+    } catch (err) {
+      setSaveError(err.message || 'Failed to upload profile photo');
     }
   }, [currentProfile, updateProfile]);
 
   const handleSave = useCallback(async () => {
+    setSaveError(null);
     const profileWithUpdates = {
       ...currentProfile,
       skills: skills || currentProfile.skills || [],
@@ -132,6 +141,8 @@ const StudentProfilePage = () => {
       refetchCompletion();
       refetchSkills();
       refetchDocuments();
+    } else {
+      setSaveError(updated.error || 'Failed to save profile changes');
     }
   }, [currentProfile, updateProfile, refetchProfile, refetchCompletion, refetchSkills, refetchDocuments, skills, languages, certifications]);
 
@@ -170,7 +181,7 @@ const StudentProfilePage = () => {
   }
 
   const resumeFromDocuments = documents.find((doc) => doc.type === 'resume');
-  const resumeForPreview = currentProfile.resume || resumeFromDocuments;
+  const resumeForPreview = resumeFromDocuments || currentProfile.resume;
   const profileForCompletion = {
     ...currentProfile,
     skills: skills || currentProfile.skills || [],
@@ -199,8 +210,6 @@ const StudentProfilePage = () => {
           <div className="w-full lg:w-80 shrink-0">
             <ProfileCard
               profile={currentProfile}
-              onEdit={handleEdit}
-              isEditing={isEditing}
               onUploadPhoto={handleProfilePhotoUpload}
             />
           </div>
@@ -227,21 +236,26 @@ const StudentProfilePage = () => {
             />
 
             {isEditing && (
-              <div className="flex items-center justify-end gap-3">
-                <button
-                  onClick={handleCancel}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-gray-300 bg-white/5 border border-gray-700 rounded-xl hover:bg-white/10 transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl hover:from-orange-600 hover:to-orange-700 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-[#050505]"
-                >
-                  <Save className="h-4 w-4" />
-                  Save Changes
-                </button>
+              <div className="flex flex-col items-end gap-2">
+                {saveError && (
+                  <p className="text-xs text-red-400">{saveError}</p>
+                )}
+                <div className="flex items-center justify-end gap-3">
+                  <button
+                    onClick={handleCancel}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-gray-300 bg-white/5 border border-gray-700 rounded-xl hover:bg-white/10 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl hover:from-orange-600 hover:to-orange-700 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-[#050505]"
+                  >
+                    <Save className="h-4 w-4" />
+                    Save Changes
+                  </button>
+                </div>
               </div>
             )}
 

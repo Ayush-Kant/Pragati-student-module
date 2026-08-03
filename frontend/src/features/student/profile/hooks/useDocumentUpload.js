@@ -65,24 +65,32 @@ export const useDocumentUpload = () => {
     setUploadProgress(0);
 
     try {
-      simulateProgress(() => {
-        studentProfileService.uploadResume(file).then((response) => {
-          if (response.success) {
-            setDocuments((prev) => [
-              {
-                id: `resume-${Date.now()}`,
-                name: file.name,
-                type: 'resume',
-                url: response.data.fileUrl,
-                uploadedAt: new Date().toISOString()
-              },
-              ...prev
-            ]);
-          }
+      const response = await new Promise((resolve) => {
+        simulateProgress(() => {
+          studentProfileService.uploadResume(file).then(resolve);
         });
       });
 
-      return { success: true };
+      if (response.success) {
+        setDocuments((prev) => [
+          {
+            id: `resume-${Date.now()}`,
+            name: file.name,
+            fileName: file.name,
+            type: 'resume',
+            url: response.data.fileUrl,
+            size: file.size,
+            uploadedAt: new Date().toISOString()
+          },
+          ...prev
+        ]);
+        setUploadProgress(100);
+        return { success: true, data: response.data };
+      }
+
+      const errorMessage = response.error || 'Failed to upload resume';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
     } catch (err) {
       const errorMessage = err.message || 'Failed to upload resume';
       setError(errorMessage);
@@ -104,15 +112,21 @@ export const useDocumentUpload = () => {
     setUploadProgress(0);
 
     try {
-      simulateProgress(() => {
-        studentProfileService.uploadDocument(file, type).then((response) => {
-          if (response.success) {
-            setDocuments((prev) => [...prev, response.data]);
-          }
+      const response = await new Promise((resolve) => {
+        simulateProgress(() => {
+          studentProfileService.uploadDocument(file, type).then(resolve);
         });
       });
 
-      return { success: true };
+      if (response.success) {
+        setDocuments((prev) => [...prev, response.data]);
+        setUploadProgress(100);
+        return { success: true, data: response.data };
+      }
+
+      const errorMessage = response.error || 'Failed to upload document';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
     } catch (err) {
       const errorMessage = err.message || 'Failed to upload document';
       setError(errorMessage);
