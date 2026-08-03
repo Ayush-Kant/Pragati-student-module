@@ -1,16 +1,6 @@
 import { pool } from '../../config/db.js';
-
-const normalizeAssignmentRecord = (row) => ({
-    id: row.id,
-    studentId: row.student_id,
-    title: row.title,
-    subject: row.subject,
-    description: row.description,
-    dueDate: row.due_date,
-    totalMarks: row.total_marks,
-    status: row.status,
-    createdAt: row.created_at,
-});
+import { ASSIGNMENT_STATUS } from '../constants/assignmentConstants.js';
+import { buildAssignmentPayload } from '../utils/assignmentHelpers.js';
 
 export const createAssignment = async (assignmentData) => {
     const { studentId, title, subject, description, dueDate, totalMarks, status } = assignmentData;
@@ -18,10 +8,20 @@ export const createAssignment = async (assignmentData) => {
         `INSERT INTO assignments (student_id, title, subject, description, due_date, total_marks, status)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING id, student_id, title, subject, description, due_date, total_marks, status, created_at`,
-        [studentId ?? null, title, subject, description ?? null, dueDate, totalMarks, status ?? 'Open'],
+        [studentId ?? null, title, subject, description ?? null, dueDate, totalMarks, status ?? ASSIGNMENT_STATUS.OPEN],
     );
 
-    return normalizeAssignmentRecord(result.rows[0]);
+    return buildAssignmentPayload({
+        id: result.rows[0].id,
+        studentId: result.rows[0].student_id,
+        title: result.rows[0].title,
+        subject: result.rows[0].subject,
+        description: result.rows[0].description,
+        dueDate: result.rows[0].due_date,
+        totalMarks: result.rows[0].total_marks,
+        status: result.rows[0].status,
+        createdAt: result.rows[0].created_at,
+    });
 };
 
 export const listAssignments = async (filters = {}) => {
@@ -48,7 +48,17 @@ export const listAssignments = async (filters = {}) => {
         values,
     );
 
-    return result.rows.map(normalizeAssignmentRecord);
+    return result.rows.map((row) => buildAssignmentPayload({
+        id: row.id,
+        studentId: row.student_id,
+        title: row.title,
+        subject: row.subject,
+        description: row.description,
+        dueDate: row.due_date,
+        totalMarks: row.total_marks,
+        status: row.status,
+        createdAt: row.created_at,
+    }));
 };
 
 export const getAssignmentById = async (id) => {
@@ -59,7 +69,17 @@ export const getAssignmentById = async (id) => {
         [id],
     );
 
-    return result.rows[0] ? normalizeAssignmentRecord(result.rows[0]) : null;
+    return result.rows[0] ? buildAssignmentPayload({
+        id: result.rows[0].id,
+        studentId: result.rows[0].student_id,
+        title: result.rows[0].title,
+        subject: result.rows[0].subject,
+        description: result.rows[0].description,
+        dueDate: result.rows[0].due_date,
+        totalMarks: result.rows[0].total_marks,
+        status: result.rows[0].status,
+        createdAt: result.rows[0].created_at,
+    }) : null;
 };
 
 export const updateAssignment = async (id, assignmentData) => {
@@ -96,7 +116,17 @@ export const updateAssignment = async (id, assignmentData) => {
         values,
     );
 
-    return result.rows[0] ? normalizeAssignmentRecord(result.rows[0]) : null;
+    return result.rows[0] ? buildAssignmentPayload({
+        id: result.rows[0].id,
+        studentId: result.rows[0].student_id,
+        title: result.rows[0].title,
+        subject: result.rows[0].subject,
+        description: result.rows[0].description,
+        dueDate: result.rows[0].due_date,
+        totalMarks: result.rows[0].total_marks,
+        status: result.rows[0].status,
+        createdAt: result.rows[0].created_at,
+    }) : null;
 };
 
 export const deleteAssignment = async (id) => {
@@ -115,9 +145,9 @@ export const getAssignmentStatistics = async (filters = {}) => {
         query = `
             SELECT 
                 COUNT(*)::int AS total,
-                COUNT(CASE WHEN status = 'Closed' THEN 1 END)::int AS closed,
-                COUNT(CASE WHEN status = 'Open' THEN 1 END)::int AS open,
-                COUNT(CASE WHEN status = 'Pending' THEN 1 END)::int AS pending,
+                COUNT(CASE WHEN status = '${ASSIGNMENT_STATUS.CLOSED}' THEN 1 END)::int AS closed,
+                COUNT(CASE WHEN status = '${ASSIGNMENT_STATUS.OPEN}' THEN 1 END)::int AS open,
+                COUNT(CASE WHEN status = '${ASSIGNMENT_STATUS.PENDING}' THEN 1 END)::int AS pending,
                 (SELECT COUNT(*)::int FROM assignment_submissions WHERE student_id = $1) AS submitted,
                 COALESCE(AVG(g.score), 0.0)::float AS "averageScore"
             FROM assignments a
@@ -129,9 +159,9 @@ export const getAssignmentStatistics = async (filters = {}) => {
         query = `
             SELECT 
                 COUNT(*)::int AS total,
-                COUNT(CASE WHEN status = 'Closed' THEN 1 END)::int AS closed,
-                COUNT(CASE WHEN status = 'Open' THEN 1 END)::int AS open,
-                COUNT(CASE WHEN status = 'Pending' THEN 1 END)::int AS pending,
+                COUNT(CASE WHEN status = '${ASSIGNMENT_STATUS.CLOSED}' THEN 1 END)::int AS closed,
+                COUNT(CASE WHEN status = '${ASSIGNMENT_STATUS.OPEN}' THEN 1 END)::int AS open,
+                COUNT(CASE WHEN status = '${ASSIGNMENT_STATUS.PENDING}' THEN 1 END)::int AS pending,
                 (SELECT COUNT(*)::int FROM assignment_submissions) AS submitted,
                 COALESCE(AVG(score), 0.0)::float AS "averageScore"
             FROM assignments a

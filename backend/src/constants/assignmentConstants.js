@@ -1,23 +1,15 @@
-export const ASSIGNMENT_STATUS_OPEN = 'Open';
-export const ASSIGNMENT_STATUS_CLOSED = 'Closed';
-export const ASSIGNMENT_STATUS_PENDING = 'Pending';
+export const ASSIGNMENT_STATUS = Object.freeze({
+    OPEN: 'Open',
+    CLOSED: 'Closed',
+    PENDING: 'Pending',
+});
 
-export const ASSIGNMENT_STATUSES = [
-    ASSIGNMENT_STATUS_OPEN,
-    ASSIGNMENT_STATUS_CLOSED,
-    ASSIGNMENT_STATUS_PENDING,
-];
+export const SUBMISSION_STATUS = Object.freeze({
+    SUBMITTED: 'Submitted',
+    PENDING: 'Pending',
+    LATE: 'Late',
+});
 
-export const DEFAULT_ASSIGNMENT_STATUS = ASSIGNMENT_STATUS_OPEN;
-export const DEFAULT_ASSIGNMENT_SUBMISSION_STATUS = 'Submitted';
-
-export const SUBMISSION_STATUS_SUBMITTED = 'Submitted';
-export const SUBMISSION_STATUS_PENDING = 'Pending';
-export const SUBMISSION_STATUS_LATE = 'Late';
-
-export const SUBMISSION_STATUSES = [
-    SUBMISSION_STATUS_SUBMITTED,
-    SUBMISSION_STATUS_PENDING,
-    SUBMISSION_STATUS_LATE,
-];
-
+export const FEEDBACK_GRADE_MAX_LENGTH = 20;
+export const ASSIGNMENT_TITLE_MAX_LENGTH = 255;
+export const ASSIGNMENT_DESCRIPTION_MAX_LENGTH = 2000;

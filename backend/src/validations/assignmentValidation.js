@@ -1,27 +1,27 @@
 import Joi from 'joi';
 import {
-    ASSIGNMENT_STATUS_CLOSED,
-    ASSIGNMENT_STATUS_OPEN,
-    ASSIGNMENT_STATUS_PENDING,
-    ASSIGNMENT_STATUSES,
+    ASSIGNMENT_STATUS,
+    ASSIGNMENT_TITLE_MAX_LENGTH,
+    ASSIGNMENT_DESCRIPTION_MAX_LENGTH,
+    FEEDBACK_GRADE_MAX_LENGTH,
 } from '../constants/assignmentConstants.js';
 
 export const createAssignmentSchema = Joi.object({
-    title: Joi.string().trim().min(3).max(255).required(),
-    subject: Joi.string().trim().min(2).max(255).required(),
-    description: Joi.string().trim().max(2000).optional(),
+    title: Joi.string().trim().min(3).max(ASSIGNMENT_TITLE_MAX_LENGTH).required(),
+    subject: Joi.string().trim().min(2).max(ASSIGNMENT_TITLE_MAX_LENGTH).required(),
+    description: Joi.string().trim().max(ASSIGNMENT_DESCRIPTION_MAX_LENGTH).optional(),
     dueDate: Joi.date().iso().required(),
     totalMarks: Joi.number().integer().min(1).required(),
-    status: Joi.string().valid(...ASSIGNMENT_STATUSES).default(ASSIGNMENT_STATUS_OPEN),
+    status: Joi.string().valid(...Object.values(ASSIGNMENT_STATUS)).default(ASSIGNMENT_STATUS.OPEN),
 }).required();
 
 export const updateAssignmentSchema = Joi.object({
-    title: Joi.string().trim().min(3).max(255).optional(),
-    subject: Joi.string().trim().min(2).max(255).optional(),
-    description: Joi.string().trim().max(2000).optional(),
+    title: Joi.string().trim().min(3).max(ASSIGNMENT_TITLE_MAX_LENGTH).optional(),
+    subject: Joi.string().trim().min(2).max(ASSIGNMENT_TITLE_MAX_LENGTH).optional(),
+    description: Joi.string().trim().max(ASSIGNMENT_DESCRIPTION_MAX_LENGTH).optional(),
     dueDate: Joi.date().iso().optional(),
     totalMarks: Joi.number().integer().min(1).optional(),
-    status: Joi.string().valid(...ASSIGNMENT_STATUSES).optional(),
+    status: Joi.string().valid(...Object.values(ASSIGNMENT_STATUS)).optional(),
 }).required();
 
 export const submitAssignmentSchema = Joi.object({
@@ -40,7 +40,7 @@ export const assignmentIdAndStudentIdSchema = Joi.object({
 
 export const feedbackSchema = Joi.object({
     remarks: Joi.string().trim().min(1).max(4000).required(),
-    grade: Joi.string().trim().min(1).max(20).required(),
+    grade: Joi.string().trim().min(1).max(FEEDBACK_GRADE_MAX_LENGTH).required(),
 }).required();
 
 export const gradeSchema = Joi.object({

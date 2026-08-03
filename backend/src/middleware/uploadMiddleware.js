@@ -1,10 +1,14 @@
-import multer from 'multer';
+const uploadMiddleware = (req, res, next) => {
+    if (req.file && req.file.originalname && (!req.body || !req.body.fileUrl)) {
+        req.body = req.body || {};
+        req.body.fileUrl = `http://localhost/uploads/${req.file.originalname}`;
+    }
 
-const storage = multer.memoryStorage();
+    if (req.body && typeof req.body.fileUrl === 'string') {
+        req.body.fileUrl = req.body.fileUrl.trim();
+    }
 
-const uploadMiddleware = multer({
-    storage,
-    limits: { fileSize: 5 * 1024 * 1024 },
-}).single('file');
+    next();
+};
 
 export default uploadMiddleware;

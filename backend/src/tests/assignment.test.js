@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { 
-    createAssignmentSchema, 
+import {
+    createAssignmentSchema,
     updateAssignmentSchema,
     submitAssignmentSchema,
     assignmentIdSchema,
@@ -284,7 +284,7 @@ test('Routes: assignment routes stack contains all expected routes and ordering'
 
     // Verify ordering
     const paths = routes.map(r => r.path);
-    
+
     // Statistics & Submissions should be defined BEFORE /:id to prevent being captured
     const statisticsIndex = paths.indexOf('/statistics');
     const submissionsIndex = paths.indexOf('/submissions');
@@ -293,7 +293,7 @@ test('Routes: assignment routes stack contains all expected routes and ordering'
     assert.ok(statisticsIndex !== -1);
     assert.ok(submissionsIndex !== -1);
     assert.ok(idIndex !== -1);
-    
+
     assert.ok(statisticsIndex < idIndex, 'statistics route must precede /:id route');
     assert.ok(submissionsIndex < idIndex, 'submissions route must precede /:id route');
 

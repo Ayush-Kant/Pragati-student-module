@@ -1,4 +1,5 @@
 import { pool } from '../../../config/db.js';
+import { ASSIGNMENT_STATUS, SUBMISSION_STATUS } from '../../constants/assignmentConstants.js';
 
 const createAssignmentTablesQuery = `
   CREATE TABLE IF NOT EXISTS assignments (
@@ -9,7 +10,7 @@ const createAssignmentTablesQuery = `
     description TEXT,
     due_date DATE NOT NULL,
     total_marks INTEGER NOT NULL CHECK (total_marks > 0),
-    status VARCHAR(50) NOT NULL DEFAULT 'Open' CHECK (status IN ('Open', 'Closed', 'Pending')),
+    status VARCHAR(50) NOT NULL DEFAULT '${ASSIGNMENT_STATUS.OPEN}' CHECK (status IN ('${ASSIGNMENT_STATUS.OPEN}', '${ASSIGNMENT_STATUS.CLOSED}', '${ASSIGNMENT_STATUS.PENDING}')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 
@@ -19,7 +20,7 @@ const createAssignmentTablesQuery = `
     student_id INTEGER NOT NULL,
     content TEXT,
     file_url TEXT,
-    status VARCHAR(50) NOT NULL DEFAULT 'Submitted' CHECK (status IN ('Submitted', 'Pending', 'Late')),
+    status VARCHAR(50) NOT NULL DEFAULT '${SUBMISSION_STATUS.SUBMITTED}' CHECK (status IN ('${SUBMISSION_STATUS.SUBMITTED}', '${SUBMISSION_STATUS.PENDING}', '${SUBMISSION_STATUS.LATE}')),
     submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (assignment_id, student_id)
   );

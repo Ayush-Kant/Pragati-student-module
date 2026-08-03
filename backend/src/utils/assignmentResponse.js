@@ -1,3 +1,6 @@
+import { buildAssignmentPayload } from './assignmentHelpers.js';
+
+export { buildAssignmentPayload };
 export const buildAssignmentPayload = (assignment) => ({
     id: assignment.id,
     studentId: assignment.studentId,

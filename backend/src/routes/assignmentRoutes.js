@@ -31,13 +31,6 @@ router.delete('/:id', validateRequest(assignmentIdSchema, 'params'), assignmentC
 router.post(
     '/:id/submit',
     uploadMiddleware,
-    (req, res, next) => {
-        if (req.file && !req.body?.fileUrl) {
-            req.body = req.body || {};
-            req.body.fileUrl = `http://localhost/uploads/${req.file.originalname}`;
-        }
-        next();
-    },
     validateRequest(assignmentIdSchema, 'params'),
     validateRequest(submitAssignmentSchema, 'body'),
     assignmentController.submitAssignment
