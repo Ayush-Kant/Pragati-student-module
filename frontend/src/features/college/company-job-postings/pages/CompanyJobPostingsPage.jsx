@@ -6,7 +6,7 @@ import {
   CircleCheckBig,
   CircleX,
 } from "lucide-react";
-
+ 
 import useCompanyData from "../hooks/useCompanyData";
 import useJobPosting from "../hooks/useJobPosting";
 import useJobFilters from "../hooks/useJobFilters";
@@ -94,19 +94,40 @@ const CompanyJobPostingsPage = () => {
     setViewCompany(company);
   };
 
-  const handleSubmitCompany = async (data) => {
-    if (editingCompany) {
-      await editCompany(editingCompany.id, data);
-      setEditingCompany(null);
-      // Update viewCompany if it's currently selected for viewing
-      if (viewCompany?.id === editingCompany.id) {
-        setViewCompany({ ...viewCompany, ...data });
-      }
-    } else {
-      await addCompany(data);
-    }
-  };
+ const handleSubmitCompany = async (data) => {
 
+  const payload = {
+    name: data.name,
+    location: data.location,
+    package: data.package
+};
+
+
+  if (editingCompany) {
+
+    await editCompany(
+      editingCompany.id,
+      payload
+    );
+
+    setEditingCompany(null);
+
+    if (viewCompany?.id === editingCompany.id) {
+
+      setViewCompany({
+        ...viewCompany,
+        ...payload,
+      });
+
+    }
+
+  } else {
+
+    await addCompany(payload);
+
+  }
+
+};
   const handleDeleteCompanyClick = (id) => {
     setCompanyToDelete(id);
   };

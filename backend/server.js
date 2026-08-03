@@ -129,13 +129,13 @@ app.use("/api/v1/company/notifications", companyNotificationRoutes);
 app.use("/api/v1/company/offers", companyOfferRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
-app.use("/api/v1/company/jobs", collegeJobsRoutes);
+
 
 // College
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
 app.use("/api/college", nominationRoutes);
-app.use("/api/v1/company/jobs", collegeJobsRoutes);
+app.use("/api/college", collegeJobsRoutes);
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);

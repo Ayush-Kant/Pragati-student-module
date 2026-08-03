@@ -10,10 +10,8 @@ const getAllCompanies = async () => {
         SELECT
             id,
             name,
-            email,
-            industry,
             location,
-            package_offered AS "packageOffered",
+            package,
             status,
             created_at AS "createdAt"
         FROM companies
@@ -30,10 +28,8 @@ const getCompanyById = async (id) => {
         SELECT
             id,
             name,
-            email,
-            industry,
             location,
-            package_offered AS "packageOffered",
+            package,
             status,
             created_at AS "createdAt"
         FROM companies
@@ -47,10 +43,8 @@ const getCompanyById = async (id) => {
 
 const createCompany = async ({
     name,
-    email,
-    industry,
     location,
-    packageOffered,
+    package: packageValue
 }) => {
 
     const result = await pool.query(
@@ -58,38 +52,30 @@ const createCompany = async ({
         INSERT INTO companies
         (
             name,
-            email,
-            industry,
             location,
-            package_offered
+            package
         )
         VALUES
         (
-            $1,$2,$3,$4,$5
+            $1,$2,$3
         )
         RETURNING *
         `,
         [
             name,
-            email,
-            industry,
             location,
-            packageOffered,
+            packageValue
         ]
     );
 
     return result.rows[0];
 };
-
 const updateCompany = async (
     id,
     {
         name,
-        email,
-        industry,
         location,
-        packageOffered,
-        status,
+        package: packageValue
     }
 ) => {
 
@@ -98,23 +84,17 @@ const updateCompany = async (
         UPDATE companies
         SET
             name=$1,
-            email=$2,
-            industry=$3,
-            location=$4,
-            package_offered=$5,
-            status=$6,
+            location=$2,
+            package=$3,
             updated_at=NOW()
-        WHERE id=$7
+        WHERE id=$4
         RETURNING *
         `,
         [
             name,
-            email,
-            industry,
             location,
-            packageOffered,
-            status,
-            id,
+            packageValue,
+            id
         ]
     );
 
@@ -142,8 +122,8 @@ const searchCompanies = async (keyword) => {
         FROM companies
         WHERE
             name ILIKE $1
-            OR industry ILIKE $1
             OR location ILIKE $1
+            OR package ILIKE $1
         `,
         [`%${keyword}%`]
     );

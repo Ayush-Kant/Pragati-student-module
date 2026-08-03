@@ -1,68 +1,105 @@
-export const validateCompany = (data, existingCompanies = [], editingCompanyId = null) => {
+export const validateCompany = (
+  data,
+  existingCompanies = [],
+  editingCompanyId = null
+) => {
+
   const errors = {};
 
-  const companyName = (data.company || "").trim();
+  const companyName = (data.name || "").trim();
+
   if (!companyName) {
-    errors.company = "Company name is required";
-  } else if (companyName.length < 2) {
-    errors.company = "Company name must be at least 2 characters";
-  } else {
-    const normalizedNewName = companyName.toLowerCase().replace(/\s+/g, ' ');
-    const isDuplicate = existingCompanies.some(
-      (c) =>
-        (c.company || "").trim().toLowerCase().replace(/\s+/g, ' ') === normalizedNewName &&
-        c.id !== editingCompanyId
-    );
-    if (isDuplicate) {
-      errors.company = "Company name already exists";
-    }
+    errors.name = "Company name is required";
   }
+  else if (companyName.length < 2) {
+    errors.name = "Company name must be at least 2 characters";
+  }
+  else {
+
+    const normalizedNewName =
+      companyName
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+
+
+    const isDuplicate = existingCompanies.some(
+      (company) =>
+        (company.name || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, " ") === normalizedNewName
+          &&
+        company.id !== editingCompanyId
+    );
+
+
+    if(isDuplicate){
+      errors.name = "Company name already exists";
+    }
+
+  }
+
 
   const location = (data.location || "").trim();
-  if (!location) {
-    errors.location = "Location is required";
-  } else if (location.length < 2) {
-    errors.location = "Location must be at least 2 characters";
-  } else if (!/^[a-zA-Z0-9\s,\-.]+$/.test(location)) {
-    errors.location = "Location must contain only letters, numbers, spaces, commas, hyphens, or periods";
+
+  if(!location){
+    errors.location="Location is required";
   }
+
 
   const pkg = (data.package || "").trim();
-  if (!pkg) {
-    errors.package = "Package is required";
-  } else {
-    // Valid format regex: positive decimal/integer, optional spacing, optional LPA (case-insensitive)
-    const packageRegex = /^(\d+(\.\d+)?)\s*(LPA)?$/i;
-    const match = pkg.match(packageRegex);
-    if (!match) {
-      errors.package = "Package must be a valid number, optionally followed by 'LPA' (e.g., '12' or '12 LPA')";
-    } else {
-      const numericVal = parseFloat(match[1]);
-      if (isNaN(numericVal) || numericVal <= 0) {
-        errors.package = "Package must be a positive value";
-      }
+
+  if(!pkg){
+
+    errors.package="Package is required";
+
+  }
+  else{
+
+    const packageRegex =
+      /^(\d+(\.\d+)?)\s*(LPA)?$/i;
+
+
+    if(!packageRegex.test(pkg)){
+
+      errors.package =
+      "Package must be like 8 LPA or 8";
+
     }
+
   }
+
 
   return errors;
-};
 
-export const validateEligibility = (data) => {
-  const errors = {};
+};   // <-- VERY IMPORTANT
 
-  const cgpaVal = parseFloat(data.cgpa);
-  if (!data.cgpa || isNaN(cgpaVal)) {
-    errors.cgpa = "CGPA must be a valid number";
-  } else if (cgpaVal < 0 || cgpaVal > 10) {
-    errors.cgpa = "CGPA must be between 0 and 10";
-  }
 
-  const batch = (data.batch || "").trim();
-  if (!batch) {
-    errors.batch = "Batch is required";
-  }
+// New export starts only after closing above function
 
-  return errors;
+export const validateEligibility = (data)=>{
+
+ const errors={};
+
+ const cgpaVal=parseFloat(data.cgpa);
+
+ if(!data.cgpa || isNaN(cgpaVal)){
+    errors.cgpa="CGPA must be a valid number";
+ }
+ else if(cgpaVal < 0 || cgpaVal > 10){
+    errors.cgpa="CGPA must be between 0 and 10";
+ }
+
+
+ const batch=(data.batch || "").trim();
+
+ if(!batch){
+    errors.batch="Batch is required";
+ }
+
+
+ return errors;
+
 };
 
 export const validateJobPosting = (data, existingJobs = [], editingJobId = null) => {
@@ -154,4 +191,4 @@ export const validateJobPosting = (data, existingJobs = [], editingJobId = null)
   }
 
   return errors;
-};
+}

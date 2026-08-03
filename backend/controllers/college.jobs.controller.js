@@ -47,17 +47,26 @@ const getCompanyById = async (req, res) => {
 
 const createCompany = async (req, res) => {
     try {
+
+        console.log("Company Request Body:", req.body);
+
         const company = await service.addCompany(req.body);
+
+        console.log("Inserted Company:", company);
 
         res.status(201).json({
             success: true,
             message: "Company created successfully",
             data: company,
         });
+
     } catch (err) {
+
+        console.error("Create Company Error:", err);
+
         res.status(500).json({
-            success: false,
-            message: err.message,
+            success:false,
+            message:err.message
         });
     }
 };

@@ -9,14 +9,24 @@ const useJobFilters = ({
   batch = "",
   status = "",
 }) => {
+
   const filteredCompanies = useMemo(() => {
-    return companies.filter((item) =>
-      item.company.toLowerCase().includes(search.toLowerCase())
-    );
+    return companies.filter((item) => {
+
+      const companyName =
+        item.company || item.name || "";
+
+      return companyName
+        .toLowerCase()
+        .includes(search.toLowerCase());
+
+    });
   }, [companies, search]);
+
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
+
       const matchesCompany =
         !company || job.company === company;
 
@@ -35,8 +45,10 @@ const useJobFilters = ({
         matchesBatch &&
         matchesStatus
       );
+
     });
   }, [jobs, company, department, batch, status]);
+
 
   return {
     filteredCompanies,
