@@ -27,7 +27,7 @@ AssessmentQuestion.init(
   {
     sequelize,
     modelName: "AssessmentQuestion",
-    tableName: "assessmentquestions",
+    tableName: "assessment_questions",
     timestamps: true,
     underscored: true,
     updatedAt: false, // this table only has created_at, no updated_at

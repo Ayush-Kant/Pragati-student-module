@@ -126,5 +126,5 @@ export const updateAttendance = async (
 export default {
     getAttendance,
     markAttendance,
-    updateAttendances
+    updateAttendance
 };

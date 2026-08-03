@@ -15,7 +15,7 @@ AssessmentAnswer.init(
   {
     sequelize,
     modelName: "AssessmentAnswer",
-    tableName: "assessmentanswers",
+    tableName: "assessment_answers",
     timestamps: true,
     underscored: true,
     updatedAt: false,
