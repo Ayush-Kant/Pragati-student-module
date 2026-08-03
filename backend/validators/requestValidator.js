@@ -1,5 +1,6 @@
 export const validatePlacementDrive = (req, res, next) => {
-  const { company, role, package: pkg, drive_date, driveDate, deadline, status } = req.body;
+  const { company, role, package: pkg, location, hiring_process, hiringProcess, drive_date, driveDate, deadline, status } = req.body;
+  const actualHiringProcess = hiring_process || hiringProcess;
 
   const actualDriveDate = drive_date || driveDate;
 
@@ -12,6 +13,18 @@ export const validatePlacementDrive = (req, res, next) => {
   if (!role || typeof role !== "string" || role.trim().length === 0) {
     return res.status(400).json({
       error: "Valid role is required",
+    });
+  }
+
+  if (location && (typeof location !== "string" || location.trim().length === 0)) {
+    return res.status(400).json({
+      error: "Valid location is required if provided",
+    });
+  }
+
+  if (actualHiringProcess && (typeof actualHiringProcess !== "string" || actualHiringProcess.trim().length === 0)) {
+    return res.status(400).json({
+      error: "Valid hiring process is required if provided",
     });
   }
 
@@ -44,6 +57,8 @@ export const validatePlacementDrive = (req, res, next) => {
 
   req.body.company = company.trim();
   req.body.role = role.trim();
+  if (location) req.body.location = location.trim();
+  if (actualHiringProcess) req.body.hiring_process = actualHiringProcess.trim();
   req.body.drive_date = actualDriveDate;
   req.body.status = currentStatus;
 

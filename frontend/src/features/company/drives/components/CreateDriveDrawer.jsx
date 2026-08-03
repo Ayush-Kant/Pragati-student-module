@@ -10,17 +10,18 @@ const defaultDriveForm = {
 
 export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
   const [form, setForm] = useState(defaultDriveForm);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const handleEscape = (event) => {
-      if (event.key === 'Escape' && isOpen) {
+      if (event.key === 'Escape' && isOpen && !isSubmitting) {
         setForm(defaultDriveForm);
         onClose();
       }
     };
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isSubmitting]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -31,16 +32,22 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
   };
 
   const handleClose = () => {
+    if (isSubmitting) return;
     setForm(defaultDriveForm);
     onClose();
   };
 
-  const handlePublish = () => {
-    if (!form.driveName.trim()) return;
+  const handlePublish = async () => {
+    if (!form.driveName.trim() || isSubmitting) return;
 
-    onCreate?.(form);
-    setForm(defaultDriveForm);
-    onClose();
+    setIsSubmitting(true);
+    try {
+      await onCreate?.(form);
+      setForm(defaultDriveForm);
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -271,15 +278,27 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
         <div className="responsive-drawer-footer fixed bottom-0 right-0 w-[420px] bg-white border-t border-gray-100 px-6 py-4 flex gap-3">
           <button
             onClick={handleClose}
-            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            disabled={isSubmitting}
+            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Save Draft
           </button>
           <button
             onClick={handlePublish}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg transition-all"
+            disabled={isSubmitting}
+            className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Publish Drive
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Publishing...
+              </>
+            ) : (
+              "Publish Drive"
+            )}
           </button>
         </div>
       </div>

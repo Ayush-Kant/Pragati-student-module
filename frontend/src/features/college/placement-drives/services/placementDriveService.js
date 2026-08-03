@@ -45,9 +45,9 @@ const normalizeDrive = (drive) => {
     location: drive.location || "Bangalore",
     hiringProcess: drive.hiring_process || drive.hiringProcess || "",
     eligibility: {
-      department: dept,
-      course: drive.eligibility?.course || ["B.Tech", "M.Tech"],
-      batch: drive.eligibility?.batch || ["2026"],
+      departments: dept,
+      courses: drive.eligibility?.courses || drive.eligibility?.course || ["B.Tech", "M.Tech"],
+      batches: drive.eligibility?.batches || drive.eligibility?.batch || ["2026"],
       cgpa: cgpaVal,
       skills: drive.eligibility?.skills || "",
     },

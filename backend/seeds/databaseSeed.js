@@ -11,9 +11,11 @@ const seedDatabase = async () => {
         company VARCHAR(255) NOT NULL,
         role VARCHAR(255) NOT NULL,
         package VARCHAR(50),
+        location VARCHAR(255),
+        hiring_process TEXT,
         drive_date DATE NOT NULL,
         deadline DATE NOT NULL,
-        status VARCHAR(20) NOT NULL CHECK (status IN ('Upcoming', 'Open', 'Closed', 'Completed')),
+        status VARCHAR(20) NOT NULL CHECK (status IN ('Upcoming', 'Open', 'Closed', 'Completed', 'Cancelled')),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
@@ -62,12 +64,14 @@ const seedDatabase = async () => {
         id SERIAL PRIMARY KEY,
         drive_id INTEGER NOT NULL,
         round_name VARCHAR(255) NOT NULL,
-        round_details TEXT,
+        description TEXT,
+        round_order INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT fk_interview_rounds
           FOREIGN KEY(drive_id) 
           REFERENCES placement_drives(id) 
-          ON DELETE CASCADE
+          ON DELETE CASCADE,
+        CONSTRAINT unique_drive_round_order UNIQUE (drive_id, round_order)
       );
     `);
     console.log("✅ interview_rounds table created");
@@ -96,15 +100,15 @@ const seedDatabase = async () => {
     const checkExisting = await pool.query(`SELECT COUNT(*) FROM placement_drives`);
     if (parseInt(checkExisting.rows[0].count) === 0) {
       const placementDriveSeedData = [
-        { company: "Google", role: "Software Engineer", package: "32 LPA", driveDate: "2026-10-15", deadline: "2026-10-10", status: "Upcoming" },
-        { company: "Microsoft", role: "SDE", package: "28 LPA", driveDate: "2026-10-20", deadline: "2026-10-15", status: "Open" }
+        { company: "Google", role: "Software Engineer", package: "32 LPA", location: "Bangalore", hiring_process: "Online Test -> Technical Interview -> HR", driveDate: "2026-10-15", deadline: "2026-10-10", status: "Upcoming" },
+        { company: "Microsoft", role: "SDE", package: "28 LPA", location: "Hyderabad", hiring_process: "OA -> 3 Tech Rounds", driveDate: "2026-10-20", deadline: "2026-10-15", status: "Open" }
       ];
 
       for (const drive of placementDriveSeedData) {
         const result = await pool.query(`
-          INSERT INTO placement_drives (company, role, package, drive_date, deadline, status)
-          VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
-        `, [drive.company, drive.role, drive.package, drive.driveDate, drive.deadline, drive.status]);
+          INSERT INTO placement_drives (company, role, package, location, hiring_process, drive_date, deadline, status)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
+        `, [drive.company, drive.role, drive.package, drive.location, drive.hiring_process, drive.driveDate, drive.deadline, drive.status]);
         
         const driveId = result.rows[0].id;
 

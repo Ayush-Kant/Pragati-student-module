@@ -39,16 +39,16 @@ export const validatePlacementDrive = (drive) => {
   export const validateEligibility = (eligibility) => {
     const errors = {};
   
-    if (!eligibility.department?.length) {
-      errors.department = "Select at least one department.";
+    if (!eligibility.departments?.length) {
+      errors.departments = "Select at least one department.";
     }
   
-    if (!eligibility.course?.length) {
-      errors.course = "Select at least one course.";
+    if (!eligibility.courses?.length) {
+      errors.courses = "Select at least one course.";
     }
   
-    if (!eligibility.batch?.length) {
-      errors.batch = "Select at least one batch.";
+    if (!eligibility.batches?.length) {
+      errors.batches = "Select at least one batch.";
     }
   
     if (

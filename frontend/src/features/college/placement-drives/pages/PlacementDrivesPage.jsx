@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Plus, Table, Grid, Building2, Calendar, CheckCircle2, Award } from "lucide-react";
+import toast from "react-hot-toast";
 
 // Hooks
 import usePlacementDrives from "../hooks/usePlacementDrives";
@@ -36,6 +37,7 @@ const PlacementDrivesPage = () => {
     addDrive,
     editDrive,
     removeDrive,
+    fetchDrives,
   } = usePlacementDrives();
 
   // Filters State & Logic
@@ -62,6 +64,7 @@ const PlacementDrivesPage = () => {
   const [selectedEditDrive, setSelectedEditDrive] = useState(null);
   const [selectedDeleteDriveId, setSelectedDeleteDriveId] = useState(null);
   const [selectedViewDrive, setSelectedViewDrive] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Loading / Error Handlers
   if (loading) {
@@ -75,7 +78,7 @@ const PlacementDrivesPage = () => {
   if (error) {
     return (
       <div className="p-8 max-w-2xl mx-auto mt-10">
-        <ErrorState message={error} />
+        <ErrorState message={error} onRetry={fetchDrives} />
       </div>
     );
   }
@@ -245,9 +248,22 @@ const PlacementDrivesPage = () => {
         <DeletePlacementDriveModal
           isOpen={!!selectedDeleteDriveId}
           onCancel={() => setSelectedDeleteDriveId(null)}
-          onConfirm={() => {
-            removeDrive(selectedDeleteDriveId);
-            setSelectedDeleteDriveId(null);
+          isLoading={isDeleting}
+          onConfirm={async () => {
+            if (isDeleting) return;
+            setIsDeleting(true);
+            try {
+              const idToDelete = selectedDeleteDriveId;
+              const res = await removeDrive(idToDelete);
+              if (res && res.success) {
+                toast.success("Placement drive deleted successfully!");
+                setSelectedDeleteDriveId(null);
+              } else {
+                toast.error(res?.error || "Failed to delete placement drive.");
+              }
+            } finally {
+              setIsDeleting(false);
+            }
           }}
         />
       )}
