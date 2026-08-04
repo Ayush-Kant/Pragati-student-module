@@ -8,11 +8,12 @@ import {
   getStudentAnalytics,
 } from "../types/analyticsDummyData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
-export const useAnalyticsDashboard = () => {
+export const useAnalyticsDashboard = (filters = {}) => {
   const [dashboardData, setDashboardData] = useState(null);
   const [placementData, setPlacementData] = useState([]);
+  const [placementTrendsData, setPlacementTrendsData] = useState([]);
   const [companyData, setCompanyData] = useState([]);
   const [departmentData, setDepartmentData] = useState([]);
   const [studentData, setStudentData] = useState(null);
@@ -30,16 +31,26 @@ export const useAnalyticsDashboard = () => {
         setCompanyData(getCompanyAnalytics());
         setDepartmentData(getDepartmentAnalytics());
         setStudentData(getStudentAnalytics());
+        setPlacementTrendsData([]);
       } else {
-        const [dash, place, comp, dept, stud] = await Promise.all([
-          analyticsService.getDashboardAnalytics(),
-          analyticsService.getPlacementAnalytics(),
-          analyticsService.getCompanyAnalytics(),
-          analyticsService.getDepartmentAnalytics(),
-          analyticsService.getStudentAnalytics(),
+        const params = {};
+        if (filters.batch && filters.batch !== "All") params.batch = filters.batch;
+        if (filters.department && filters.department !== "All") params.department = filters.department;
+        if (filters.company && filters.company !== "All") params.company = filters.company;
+        if (filters.dateRange?.start) params.startDate = filters.dateRange.start;
+        if (filters.dateRange?.end) params.endDate = filters.dateRange.end;
+
+        const [dash, place, placeTrends, comp, dept, stud] = await Promise.all([
+          analyticsService.getDashboardAnalytics(params),
+          analyticsService.getPlacementAnalytics(params),
+          analyticsService.getPlacementTrends(params),
+          analyticsService.getCompanyReport(params),
+          analyticsService.getDepartmentReport(params),
+          analyticsService.getStudentReport(params),
         ]);
         setDashboardData(dash.data);
         setPlacementData(place.data);
+        setPlacementTrendsData(placeTrends.data);
         setCompanyData(comp.data);
         setDepartmentData(dept.data);
         setStudentData(stud.data);
@@ -49,7 +60,7 @@ export const useAnalyticsDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [filters]);
 
   useEffect(() => {
     fetchAll();
@@ -58,6 +69,7 @@ export const useAnalyticsDashboard = () => {
   return {
     dashboardData,
     placementData,
+    placementTrendsData,
     companyData,
     departmentData,
     studentData,

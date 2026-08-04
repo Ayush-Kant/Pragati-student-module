@@ -1,6 +1,10 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
+import * as analyticsService from "../services/analyticsService";
 
-export const useAnalyticsReports = (reportType = 'Overview', activeFilters = {}) => {
+export const useAnalyticsReports = (
+  reportType = "Overview",
+  activeFilters = {},
+) => {
   const [reportData, setReportData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -10,46 +14,89 @@ export const useAnalyticsReports = (reportType = 'Overview', activeFilters = {})
     setLoading(true);
     setError(null);
     try {
-      // Handle actual request parsing configurations inside active endpoints
-      // const response = await fetch(`/api/analytics/reports?type=${reportType}&dept=${activeFilters.department}`);
-      
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      const params = {};
+      if (activeFilters.batch && activeFilters.batch !== "All")
+        params.batch = activeFilters.batch;
+      if (activeFilters.department && activeFilters.department !== "All")
+        params.department = activeFilters.department;
+      if (activeFilters.company && activeFilters.company !== "All")
+        params.company = activeFilters.company;
+      if (activeFilters.dateRange?.start)
+        params.startDate = activeFilters.dateRange.start;
+      if (activeFilters.dateRange?.end)
+        params.endDate = activeFilters.dateRange.end;
 
-      // Mock documents tracking dynamic data array shapes matching Report requirements
-      const generatedMockRows = Array.from({ length: 5 }, (_, index) => ({
-        id: `RPT-2026-${reportType.toUpperCase().slice(0, 3)}-00${index + 1}`,
-        title: `${activeFilters.department || 'General'} Branch ${reportType} Assessment Metrics v${index + 1}.0`,
-        date: new Date(2026, 5, 10 - index).toISOString().split('T')[0],
-        status: index === 4 ? 'Pending Archive' : 'Verified'
-      }));
+      let res;
+      const type = reportType?.toLowerCase();
+      if (type === "placements") {
+        res = await analyticsService.getPlacementAnalytics(params);
+      } else if (type === "companies") {
+        res = await analyticsService.getCompanyAnalytics(params);
+      } else if (type === "departments") {
+        res = await analyticsService.getDepartmentAnalytics(params);
+      } else if (type === "students") {
+        res = await analyticsService.getStudentAnalytics(params);
+      } else {
+        res = await analyticsService.getDashboardAnalytics(params);
+      }
 
-      setReportData(generatedMockRows);
+      setReportData(res?.data || []);
     } catch (err) {
-      setError(err.message || 'Failed to extract generated ledger profiles.');
+      setError(err.message || "Failed to fetch report data.");
     } finally {
       setLoading(false);
     }
-  }, [reportType, activeFilters.department, activeFilters.company, activeFilters.batch]);
+  }, [
+    reportType,
+    activeFilters.department,
+    activeFilters.company,
+    activeFilters.batch,
+    activeFilters.dateRange?.start,
+    activeFilters.dateRange?.end,
+  ]);
 
-  const exportReport = useCallback(async (format = 'PDF') => {
-    try {
-      console.log(`Triggering download stream formatting for ${reportType} as target ${format}`);
-      alert(`Exporting ${reportType} Report summary format layout options configuration to ${format} successfully completed!`);
-      return true;
-    } catch (err) {
-      console.error('File compilation stream fault.', err);
-      return false;
-    }
-  }, [reportType]);
+  const exportReport = useCallback(
+    async (format = "PDF") => {
+      try {
+        setExporting(true);
+        const mappedFormat = format.toLowerCase() === "excel" ? "excel" : "pdf";
+        const rawReportType = reportType.toLowerCase();
+        const mappedReportType =
+          rawReportType === "overview" ? "dashboard" : rawReportType;
 
-  const executeExport = useCallback(async (format = 'PDF') => {
-    setExporting(true);
-    try {
+        const blob = await analyticsService.exportAnalytics(
+          mappedFormat,
+          mappedReportType,
+        );
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `${mappedReportType}_report_${Date.now()}.${mappedFormat === "pdf" ? "html" : "csv"}`,
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        return true;
+      } catch (err) {
+        setError(err.message || "File compilation stream fault.");
+        console.error("File compilation stream fault.", err);
+        return false;
+      } finally {
+        setExporting(false);
+      }
+    },
+    [reportType],
+  );
+
+  const executeExport = useCallback(
+    async (format = "PDF") => {
       return await exportReport(format);
-    } finally {
-      setExporting(false);
-    }
-  }, [exportReport]);
+    },
+    [exportReport],
+  );
 
   const printReportElement = useCallback((containerId) => {
     const content = document.getElementById(containerId);
@@ -58,9 +105,9 @@ export const useAnalyticsReports = (reportType = 'Overview', activeFilters = {})
       return;
     }
 
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (!printWindow) {
-      console.warn('Unable to open print window for analytics report');
+      console.warn("Unable to open print window for analytics report");
       return;
     }
 
@@ -91,6 +138,6 @@ export const useAnalyticsReports = (reportType = 'Overview', activeFilters = {})
     executeExport,
     printReportElement,
     refreshReport: fetchReportData,
-    exportReport
+    exportReport,
   };
 };

@@ -47,9 +47,19 @@ const TABS = [
 
 const AnalyticsDashboardPage = () => {
   const { darkMode } = useOutletContext();
-  const { dashboardData, placementData, companyData, departmentData, studentData, loading, error, refresh } = useAnalyticsDashboard();
   const { filters, updateFilterField } = useAnalyticsFilters();
-  const { loading: reportLoading } = useAnalyticsReports(filters.reportType, filters);
+  const { 
+    dashboardData, 
+    placementData, 
+    placementTrendsData, 
+    companyData, 
+    departmentData, 
+    studentData, 
+    loading, 
+    error, 
+    refresh 
+  } = useAnalyticsDashboard(filters);
+  const { loading: reportLoading, executeExport, exporting } = useAnalyticsReports(filters.reportType, filters);
 
   const [activeTab, setActiveTab] = useState("Overview");
 
@@ -101,11 +111,12 @@ const AnalyticsDashboardPage = () => {
             Refresh
           </button>
           <button
-            onClick={() => alert("Exporting analytics as PDF...")}
+            onClick={() => executeExport("pdf")}
+            disabled={exporting}
             className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl bg-gradient-to-r from-[#ff6d34] to-[#ff8f66] text-white hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 transition-all duration-200"
           >
             <Download className="w-3.5 h-3.5" />
-            Export PDF
+            {exporting ? "Exporting..." : "Export PDF"}
           </button>
         </div>
       </div>
@@ -151,18 +162,18 @@ const AnalyticsDashboardPage = () => {
       {activeTab === "Charts" && (
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <PlacementTrendChart data={placementTrend} darkMode={darkMode} />
-            <CompanyAnalyticsChart data={companyAnalytics} darkMode={darkMode} />
+            <PlacementTrendChart data={placementTrendsData.length > 0 ? placementTrendsData : placementData} darkMode={darkMode} />
+            <CompanyAnalyticsChart data={companyData} darkMode={darkMode} />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <DepartmentAnalyticsChart data={departmentAnalytics} darkMode={darkMode} />
-            <PackageDistributionChart data={packageDistribution} darkMode={darkMode} />
+            <DepartmentAnalyticsChart data={departmentData} darkMode={darkMode} />
+            <PackageDistributionChart data={dashboardData?.packageDistribution || []} darkMode={darkMode} />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <HiringTrendChart data={monthlyHiring} darkMode={darkMode} />
-            <MonthlyAnalyticsChart data={monthlyHiring} darkMode={darkMode} />
+            <HiringTrendChart data={dashboardData?.monthlyHiring || []} darkMode={darkMode} />
+            <MonthlyAnalyticsChart data={dashboardData?.monthlyHiring || []} darkMode={darkMode} />
           </div>
-          <StudentPerformanceChart data={studentPerformance} darkMode={darkMode} />
+          <StudentPerformanceChart data={studentData?.studentPerformance || []} darkMode={darkMode} />
         </div>
       )}
 
