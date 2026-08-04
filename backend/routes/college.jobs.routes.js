@@ -97,7 +97,7 @@ router.put(
     '/postings/:id',
     validator.sanitizeInput,
     validator.validateRequestBody,
-    validator.validateJobPosting,
+    validator.validateUpdateJobPosting,
     controller.updateJobPosting
 );
 

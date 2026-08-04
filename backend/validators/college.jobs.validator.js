@@ -80,58 +80,177 @@ const validateCreateJob = (req, res, next) => {
 =========================== */
 
 const validateJobPosting = (req, res, next) => {
-
+    console.log("VALIDATOR BODY:", req.body);
     const {
-        company_id,
-        title,
-        job_type,
+        role,
+        company,
+        department,
         location,
-        salary_min,
-        salary_max,
-        experience_required
+        package: pkg,
+        cgpa,
+        batch,
+        deadline,
+        jobDescription,
+        hiringProcess
     } = req.body;
 
-    if (!company_id) {
+
+    if (!role)
         return res.status(400).json({
-            message: "Company ID is required",
+            message: "Job role is required"
+        });
+
+
+    if (!company)
+        return res.status(400).json({
+            message: "Company is required"
+        });
+
+
+    if (!department)
+        return res.status(400).json({
+            message: "Department is required"
+        });
+
+
+    if (!location)
+        return res.status(400).json({
+            message: "Location is required"
+        });
+
+
+    if (!pkg)
+        return res.status(400).json({
+            message: "Package is required"
+        });
+
+
+    const packageRegex = /^(\d+(\.\d+)?)\s*(LPA)?$/i;
+
+    if (!packageRegex.test(pkg)) {
+        return res.status(400).json({
+            message: "Package format should be like 10 LPA"
         });
     }
 
-    if (!title || title.trim() === "") {
+
+    const cgpaValue = Number(cgpa);
+
+    if (!cgpa || isNaN(cgpaValue)) {
         return res.status(400).json({
-            message: "Job title is required",
+            message: "Valid CGPA is required"
         });
     }
 
-    if (!job_type || job_type.trim() === "") {
+
+    if (cgpaValue < 0 || cgpaValue > 10) {
         return res.status(400).json({
-            message: "Job type is required",
+            message: "CGPA must be between 0 and 10"
         });
     }
 
-    if (!location || location.trim() === "") {
-        return res.status(400).json({
-            message: "Location is required",
-        });
-    }
 
-    if (salary_min === undefined || isNaN(salary_min)) {
+    if (!batch)
         return res.status(400).json({
-            message: "Valid minimum salary is required",
+            message: "Batch is required"
         });
-    }
 
-    if (salary_max === undefined || isNaN(salary_max)) {
-        return res.status(400).json({
-            message: "Valid maximum salary is required",
-        });
-    }
 
-    if (!experience_required || experience_required.toString().trim() === "") {
+    if (!deadline)
         return res.status(400).json({
-            message: "Valid experience is required",
+            message: "Deadline is required"
         });
-    }
+
+
+    if (!jobDescription)
+        return res.status(400).json({
+            message: "Job Description is required"
+        });
+
+
+    if (jobDescription.length < 10)
+        return res.status(400).json({
+            message: "Job Description must contain minimum 10 characters"
+        });
+
+
+    if (!hiringProcess)
+        return res.status(400).json({
+            message: "Hiring Process is required"
+        });
+
+
+    next();
+};
+
+const validateUpdateJobPosting = (req, res, next) => {
+    console.log("UPDATE VALIDATOR BODY:", req.body);
+    const {
+        role,
+        department,
+        location,
+        package: pkg,
+        cgpa_limit,
+        batch,
+        application_deadline,
+        job_description,
+        hiring_process
+    } = req.body;
+
+
+    if (!role)
+        return res.status(400).json({
+            message:"Job role is required"
+        });
+
+
+    if (!department)
+        return res.status(400).json({
+            message:"Department is required"
+        });
+
+
+    if (!location)
+        return res.status(400).json({
+            message:"Location is required"
+        });
+
+
+    if (!pkg)
+        return res.status(400).json({
+            message:"Package is required"
+        });
+
+
+    if (cgpa_limit === undefined)
+        return res.status(400).json({
+            message:"CGPA is required"
+        });
+
+
+    if (!batch)
+        return res.status(400).json({
+            message:"Batch is required"
+        });
+
+
+    if (!application_deadline)
+        return res.status(400).json({
+            message:"Deadline is required"
+        });
+
+
+    if (!job_description)
+        return res.status(400).json({
+            message:"Job Description is required"
+        });
+
+
+    if (!hiring_process)
+        return res.status(400).json({
+            message:"Hiring Process is required"
+        });
+
 
     next();
 };
@@ -215,6 +334,7 @@ export {
     validateCreateJob,
 
     validateJobPosting,
+    validateUpdateJobPosting,
 
     validateEligibility,
 };

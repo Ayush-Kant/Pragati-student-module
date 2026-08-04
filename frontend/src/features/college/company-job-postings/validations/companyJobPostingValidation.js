@@ -178,13 +178,14 @@ export const validateJobPosting = (data, existingJobs = [], editingJobId = null)
 
   // Prevent duplicate job postings where applicable (same company, role, and batch)
   if (company && role && data.batch) {
-    const isDuplicate = existingJobs.some(
-      (j) =>
-        j.company.trim().toLowerCase() === company.toLowerCase() &&
-        j.role.trim().toLowerCase() === role.toLowerCase() &&
-        j.batch.trim() === data.batch.trim() &&
-        j.id !== editingJobId
-    );
+    const isDuplicate = existingJobs.some((j) => {
+  return (
+    (j.company || "").trim().toLowerCase() === company.toLowerCase() &&
+    (j.role || j.title || "").trim().toLowerCase() === role.toLowerCase() &&
+    (j.batch || "").trim() === (data.batch || "").trim() &&
+    j.id !== editingJobId
+  );
+});
     if (isDuplicate) {
       errors.role = "A job posting with the same company, role, and batch already exists";
     }

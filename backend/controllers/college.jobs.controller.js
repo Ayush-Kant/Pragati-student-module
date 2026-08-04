@@ -206,6 +206,9 @@ const getJobPostingById = async (req, res) => {
 
 const createJobPosting = async (req, res) => {
     try {
+
+        console.log("CREATE JOB BODY:", req.body);
+
         const job = await service.addJobPosting(req.body);
 
         res.status(201).json({
@@ -213,7 +216,11 @@ const createJobPosting = async (req, res) => {
             message: "Job created successfully",
             data: job,
         });
+
     } catch (err) {
+
+        console.error("CREATE JOB ERROR:", err);
+
         res.status(500).json({
             success: false,
             message: err.message,
@@ -222,25 +229,100 @@ const createJobPosting = async (req, res) => {
 };
 
 const updateJobPosting = async (req, res) => {
+
     try {
-        const job = await service.editJobPosting(
-            req.params.id,
-            req.body
+
+        const existingJob =
+            await service.getJobPosting(req.params.id);
+
+
+        const updatedJob = {
+
+            company_id:
+                existingJob.company_id,
+
+
+            role:
+                req.body.role ?? existingJob.role,
+
+
+            department:
+                req.body.department ?? existingJob.department,
+
+
+            location:
+                req.body.location ?? existingJob.location,
+
+
+            package:
+                req.body.package ?? existingJob.package,
+
+
+            cgpa_limit:
+                Number(
+                    req.body.cgpa_limit ??
+                    existingJob.cgpa_limit
+                ),
+
+
+            batch:
+                req.body.batch ?? existingJob.batch,
+
+
+            application_deadline:
+                req.body.application_deadline ??
+                existingJob.application_deadline,
+
+
+            job_description:
+                req.body.job_description ??
+                existingJob.job_description,
+
+
+            hiring_process:
+                req.body.hiring_process ??
+                existingJob.hiring_process,
+
+
+            status:
+                req.body.status ?? existingJob.status
+        };
+
+
+        console.log(
+            "FINAL UPDATE DATA:",
+            updatedJob
         );
 
+
+        const job =
+            await service.editJobPosting(
+                req.params.id,
+                updatedJob
+            );
+
+
         res.status(200).json({
-            success: true,
-            message: "Job updated successfully",
-            data: job,
+            success:true,
+            message:"Job updated successfully",
+            data:job
         });
-    } catch (err) {
+
+
+    } catch(err){
+
+        console.log(
+            "UPDATE JOB ERROR:",
+            err
+        );
+
         res.status(500).json({
-            success: false,
-            message: err.message,
+            success:false,
+            message:err.message
         });
+
     }
 };
-
 const deleteJobPosting = async (req, res) => {
     try {
         await service.removeJobPosting(req.params.id);

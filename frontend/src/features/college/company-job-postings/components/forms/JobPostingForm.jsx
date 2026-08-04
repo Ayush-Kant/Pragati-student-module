@@ -2,14 +2,16 @@ import { useEffect, useReducer, useState } from "react";
 import { Plus } from "lucide-react";
 import { validateJobPosting } from "../../validations/companyJobPostingValidation";
 import { DEPARTMENTS, BATCHES } from "../../constants/companyJobPostingConstants";
-
+import { getCompanies } from "../../services/companyJobPostingService";
 const getInitialFormData = (job) => ({
   role: job?.role || "",
   company: job?.company || "",
   location: job?.location || "",
   cgpa: job?.cgpa || "",
   batch: job?.batch || "",
-  deadline: job?.deadline || "",
+  deadline: job?.deadline
+  ? job.deadline.substring(0, 10)
+  : "",
   status: job?.status || "Open",
   department: job?.department || "",
   package: job?.package || "",
@@ -34,11 +36,27 @@ const formReducer = (state, action) => {
 };
 
 const JobPostingForm = ({ onSubmit, editingJob, jobs = [], darkMode }) => {
+  const [companies, setCompanies] = useState([]);
+  
   const [formData, dispatch] = useReducer(
     formReducer,
     editingJob,
     getInitialFormData
   );
+
+  useEffect(() => {
+  const fetchCompanies = async () => {
+    try {
+      const data = await getCompanies();
+      setCompanies(data);
+    } catch (error) {
+      console.error("Error fetching companies:", error);
+    }
+  };
+
+  fetchCompanies();
+}, []);
+
 
   const [errors, setErrors] = useState({
     role: "",
@@ -61,7 +79,7 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [], darkMode }) => {
       type: "reset",
       payload: getInitialFormData(editingJob),
     });
-
+    
     // Reset errors synchronously to avoid asynchronous setState issues
     setErrors({
       role: "",
@@ -89,6 +107,30 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [], darkMode }) => {
       [e.target.name]: "",
     }));
   };
+
+  const handleCompanyChange = (e) => {
+
+  const companyId = Number(e.target.value);
+
+  const selectedCompany = companies.find(
+    (company) => company.id === companyId
+  );
+
+
+  dispatch({
+    type: "change",
+    name: "company",
+    value: selectedCompany?.name || "",
+  });
+
+
+  dispatch({
+    type: "change",
+    name: "location",
+    value: selectedCompany?.location || "",
+  });
+
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -161,17 +203,38 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [], darkMode }) => {
 
         {/* Company */}
         <div>
-          <input
-            name="company"
-            placeholder="Company"
-            value={formData.company}
-            onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
-              darkMode
-                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
-                : 'border'
-            } ${errors.company ? "border-red-500" : darkMode ? '' : "border"}`}
-          />
+          <select
+  name="company"
+  value={
+    companies.find(
+      (company)=>company.name === formData.company
+    )?.id || ""
+  }
+  onChange={handleCompanyChange}
+  className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+    darkMode
+      ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white'
+      : 'bg-white border'
+  }`}
+>
+
+<option value="">
+  Select Company
+</option>
+
+
+{
+ companies.map((company)=>(
+   <option
+     key={company.id}
+     value={company.id}
+   >
+      {company.name}
+   </option>
+ ))
+}
+
+</select>
 
           {errors.company && (
             <p className="text-red-500 text-sm mt-1">
@@ -180,53 +243,57 @@ const JobPostingForm = ({ onSubmit, editingJob, jobs = [], darkMode }) => {
           )}
         </div>
 
-        {/* Department select dropdown */}
-        <div>
-          <select
-            name="department"
-            value={formData.department}
-            onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
-              darkMode
-                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white'
-                : 'bg-white border'
-            } ${errors.department ? "border-red-500" : darkMode ? '' : "border"}`}
-          >
-            <option value="">Select Department</option>
-            {DEPARTMENTS.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
-            ))}
-          </select>
+       {/* Department select dropdown */}
+<div>
+  <select
+    name="department"
+    value={formData.department}
+    onChange={handleChange}
+    className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+      darkMode
+        ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white'
+        : 'bg-white border'
+    } ${errors.department ? "border-red-500" : darkMode ? '' : "border"}`}
+  >
+    <option value="">
+      Select Department
+    </option>
 
-          {errors.department && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.department}
-            </p>
-          )}
-        </div>
+    {DEPARTMENTS.map((dept) => (
+      <option key={dept} value={dept}>
+        {dept}
+      </option>
+    ))}
+  </select>
 
-        {/* Location */}
-        <div>
-          <input
-            name="location"
-            placeholder="Location"
-            value={formData.location}
-            onChange={handleChange}
-            className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
-              darkMode
-                ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
-                : 'border'
-            } ${errors.location ? "border-red-500" : darkMode ? '' : "border"}`}
-          />
+  {errors.department && (
+    <p className="text-red-500 text-sm mt-1">
+      {errors.department}
+    </p>
+  )}
+</div>
 
-          {errors.location && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.location}
-            </p>
-          )}
-        </div>
+
+{/* Location */}
+<div>
+  <input
+    name="location"
+    placeholder="Location"
+    value={formData.location}
+    readOnly
+    className={`w-full rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+      darkMode
+        ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+        : 'border'
+    } ${errors.location ? "border-red-500" : darkMode ? '' : "border"}`}
+  />
+
+  {errors.location && (
+    <p className="text-red-500 text-sm mt-1">
+      {errors.location}
+    </p>
+  )}
+</div>
 
         {/* Package */}
         <div>

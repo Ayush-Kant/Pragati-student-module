@@ -74,7 +74,11 @@ const JobPostingCard = ({
 
             <div className="flex items-center gap-2">
               <CalendarDays size={18} className={darkMode ? 'text-gray-500' : 'text-slate-400'} />
-              <span>Deadline: {job.deadline}</span>
+              <span>Deadline: {
+  new Date(job.deadline)
+    .toLocaleDateString("en-GB")
+    .replaceAll("/", "-")
+}</span>
             </div>
 
             {job.package && (
