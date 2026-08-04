@@ -1,6 +1,15 @@
 import { CandidateRow } from './CandidateRow';
 
-export const CandidateTable = ({ candidates, loading, onSelectCandidate, onMenuClick, onEdit }) => {
+export const CandidateTable = ({ 
+  candidates, 
+  loading, 
+  onSelectCandidate, 
+  onMenuClick, 
+  onEdit,
+  selectedIds = [],
+  onToggleSelect,
+  onToggleSelectAll
+}) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -25,11 +34,22 @@ export const CandidateTable = ({ candidates, loading, onSelectCandidate, onMenuC
     );
   }
 
+  const isAllSelected = candidates.length > 0 && candidates.every(c => selectedIds.includes(c.id));
+
   return (
     <div className="responsive-table-wrap overflow-x-auto bg-white rounded-xl border border-gray-100 shadow-sm">
       <table className="min-w-full divide-y divide-gray-100">
         <thead className="bg-gray-50/50">
           <tr>
+            {/* Select All Checkbox */}
+            <th className="px-6 py-4 text-left w-12">
+              <input
+                type="checkbox"
+                checked={isAllSelected}
+                onChange={onToggleSelectAll}
+                className="h-5 w-5 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+            </th>
             <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
               Candidate
             </th>
@@ -58,6 +78,8 @@ export const CandidateTable = ({ candidates, loading, onSelectCandidate, onMenuC
               onSelect={onSelectCandidate}
               onMenuClick={onMenuClick}
               onEdit={onEdit}
+              isSelected={selectedIds.includes(candidate.id)}
+              onToggleSelect={onToggleSelect}
             />
           ))}
         </tbody>

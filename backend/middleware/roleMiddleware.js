@@ -13,6 +13,7 @@ const roleMiddleware = (...allowedRoles) => {
       });
     }
 
+    console.log("✅ ACCESS GRANTED");
     next();
   };
 };

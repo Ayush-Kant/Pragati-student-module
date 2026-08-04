@@ -1,63 +1,87 @@
-import { useState, useMemo, useEffect } from "react";
-import { useOutletContext } from "react-router-dom"; 
-import { Filter, X } from "lucide-react"; 
-import Pagination from "../components/common/Pagination";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { useOutletContext } from "react-router-dom";
+import { Filter, X, UserPlus, Users, CheckSquare, ListChecks } from "lucide-react";
+import toast from "react-hot-toast";
 
+import Pagination from "../components/common/Pagination";
 import BatchFilter from "../components/filters/BatchFilter";
 import CompanyFilter from "../components/filters/CompanyFilter";
 import DepartmentFilter from "../components/filters/DepartmentFilter";
 import SearchStudent from "../components/filters/SearchStudent";
 import StatusFilter from "../components/filters/StatusFilter";
+import DriveSelector from "../components/filters/DriveSelector";
 
 import NominationDetails from "../components/nomination/NominationDetails";
 import NominationStatistics from "../components/nomination/NominationStatistics";
 import NominationTable from "../components/nomination/NominationTable";
-import StudentNominationForm from "../components/forms/StudentNominationForm";
-
-import ShortlistedStudents from "../components/shortlist/ShortlistedStudents";
-
 import NominationTabs from "../components/nomination/NominationTabs";
 import NominatedTable from "../components/nomination/NominatedTable";
+import NominationCard from "../components/nomination/NominationCard";
+import StudentNominationForm from "../components/forms/StudentNominationForm";
 import EditNominationForm from "../components/forms/EditNominationForm";
 import RemoveNominationModal from "../components/forms/RemoveNominationModal";
-
-import {
-  eligibleStudents,
-  nominatedStudents,
-} from "../types/studentNominationDummyData";
+import ShortlistedStudents from "../components/shortlist/ShortlistedStudents";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import EmptyState from "../components/common/EmptyState";
 import ErrorState from "../components/common/ErrorState";
-import NominationCard from "../components/nomination/NominationCard";
+
+import useStudentNomination from "../hooks/useStudentNomination";
+import { getPlacementDrives } from "../../placement-drives/services/placementDriveService";
 
 const StudentNominationPage = () => {
   const { darkMode } = useOutletContext();
 
-  /* =====================================================
-                        Page State
-  ===================================================== */
+  /* ── Drive selection ────────────────────────────────────────────── */
+  const [selectedDriveId, setSelectedDriveId] = useState(null);
+  const [selectedDrive, setSelectedDrive] = useState(null);
+  const [allDrives, setAllDrives] = useState([]);
+
+  useEffect(() => {
+    getPlacementDrives().then((res) => {
+      if (res.success) setAllDrives(res.data || []);
+    });
+  }, []);
+
+  const handleDriveChange = useCallback((driveId) => {
+    setSelectedDriveId(driveId);
+    setSelectedDrive(allDrives.find((d) => d.id === driveId) || null);
+    setSelectedStudentIds([]);
+    setCurrentPage(1);
+  }, [allDrives]);
+
+  /* ── Hook (re-fetches whenever selectedDriveId changes) ────────── */
+  const {
+    eligibleStudents,
+    nominatedStudents,
+    loading,
+    error,
+    bulkNominate,
+    bulkShortlist,
+    nominateStudent,
+    updateNomination,
+    removeNomination,
+    refreshData,
+  } = useStudentNomination(selectedDriveId);
+
+  /* ── Tab / UI state ─────────────────────────────────────────────── */
   const [activeTab, setActiveTab] = useState("eligible");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-  /* =====================================================
-                        Filter States
-  ===================================================== */
+  /* ── Bulk selection ─────────────────────────────────────────────── */
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  /* ── Filters ────────────────────────────────────────────────────── */
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedBatch, setSelectedBatch] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-
-  /* =====================================================
-                  Form / Modal States (FIXED)
-  ===================================================== */
+  /* ── Form / modal state ─────────────────────────────────────────── */
   const [showNominationForm, setShowNominationForm] = useState(false);
   const [nominatingStudent, setNominatingStudent] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -65,11 +89,8 @@ const StudentNominationPage = () => {
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removingStudent, setRemovingStudent] = useState(null);
 
-  /* =====================================================
-                  Responsive Page Sizing Logic
-  ===================================================== */
+  /* ── Responsive page size ───────────────────────────────────────── */
   const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 8);
-  // NEW: Create a dynamic array slicing boundary hook for the shortlisted card container
   const [shortlistLimit, setShortlistLimit] = useState(window.innerWidth < 768 ? 3 : undefined);
 
   useEffect(() => {
@@ -81,21 +102,13 @@ const StudentNominationPage = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  /* =====================================================
-                        Data States
-  ==================================================== */
-  const [eligibleData, setEligibleData] = useState(eligibleStudents);
-  const [nominatedData, setNominatedData] = useState(nominatedStudents);
-
-  /* =====================================================
-                        Handlers
-  ===================================================== */
+  /* ── Handlers ───────────────────────────────────────────────────── */
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setCurrentPage(1);
     setSelectedStudent(null);
     setIsDetailOpen(false);
-    setError(null);
+    setSelectedStudentIds([]);
     setSearchQuery("");
     setSelectedCompany("");
     setSelectedDepartment("");
@@ -106,113 +119,264 @@ const StudentNominationPage = () => {
   const handleFilterChange = (setter) => (e) => {
     setter(e.target.value);
     setCurrentPage(1);
+    setSelectedStudentIds([]);
   };
 
-  const handleReNominate = (student) => {
-    try {
-      setError(null);
-      setNominatedData((prev) =>
-        prev.map((s) => (s.id === student.id ? { ...s, status: "Waiting", remarks: "Re-nominated by Admin" } : s))
-      );
-    } catch (err) {
-      setError("Failed to execute re-nomination workflow action.");
+  const handleRetryFetch = () => refreshData();
+
+  /* ── Checkbox helpers ───────────────────────────────────────────── */
+  const toggleStudentSelect = (id) => {
+    setSelectedStudentIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = (visibleStudents) => {
+    const visibleIds = visibleStudents.map((s) => s.id);
+    const allSelected = visibleIds.every((id) => selectedStudentIds.includes(id));
+    if (allSelected) {
+      setSelectedStudentIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
+    } else {
+      setSelectedStudentIds((prev) => [...new Set([...prev, ...visibleIds])]);
     }
   };
 
-  const handleMarkSelected = (student) => {
-    try {
-      setError(null);
-      setNominatedData((prev) =>
-        prev.map((s) => (s.id === student.id ? { ...s, status: "Selected" } : s))
-      );
-    } catch (err) {
-      setError("Failed to change student eligibility criteria status flag.");
+  /* ── Bulk actions ───────────────────────────────────────────────── */
+  const handleBulkNominate = async () => {
+    if (!selectedDriveId) {
+      toast.error("Please select a drive first.");
+      return;
+    }
+    if (selectedStudentIds.length === 0) {
+      toast.error("Select at least one student.");
+      return;
+    }
+    setBulkLoading(true);
+    const res = await bulkNominate(selectedStudentIds);
+    setBulkLoading(false);
+    if (res.success) {
+      toast.success(res.message || `${selectedStudentIds.length} student(s) nominated.`);
+      setSelectedStudentIds([]);
+    } else {
+      toast.error(res.message || "Nomination failed.");
     }
   };
 
-  const handleRetryFetch = () => {
-    setError(null);
-    setEligibleData(eligibleStudents);
-    setNominatedData(nominatedStudents);
+  const handleBulkShortlist = async () => {
+    if (!selectedDriveId) {
+      toast.error("Please select a drive first.");
+      return;
+    }
+    if (selectedStudentIds.length === 0) {
+      toast.error("Select at least one student.");
+      return;
+    }
+    setBulkLoading(true);
+    const res = await bulkShortlist(selectedStudentIds);
+    setBulkLoading(false);
+    if (res.success) {
+      toast.success(res.message || `${selectedStudentIds.length} student(s) shortlisted.`);
+      setSelectedStudentIds([]);
+    } else {
+      toast.error(res.message || "Shortlisting failed.");
+    }
   };
 
-  const hasActiveFilters = selectedCompany !== "" || selectedDepartment !== "" || selectedBatch !== "" || (activeTab === "nominated" && selectedStatus !== "");
-  const hasSearched = searchQuery.trim().length > 0;
-
-  /* =====================================================
-                        Filtering Logic
-  ===================================================== */
-  const baseStudents = activeTab === "eligible" ? eligibleData : nominatedData;
+  /* ── Filtering ──────────────────────────────────────────────────── */
+  const students = activeTab === "eligible" ? eligibleStudents : nominatedStudents;
 
   const filteredStudents = useMemo(() => {
-    return baseStudents.filter((student) => {
-      if (searchQuery.trim() !== "") {
-        const query = searchQuery.toLowerCase();
-        const matchesName = student.name?.toLowerCase().startsWith(query);
-        const matchesEnrollment = student.enrollmentNo?.toLowerCase().startsWith(query);
-        if (!matchesName && !matchesEnrollment) return false;
+    return students.filter((s) => {
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        if (!s.name?.toLowerCase().startsWith(q) && !s.enrollmentNo?.toLowerCase().startsWith(q)) return false;
       }
-
-      if (selectedCompany !== "" && student.company !== selectedCompany) return false;
-      if (selectedDepartment !== "" && student.department !== selectedDepartment) return false;
-      if (selectedBatch !== "" && String(student.batch) !== String(selectedBatch)) return false;
-      if (activeTab === "nominated" && selectedStatus !== "" && student.status !== selectedStatus) return false;
-
+      if (selectedCompany && s.company !== selectedCompany) return false;
+      if (selectedDepartment && s.department !== selectedDepartment) return false;
+      if (selectedBatch && String(s.batch) !== String(selectedBatch)) return false;
+      if (activeTab === "nominated" && selectedStatus && s.status !== selectedStatus) return false;
       return true;
     });
-  }, [baseStudents, searchQuery, selectedCompany, selectedDepartment, selectedBatch, selectedStatus, activeTab]);
+  }, [students, searchQuery, selectedCompany, selectedDepartment, selectedBatch, selectedStatus, activeTab]);
 
-  /* =====================================================
-                        Pagination Computation
-  ===================================================== */
+  /* ── Pagination ─────────────────────────────────────────────────── */
   const totalStudents = filteredStudents.length;
   const totalPages = Math.ceil(totalStudents / itemsPerPage);
-  const indexOfLastStudent = currentPage * itemsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - itemsPerPage;
-  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentStudents = filteredStudents.slice(indexOfFirst, indexOfLast);
 
+  const hasActiveFilters =
+    selectedCompany !== "" ||
+    selectedDepartment !== "" ||
+    selectedBatch !== "" ||
+    (activeTab === "nominated" && selectedStatus !== "");
+
+  /* ── Bulk action bar (shown when checkboxes are ticked) ─────────── */
+  const BulkActionBar = () => {
+    if (selectedStudentIds.length === 0) return null;
+    return (
+      <div className={`flex items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 ${darkMode ? "bg-[#2D2D2D] border-[#ff6d34]/30" : "bg-orange-50 border-orange-200"
+        }`}>
+        <span className={`text-sm font-semibold ${darkMode ? "text-[#ff6d34]" : "text-[#ff7a00]"}`}>
+          {selectedStudentIds.length} student{selectedStudentIds.length > 1 ? "s" : ""} selected
+        </span>
+        <div className="flex items-center gap-2">
+          {activeTab === "eligible" && (
+            <button
+              onClick={handleBulkNominate}
+              disabled={bulkLoading || !selectedDriveId}
+              className="flex items-center gap-2 rounded-xl bg-[#ff7a00] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#e06b00] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <UserPlus size={14} />
+              {bulkLoading ? "Nominating…" : "Nominate Selected"}
+            </button>
+          )}
+          {activeTab === "nominated" && (
+            <button
+              onClick={handleBulkShortlist}
+              disabled={bulkLoading || !selectedDriveId}
+              className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ListChecks size={14} />
+              {bulkLoading ? "Shortlisting…" : "Shortlist Selected"}
+            </button>
+          )}
+          <button
+            onClick={() => setSelectedStudentIds([])}
+            className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${darkMode ? "border-[#3D3D3D] hover:bg-[#3D3D3D]" : "border-slate-300 hover:bg-slate-100"
+              }`}
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  /* ── Checkable NominationTable wrapper ──────────────────────────── */
+  const CheckableTable = ({ isNominated }) => {
+    const tableStudents = currentStudents;
+    const visibleIds = tableStudents.map((s) => s.id);
+    const allChecked = visibleIds.length > 0 && visibleIds.every((id) => selectedStudentIds.includes(id));
+    const someChecked = visibleIds.some((id) => selectedStudentIds.includes(id));
+
+    return (
+      <div className="flex min-w-0 h-full flex-1 flex-col">
+        {/* Select-all row */}
+        {selectedDriveId && tableStudents.length > 0 && (
+          <div className={`flex items-center gap-3 px-5 py-2.5 rounded-t-2xl border-b text-sm ${darkMode ? "bg-[#1A1A1A]/60 border-[#3D3D3D] text-slate-400" : "bg-slate-50 border-slate-200 text-slate-600"
+            }`}>
+            <input
+              type="checkbox"
+              checked={allChecked}
+              ref={(el) => { if (el) el.indeterminate = someChecked && !allChecked; }}
+              onChange={() => toggleSelectAll(tableStudents)}
+              className="h-4 w-4 rounded accent-[#ff7a00] cursor-pointer"
+              aria-label="Select all visible students"
+            />
+            <span className="font-medium">
+              {allChecked ? "Deselect all" : `Select all ${visibleIds.length}`}
+            </span>
+          </div>
+        )}
+
+        {!isNominated ? (
+          <NominationTable
+            students={tableStudents}
+            totalStudents={totalStudents}
+            selectedStudent={selectedStudent}
+            isDetailOpen={isDetailOpen}
+            setSelectedStudent={setSelectedStudent}
+            setIsDetailOpen={setIsDetailOpen}
+            onNominate={(s) => {
+              if (selectedDriveId) {
+                // single nominate via bulk with one student
+                setBulkLoading(true);
+                bulkNominate([s.id]).then((res) => {
+                  setBulkLoading(false);
+                  if (res.success) toast.success(`${s.name} nominated.`);
+                  else toast.error(res.message || "Nomination failed.");
+                });
+              } else {
+                setNominatingStudent(s);
+                setShowNominationForm(true);
+              }
+            }}
+            selectedIds={selectedStudentIds}
+            onToggleSelect={selectedDriveId ? toggleStudentSelect : null}
+          />
+        ) : (
+          <NominatedTable
+            students={tableStudents}
+            totalStudents={totalStudents}
+            selectedStudent={selectedStudent}
+            isDetailOpen={isDetailOpen}
+            setSelectedStudent={setSelectedStudent}
+            setIsDetailOpen={setIsDetailOpen}
+            onEditNomination={(s) => { setEditingStudent(s); setShowEditForm(true); }}
+            onRemoveNomination={(s) => { setRemovingStudent(s); setShowRemoveModal(true); }}
+            onReNominate={(s) => { setNominatingStudent(s); setShowNominationForm(true); }}
+            onMarkSelected={() => refreshData()}
+            selectedIds={selectedStudentIds}
+            onToggleSelect={selectedDriveId ? toggleStudentSelect : null}
+          />
+        )}
+      </div>
+    );
+  };
+
+  /* ── Render ─────────────────────────────────────────────────────── */
   return (
     <div className="flex w-full max-w-full min-w-0 flex-col gap-6 px-2 py-4 sm:px-4 lg:px-6 overflow-hidden">
       <NominationStatistics />
 
+      {/* Drive selector — full width, prominent */}
+      <div className="w-full">
+        <p className={`mb-2 text-xs font-semibold uppercase tracking-wider ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+          Select Placement Drive
+        </p>
+        <DriveSelector
+          selectedDriveId={selectedDriveId}
+          onDriveChange={handleDriveChange}
+        />
+        {selectedDriveId && (
+          <p className={`mt-1.5 text-xs ${darkMode ? "text-slate-500" : "text-slate-400"}`}>
+            Showing eligible students and nominations for the selected drive only.
+          </p>
+        )}
+      </div>
+
       <NominationTabs
         activeTab={activeTab}
         setActiveTab={handleTabChange}
-        eligibleCount={eligibleData.length}
-        nominatedCount={nominatedData.length}
+        eligibleCount={eligibleStudents.length}
+        nominatedCount={nominatedStudents.length}
       />
 
+      {/* Search + mobile filter toggle */}
       <div className="mt-2 flex gap-3 items-center w-full">
         <div className="flex-1 min-w-0">
-          <SearchStudent 
-            value={searchQuery} 
-            onChange={handleFilterChange(setSearchQuery)} 
-          />
+          <SearchStudent value={searchQuery} onChange={handleFilterChange(setSearchQuery)} />
         </div>
-        
         <button
           onClick={() => setIsMobileFilterOpen(true)}
-          aria-label="Toggle structural filters drawer grid"
-          className={`md:hidden flex items-center justify-center p-3.5 rounded-2xl border relative shrink-0 transition-all duration-200 ${
-            darkMode
-              ? "border-slate-700/60 bg-[#151D30] hover:bg-[#1C263E] text-slate-300"
-              : "border-slate-300 bg-white hover:bg-slate-50 text-slate-600"
-          }`}
+          aria-label="Toggle filters"
+          className={`md:hidden flex items-center justify-center p-3.5 rounded-2xl border relative shrink-0 transition-all duration-200 ${darkMode
+            ? "border-[#3D3D3D] bg-[#2D2D2D] hover:bg-[#3D3D3D] text-gray-300"
+            : "border-slate-300 bg-white hover:bg-slate-50 text-slate-600"
+            }`}
         >
           <Filter size={18} strokeWidth={2.2} />
           {hasActiveFilters && (
-            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-blue-500 ring-2 ring-blue-500/30 animate-pulse" />
+            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#ff7a00] ring-2 ring-[#ff7a00]/30 animate-pulse" />
           )}
         </button>
       </div>
 
-      <div 
-        className={`hidden md:grid grid-cols-1 gap-4 w-full ${
-          activeTab === "eligible" 
-            ? "md:grid-cols-3" 
-            : "md:grid-cols-2 xl:grid-cols-4"
-        }`}
-      >
+      {/* Desktop filters */}
+      <div className={`hidden md:grid grid-cols-1 gap-4 w-full ${activeTab === "eligible" ? "md:grid-cols-3" : "md:grid-cols-2 xl:grid-cols-4"
+        }`}>
         <CompanyFilter value={selectedCompany} onChange={handleFilterChange(setSelectedCompany)} />
         <DepartmentFilter value={selectedDepartment} onChange={handleFilterChange(setSelectedDepartment)} />
         {activeTab === "nominated" && (
@@ -221,141 +385,126 @@ const StudentNominationPage = () => {
         <BatchFilter value={selectedBatch} onChange={handleFilterChange(setSelectedBatch)} />
       </div>
 
+      {/* Bulk action bar */}
+      <BulkActionBar />
+
+      {/* Mobile filter drawer */}
       {isMobileFilterOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs md:hidden animate-fade-in">
-          <div 
-            className={`w-full max-w-md rounded-t-3xl border-t shadow-2xl transition-all duration-300 transform translate-y-0 flex flex-col max-h-[85vh] ${
-              darkMode ? "bg-[#0F172A] border-slate-800 text-white" : "bg-white border-slate-200 text-slate-800"
-            }`}
-          >
-            <div className={`flex items-center justify-between border-b p-5 shrink-0 ${darkMode ? "border-slate-800" : "border-slate-100"}`}>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold">Filter Options</h3>
-                {hasActiveFilters && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">Active</span>
-                )}
-              </div>
-              <button 
-                onClick={() => setIsMobileFilterOpen(false)} 
-                className={`p-1.5 rounded-xl border transition-colors ${darkMode ? "border-slate-800 bg-[#151D30] text-slate-400 hover:text-white" : "border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-800"}`}
-              >
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs md:hidden">
+          <div className={`w-full max-w-md rounded-t-3xl border-t shadow-2xl flex flex-col max-h-[85vh] ${darkMode ? "bg-[#1A1A1A] border-[#3D3D3D] text-white" : "bg-white border-slate-200 text-slate-800"
+            }`}>
+            <div className={`flex items-center justify-between border-b p-5 shrink-0 ${darkMode ? "border-[#3D3D3D]" : "border-slate-100"}`}>
+              <h3 className="text-base font-bold">Filter Options</h3>
+              <button onClick={() => setIsMobileFilterOpen(false)} className={`p-1.5 rounded-xl border ${darkMode ? "border-[#3D3D3D] bg-[#2D2D2D]" : "border-slate-200 bg-slate-50"}`}>
                 <X size={16} />
               </button>
             </div>
-
             <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-5 pb-36">
               <div className="flex flex-col gap-1.5">
-                <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>Company</span>
+                <span className={`text-xs font-semibold ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Company</span>
                 <CompanyFilter value={selectedCompany} onChange={handleFilterChange(setSelectedCompany)} />
               </div>
-              
               <div className="flex flex-col gap-1.5">
-                <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>Department</span>
+                <span className={`text-xs font-semibold ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Department</span>
                 <DepartmentFilter value={selectedDepartment} onChange={handleFilterChange(setSelectedDepartment)} />
               </div>
-              
               {activeTab === "nominated" && (
                 <div className="flex flex-col gap-1.5">
-                  <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>Status Flag</span>
+                  <span className={`text-xs font-semibold ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Status</span>
                   <StatusFilter value={selectedStatus} onChange={handleFilterChange(setSelectedStatus)} />
                 </div>
               )}
-              
               <div className="flex flex-col gap-1.5">
-                <span className={`text-xs font-semibold px-0.5 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>Batch Year</span>
+                <span className={`text-xs font-semibold ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Batch Year</span>
                 <BatchFilter value={selectedBatch} onChange={handleFilterChange(setSelectedBatch)} />
               </div>
             </div>
-
-            <div className={`grid grid-cols-2 gap-3 p-4 border-t shrink-0 ${darkMode ? "border-slate-800 bg-[#0F172A]" : "border-slate-100 bg-white"}`}>
-              <button 
-                onClick={() => { 
-                  setSelectedCompany(""); 
-                  setSelectedDepartment(""); 
-                  setSelectedBatch(""); 
-                  setSelectedStatus(""); 
-                  setIsMobileFilterOpen(false); 
-                }} 
-                className={`w-full py-3 text-sm font-semibold rounded-xl border transition-colors ${
-                  darkMode ? "border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/30" : "border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-                }`}
+            <div className={`grid grid-cols-2 gap-3 p-4 border-t shrink-0 ${darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-100 bg-white"}`}>
+              <button
+                onClick={() => { setSelectedCompany(""); setSelectedDepartment(""); setSelectedBatch(""); setSelectedStatus(""); setIsMobileFilterOpen(false); }}
+                className={`w-full py-3 text-sm font-semibold rounded-xl border transition-colors ${darkMode ? "border-[#3D3D3D] text-gray-400 hover:text-white hover:bg-[#2D2D2D]" : "border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
               >
-                Clear Filters
+                Clear
               </button>
-              <button 
-                onClick={() => setIsMobileFilterOpen(false)} 
-                className="w-full py-3 text-sm font-semibold rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/15 active:scale-[0.98] transition-all"
-              >
-                Apply Filters
+              <button onClick={() => setIsMobileFilterOpen(false)} className="w-full py-3 text-sm font-semibold rounded-xl bg-[#ff7a00] hover:bg-[#e06b00] text-white shadow-lg">
+                Apply
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {error ? (
+      {/* Main content area */}
+      {loading ? (
+        <LoadingSpinner />
+      ) : error ? (
         <ErrorState message={error} onRetry={handleRetryFetch} />
       ) : showNominationForm ? (
-        <StudentNominationForm student={nominatingStudent} onClose={() => { setShowNominationForm(false); setNominatingStudent(null); }} onSave={(newNomination) => { try { setEligibleData((prev) => prev.filter((student) => student.id !== newNomination.id)); setNominatedData((prev) => [newNomination, ...prev]); setShowNominationForm(false); setNominatingStudent(null); } catch (err) { setError("An error occurred while saving the new student nomination mapping."); } }} />
+        <StudentNominationForm
+          student={nominatingStudent}
+          selectedDrive={selectedDrive}
+          onClose={() => { setShowNominationForm(false); setNominatingStudent(null); }}
+          onSave={async (data) => {
+            const res = await nominateStudent(data);
+            if (res.isValid) {
+              setShowNominationForm(false);
+              setNominatingStudent(null);
+              toast.success(res.message || "Student nominated.");
+            } else {
+              toast.error(res.errors?.service || res.errors?.student || "Failed to nominate.");
+            }
+          }}
+        />
       ) : showEditForm ? (
-        <EditNominationForm student={editingStudent} onClose={() => { setShowEditForm(false); setEditingStudent(null); }} onSave={(updatedNomination) => { try { setNominatedData((prev) => prev.map((student) => student.id === updatedNomination.id ? updatedNomination : student)); setEditingStudent(updatedNomination); setShowEditForm(false); } catch (err) { setError("An error occurred during updating specific student records data values."); } }} />
+        <EditNominationForm
+          student={editingStudent}
+          onClose={() => { setShowEditForm(false); setEditingStudent(null); }}
+          onSave={async () => { await refreshData(); setShowEditForm(false); setEditingStudent(null); }}
+        />
       ) : showRemoveModal ? (
-        <RemoveNominationModal student={removingStudent} onClose={() => { setShowRemoveModal(false); setRemovingStudent(null); }} onRemove={(updatedStudent) => { try { setNominatedData((prev) => prev.filter((student) => student.id !== updatedStudent.id)); const eligibleStudent = { ...updatedStudent, company: "--", role: "--", package: "--", remarks: "", shortlistedDate: "--", status: "Eligible", }; setEligibleData((prev) => [...prev, eligibleStudent]); setShowRemoveModal(false); setRemovingStudent(null); } catch (err) { setError("Failed to cleanly shift back to active eligible pool array index values."); } }} />
+        <RemoveNominationModal
+          student={removingStudent}
+          onClose={() => { setShowRemoveModal(false); setRemovingStudent(null); }}
+          onRemove={async () => { await refreshData(); setShowRemoveModal(false); setRemovingStudent(null); }}
+        />
+      ) : totalStudents === 0 ? (
+        <EmptyState
+          title={selectedDriveId ? "No students match this drive" : "No students found"}
+          description={selectedDriveId ? "No eligible students meet this drive's criteria." : "Try clearing filters or selecting a drive."}
+        />
       ) : (
         <>
-          {totalStudents === 0 ? (
-            <EmptyState title="No Match Found" description="Try clearing structural filter parameters to match target variables." />
-          ) : (
-            <>
-              {/* Desktop View Table Block */}
-              <div className="hidden md:flex h-167 gap-4 min-w-0">
-                <div className="flex min-w-0 h-full flex-1 flex-col">
-                  {activeTab === "eligible" ? (
-                    <NominationTable students={currentStudents} totalStudents={totalStudents} selectedStudent={selectedStudent} isDetailOpen={isDetailOpen} setSelectedStudent={setSelectedStudent} setIsDetailOpen={setIsDetailOpen} onNominate={(student) => { setNominatingStudent(student); setShowNominationForm(true); }} />
-                  ) : (
-                    <NominatedTable students={currentStudents} totalStudents={totalStudents} selectedStudent={selectedStudent} isDetailOpen={isDetailOpen} setSelectedStudent={setSelectedStudent} setIsDetailOpen={setIsDetailOpen} onEditNomination={(student) => { setEditingStudent(student); setShowEditForm(true); }} onRemoveNomination={(student) => { setRemovingStudent(student); setShowRemoveModal(true); }} onReNominate={handleReNominate} onMarkSelected={handleMarkSelected} />
-                  )}
-                </div>
+          {/* Desktop table + details panel */}
+          <div className="hidden md:flex h-167 gap-4 min-w-0">
+            <CheckableTable isNominated={activeTab === "nominated"} />
+            <div className={`h-full overflow-hidden transition-all duration-300 ease-in-out ${isDetailOpen ? "w-[520px] shrink-0" : "w-0"}`}>
+              <NominationDetails student={selectedStudent} isOpen={isDetailOpen} onClose={() => { setSelectedStudent(null); setIsDetailOpen(false); }} />
+            </div>
+          </div>
 
-                <div className={`h-full overflow-hidden transition-all duration-300 ease-in-out ${isDetailOpen ? "w-[520px] shrink-0" : "w-0"}`}>
-                  <NominationDetails student={selectedStudent} isOpen={isDetailOpen} onClose={() => { setSelectedStudent(null); setIsDetailOpen(false); }} />
-                </div>
-              </div>
-
-              {/* Mobile Card Layout Interface View */}
-              <div className="block md:hidden">
-                <NominationCard
-                  students={currentStudents}
-                  hasSearched={true} 
-                  activeTab={activeTab}
-                  onNominate={(student) => {
-                    setNominatingStudent(student);
-                    setShowNominationForm(true);
-                  }}
-                  onEditNomination={(student) => {
-                    setEditingStudent(student);
-                    setShowEditForm(true);
-                  }}
-                  onRemoveNomination={(student) => {
-                    setRemovingStudent(student);
-                    setShowRemoveModal(true);
-                  }}
-                  onReNominate={handleReNominate}
-                  onMarkSelected={handleMarkSelected}
-                  getStudentActions={(student) => {
-                    switch (student.status) {
-                      case "Waiting":
-                      case "Nominated": return { canEdit: true, canRemove: true };
-                      case "Rejected": return { canReNominate: true };
-                      case "Shortlisted": return { canMarkSelected: true };
-                      case "Selected": return { isSelected: true };
-                      default: return {};
-                    }
-                  }}
-                />
-              </div>
-            </>
-          )}
+          {/* Mobile card layout */}
+          <div className="block md:hidden">
+            <NominationCard
+              students={currentStudents}
+              hasSearched={true}
+              activeTab={activeTab}
+              onNominate={(s) => { setNominatingStudent(s); setShowNominationForm(true); }}
+              onEditNomination={(s) => { setEditingStudent(s); setShowEditForm(true); }}
+              onRemoveNomination={(s) => { setRemovingStudent(s); setShowRemoveModal(true); }}
+              onReNominate={(s) => { setNominatingStudent(s); setShowNominationForm(true); }}
+              onMarkSelected={() => refreshData()}
+              getStudentActions={(s) => {
+                switch (s.status) {
+                  case "Waiting":
+                  case "Nominated": return { canEdit: true, canRemove: true };
+                  case "Rejected": return { canReNominate: true };
+                  case "Shortlisted": return { canMarkSelected: true };
+                  case "Selected": return { isSelected: true };
+                  default: return {};
+                }
+              }}
+            />
+          </div>
         </>
       )}
 
@@ -364,7 +513,6 @@ const StudentNominationPage = () => {
       )}
 
       <div className="w-full min-w-0 max-w-full overflow-hidden">
-        {/* MODIFIED: Pass the responsive display limit down to the Shortlisted component */}
         <ShortlistedStudents limit={shortlistLimit} />
       </div>
     </div>

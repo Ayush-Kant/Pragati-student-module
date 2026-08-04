@@ -8,7 +8,8 @@ const seedDatabase = async () => {
       VALUES
       ('Placement', 'Placement related announcements'),
       ('Training', 'Training sessions'),
-      ('General', 'General college announcements')
+      ('General', 'General college announcements'),
+      ('Hackathon', 'Hackathon related announcements')
       ON CONFLICT DO NOTHING;
     `);
 

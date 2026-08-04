@@ -5,18 +5,18 @@ import api from "../../../../services/api";
 ===================================== */
 
 export const getAnnouncements = async (params = {}) => {
-  const { data } = await api.get("/announcements", { params });
+  const { data } = await api.get("/college/communication/announcements", { params });
   return data;
 };
 
 export const getAnnouncementById = async (id) => {
-  const { data } = await api.get(`/announcements/${id}`);
+  const { data } = await api.get(`/college/communication/announcements/${id}`);
   return data;
 };
 
 export const createAnnouncement = async (announcementData) => {
   const { data } = await api.post(
-    "/announcements",
+    "/college/communication/announcements",
     announcementData
   );
   return data;
@@ -27,7 +27,7 @@ export const updateAnnouncement = async (
   announcementData
 ) => {
   const { data } = await api.put(
-    `/announcements/${id}`,
+    `/college/communication/announcements/${id}`,
     announcementData
   );
   return data;
@@ -35,21 +35,21 @@ export const updateAnnouncement = async (
 
 export const deleteAnnouncement = async (id) => {
   const { data } = await api.delete(
-    `/announcements/${id}`
+    `/college/communication/announcements/${id}`
   );
   return data;
 };
 
 export const publishAnnouncement = async (id) => {
   const { data } = await api.patch(
-    `/announcements/${id}/publish`
+    `/college/communication/announcements/${id}/publish`
   );
   return data;
 };
 
 export const unpublishAnnouncement = async (id) => {
   const { data } = await api.patch(
-    `/announcements/${id}/unpublish`
+    `/college/communication/announcements/${id}/unpublish`
   );
   return data;
 };
@@ -59,13 +59,13 @@ export const unpublishAnnouncement = async (id) => {
 ===================================== */
 
 export const getNotifications = async () => {
-  const { data } = await api.get("/notifications");
+  const { data } = await api.get("/college/communication/notifications");
   return data;
 };
 
 export const getNotificationHistory = async () => {
   const { data } = await api.get(
-    "/notifications/history"
+    "/college/communication/notifications/history"
   );
   return data;
 };
@@ -74,7 +74,7 @@ export const sendNotification = async (
   notificationData
 ) => {
   const { data } = await api.post(
-    "/notifications",
+    "/college/communication/notifications",
     notificationData
   );
   return data;
@@ -85,7 +85,7 @@ export const updateNotification = async (
   notificationData
 ) => {
   const { data } = await api.put(
-    `/notifications/${id}`,
+    `/college/communication/notifications/${id}`,
     notificationData
   );
   return data;
@@ -93,14 +93,14 @@ export const updateNotification = async (
 
 export const deleteNotification = async (id) => {
   const { data } = await api.delete(
-    `/notifications/${id}`
+    `/college/communication/notifications/${id}`
   );
   return data;
 };
 
 export const triggerNotification = async (id) => {
   const { data } = await api.post(
-    `/notifications/${id}/send`
+    `/college/communication/notifications/${id}/send`
   );
   return data;
 };

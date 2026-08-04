@@ -71,39 +71,39 @@ const localStats = [
 const iconMap = {
   "Total Students": {
     icon: Users,
-    iconBg: "bg-gradient-to-br from-blue-50 to-indigo-50 text-indigo-600 border border-indigo-100/80"
+    iconBg: "bg-gradient-to-br from-orange-50 to-amber-50 text-[#ff6d34] border border-orange-200/80"
   },
   "Active Drives": {
     icon: Briefcase,
-    iconBg: "bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-600 border border-emerald-100/80"
+    iconBg: "bg-gradient-to-br from-teal-50 to-emerald-50 text-[#00bea3] border border-teal-200/80"
   },
   "Companies": {
     icon: Building2,
-    iconBg: "bg-gradient-to-br from-violet-50 to-fuchsia-50 text-violet-600 border border-violet-100/80"
+    iconBg: "bg-gradient-to-br from-orange-50 to-rose-50 text-[#ff6d34] border border-orange-200/80"
   },
   "Placements": {
     icon: Award,
-    iconBg: "bg-gradient-to-br from-amber-50 to-orange-50 text-amber-600 border border-amber-100/80"
+    iconBg: "bg-gradient-to-br from-teal-50 to-cyan-50 text-[#00bea3] border border-teal-200/80"
   },
   "Faculty": {
     icon: GraduationCap,
-    iconBg: "bg-gradient-to-br from-sky-50 to-blue-50 text-sky-600 border border-sky-100/80"
+    iconBg: "bg-gradient-to-br from-orange-50 to-yellow-50 text-[#ff6d34] border border-orange-200/80"
   },
   "Departments": {
     icon: Layers,
-    iconBg: "bg-gradient-to-br from-rose-50 to-pink-50 text-rose-600 border border-rose-100/80"
+    iconBg: "bg-gradient-to-br from-teal-50 to-green-50 text-[#00bea3] border border-teal-200/80"
   },
   "Internships": {
     icon: ClipboardList,
-    iconBg: "bg-gradient-to-br from-teal-50 to-emerald-50 text-teal-600 border border-teal-100/80"
+    iconBg: "bg-gradient-to-br from-orange-50 to-amber-50 text-[#ff6d34] border border-orange-200/80"
   },
   "Placement Rate": {
     icon: Percent,
-    iconBg: "bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-600 border border-indigo-100/80"
+    iconBg: "bg-gradient-to-br from-teal-50 to-emerald-50 text-[#00bea3] border border-teal-200/80"
   }
 };
 
-const StatsGrid = ({ stats }) => {
+const StatsGrid = ({ darkMode, stats }) => {
   const displayStats = stats && stats.length > 0 ? stats : localStats;
 
   return (
@@ -116,6 +116,7 @@ const StatsGrid = ({ stats }) => {
         return (
           <StatsCard
             key={stat.id || stat.title}
+            darkMode={darkMode}
             title={stat.title}
             value={stat.value}
             change={stat.change}

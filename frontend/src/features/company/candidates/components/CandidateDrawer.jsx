@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { X, Download } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const getAvatarBgColor = (avatar) => {
   const av = (avatar || "").toUpperCase();
@@ -124,7 +125,59 @@ export const CandidateDrawer = ({
       {/* Resume Download */}
       <div>
         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-4">Resume</h3>
-        <button className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-semibold hover:border-gray-300">
+        <button
+          onClick={() => {
+            if (!candidate) return;
+            const rawResumeName = candidate.resume || `${candidate.name.replace(/\s+/g, '_')}_resume.pdf`;
+            const fileName = rawResumeName.endsWith('.pdf') 
+              ? rawResumeName.replace('.pdf', '_resume.txt') 
+              : `${rawResumeName}_resume.txt`;
+            const resumeText = `
+==================================================
+              PRAGATI CAREER PORTAL
+                CANDIDATE RESUME
+==================================================
+
+CANDIDATE PROFILE:
+------------------
+Name:            ${candidate.name}
+College:         ${candidate.college}
+Degree:          ${candidate.degree || 'B.Tech / B.E'}
+Graduation:      Class of ${candidate.graduationYear || '2026'}
+GPA:             ${candidate.gpa || 'N/A'} / 10.0
+
+CONTACT DETAILS:
+----------------
+Email:           ${candidate.email}
+Phone:           ${candidate.phone}
+Address:         ${candidate.location || 'N/A'}
+
+TECHNICAL SKILLS:
+-----------------
+${candidate.skills && candidate.skills.length > 0 ? candidate.skills.join(', ') : 'React, Node.js, JavaScript'}
+
+ASSESSMENT & TRAINING METRICS:
+------------------------------
+Assessment Score:   ${candidate.score || 0}%
+Training Progress:  ${candidate.trainingProgress || 0}%
+
+FEEDBACK & NOTES:
+-----------------
+${candidate.feedback || 'Highly recommended candidate.'}
+`;
+            const blob = new Blob([resumeText.trim()], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            toast.success(`Resume (${fileName}) downloaded successfully!`);
+          }}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-semibold hover:border-gray-300 cursor-pointer"
+        >
           <Download size={20} />
           <span>Download Resume</span>
         </button>

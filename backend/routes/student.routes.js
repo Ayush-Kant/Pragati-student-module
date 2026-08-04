@@ -9,6 +9,7 @@ import {
   searchStudents,
   filterStudents,
   getStudentStatistics,
+  getEligiblePool,
   getAcademicDetails,
   updateAcademicDetails,
   getStudentSkills,
@@ -21,16 +22,17 @@ const router = Router();
 // All student routes require authentication
 router.use(authMiddleware);
 
-// ─── Search & Filter & Statistics (before /:id to avoid conflicts) ────────────
-router.get('/search',     searchStudents);
-router.get('/filter',     filterStudents);
+// ─── Search & Filter & Statistics & Eligible Pool (before /:id) ───────────────
+router.get('/search', searchStudents);
+router.get('/filter', filterStudents);
 router.get('/statistics', getStudentStatistics);
+router.get('/eligible-pool', getEligiblePool);   // ← nomination pool from students table
 
 // ─── Student CRUD ─────────────────────────────────────────────────────────────
-router.get('/',    getStudents);
-router.post('/',   createStudent);
-router.get('/:id',    getStudentById);
-router.put('/:id',    updateStudent);
+router.get('/', getStudents);
+router.post('/', createStudent);
+router.get('/:id', getStudentById);
+router.put('/:id', updateStudent);
 router.delete('/:id', deleteStudent);
 
 // ─── Academic Details ─────────────────────────────────────────────────────────
@@ -38,8 +40,8 @@ router.get('/:id/academic', getAcademicDetails);
 router.put('/:id/academic', updateAcademicDetails);
 
 // ─── Skills ───────────────────────────────────────────────────────────────────
-router.get('/:id/skills',             getStudentSkills);
-router.post('/:id/skills',            addStudentSkill);
+router.get('/:id/skills', getStudentSkills);
+router.post('/:id/skills', addStudentSkill);
 router.delete('/:id/skills/:skillId', deleteStudentSkill);
 
 export default router;

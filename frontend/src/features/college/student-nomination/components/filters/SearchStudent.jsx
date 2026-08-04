@@ -13,14 +13,14 @@ const SearchStudent = ({
       className={`flex items-center rounded-2xl border px-4 py-3 gap-3 transition-all duration-200 ease-out
         ${
           darkMode
-            ? "border-slate-700/60 bg-[#151D30] focus-within:border-blue-500/70 focus-within:ring-4 focus-within:ring-blue-500/10"
-            : "border-slate-300 bg-white focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10"
+            ? "border-[#3D3D3D] bg-[#2D2D2D] focus-within:border-[#ff6d34]/70 focus-within:ring-4 focus-within:ring-[#ff6d34]/10"
+            : "border-slate-300 bg-white focus-within:border-[#ff7a00] focus-within:ring-4 focus-within:ring-[#ff7a00]/10"
         }`}
     >
       <Search
         size={18}
         strokeWidth={2.2}
-        className={`shrink-0 ${darkMode ? "text-slate-400" : "text-slate-500"}`}
+        className={`shrink-0 ${darkMode ? "text-gray-400" : "text-slate-500"}`}
       />
       <input
         type="search"

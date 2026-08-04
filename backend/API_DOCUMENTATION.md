@@ -46,7 +46,7 @@ All routes require a Bearer JWT token with the `student` role.
 
 ---
 
-# ?? API Documentation � Module 6: Training Coordination
+# ?? API Documentation — Module 6: Training Coordination
 
 **Base URL:** `http://localhost:5000/api/v1/company/training`  
 **Auth:** All endpoints require `Authorization: Bearer <JWT_TOKEN>` header
@@ -85,7 +85,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 | Parameter | Type   | Required | Default | Description            |
 |-----------|--------|----------|---------|------------------------|
-| status    | string | No       | �       | Filter by status: `ACTIVE`, `COMPLETED`, `PAUSED`, `CANCELLED` |
+| status    | string | No       | —       | Filter by status: `ACTIVE`, `COMPLETED`, `PAUSED`, `CANCELLED` |
 | limit     | number | No       | 10      | Max results per page   |
 | offset    | number | No       | 0       | Number of results to skip |
 
@@ -301,4 +301,183 @@ curl -s -X PATCH http://localhost:5000/api/v1/company/training/T101/assign-mento
 # 4. Get progress analytics
 curl -s http://localhost:5000/api/v1/company/training/T101/progress \
   -H "Authorization: Bearer $TOKEN" | jq .
+
+---
+
+# 📊 API Documentation - Module 7: College Analytics Dashboard
+
+**Base URL:** `http://localhost:5000/api/analytics`  
+**Auth:** All endpoints require `Authorization: Bearer <JWT_TOKEN>` header with `college` role.
+
+---
+
+## 🔒 Authentication
+
+All endpoints are protected by JWT authentication and role authorization.  
+JWT token is obtained from the `/api/auth/login` endpoint.
+
+---
+
+## 🚀 Endpoints
+
+### 1. GET `/api/analytics/dashboard`
+- **Description:** Get high-level dashboard KPIs (total students, placed, rates, active drives, companies).
+- **Success Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Dashboard analytics fetched successfully.",
+  "data": {
+    "college_id": 3,
+    "total_students": 2450,
+    "total_placed": 1280,
+    "placement_rate": 82,
+    "average_package": 12,
+    "top_recruiter": "Google",
+    "active_drives": 15,
+    "total_companies": 45
+  }
+}
+```
+
+### 2. GET `/api/analytics/overview`
+- **Description:** Get overview statistics (mirrors dashboard analytics).
+- **Success Response (200 OK):** Same as dashboard.
+
+### 3. GET `/api/analytics/placements`
+- **Description:** Get year-wise placement trends.
+- **Success Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Placement analytics fetched successfully.",
+  "data": [
+    {
+      "college_id": 3,
+      "year": 2026,
+      "total_students": 2450,
+      "total_placed": 1280,
+      "placement_rate": 82,
+      "average_package": 12,
+      "highest_package": 45
+    }
+  ]
+}
+```
+
+### 4. GET `/api/analytics/placement-trends`
+- **Description:** Get placement trends (historic yearly placements).
+- **Success Response (200 OK):** Same as placements.
+
+### 5. GET `/api/analytics/companies`
+- **Description:** Get company hiring statistics.
+- **Success Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Company analytics fetched successfully.",
+  "data": [
+    {
+      "college_id": 3,
+      "company_name": "Google",
+      "total_hired": 45,
+      "average_package": 24.5
+    }
+  ]
+}
+```
+
+### 6. GET `/api/analytics/company-report`
+- **Description:** Generate Company CSV placement report.
+- **Success Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Company report generated successfully.",
+  "data": {
+    "report": "\"Company Name\",\"Total Students Placed\",\"Average Salary Package (LPA)\"\n\"Google\",\"45\",\"24.50\"...",
+    "filename": "companies_report_1710000000000.csv"
+  }
+}
+```
+
+### 7. GET `/api/analytics/departments`
+- **Description:** Get department-wise performance metrics.
+- **Success Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Department analytics fetched successfully.",
+  "data": [
+    {
+      "department_name": "Computer Science Engineering",
+      "department_code": "CSE",
+      "total_students": 240,
+      "total_placed": 210,
+      "placement_rate": 87.5,
+      "average_package": 14.5
+    }
+  ]
+}
+```
+
+### 8. GET `/api/analytics/department-report`
+- **Description:** Generate Department CSV placement report.
+- **Success Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Department report generated successfully.",
+  "data": {
+    "report": "\"Department Name\",\"Code\",\"Total Students\",\"Placed Students\",\"Placement Rate (%)\",\"Average Salary Package (LPA)\"...",
+    "filename": "departments_report_1710000000000.csv"
+  }
+}
+```
+
+### 9. GET `/api/analytics/students`
+- **Description:** Get students counts grouped by placement status and CGPA ranges.
+- **Success Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Student analytics statistics fetched successfully.",
+  "data": {
+    "statusCounts": [
+      { "status": "Placed", "count": 4 },
+      { "status": "Eligible", "count": 1 }
+    ],
+    "cgpaRanges": {
+      "range_9_10": 1,
+      "range_8_9": 2,
+      "range_7_8": 1,
+      "range_below_7": 0
+    }
+  }
+}
+```
+
+### 10. GET `/api/analytics/student-report`
+- **Description:** Generate Student CSV placement report.
+- **Success Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Student report generated successfully.",
+  "data": {
+    "report": "\"Enrollment Number\",\"Student Name\",\"Email ID\",\"Department\",\"Course\",\"CGPA\",\"Status\",\"Placed At Company\",\"Salary Package\"...",
+    "filename": "students_report_1710000000000.csv"
+  }
+}
+```
+
+### 11. GET `/api/analytics/export/pdf`
+- **Description:** Export analytics report in PDF (HTML) format.
+- **Query Parameters:** `reportType` (placements, companies, departments, students, dashboard).
+- **Success Response (200 OK):** HTML document binary.
+
+### 12. GET `/api/analytics/export/excel`
+- **Description:** Export analytics report in Excel (CSV) format.
+- **Query Parameters:** `reportType` (placements, companies, departments, students, dashboard).
+- **Success Response (200 OK):** CSV file binary/text.
 ```

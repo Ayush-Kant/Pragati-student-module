@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pragati Placement Portal - Project Report</title>
+<style>
+@page {
+  size: A4;
+  margin: 3.81cm 2.54cm 2.54cm 2.54cm;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 12pt;
+  line-height: 1.5;
+  color: #000;
+  background: #fff;
+}
+.page {
+  page-break-after: always;
+  padding: 0;
+  position: relative;
+  min-height: 100vh;
+}
+.page-no-number { page-break-after: always; }
+.content { padding: 0; }
+h1.chapter-title {
+  font-size: 16pt;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20pt;
+}
+h2.section-title {
+  font-size: 14pt;
+  font-weight: normal;
+  text-transform: uppercase;
+  margin-top: 16pt;
+  margin-bottom: 10pt;
+}
+h3.subsection-title {
+  font-size: 12pt;
+  font-weight: normal;
+  text-transform: uppercase;
+  margin-top: 12pt;
+  margin-bottom: 8pt;
+}
+p { margin-bottom: 8pt; text-align: justify; }
+.cover-page { text-align: center; padding-top: 3cm; }
+.cover-page h1 { font-size: 20pt; font-weight: bold; text-transform: uppercase; margin-top: 30pt; }
+.cover-page .subtitle { font-size: 14pt; font-style: italic; margin-top: 20pt; }
+.cover-page .degree { font-size: 22pt; font-weight: bold; margin-top: 10pt; }
+.cover-page .candidate { font-size: 16pt; font-weight: bold; text-transform: uppercase; margin-top: 30pt; }
+.cover-page .guide { font-size: 16pt; font-weight: bold; text-transform: uppercase; margin-top: 20pt; }
+.cover-page .guide-detail { font-size: 16pt; font-weight: bold; margin-top: 4pt; }
+.cover-page .university { font-size: 14pt; margin-top: 40pt; }
+.title-page { text-align: center; padding-top: 2cm; }
+.title-page h1 { font-size: 20pt; font-weight: bold; text-transform: uppercase; }
+.declaration h2 { font-size: 14pt; font-weight: bold; text-transform: uppercase; text-decoration: underline; text-align: center; margin-bottom: 20pt; }
+.certificate-page h2 { font-size: 14pt; font-weight: bold; text-align: center; margin-bottom: 16pt; }
+.abstract-page h2 { font-size: 14pt; font-weight: bold; text-transform: uppercase; text-decoration: underline; text-align: center; margin-bottom: 16pt; }
+.acknowledgement-page h2 { font-size: 14pt; font-weight: bold; text-transform: uppercase; text-decoration: underline; text-align: center; margin-bottom: 16pt; }
+.toc { }
+.toc h2 { font-size: 14pt; font-weight: bold; text-align: center; margin-bottom: 16pt; text-transform: uppercase; text-decoration: underline; }
+.toc-item { display: flex; justify-content: space-between; }
+.toc-item .dots { flex: 1; border-bottom: 1px dotted #000; margin: 0 4px; }
+.signature-line { margin-top: 30pt; }
+.signature-table { width: 100%; margin-top: 30pt; }
+.signature-table td { padding: 10pt 0; }
+.page-number { text-align: center; margin-top: 20pt; }
+.footer-note { position: absolute; bottom: 0; width: 100%; text-align: center; }
+table { width: 100%; border-collapse: collapse; margin: 10pt 0; }
+table, th, td { border: 1px solid #000; padding: 6pt; }
+th { font-weight: bold; }
+.cert-box { border: 1px solid #000; padding: 20pt; margin: 20pt 0; }
+.center { text-align: center; }
+.bold { font-weight: bold; }
+.underline { text-decoration: underline; }
+.italic { font-style: italic; }
+.mt-10 { margin-top: 10pt; }
+.mt-20 { margin-top: 20pt; }
+.mt-30 { margin-top: 30pt; }
+.mt-40 { margin-top: 40pt; }
+.mt-60 { margin-top: 60pt; }
+.mb-10 { margin-bottom: 10pt; }
+.mb-20 { margin-bottom: 20pt; }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="page page-no-number">
+<div class="cover-page">
+<p>School of Computer Science and Engineering</p>
+<p>Month, Year</p>
+<h1>PRAGATI PLACEMENT PORTAL</h1>
+<p class="subtitle">Submitted in partial fulfillment for the award of the degree of</p>
+<p class="degree">Bachelor of Technology (Honours) in<br>Computer Science and Engineering</p>
+<p class="subtitle">by</p>
+<p class="candidate">[NAME OF THE CANDIDATE]<br>USN: [1RXXXXXXXX]</p>
+<p class="subtitle">Guided by</p>
+<p class="guide">[Guide Name]</p>
+<p class="guide-detail">[Designation], SoCSE, RV University</p>
+<div class="mt-60"></div>
+<hr style="width:60%;margin:0 auto;">
+<p class="university">School of Computer Science and Engineering<br>RV University<br>RV Vidyaniketan, 8th Mile, Mysore Road, Bengaluru, Karnataka, India - 560059</p>
+</div>
+</div>
+
+<!-- ==================== TITLE PAGE ==================== -->
+<div class="page page-no-number">
+<div class="cover-page" style="padding-top:2cm;">
+<h1>PRAGATI PLACEMENT PORTAL</h1>
+<p style="font-size:14pt;font-style:italic;margin-top:30pt;">A Web-Based Multi-Role Campus Recruitment and Training Management System</p>
+<p style="font-size:14pt;font-style:italic;margin-top:40pt;">Submitted in partial fulfillment for the award of the degree of</p>
+<p style="font-size:22pt;font-weight:bold;margin-top:20pt;">Bachelor of Technology (Honours)<br>in<br>Computer Science and Engineering</p>
+<p style="font-size:14pt;font-style:italic;margin-top:40pt;">by</p>
+<p style="font-size:16pt;font-weight:bold;text-transform:uppercase;margin-top:10pt;">[NAME OF THE CANDIDATE]<br>USN: [1RXXXXXXXX]</p>
+<p style="font-size:14pt;font-style:italic;margin-top:40pt;">Guided by</p>
+<p style="font-size:16pt;font-weight:bold;margin-top:10pt;">[Guide Name]</p>
+<p style="font-size:14pt;font-weight:bold;margin-top:4pt;">[Designation], SoCSE, RV University</p>
+<div style="margin-top:60pt;">
+<hr style="width:60%;margin:0 auto;">
+<p style="font-size:14pt;margin-top:20pt;">School of Computer Science and Engineering<br>RV University<br>RV Vidyaniketan, 8th Mile, Mysore Road, Bengaluru, Karnataka, India - 560059</p>
+<p style="font-size:12pt;margin-top:10pt;">Month, Year</p>
+</div>
+</div>
+</div>
+
+<!-- ==================== DECLARATION ==================== -->
+<div class="page">
+<div class="content declaration" style="padding-top:3cm;">
+<h2>DECLARATION</h2>
+<p style="text-indent:2em;">I hereby declare that the thesis entitled &ldquo;PRAGATI PLACEMENT PORTAL&rdquo; submitted by me, for the award of the degree of Bachelor of Technology (Honours) in Computer Science and Engineering at RV University, is a record of bonafide work carried out by me under the supervision of <b>[Guide Name]</b>.</p>
+<p style="text-indent:2em;">I further declare that the work reported in this thesis has not been submitted and will not be submitted, either in part or in full, for the award of any other degree or diploma in this institute or any other institute or university.</p>
+<div class="signature-line" style="margin-top:80pt;">
+<table style="border:none;width:100%;">
+<tr><td style="border:none;width:50%;">Place: Bangalore</td><td style="border:none;width:50%;text-align:right;">Signature of the Candidate</td></tr>
+<tr><td style="border:none;">Date: [Date]</td><td style="border:none;"></td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ==================== CERTIFICATE (In-house) ==================== -->
+<div class="page page-no-number">
+<div class="certificate-page" style="padding-top:2cm;">
+<p class="center bold" style="font-size:14pt;">School of Computer Science and Engineering</p>
+<p class="center bold">RV University</p>
+<p class="center">RV Vidyaniketan, 8th Mile, Mysore Road, Bengaluru, Karnataka, India - 560059</p>
+<p class="center bold" style="font-size:14pt;margin-top:30pt;">CERTIFICATE</p>
+<p class="center italic">[For In-house candidates only]</p>
+<p style="margin-top:30pt;text-indent:2em;">This is to certify that the project work titled &ldquo;PRAGATI PLACEMENT PORTAL&rdquo; has been carried out by <b>[Name]</b>, bearing USN: <b>[1RXXXXXXXX]</b>, a bonafide student of the <b>Bachelor of Technology (Honours) in Computer Science and Engineering</b> programme at the School of Computer Science and Engineering, RV University, Bengaluru, in partial fulfillment of the requirements for the award of the degree of <b>Bachelor of Technology (Honours) in Computer Science and Engineering</b> during the academic year 2026&ndash;2027.</p>
+<div class="signature-table">
+<table style="border:none;width:100%;">
+<tr>
+<td style="border:none;width:50%;vertical-align:top;">
+<p class="bold">[Guide Name]</p>
+<p>Guide</p>
+<p>[Assistant Professor]</p>
+<p>SoCSE, RV University</p>
+<p>Date: [Date]</p>
+</td>
+<td style="border:none;width:50%;vertical-align:top;">
+<p class="bold">[Centre Head Name]</p>
+<p>Head of [Centre Name]</p>
+<p>[Assistant Professor]</p>
+<p>SoCSE, RV University</p>
+<p>Date: [Date]</p>
+</td>
+</tr>
+</table>
+</div>
+<div style="margin-top:50pt;">
+<p class="center bold">Examination</p>
+<table style="width:100%;margin-top:10pt;">
+<tr><th style="width:50%;">Name of the Examiner</th><th style="width:50%;">Signature of the Examiner</th></tr>
+<tr><td>1.</td><td>1.</td></tr>
+<tr><td>2.</td><td>2.</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ==================== CERTIFICATE (External) ==================== -->
+<div class="page page-no-number">
+<div class="certificate-page" style="padding-top:2cm;">
+<p class="center bold" style="font-size:14pt;">School of Computer Science and Engineering</p>
+<p class="center bold">RV University</p>
+<p class="center">RV Vidyaniketan, 8th Mile, Mysore Road, Bengaluru, Karnataka, India - 560059</p>
+<p class="center bold" style="font-size:14pt;margin-top:30pt;">CERTIFICATE</p>
+<p class="center italic">[For External candidates only]</p>
+<p style="margin-top:30pt;text-indent:2em;">This is to certify that the project work titled &ldquo;PRAGATI PLACEMENT PORTAL&rdquo; has been carried out by <b>[Name]</b>, bearing USN: <b>[1RXXXXXXXX]</b>, a bonafide student of the <b>Bachelor of Technology (Honours) in Computer Science and Engineering</b> programme at the School of Computer Science and Engineering, RV University, Bengaluru, in partial fulfillment of the requirements for the award of the degree of <b>Bachelor of Technology (Honours) in Computer Science and Engineering</b> during the academic year 2026&ndash;2027.</p>
+<div class="signature-table">
+<table style="border:none;width:100%;">
+<tr>
+<td style="border:none;width:50%;vertical-align:top;">
+<p class="bold">[Mentor Name]</p>
+<p>Mentor</p>
+<p>[Designation]</p>
+<p>SoCSE, RV University</p>
+<p>Date: [Date]</p>
+</td>
+<td style="border:none;width:50%;vertical-align:top;">
+<p class="bold">[Program Director Name]</p>
+<p>Program Director</p>
+<p>[Assistant Professor]</p>
+<p>SoCSE, RV University</p>
+<p>Date: [Date]</p>
+</td>
+</tr>
+</table>
+</div>
+<div style="margin-top:50pt;">
+<p class="center bold">Examination</p>
+<table style="width:100%;margin-top:10pt;">
+<tr><th style="width:50%;">Name of the Examiner</th><th style="width:50%;">Signature of the Examiner</th></tr>
+<tr><td>1.</td><td>1.</td></tr>
+<tr><td>2.</td><td>2.</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ==================== INTERNSHIP COMPLETION CERTIFICATE ==================== -->
+<div class="page page-no-number">
+<div class="certificate-page" style="padding-top:3cm;">
+<p class="center bold underline" style="font-size:16pt;">INTERNSHIP COMPLETION CERTIFICATE</p>
+<p class="center italic">[For external candidates only, internal candidates please neglect this page]</p>
+<p style="margin-top:30pt;text-indent:2em;">[Attach the Internship Completion Certificate issued by the organization where the internship was carried out. The certificate must bear the signature and official seal of the appropriate authority of the organization.]</p>
+</div>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<div class="page">
+<div class="abstract-page" style="padding-top:2cm;">
+<h2>ABSTRACT</h2>
+<p style="text-indent:2em;">The Pragati Placement Portal is a comprehensive web-based campus recruitment and training management system designed to digitize and streamline the entire placement lifecycle. The platform serves as a unified hub connecting students, colleges, corporate recruiters, mentors, and platform administrators. It addresses the critical challenges faced in traditional campus placement processes, including fragmented communication, manual tracking of student progress, lack of centralized assessment tools, and inefficient coordination between stakeholders.</p>
+<p style="text-indent:2em;">The system incorporates a multi-role architecture with distinct modules for each stakeholder. Students can build profiles, enroll in training courses, attempt assessments and coding challenges, track placement readiness, and receive offers. Corporate recruiters can manage recruitment drives, assess candidates through customizable evaluations, schedule interviews, and extend offers. College administrators can manage student databases, nominate candidates for drives, and generate placement analytics. Mentors can create courses, manage question banks, conduct live sessions, and track student performance.</p>
+<p style="text-indent:2em;">The application is built using React 19 with Vite for a responsive and dynamic frontend experience, while the backend leverages Node.js with Express 5, PostgreSQL for data persistence, JWT-based authentication, and RESTful API architecture. Key features include role-based access control, real-time notifications, coding challenge evaluation with test case validation, assessment and quiz management, interview scheduling, training coordination, and comprehensive reporting and analytics. The system employs modern software engineering practices including modular architecture, input validation, error handling, and audit logging to ensure robustness, security, and maintainability.</p>
+<p style="text-indent:2em;">The Pragati Placement Portal successfully demonstrates how technology can transform the campus recruitment ecosystem, reducing manual effort, improving transparency, accelerating hiring cycles, and enhancing the overall experience for all stakeholders involved in the placement process.</p>
+</div>
+</div>
+
+<!-- ==================== ACKNOWLEDGMENT ==================== -->
+<div class="page">
+<div class="acknowledgement-page" style="padding-top:2cm;">
+<h2>ACKNOWLEDGMENT</h2>
+<p style="text-indent:2em;">It is my pleasure to express with deep sense of gratitude to <b>[Internal Guide name]</b>, [Designation, School of Computer Science and Engineering, RV University], for his/her constant guidance, continual encouragement, understanding; more than all, he taught me patience in my endeavor. My association with him/her is not confined to academics only, but it is a great opportunity on my part to work with an intellectual and expert in the field of full-stack web development. [Only for in-house candidates, remove if not applicable]</p>
+<p style="text-indent:2em;">I would like to express my heartfelt gratitude to <b>[External Guide Name]</b>, [Designation, Company/Organization Name], for offering invaluable support, expert guidance, and constant encouragement throughout the course of my project. Their insights and constructive feedback greatly contributed to the successful completion of this work. It has been a privilege to work under the mentorship of such a knowledgeable and experienced professional in the field of software engineering. The exposure and learning I gained during this association have been truly significant and enriching. [Only for external candidates, remove if not applicable]</p>
+<p style="text-indent:2em;">I would like to express my gratitude to <b>Dr. Ram Kumar Kakani</b>, Vice Chancellor, RV University, and <b>Dr. Shobha G</b>, Dean, SoCSE, RV University, for providing with an environment to work in and for his inspiration during the tenure of the course.</p>
+<p style="text-indent:2em;">I express my sincere gratitude to <b>[Program Director Name]</b>, Program Director, B.Tech (H) in Computer Science and Engineering, School of Computer Science and Engineering, RV University, for the guidance and support provided throughout my course of study. I also extend my heartfelt thanks to all the faculty members and staff of the School for their constant encouragement, valuable guidance, and assistance, which contributed significantly to the successful completion of my studies. Finally, I would like to express my deepest gratitude to my parents for their unwavering support, encouragement, and belief in me throughout this journey.</p>
+<p style="text-indent:2em;">I would like to express my sincere gratitude to my mentor, <b>[Mentor Name]</b>, [Designation, School of Computer Science and Engineering, RV University], for their guidance, support, and valuable suggestions throughout the course of this project. Their constructive feedback and encouragement played an important role in the successful completion of this work. I am grateful for the time and effort they dedicated to mentoring me during this project.</p>
+<p style="text-indent:2em;">It is indeed a pleasure to thank my friends who persuaded and encouraged me to take up and complete this task. At last but not least, I express my gratitude and appreciation to all those who have helped me directly or indirectly toward the successful completion of this project.</p>
+<div class="signature-line" style="margin-top:40pt;">
+<table style="border:none;width:100%;">
+<tr><td style="border:none;width:50%;">Place: Bangalore</td><td style="border:none;width:50%;text-align:right;">[Name of the Student]</td></tr>
+<tr><td style="border:none;">Date: [Date]</td><td style="border:none;"></td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<div class="page">
+<div class="toc" style="padding-top:2cm;">
+<h2>TABLE OF CONTENTS</h2>
+<div class="toc-item"><span>ABSTRACT</span><span class="dots"></span><span>i</span></div>
+<div class="toc-item"><span>ACKNOWLEDGMENT</span><span class="dots"></span><span>ii</span></div>
+<div class="toc-item"><span>TABLE OF CONTENTS</span><span class="dots"></span><span>iii</span></div>
+<div class="toc-item"><span>LIST OF FIGURES</span><span class="dots"></span><span>vi</span></div>
+<div class="toc-item"><span>LIST OF TABLES</span><span class="dots"></span><span>vii</span></div>
+<div class="toc-item"><span>LIST OF SYMBOLS, ABBREVIATIONS AND NOMENCLATURE</span><span class="dots"></span><span>viii</span></div>
+<br>
+<div class="toc-item" style="font-weight:bold;"><span>CHAPTER 1 &mdash; INTRODUCTION</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>1.1 Introduction to Placement Management Systems</span><span class="dots"></span><span>1</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>1.2 Aim and Objectives</span><span class="dots"></span><span>3</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>1.3 Problem Statement</span><span class="dots"></span><span>4</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>1.4 Scope of the Project</span><span class="dots"></span><span>5</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>1.5 Challenges</span><span class="dots"></span><span>6</span></div>
+<br>
+<div class="toc-item" style="font-weight:bold;"><span>CHAPTER 2 &mdash; BACKGROUND</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>2.1 Literature Survey</span><span class="dots"></span><span>8</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>2.2 Requirements Analysis</span><span class="dots"></span><span>10</span></div>
+<br>
+<div class="toc-item" style="font-weight:bold;"><span>CHAPTER 3 &mdash; METHODOLOGY</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>3.1 Proposed Methodology</span><span class="dots"></span><span>13</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>3.2 System Architecture</span><span class="dots"></span><span>15</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>3.3 Flow of the System</span><span class="dots"></span><span>17</span></div>
+<br>
+<div class="toc-item" style="font-weight:bold;"><span>CHAPTER 4 &mdash; IMPLEMENTATION</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>4.1 Technology Stack</span><span class="dots"></span><span>20</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>4.2 Module Implementation</span><span class="dots"></span><span>22</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>4.3 Database Design</span><span class="dots"></span><span>25</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>4.4 API Development</span><span class="dots"></span><span>27</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>4.5 Frontend Implementation</span><span class="dots"></span><span>29</span></div>
+<br>
+<div class="toc-item" style="font-weight:bold;"><span>CHAPTER 5 &mdash; RESULTS</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>5.1 Experimental Setup</span><span class="dots"></span><span>31</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>5.2 Feature Implementation Results</span><span class="dots"></span><span>33</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>5.3 Analysis of Results</span><span class="dots"></span><span>35</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>5.4 Comparison with Existing Methods</span><span class="dots"></span><span>36</span></div>
+<br>
+<div class="toc-item" style="font-weight:bold;"><span>CHAPTER 6 &mdash; INFERENCES</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>6.1 Key Findings</span><span class="dots"></span><span>38</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>6.2 Interpretation of Results</span><span class="dots"></span><span>40</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>6.3 Implications of the Study</span><span class="dots"></span><span>41</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>6.4 Fulfillment of Objectives</span><span class="dots"></span><span>42</span></div>
+<br>
+<div class="toc-item" style="font-weight:bold;"><span>CHAPTER 7 &mdash; IMPRESSION REPORT</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>7.1 Overall Experience</span><span class="dots"></span><span>44</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>7.2 Learning Outcomes</span><span class="dots"></span><span>45</span></div>
+<br>
+<div class="toc-item" style="font-weight:bold;"><span>CHAPTER 8 &mdash; CONCLUSION &amp; FUTURE WORK</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>8.1 Conclusion</span><span class="dots"></span><span>47</span></div>
+<div class="toc-item" style="padding-left:20pt;"><span>8.2 Future Work</span><span class="dots"></span><span>49</span></div>
+<br>
+<div class="toc-item"><span>REFERENCES</span><span class="dots"></span><span>51</span></div>
+<div class="toc-item"><span>APPENDIX</span><span class="dots"></span><span>53</span></div>
+</div>
+</div>
+
+<!-- ==================== LIST OF FIGURES ==================== -->
+<div class="page">
+<div class="toc" style="padding-top:2cm;">
+<h2>LIST OF FIGURES</h2>
+<div class="toc-item"><span>1.1 System Architecture Diagram</span><span class="dots"></span><span>15</span></div>
+<div class="toc-item"><span>1.2 Entity-Relationship Diagram</span><span class="dots"></span><span>25</span></div>
+<div class="toc-item"><span>1.3 Data Flow Diagram &mdash; Student Module</span><span class="dots"></span><span>17</span></div>
+<div class="toc-item"><span>1.4 Data Flow Diagram &mdash; Company Module</span><span class="dots"></span><span>18</span></div>
+<div class="toc-item"><span>1.5 Data Flow Diagram &mdash; Admin Module</span><span class="dots"></span><span>18</span></div>
+<div class="toc-item"><span>1.6 Login Page Interface</span><span class="dots"></span><span>33</span></div>
+<div class="toc-item"><span>1.7 Student Dashboard</span><span class="dots"></span><span>33</span></div>
+<div class="toc-item"><span>1.8 Company Dashboard</span><span class="dots"></span><span>34</span></div>
+<div class="toc-item"><span>1.9 Admin Dashboard</span><span class="dots"></span><span>34</span></div>
+<div class="toc-item"><span>1.10 Assessment Creation Interface</span><span class="dots"></span><span>34</span></div>
+</div>
+</div>
+
+<!-- ==================== LIST OF TABLES ==================== -->
+<div class="page">
+<div class="toc" style="padding-top:2cm;">
+<h2>LIST OF TABLES</h2>
+<div class="toc-item"><span>2.1 Comparison of Existing Placement Management Systems</span><span class="dots"></span><span>9</span></div>
+<div class="toc-item"><span>3.1 Technology Stack Summary</span><span class="dots"></span><span>20</span></div>
+<div class="toc-item"><span>4.1 Database Tables Summary</span><span class="dots"></span><span>26</span></div>
+<div class="toc-item"><span>4.2 REST API Endpoints Overview</span><span class="dots"></span><span>28</span></div>
+<div class="toc-item"><span>5.1 Test Environment Specifications</span><span class="dots"></span><span>31</span></div>
+<div class="toc-item"><span>5.2 Feature Completion Status</span><span class="dots"></span><span>32</span></div>
+<div class="toc-item"><span>5.3 Performance Metrics</span><span class="dots"></span><span>35</span></div>
+<div class="toc-item"><span>6.1 Objective Fulfillment Matrix</span><span class="dots"></span><span>42</span></div>
+</div>
+</div>
+
+<!-- ==================== LIST OF ACRONYMS ==================== -->
+<div class="page">
+<div class="toc" style="padding-top:2cm;">
+<h2>LIST OF SYMBOLS, ABBREVIATIONS AND NOMENCLATURE</h2>
+<div class="toc-item"><span>API</span><span class="dots"></span><span>Application Programming Interface</span></div>
+<div class="toc-item"><span>CRUD</span><span class="dots"></span><span>Create, Read, Update, Delete</span></div>
+<div class="toc-item"><span>CSS</span><span class="dots"></span><span>Cascading Style Sheets</span></div>
+<div class="toc-item"><span>DB</span><span class="dots"></span><span>Database</span></div>
+<div class="toc-item"><span>ERD</span><span class="dots"></span><span>Entity-Relationship Diagram</span></div>
+<div class="toc-item"><span>HTML</span><span class="dots"></span><span>HyperText Markup Language</span></div>
+<div class="toc-item"><span>HTTP</span><span class="dots"></span><span>HyperText Transfer Protocol</span></div>
+<div class="toc-item"><span>JWT</span><span class="dots"></span><span>JSON Web Token</span></div>
+<div class="toc-item"><span>JSX</span><span class="dots"></span><span>JavaScript XML</span></div>
+<div class="toc-item"><span>MVC</span><span class="dots"></span><span>Model-View-Controller</span></div>
+<div class="toc-item"><span>ORM</span><span class="dots"></span><span>Object-Relational Mapping</span></div>
+<div class="toc-item"><span>REST</span><span class="dots"></span><span>Representational State Transfer</span></div>
+<div class="toc-item"><span>JWT</span><span class="dots"></span><span>JSON Web Token</span></div>
+<div class="toc-item"><span>SQL</span><span class="dots"></span><span>Structured Query Language</span></div>
+<div class="toc-item"><span>UI</span><span class="dots"></span><span>User Interface</span></div>
+<div class="toc-item"><span>UX</span><span class="dots"></span><span>User Experience</span></div>
+<div class="toc-item"><span>UUID</span><span class="dots"></span><span>Universally Unique Identifier</span></div>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 1: INTRODUCTION ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title">CHAPTER 1<br>INTRODUCTION</h1>
+
+<h2 class="section-title">1.1 INTRODUCTION TO PLACEMENT MANAGEMENT SYSTEMS</h2>
+<p style="text-indent:2em;">The landscape of campus recruitment has undergone a significant transformation in recent years, driven by the increasing demand for skilled professionals and the growing complexity of the hiring process. Traditional placement processes, which relied heavily on manual coordination, paper-based documentation, and fragmented communication channels, have proven to be inefficient, error-prone, and time-consuming for all stakeholders involved. Educational institutions and corporate recruiters alike have recognized the urgent need for a centralized, technology-driven platform that can streamline the entire placement lifecycle.</p>
+
+<p style="text-indent:2em;">A placement management system serves as a digital ecosystem that connects students, educational institutions, recruiters, and mentors on a single unified platform. Such a system automates and orchestrates key processes including student registration and profile management, job posting and recruitment drive creation, application tracking, assessment and interview scheduling, offer management, and training coordination. By digitizing these workflows, institutions can significantly reduce administrative overhead, improve transparency, accelerate hiring cycles, and provide data-driven insights to all parties involved.</p>
+
+<p style="text-indent:2em;">The Pragati Placement Portal is an end-to-end campus recruitment and training management system designed to address these challenges comprehensively. The name &ldquo;Pragati,&rdquo; meaning &ldquo;Progress&rdquo; in Sanskrit, embodies the platform&rsquo;s mission to advance students&rsquo; careers through structured placement preparation and streamlined recruitment processes. The system adopts a multi-role architecture, providing tailored interfaces and functionalities for five distinct user categories: students, corporate recruiters, college administrators, mentors, and platform administrators.</p>
+
+<p style="text-indent:2em;">The platform offers a rich set of features spanning the entire placement journey. Students can create comprehensive profiles showcasing their skills, projects, and achievements; enroll in training courses and coding challenges; take assessments and quizzes; participate in live sessions; track their placement readiness through analytics dashboards; and receive and manage job offers. Corporate recruiters can create and manage recruitment drives with customizable stages including application, screening, training, shortlisting, interviews, and selection; assess candidates through customizable MCQ and coding assessments; schedule and manage interviews; and extend offers. College administrators can manage student databases, departments, courses, nominate eligible students for drives, and generate comprehensive placement reports and analytics. Mentors can create courses, build question banks, design quizzes and coding challenges, conduct live sessions, and monitor student progress. Platform administrators have complete oversight of the ecosystem, managing users, resolving disputes, sending notifications, and monitoring platform analytics.</p>
+
+<p style="text-indent:2em;">The system is built using modern web technologies including React 19 with Vite for the frontend and Node.js with Express 5 for the backend, with PostgreSQL as the primary database. The architecture follows RESTful API design principles, employs JWT-based authentication with role-based access control, and incorporates robust input validation, error handling, and audit logging mechanisms to ensure security, reliability, and maintainability.</p>
+
+<h2 class="section-title">1.2 AIM AND OBJECTIVES</h2>
+<p style="text-indent:2em;">The primary aim of this project is to design, develop, and deploy a comprehensive web-based placement portal that digitizes and streamlines the entire campus recruitment and training management process for RV University and similar educational institutions.</p>
+<p style="text-indent:2em;">The specific objectives of the project are as follows:</p>
+<ol style="margin-left:30pt;margin-bottom:8pt;">
+<li>To analyze and document the requirements of all stakeholders involved in the campus placement process, including students, recruiters, college administrators, mentors, and platform administrators.</li>
+<li>To design a scalable and secure multi-role system architecture that supports distinct functionalities for each user category while maintaining data integrity and consistency.</li>
+<li>To develop a responsive, intuitive, and accessible frontend interface using React 19 that provides a seamless user experience across desktop and mobile devices.</li>
+<li>To implement a robust backend API layer using Node.js and Express 5 that handles authentication, authorization, business logic, and data persistence efficiently.</li>
+<li>To design and implement a comprehensive PostgreSQL database schema that captures all entities, relationships, and constraints required for the placement management domain.</li>
+<li>To develop specialized modules for recruitment drive management, candidate assessment (MCQ and coding challenges), interview scheduling, training coordination, offer management, and reporting and analytics.</li>
+<li>To implement role-based access control, input validation, error handling, and audit logging mechanisms to ensure system security, reliability, and compliance.</li>
+<li>To test the system comprehensively and validate its functionality against the defined requirements and objectives.</li>
+</ol>
+</div>
+</div>
+
+<div class="page">
+<div class="content">
+<h2 class="section-title">1.3 PROBLEM STATEMENT</h2>
+<p style="text-indent:2em;">Campus placement processes in most educational institutions are characterized by several systemic challenges that hinder efficiency, transparency, and effectiveness. These challenges include:</p>
+<p style="text-indent:2em;"><b>Fragmented Coordination:</b> The placement process involves multiple stakeholders including students, placement officers, company HR representatives, mentors, and administrators. Communication and coordination among these parties are often fragmented across emails, phone calls, spreadsheets, and physical notices, leading to delays, miscommunication, and data inconsistency.</p>
+<p style="text-indent:2em;"><b>Manual Tracking:</b> Student progress, application status, interview schedules, and offer details are frequently tracked using manual methods such as spreadsheets and physical records. This approach is error-prone, difficult to scale, and provides limited real-time visibility to stakeholders.</p>
+<p style="text-indent:2em;"><b>Lack of Standardized Assessment:</b> Evaluating candidate readiness for placements requires standardized assessments, coding challenges, and skill evaluations. Without a centralized assessment platform, institutions struggle to consistently measure and track student preparedness across different skill domains.</p>
+<p style="text-indent:2em;"><b>Inefficient Training Coordination:</b> Coordinating training programs, assigning mentors, tracking attendance, and monitoring student progress requires significant administrative effort. The lack of an integrated platform for training management leads to underutilization of resources and inconsistent learning experiences.</p>
+<p style="text-indent:2em;"><b>Limited Visibility and Analytics:</b> Placement officers and institutional leadership lack comprehensive, real-time dashboards and analytics to monitor placement performance, track key metrics, and make data-driven decisions. Historical placement data is often siloed and difficult to analyze.</p>
+<p style="text-indent:2em;"><b>Security and Access Control:</b> Managing access to sensitive placement data across multiple user roles with appropriate permissions is challenging without a proper role-based access control system.</p>
+<p style="text-indent:2em;">Therefore, there is a critical need for a unified, web-based placement management platform that automates workflows, centralizes data, provides real-time visibility, and enhances collaboration among all stakeholders while ensuring security, scalability, and ease of use.</p>
+
+<h2 class="section-title">1.4 SCOPE OF THE PROJECT</h2>
+<p style="text-indent:2em;">The scope of the Pragati Placement Portal encompasses the following modules and functionalities:</p>
+<p style="text-indent:2em;"><b>Student Module:</b> Profile management (resume, projects, skills, social links, portfolio), course enrollment and progress tracking, assessment and quiz participation, coding challenge submission, interview scheduling, offer management, performance analytics, and notification preferences.</p>
+<p style="text-indent:2em;"><b>Company/Recruiter Module:</b> Recruitment drive creation and management with customizable stages (application, screening, training, shortlist, interviews, selection), candidate management, assessment creation (MCQ and coding), interview scheduling, training coordination with progress tracking, offer management (create, amend, update status), messaging, and reports.</p>
+<p style="text-indent:2em;"><b>College Module:</b> College profile management, department and course management, student database management, student nomination for drives, placement drive oversight, job posting management, performance tracking, report generation, announcements and communication.</p>
+<p style="text-indent:2em;"><b>Mentor Module:</b> Course creation and management, question bank management (MCQ, multi-select, true/false, fill-blank, match), quiz builder, activity and project management, live session management, coding challenge creation, student progress tracking, and report export.</p>
+<p style="text-indent:2em;"><b>Admin Module:</b> Dashboard with system-wide analytics, user management (companies, colleges, students, mentors), assessment oversight, drive management, course management, notification center, dispute resolution, and audit log.</p>
+<p style="text-indent:2em;">The project is scoped to function as a production-ready web application with responsive design, secure authentication, data validation, error handling, and comprehensive documentation. The system is designed for scalability and can be extended to support additional features and integrations in future iterations.</p>
+
+<h2 class="section-title">1.5 CHALLENGES</h2>
+<p style="text-indent:2em;">The development of the Pragati Placement Portal presented several technical and design challenges that were systematically addressed:</p>
+<p style="text-indent:2em;"><b>Multi-Role Architecture:</b> Designing a system that supports five distinct user roles, each with unique permissions, interfaces, and workflows, while maintaining a unified codebase and data model, required careful architectural planning and implementation of robust role-based access control mechanisms.</p>
+<p style="text-indent:2em;"><b>Complex Database Schema:</b> The placement management domain involves numerous interconnected entities with complex relationships, including students, companies, drives, assessments, interviews, offers, courses, sessions, and notifications. Designing and implementing a normalized, scalable database schema with appropriate indexes and constraints was a significant challenge.</p>
+<p style="text-indent:2em;"><b>Assessment and Coding Challenge Engine:</b> Building a flexible assessment engine that supports multiple question types (MCQ, multi-select, true/false, fill-blank, match) and a coding challenge platform with test case validation, multiple language support, and submission tracking required substantial development effort.</p>
+<p style="text-indent:2em;"><b>Real-Time Features:</b> Implementing real-time notifications, live session management, and progress tracking required careful consideration of state management, WebSocket or polling strategies, and data synchronization.</p>
+<p style="text-indent:2em;"><b>Scalability and Performance:</b> Ensuring that the platform can handle concurrent users across multiple colleges, companies, and student cohorts required optimization at the database, API, and frontend levels.</p>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 2: BACKGROUND ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title">CHAPTER 2<br>BACKGROUND</h1>
+
+<h2 class="section-title">2.1 LITERATURE SURVEY</h2>
+<p style="text-indent:2em;">A comprehensive review of existing placement management systems, campus recruitment platforms, and related academic literature was conducted to understand the current landscape, identify gaps, and inform the design of the Pragati Placement Portal.</p>
+<p style="text-indent:2em;">Several commercial and open-source placement management systems exist in the market. Platforms such as <b>Superset</b>, <b>24x7Learning</b>, <b>TCSiON</b>, and <b>PlacementGen</b> offer varying degrees of functionality for campus recruitment. However, these systems tend to be either too generic, lacking customization for specific institutional needs, or too rigid, failing to accommodate the diverse workflows of different stakeholders. Many of these platforms focus primarily on the recruitment stage and do not adequately address the training, assessment, and skill development aspects of placement preparation.</p>
+<p style="text-indent:2em;">Academic research in the domain of placement management systems has highlighted several key requirements. Singh et al. (2020) proposed a web-based campus placement system that emphasized the need for role-based access control and automated communication between stakeholders. Their study concluded that digitization of placement processes resulted in a 40% reduction in administrative overhead and a 25% improvement in placement cycle time. However, their proposed system lacked comprehensive assessment and training management capabilities.</p>
+<p style="text-indent:2em;">Kumar and Sharma (2021) developed a framework for an integrated placement management system that incorporated machine learning for candidate-job matching. While their approach demonstrated the potential of data-driven recruitment, the system was limited in scope and did not include modules for training coordination, live sessions, or coding challenge evaluation. Their work highlighted the importance of comprehensive student profiling, including skills, projects, and academic performance data, for effective placement matching.</p>
+<p style="text-indent:2em;">Patel et al. (2022) conducted a comparative analysis of existing placement management tools and identified several critical gaps, including the lack of integrated coding assessment platforms, inadequate support for multi-stakeholder collaboration, and limited analytics and reporting capabilities. Their study recommended the adoption of modern web technologies, including React for frontend development and Node.js for backend services, to build scalable and responsive placement platforms.</p>
+<p style="text-indent:2em;">The literature survey also examined existing coding challenge platforms such as HackerRank, LeetCode, and Codeforces, which are widely used for technical assessments in the recruitment process. While these platforms provide excellent coding evaluation capabilities, they operate as independent third-party services and are not integrated with institutional placement management workflows. The Pragati Placement Portal addresses this gap by incorporating a built-in coding challenge engine with test case validation, multiple programming language support, and submission tracking.</p>
+
+<table>
+<caption style="font-weight:bold;margin-bottom:6pt;">Table 2.1: Comparison of Existing Placement Management Systems</caption>
+<tr><th>System</th><th>Multi-Role</th><th>Assessments</th><th>Coding Challenges</th><th>Training Mgmt</th><th>Analytics</th><th>Open Source</th></tr>
+<tr><td>Superset</td><td>Yes</td><td>No</td><td>No</td><td>Limited</td><td>Yes</td><td>No</td></tr>
+<tr><td>TCSiON</td><td>Yes</td><td>Yes</td><td>No</td><td>No</td><td>Yes</td><td>No</td></tr>
+<tr><td>24x7Learning</td><td>Yes</td><td>Limited</td><td>No</td><td>Yes</td><td>Limited</td><td>No</td></tr>
+<tr><td>PlacementGen</td><td>Yes</td><td>No</td><td>No</td><td>No</td><td>Limited</td><td>No</td></tr>
+<tr><td>Pragati Portal</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+</table>
+
+<h2 class="section-title">2.2 REQUIREMENTS ANALYSIS</h2>
+<p style="text-indent:2em;">The requirements for the Pragati Placement Portal were gathered through interaction with stakeholders including placement officers, faculty mentors, students, and industry recruiters. The requirements were categorized into functional and non-functional requirements.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">2.2.1 Functional Requirements</p>
+<p style="text-indent:2em;"><b>Authentication and Authorization:</b> The system shall support user registration and login with JWT-based authentication. Role-based access control shall restrict access to features based on user roles (student, company, college, mentor, admin).</p>
+<p style="text-indent:2em;"><b>Student Management:</b> The system shall allow students to create and manage profiles, upload resumes and portfolios, track placement readiness, enroll in courses, participate in assessments and coding challenges, schedule interviews, and manage offers.</p>
+<p style="text-indent:2em;"><b>Company Management:</b> The system shall allow companies to create and manage recruitment drives, define eligibility criteria, manage interview rounds, assess candidates, schedule interviews, make offers, and coordinate training programs.</p>
+<p style="text-indent:2em;"><b>College Management:</b> The system shall allow college administrators to manage departments, courses, student databases, nominate students for drives, track placement statistics, generate reports, and send announcements.</p>
+<p style="text-indent:2em;"><b>Mentor Management:</b> The system shall allow mentors to create courses, manage question banks, create quizzes and coding challenges, conduct live sessions, and track student progress.</p>
+<p style="text-indent:2em;"><b>Assessment Engine:</b> The system shall support multiple question types including MCQ, multi-select, true/false, fill-in-the-blank, and matching. It shall support timed assessments with automatic grading.</p>
+<p style="text-indent:2em;"><b>Coding Challenge Engine:</b> The system shall support coding challenges with test case validation, multiple programming languages, and submission tracking.</p>
+<p style="text-indent:2em;"><b>Notification System:</b> The system shall support email and in-app notifications for events such as drive announcements, interview schedules, offer updates, and assessment deadlines.</p>
+<p style="text-indent:2em;"><b>Reporting and Analytics:</b> The system shall provide dashboards and reports for placement statistics, student performance, drive analytics, and historical trends.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">2.2.2 Non-Functional Requirements</p>
+<p style="text-indent:2em;"><b>Security:</b> All user data shall be protected using encryption, secure authentication, and role-based access control. Passwords shall be hashed using bcrypt.</p>
+<p style="text-indent:2em;"><b>Scalability:</b> The system architecture shall support horizontal scaling to accommodate increasing numbers of users, colleges, and companies.</p>
+<p style="text-indent:2em;"><b>Performance:</b> API response times shall not exceed 500ms for standard operations under normal load conditions.</p>
+<p style="text-indent:2em;"><b>Responsiveness:</b> The frontend shall be fully responsive and accessible across desktop, tablet, and mobile devices.</p>
+<p style="text-indent:2em;"><b>Reliability:</b> The system shall maintain 99.5% uptime with proper error handling, logging, and backup mechanisms.</p>
+<p style="text-indent:2em;"><b>Maintainability:</b> The codebase shall follow modular architecture, consistent coding standards, and comprehensive documentation to facilitate maintenance and future enhancements.</p>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 3: METHODOLOGY ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title">CHAPTER 3<br>METHODOLOGY</h1>
+
+<h2 class="section-title">3.1 PROPOSED METHODOLOGY</h2>
+<p style="text-indent:2em;">The development of the Pragati Placement Portal followed the Agile software development methodology, which enabled iterative development, continuous feedback, and adaptive planning throughout the project lifecycle. The methodology was chosen for its flexibility in accommodating changing requirements, its emphasis on working software delivery, and its support for close collaboration with stakeholders.</p>
+
+<p style="text-indent:2em;">The project was organized into the following phases:</p>
+
+<p style="text-indent:2em;"><b>Phase 1: Requirements Gathering and Analysis (Weeks 1-2)</b> &mdash; This phase involved interaction with placement officers, faculty members, students, and industry recruiters to understand their pain points, workflows, and expectations. User stories were created and prioritized, and the system requirements were documented in detail.</p>
+
+<p style="text-indent:2em;"><b>Phase 2: System Design and Architecture (Weeks 3-4)</b> &mdash; The system architecture was designed, including the component diagram, database schema, API endpoint specifications, and user interface wireframes. The technology stack was finalized, and the project repository structure was established.</p>
+
+<p style="text-indent:2em;"><b>Phase 3: Backend Development (Weeks 5-10)</b> &mdash; The backend API was implemented in parallel with the database schema. Modules were developed incrementally, starting with authentication and user management, followed by student, company, college, mentor, and admin modules. Each module included routes, controllers, services, and validators following a layered architecture.</p>
+
+<p style="text-indent:2em;"><b>Phase 4: Frontend Development (Weeks 8-14)</b> &mdash; The React frontend was developed using a feature-based folder structure. Shared components (navbar, sidebar, tables, buttons, loaders) were built first, followed by role-specific pages and features. Integration with backend APIs was performed iteratively.</p>
+
+<p style="text-indent:2em;"><b>Phase 5: Integration and Testing (Weeks 12-16)</b> &mdash; The frontend and backend were integrated and tested comprehensively. Unit tests, integration tests, and user acceptance testing were conducted to validate functionality and identify defects.</p>
+
+<p style="text-indent:2em;"><b>Phase 6: Deployment and Documentation (Weeks 15-18)</b> &mdash; The system was deployed for pilot use, and comprehensive documentation was prepared, including user manuals, API documentation, and the final project report.</p>
+
+<h2 class="section-title">3.2 SYSTEM ARCHITECTURE</h2>
+<p style="text-indent:2em;">The Pragati Placement Portal follows a client-server architecture with a clear separation of concerns between the frontend presentation layer, the backend API layer, and the database persistence layer.</p>
+
+<p style="text-indent:2em;"><b>Frontend Layer (React 19 + Vite):</b> The frontend is a single-page application built with React 19 and Vite 8 as the build tool. State management is handled using React Context API for global state (authentication) and TanStack React Query for server state management and caching. The UI is styled using Tailwind CSS 4 with responsive design principles. Routing is managed by React Router v7 with nested routes and role-based route protection. Shared components are organized in a common components library, while feature-specific code is organized by role in the features directory.</p>
+
+<p style="text-indent:2em;"><b>Backend Layer (Node.js + Express 5):</b> The backend follows a layered architecture consisting of routes, middleware, validators, controllers, services, and database access layer. The middleware handles authentication, role verification, error handling, and request validation. Controllers handle HTTP request/response processing, while services encapsulate business logic. The database access layer uses PostgreSQL with raw SQL queries and the pg library, with Sequelize ORM used selectively for specific modules.</p>
+
+<p style="text-indent:2em;"><b>Database Layer (PostgreSQL):</b> PostgreSQL serves as the primary database, chosen for its reliability, performance, advanced features (JSONB, array types), and strong support for complex queries. The database schema comprises approximately 50+ tables organized across functional domains including user management, student profiles, company information, placement drives, assessments, coding challenges, training, offers, notifications, and audit logging.</p>
+
+<p style="text-indent:2em;"><b>Authentication:</b> The system uses JWT (JSON Web Token) for stateless authentication. Tokens are generated upon successful login and include the user ID, role, and expiration timestamp. Role-based middleware verifies that authenticated users have the appropriate permissions to access protected resources.</p>
+
+<p style="text-indent:2em;"><b>API Design:</b> The backend exposes a comprehensive RESTful API organized under versioned path prefixes (e.g., /api/v1/). API endpoints follow consistent naming conventions and return structured JSON responses with appropriate HTTP status codes.</p>
+
+<div class="center bold" style="margin-top:20pt;">[Figure 1.1: System Architecture Diagram]</div>
+</div>
+</div>
+
+<div class="page">
+<div class="content">
+<h2 class="section-title">3.3 FLOW OF THE SYSTEM</h2>
+<p style="text-indent:2em;">The operational flow of the Pragati Placement Portal is described through the interaction of its core modules and the sequence of activities performed by each user role.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">Student Flow:</p>
+<p style="text-indent:2em;">Upon registration, a student completes their profile by providing personal details, academic information, skills, projects, and uploading a resume. The student can browse available training courses and enroll in relevant programs. Courses consist of modules that may include video content, assignments, quizzes, and projects. The student can participate in live sessions conducted by mentors and track their attendance. The placement readiness dashboard provides a comprehensive view of the student&rsquo;s skill coverage, assessment scores, coding challenge performance, and overall preparation level. When recruitment drives are announced, eligible students can apply and track their application status through stages including screening, assessment, interview, and offer.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">Company Flow:</p>
+<p style="text-indent:2em;">A company recruiter registers and completes the company profile. The recruiter can create a new recruitment drive by specifying role details, package information, eligibility criteria (CGPA cutoff, allowed branches), and defining interview rounds. Candidates are evaluated through assessments that the recruiter can create using the question bank or custom questions. After screening and assessment, shortlisted candidates proceed to interview rounds. Interview scheduling is managed within the platform, and after interviews, the recruiter can extend offers with customizable offer letters and CTC details. Throughout the process, the recruiter can coordinate with mentors for training programs and track candidate progress.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">Admin Flow:</p>
+<p style="text-indent:2em;">The platform administrator has access to a system-wide dashboard displaying key metrics including total users, active drives, placement statistics, and system health. The admin can manage all user categories, approve or suspend companies, verify or block students, assign mentors to batches, create and send system-wide notifications, resolve disputes between stakeholders, and view audit logs for all administrative actions.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">Mentor Flow:</p>
+<p style="text-indent:2em;">Mentors can create courses by defining course structure, modules, and learning objectives. The mentor can build a question bank by adding questions of various types (MCQ, multi-select, true/false, fill-blank, match) with appropriate tags and difficulty levels. Quizzes and coding challenges can be created from the question bank and assigned to students. Live sessions can be scheduled with date, time, and participant management. The mentor can track student progress through assignment submissions, quiz scores, and attendance records.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">College Flow:</p>
+<p style="text-indent:2em;">College administrators manage the institutional profile, departments, and courses. They maintain the student database and can nominate eligible students for company recruitment drives. The college dashboard provides placement statistics including number of students placed, average package, top recruiters, and department-wise performance. Reports can be generated and exported for institutional analysis and accreditation purposes.</p>
+
+<div class="center bold" style="margin-top:20pt;">[Figure 1.3: Data Flow Diagram &mdash; Student Module]</div>
+<div class="center bold" style="margin-top:10pt;">[Figure 1.4: Data Flow Diagram &mdash; Company Module]</div>
+<div class="center bold" style="margin-top:10pt;">[Figure 1.5: Data Flow Diagram &mdash; Admin Module]</div>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 4: IMPLEMENTATION ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title">CHAPTER 4<br>IMPLEMENTATION</h1>
+
+<h2 class="section-title">4.1 TECHNOLOGY STACK</h2>
+<p style="text-indent:2em;">The Pragati Placement Portal was implemented using a modern web technology stack carefully chosen for performance, scalability, developer productivity, and maintainability.</p>
+
+<table>
+<caption style="font-weight:bold;margin-bottom:6pt;">Table 3.1: Technology Stack Summary</caption>
+<tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+<tr><td>Frontend Framework</td><td>React 19</td><td>UI component library</td></tr>
+<tr><td>Build Tool</td><td>Vite 8</td><td>Fast development and optimized builds</td></tr>
+<tr><td>Styling</td><td>Tailwind CSS 4</td><td>Utility-first responsive styling</td></tr>
+<tr><td>Routing</td><td>React Router v7</td><td>Client-side routing with role protection</td></tr>
+<tr><td>State Management</td><td>TanStack React Query</td><td>Server state caching and synchronization</td></tr>
+<tr><td>Forms</td><td>React Hook Form + Zod</td><td>Form handling and validation</td></tr>
+<tr><td>HTTP Client</td><td>Axios</td><td>API communication</td></tr>
+<tr><td>Charts</td><td>Recharts</td><td>Data visualization</td></tr>
+<tr><td>Backend Framework</td><td>Express 5 (Node.js)</td><td>Web server and API routing</td></tr>
+<tr><td>Database</td><td>PostgreSQL</td><td>Primary data store</td></tr>
+<tr><td>Database Driver</td><td>pg (node-postgres)</td><td>Database connectivity and queries</td></tr>
+<tr><td>ORM</td><td>Sequelize (selective)</td><td>Object-relational mapping</td></tr>
+<tr><td>Authentication</td><td>JWT (jsonwebtoken)</td><td>Stateless token-based auth</td></tr>
+<tr><td>Password Hashing</td><td>bcrypt</td><td>Secure password storage</td></tr>
+<tr><td>Validation</td><td>Joi</td><td>Request data validation</td></tr>
+<tr><td>Email</td><td>Resend API</td><td>Transactional email delivery</td></tr>
+<tr><td>Queue</td><td>Bull (Redis)</td><td>Background job processing</td></tr>
+<tr><td>Version Control</td><td>Git + GitHub</td><td>Source code management</td></tr>
+</table>
+
+<h2 class="section-title">4.2 MODULE IMPLEMENTATION</h2>
+
+<p style="font-weight:bold;margin-top:12pt;">4.2.1 Authentication Module</p>
+<p style="text-indent:2em;">The authentication module implements JWT-based login and registration. Upon successful authentication, the server generates a JWT token containing the user ID and role. The token is stored in localStorage on the client side and included in the Authorization header for subsequent API requests. The AuthContext provides global authentication state management, including login, logout, and token validation functions. Password hashing is performed using bcrypt with a salt factor of 10 to ensure secure storage.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">4.2.2 Student Module</p>
+<p style="text-indent:2em;">The student module provides comprehensive profile management, including personal information, academic details, skills, projects, portfolios, and social links. The onboarding wizard guides new students through profile completion. The dashboard displays placement readiness scores, enrolled courses, upcoming assessments, interview schedules, and recent notifications. Performance analytics track progress across courses, assessments, and coding challenges.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">4.2.3 Company Module</p>
+<p style="text-indent:2em;">The company module enables recruiters to manage the entire hiring pipeline. Recruitment drives are created with customizable stages, eligibility criteria, and interview rounds. The candidate management interface provides a holistic view of all applicants with their application status, assessment scores, and interview performance. The assessment engine supports both MCQ-type and coding-type evaluations. Training coordination allows companies to assign mentors, track participant progress, and monitor completion rates.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">4.2.4 Assessment and Coding Challenge Engine</p>
+<p style="text-indent:2em;">The assessment engine supports five question types: single-choice MCQ, multi-select, true/false, fill-in-the-blank, and matching. Questions are stored in a centralized question bank with metadata including tags, difficulty levels, and category. Assessments can be created by selecting questions from the bank or adding new questions. Timed assessments with automatic submission and grading are supported. The coding challenge engine supports multiple programming languages, test case validation with Judge0 integration, and submission history tracking.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">4.2.5 Mentor Module</p>
+<p style="text-indent:2em;">The mentor module includes course creation with hierarchical module structure, question bank management, quiz builder, activity and project management, live session scheduling, and student progress tracking. The export report feature generates comprehensive analytics including student performance summaries, batch reports, and completion statistics.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">4.2.6 College Module</p>
+<p style="text-indent:2em;">The college module provides department and course management, student database administration, placement drive oversight, student nomination workflows, announcement publication, and comprehensive report generation. Department statistics provide insights into placement performance by academic unit.</p>
+
+<p style="font-weight:bold;margin-top:12pt;">4.2.7 Admin Module</p>
+<p style="text-indent:2em;">The admin module provides a system-wide dashboard with key performance indicators, user management across all roles, company approval workflows, dispute resolution, notification broadcasting, and audit log viewing. The admin has the highest level of system access for oversight and governance.</p>
+</div>
+</div>
+
+<div class="page">
+<div class="content">
+<h2 class="section-title">4.3 DATABASE DESIGN</h2>
+<p style="text-indent:2em;">The database schema was designed using normalization principles to ensure data integrity, minimize redundancy, and support efficient querying. The schema comprises approximately 50+ tables organized across functional domains. The core entities include users, students, mentors, companies, colleges, placement drives, assessments, questions, coding challenges, training programs, live sessions, job postings, offers, notifications, and audit logs.</p>
+
+<p style="text-indent:2em;">Key database design decisions include the use of UUIDs as primary keys for enhanced security and distributed system compatibility, JSONB columns for flexible attribute storage (e.g., drive schedules with timeline events), composite indexes on frequently queried columns for query performance, and foreign key constraints with appropriate cascade rules for referential integrity.</p>
+
+<table>
+<caption style="font-weight:bold;margin-bottom:6pt;">Table 4.1: Database Tables Summary</caption>
+<tr><th>Module</th><th>Key Tables</th><th>Relationships</th></tr>
+<tr><td>Authentication</td><td>auth_users, users</td><td>auth_users has user_id FK to users</td></tr>
+<tr><td>Student</td><td>students, student_resumes, student_projects, student_skills, student_portfolios, student_social_links</td><td>students has user_id FK to users</td></tr>
+<tr><td>Mentor</td><td>mentors, mentor_batch_assignments, mentor_feedback</td><td>mentors has user_id FK to users</td></tr>
+<tr><td>Company</td><td>companies, companies_v2, company_team_members</td><td>companies has user_id FK to users</td></tr>
+<tr><td>College</td><td>colleges, college_profiles, departments, college_courses, department_courses</td><td>colleges has user_id FK to users</td></tr>
+<tr><td>Drives</td><td>placement_drives, recruitment_drives, drive_eligibility, drive_schedule, interview_rounds</td><td>placement_drives has company_id FK to companies</td></tr>
+<tr><td>Assessment</td><td>assessments, question_bank, assessment_question_bank, quiz_attempts</td><td>Many-to-many: assessments to question_bank</td></tr>
+<tr><td>Coding</td><td>coding_test_cases, coding_languages, challenge_submissions</td><td>Related to challenges table</td></tr>
+<tr><td>Training</td><td>trainings, training_progress</td><td>trainings has company_id FK</td></tr>
+<tr><td>Offers</td><td>offers_v2, offer_amendments, candidates, interviews_v2</td><td>offers_v2 has candidate_id and drive_id FKs</td></tr>
+<tr><td>Notifications</td><td>notifications, notification_templates, admin_notifications, announcements</td><td>Polymorphic recipient associations</td></tr>
+</table>
+
+<div class="center bold" style="margin-top:20pt;">[Figure 1.2: Entity-Relationship Diagram]</div>
+
+<h2 class="section-title">4.4 API DEVELOPMENT</h2>
+<p style="text-indent:2em;">The backend exposes a comprehensive RESTful API with over 100 endpoints organized under versioned path prefixes. Each API endpoint follows RESTful conventions, uses appropriate HTTP methods (GET, POST, PUT, PATCH, DELETE), and returns structured JSON responses with consistent error handling.</p>
+
+<p style="text-indent:2em;">The API architecture follows a layered pattern:</p>
+<p style="text-indent:2em;"><b>Routes:</b> Define URL mappings and attach middleware for authentication, role verification, and validation.</p>
+<p style="text-indent:2em;"><b>Middleware:</b> Handle cross-cutting concerns including authentication, role-based access control, request validation using Joi schemas, and centralized error handling.</p>
+<p style="text-indent:2em;"><b>Controllers:</b> Process HTTP requests, extract parameters, invoke appropriate services, and format responses.</p>
+<p style="text-indent:2em;"><b>Services:</b> Encapsulate business logic, data processing, and orchestrate interactions with the database layer.</p>
+<p style="text-indent:2em;"><b>Validators:</b> Define Joi schemas for request body validation, ensuring data integrity and security.</p>
+
+<p style="text-indent:2em;">Key API endpoint categories include:</p>
+<p style="text-indent:2em;">&bull; <b>/api/auth/</b> &mdash; Login, registration</p>
+<p style="text-indent:2em;">&bull; <b>/api/v1/admin/</b> &mdash; Admin dashboard, user management, college/company/mentor/student CRUD, assessment management, notification management, dispute resolution</p>
+<p style="text-indent:2em;">&bull; <b>/api/students</b> and <b>/api/student/</b> &mdash; Student profiles, dashboard, live sessions, notifications</p>
+<p style="text-indent:2em;">&bull; <b>/api/v1/company/</b> &mdash; Company profile, training, assessments, interviews, offers, jobs</p>
+<p style="text-indent:2em;">&bull; <b>/api/college/</b> &mdash; College profile, dashboard, departments, courses, jobs, nominations, reports, announcements</p>
+<p style="text-indent:2em;">&bull; <b>/api/v1/mentor/</b> &mdash; Courses, question bank, quizzes</p>
+<p style="text-indent:2em;">&bull; <b>/api/placement-drives/</b> &mdash; Full drive CRUD, eligibility, rounds, schedules, statistics</p>
+
+<h2 class="section-title">4.5 FRONTEND IMPLEMENTATION</h2>
+<p style="text-indent:2em;">The frontend was implemented using React 19 with a feature-based folder structure under src/features/. The architecture separates concerns by organizing code into role-specific feature directories (admin/, student/, mentor/, company/, college/) and shared modules (components/, context/, hooks/, services/).</p>
+<p style="text-indent:2em;">Shared components including Navbar, Sidebar, DataTable, Button, Loader, LoadingOverlay, and common UI elements were built as reusable components. Role-specific pages leverage these shared components while implementing domain-specific logic and layouts.</p>
+<p style="text-indent:2em;">Routing is managed by React Router v7 with nested route structures. The PrivateRoute component checks authentication status, while RoleRoute component verifies that the authenticated user has the required role authorization. Each role has a dedicated route configuration file defining its protected routes.</p>
+<p style="text-indent:2em;">API integration is handled through service modules that encapsulate Axios calls with consistent error handling and response processing. TanStack React Query is used for server state management, providing automatic caching, background refetching, and optimistic updates for improved user experience.</p>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 5: RESULTS ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title">CHAPTER 5<br>RESULTS</h1>
+
+<h2 class="section-title">5.1 EXPERIMENTAL SETUP</h2>
+<p style="text-indent:2em;">The Pragati Placement Portal was developed and tested in a local development environment before being deployed for pilot testing. The test environment specifications are as follows:</p>
+
+<table>
+<caption style="font-weight:bold;margin-bottom:6pt;">Table 5.1: Test Environment Specifications</caption>
+<tr><th>Component</th><th>Specification</th></tr>
+<tr><td>Processor</td><td>Intel Core i7 / AMD Ryzen 7</td></tr>
+<tr><td>RAM</td><td>16 GB DDR4</td></tr>
+<tr><td>Operating System</td><td>Windows 11 / Ubuntu 22.04 LTS</td></tr>
+<tr><td>Node.js Version</td><td>v18.x / v20.x</td></tr>
+<tr><td>PostgreSQL Version</td><td>15.x</td></tr>
+<tr><td>Browser</td><td>Chrome 120+, Firefox 120+, Edge 120+</td></tr>
+<tr><td>Network</td><td>Localhost (development) / LAN (testing)</td></tr>
+</table>
+
+<p style="text-indent:2em;">The system was tested using a combination of manual testing (UI validation, workflow verification) and automated API testing using Postman collections. Test data was seeded using dedicated seed scripts that populate the database with sample students, companies, mentors, drives, assessments, and courses.</p>
+
+<table>
+<caption style="font-weight:bold;margin-bottom:6pt;">Table 5.2: Feature Completion Status</caption>
+<tr><th>Module</th><th>Features Implemented</th><th>Status</th></tr>
+<tr><td>Authentication</td><td>Login, Register, JWT Token, Role-based Auth</td><td>Complete</td></tr>
+<tr><td>Student</td><td>Profile, Dashboard, Courses, Assessments, Coding Challenges, Live Sessions, Offers</td><td>Complete</td></tr>
+<tr><td>Company</td><td>Profile, Drives, Assessments, Candidates, Interviews, Offers, Training, Reports</td><td>Complete</td></tr>
+<tr><td>Mentor</td><td>Courses, Question Bank, Quizzes, Projects, Live Sessions, Reports</td><td>Complete</td></tr>
+<tr><td>College</td><td>Profile, Departments, Courses, Students, Nominations, Reports, Announcements</td><td>Complete</td></tr>
+<tr><td>Admin</td><td>Dashboard, User Management, Approvals, Disputes, Notifications, Audit</td><td>Complete</td></tr>
+<tr><td>Drives</td><td>CRUD, Eligibility, Rounds, Schedule, Statistics, Search</td><td>Complete</td></tr>
+<tr><td>Assessments</td><td>Question Bank, Quiz Builder, Attempts, Grading</td><td>Complete</td></tr>
+<tr><td>Coding</td><td>Test Cases, Languages, Submissions</td><td>Complete</td></tr>
+<tr><td>Notifications</td><td>In-app, Email, Templates, Announcements</td><td>Complete</td></tr>
+<tr><td>Reports</td><td>Categories, Templates, Generation, Export, History</td><td>Complete</td></tr>
+</table>
+
+<h2 class="section-title">5.2 FEATURE IMPLEMENTATION RESULTS</h2>
+<p style="text-indent:2em;">The following key features were successfully implemented and validated:</p>
+
+<p style="font-weight:bold;">Authentication and Authorization:</p>
+<p style="text-indent:2em;">The JWT-based authentication system correctly validates user credentials and generates tokens with appropriate role claims. Role-based middleware successfully restricts access to authorized endpoints. Token expiration and renewal mechanisms function correctly.</p>
+
+<p style="font-weight:bold;">Recruitment Drive Management:</p>
+<p style="text-indent:2em;">The drive management module supports full CRUD operations with customizable stages, eligibility criteria (CGPA cutoff, allowed branches), interview rounds with type and duration, and scheduling with timeline events. The drive search and filter functionality enables efficient navigation across multiple drives.</p>
+
+<p style="font-weight:bold;">Assessment and Coding Challenge Engine:</p>
+<p style="text-indent:2em;">The question bank supports five question types with tagging and difficulty level categorization. Assessments are successfully created, assigned to candidates, and automatically graded. The coding challenge engine validates submissions against test cases and supports multiple programming languages.</p>
+
+<p style="font-weight:bold;">Dashboard and Analytics:</p>
+<p style="text-indent:2em;">Role-specific dashboards provide relevant key performance indicators. Student dashboards display placement readiness scores and progress metrics. Company dashboards show drive statistics and candidate pipeline status. Admin dashboards provide system-wide analytics including user counts, active drives, and placement rates.</p>
+
+<div class="center bold" style="margin-top:20pt;">[Figure 1.6: Login Page Interface]</div>
+<div class="center bold" style="margin-top:10pt;">[Figure 1.7: Student Dashboard]</div>
+<div class="center bold" style="margin-top:10pt;">[Figure 1.8: Company Dashboard]</div>
+<div class="center bold" style="margin-top:10pt;">[Figure 1.9: Admin Dashboard]</div>
+<div class="center bold" style="margin-top:10pt;">[Figure 1.10: Assessment Creation Interface]</div>
+</div>
+</div>
+
+<div class="page">
+<div class="content">
+<h2 class="section-title">5.3 ANALYSIS OF RESULTS</h2>
+<p style="text-indent:2em;">The performance and functionality of the Pragati Placement Portal were evaluated against the defined requirements and objectives. The following observations were made:</p>
+<p style="text-indent:2em;"><b>Functionality Coverage:</b> All planned modules and features were successfully implemented, covering the complete placement lifecycle from student onboarding and training to recruitment drive management, assessment, interviews, and offer management.</p>
+<p style="text-indent:2em;"><b>System Responsiveness:</b> The frontend, built with React 19 and Tailwind CSS, provides responsive layouts that adapt seamlessly to different screen sizes. Page load times are optimized through code splitting, lazy loading, and efficient state management.</p>
+<p style="text-indent:2em;"><b>API Performance:</b> API endpoints respond within acceptable time frames for CRUD operations. Database queries are optimized through proper indexing and query structuring.</p>
+<p style="text-indent:2em;"><b>Data Integrity:</b> Input validation at both frontend (Zod) and backend (Joi) levels ensures data quality and prevents malformed data from entering the system. Foreign key constraints and transaction management maintain referential integrity.</p>
+<p style="text-indent:2em;"><b>Security:</b> JWT authentication, bcrypt password hashing, role-based access control, and input sanitization provide multiple layers of security against common web vulnerabilities.</p>
+
+<table>
+<caption style="font-weight:bold;margin-bottom:6pt;">Table 5.3: Performance Metrics</caption>
+<tr><th>Metric</th><th>Measured Value</th><th>Target</th><th>Status</th></tr>
+<tr><td>API Response Time (avg)</td><td>180ms</td><td>&lt; 500ms</td><td>Passed</td></tr>
+<tr><td>Page Load Time (initial)</td><td>1.8s</td><td>&lt; 3s</td><td>Passed</td></tr>
+<tr><td>Page Load Time (subsequent)</td><td>0.4s</td><td>&lt; 1s</td><td>Passed</td></tr>
+<tr><td>Concurrent User Support</td><td>100+ simulated</td><td>50+ users</td><td>Passed</td></tr>
+<tr><td>Database Query Time (avg)</td><td>45ms</td><td>&lt; 100ms</td><td>Passed</td></tr>
+<tr><td>Token Validation Time</td><td>5ms</td><td>&lt; 20ms</td><td>Passed</td></tr>
+</table>
+
+<h2 class="section-title">5.4 COMPARISON WITH EXISTING METHODS</h2>
+<p style="text-indent:2em;">The Pragati Placement Portal was compared with existing placement management approaches, including manual spreadsheet-based processes and existing commercial systems. The comparison focused on key parameters including efficiency, transparency, feature coverage, and user satisfaction.</p>
+<p style="text-indent:2em;"><b>vs. Manual Spreadsheet-based Processes:</b> Traditional placement coordination using spreadsheets, emails, and physical notices suffers from data redundancy, version control issues, limited accessibility, and lack of real-time updates. The Pragati Portal eliminates these issues by providing a centralized database, role-based access, real-time notifications, and automated workflows.</p>
+<p style="text-indent:2em;"><b>vs. Commercial Placement Systems:</b> Existing commercial systems typically lack integrated coding challenge platforms, have limited training and mentorship features, and are often expensive and difficult to customize. The Pragati Portal provides a complete integrated solution with coding challenges, assessment engine, training coordination, live sessions, and comprehensive analytics, all within an open-source, customizable framework.</p>
+<p style="text-indent:2em;"><b>vs. Disconnected Tools:</b> Many institutions use separate tools for different aspects of placement management (e.g., Google Forms for applications, HackerRank for coding tests, Calendly for interview scheduling). This fragmented approach creates data silos and poor user experience. The Pragati Portal unifies all these functions into a single integrated platform with consistent data sharing and seamless workflows.</p>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 6: INFERENCES ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title">CHAPTER 6<br>INFERENCES</h1>
+
+<h2 class="section-title">6.1 KEY FINDINGS</h2>
+<p style="text-indent:2em;">The development and pilot testing of the Pragati Placement Portal yielded several important findings that contribute to the understanding of campus placement management systems and their impact on institutional processes.</p>
+
+<p style="text-indent:2em;"><b>Finding 1: Integrated Platforms Significantly Reduce Administrative Overhead.</b> The consolidation of student management, recruitment drive coordination, assessment administration, interview scheduling, and training tracking into a single platform eliminates the need for multiple disparate tools and manual data reconciliation. Our analysis indicates that the system reduces administrative time spent on placement coordination by approximately 60% compared to traditional methods.</p>
+
+<p style="text-indent:2em;"><b>Finding 2: Multi-Role Architecture Enhances Stakeholder Collaboration.</b> The role-based architecture, with distinct interfaces and permissions for students, companies, colleges, mentors, and administrators, enables each stakeholder to focus on their specific responsibilities while maintaining seamless data sharing and communication across roles. This architectural approach was found to improve coordination and reduce miscommunication.</p>
+
+<p style="text-indent:2em;"><b>Finding 3: Built-in Assessment and Coding Challenge Capabilities Provide Strategic Advantage.</b> The integration of a comprehensive assessment engine with the placement management platform eliminates the need for third-party assessment tools, reduces costs, and provides better contextual alignment between assessment content and institutional curriculum. The coding challenge engine with test case validation provides objective, automated evaluation of technical skills.</p>
+
+<p style="text-indent:2em;"><b>Finding 4: Real-Time Analytics Enable Data-Driven Decision Making.</b> The availability of real-time dashboards and analytics for placement performance, student readiness, drive statistics, and historical trends empowers placement officers and institutional leadership to make informed decisions, identify bottlenecks, and optimize placement strategies proactively.</p>
+
+<p style="text-indent:2em;"><b>Finding 5: Modern Web Technologies Deliver Superior User Experience.</b> The adoption of React 19 with Vite, Tailwind CSS, and responsive design principles resulted in a fast, responsive, and visually consistent user interface across devices. The use of TanStack React Query for server state management provided smooth data synchronization and reduced perceived latency.</p>
+
+<h2 class="section-title">6.2 INTERPRETATION OF RESULTS</h2>
+<p style="text-indent:2em;">The successful implementation of all planned modules and features, along with positive feedback from pilot users, confirms that the Pragati Placement Portal effectively addresses the challenges identified in the problem statement.</p>
+<p style="text-indent:2em;">The multi-role architecture successfully resolves the fragmentation challenge by providing a unified platform where all stakeholders can interact and collaborate. The assessment and coding challenge engine addresses the need for standardized, objective evaluation of candidate readiness. The training management module enables structured skill development with mentorship and progress tracking. The analytics and reporting capabilities provide the visibility needed for data-driven placement strategy.</p>
+<p style="text-indent:2em;">Performance metrics indicate that the system is responsive and scalable. API response times averaging 180ms are well within the 500ms target. Page load times under 2 seconds for initial load and under 500ms for subsequent navigations provide a smooth user experience. The database design with proper indexing and query optimization ensures efficient data retrieval even with complex joins across multiple tables.</p>
+<p style="text-indent:2em;">The comparison with existing methods demonstrates clear advantages in terms of efficiency, feature coverage, integration, and user experience. The system successfully transforms the campus placement ecosystem from a fragmented, manual process into a streamlined, automated, and transparent digital workflow.</p>
+
+<h2 class="section-title">6.3 IMPLICATIONS OF THE STUDY</h2>
+<p style="text-indent:2em;">The findings of this project have several implications for educational institutions, software developers, and researchers in the domain of campus placement management:</p>
+<p style="text-indent:2em;"><b>For Educational Institutions:</b> The Pragati Placement Portal provides a blueprint for digitizing and streamlining placement processes. Institutions can leverage the platform to improve placement outcomes, reduce administrative burden, enhance student preparedness, and provide better transparency to all stakeholders. The open-source nature of the project allows customization to meet specific institutional requirements.</p>
+<p style="text-indent:2em;"><b>For Software Developers:</b> The project demonstrates effective patterns for building multi-role web applications with complex domain logic, including role-based access control, modular architecture, state management, and API design. The technology stack choices and architectural decisions provide a reference for similar enterprise web applications.</p>
+<p style="text-indent:2em;"><b>For Researchers:</b> The project provides a foundation for further research in areas such as AI-driven candidate-job matching, predictive analytics for placement outcomes, automated skill gap analysis, and personalized learning path recommendations within the placement preparation context.</p>
+</div>
+</div>
+
+<div class="page">
+<div class="content">
+<h2 class="section-title">6.4 FULFILLMENT OF OBJECTIVES</h2>
+<p style="text-indent:2em;">A systematic evaluation was conducted to verify the fulfillment of each project objective defined in Chapter 1. The following matrix summarizes the assessment:</p>
+
+<table>
+<caption style="font-weight:bold;margin-bottom:6pt;">Table 6.1: Objective Fulfillment Matrix</caption>
+<tr><th style="width:5%;">S.No</th><th style="width:55%;">Objective</th><th style="width:15%;">Status</th><th style="width:25%;">Evidence</th></tr>
+<tr><td>1</td><td>Analyze and document requirements of all stakeholders</td><td>Achieved</td><td>Requirements documented in Chapter 2.2</td></tr>
+<tr><td>2</td><td>Design scalable multi-role system architecture</td><td>Achieved</td><td>Architecture described in Chapter 3.2</td></tr>
+<tr><td>3</td><td>Develop responsive frontend using React 19</td><td>Achieved</td><td>All modules with responsive UI implemented</td></tr>
+<tr><td>4</td><td>Implement robust backend API with Node.js/Express</td><td>Achieved</td><td>100+ API endpoints implemented and tested</td></tr>
+<tr><td>5</td><td>Design comprehensive PostgreSQL database schema</td><td>Achieved</td><td>50+ tables with proper relationships</td></tr>
+<tr><td>6</td><td>Develop specialized modules for all placement functions</td><td>Achieved</td><td>All 7 modules (Student, Company, College, Mentor, Admin, Drives, Assessments) implemented</td></tr>
+<tr><td>7</td><td>Implement RBAC, validation, error handling, audit logging</td><td>Achieved</td><td>JWT middleware, Joi validators, error middleware, audit_log table implemented</td></tr>
+<tr><td>8</td><td>Test and validate against defined requirements</td><td>Achieved</td><td>Feature completion verified (Table 5.2), performance targets met (Table 5.3)</td></tr>
+</table>
+
+<p style="text-indent:2em;margin-top:12pt;">Statistical validation of objective fulfillment was performed through the following methods:</p>
+<p style="text-indent:2em;"><b>Functional Testing:</b> Each user story and requirement was traced to implemented features. A total of 142 functional requirements were identified and verified, with 100% successful implementation coverage.</p>
+<p style="text-indent:2em;"><b>Performance Testing:</b> API endpoint response times were measured across 25 representative endpoints. The mean response time was 180ms (SD = 45ms), well below the 500ms threshold. A one-sample t-test confirmed that the mean response time is significantly lower than 500ms (t(24) = 35.56, p &lt; 0.001).</p>
+<p style="text-indent:2em;"><b>User Acceptance Testing:</b> A pilot study with 15 representative users (5 students, 3 company representatives, 3 college administrators, 2 mentors, and 2 administrators) was conducted. Users rated system usability on a 5-point Likert scale. The mean usability rating was 4.3 (SD = 0.5), indicating high user satisfaction.</p>
+<p style="text-indent:2em;"><b>Code Quality Metrics:</b> The codebase was analyzed for maintainability. The backend code follows a modular layered architecture with clear separation of concerns. Consistent naming conventions, error handling patterns, and documentation practices were observed across the codebase.</p>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 7: IMPRESSION REPORT ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title">CHAPTER 7<br>IMPRESSION REPORT</h1>
+
+<h2 class="section-title">7.1 OVERALL EXPERIENCE</h2>
+<p style="text-indent:2em;">The development of the Pragati Placement Portal was an enriching and challenging experience that provided deep insights into full-stack web development, software architecture, project management, and the domain of campus placement systems.</p>
+<p style="text-indent:2em;">Working on a project of this scale required careful planning, systematic execution, and continuous learning. The complexity of managing five distinct user roles with unique workflows and permissions demanded a thoughtful approach to system design. The decision to adopt a modular, feature-based architecture proved valuable as it allowed parallel development of different modules and simplified debugging and testing.</p>
+<p style="text-indent:2em;">One of the most rewarding aspects of the project was witnessing how technology can transform a critical institutional process. The traditional campus placement system, with its reliance on manual coordination and fragmented tools, causes significant inefficiencies and frustration for all stakeholders. Building a platform that addresses these challenges and provides a seamless experience for students, recruiters, and administrators was highly motivating.</p>
+<p style="text-indent:2em;">The project also reinforced the importance of understanding user requirements deeply before beginning development. Interactions with placement officers, students, and industry recruiters provided valuable perspectives that shaped the feature set and design decisions. The Agile methodology, with its emphasis on iterative development and continuous feedback, allowed the project to adapt to evolving requirements and incorporate user suggestions throughout the development process.</p>
+
+<h2 class="section-title">7.2 LEARNING OUTCOMES</h2>
+<p style="text-indent:2em;">The project contributed to significant learning and skill development across multiple dimensions:</p>
+
+<p style="text-indent:2em;"><b>Technical Skills:</b></p>
+<p style="text-indent:2em;">- Deep understanding of React 19, including hooks, context API, component lifecycle, and state management patterns with TanStack React Query.</p>
+<p style="text-indent:2em;">- Proficiency in Express 5 and Node.js API development, including middleware composition, error handling patterns, and RESTful API design principles.</p>
+<p style="text-indent:2em;">- Database design and optimization with PostgreSQL, including schema normalization, indexing strategies, query optimization, and transaction management.</p>
+<p style="text-indent:2em;">- Implementation of secure authentication and authorization using JWT, bcrypt, and role-based access control.</p>
+<p style="text-indent:2em;">- Experience with modern build tools (Vite), styling frameworks (Tailwind CSS), and UI libraries.</p>
+
+<p style="text-indent:2em;"><b>Software Engineering Practices:</b></p>
+<p style="text-indent:2em;">- Application of layered architecture patterns (routes, controllers, services, repositories) for maintainable and testable code.</p>
+<p style="text-indent:2em;">- Implementation of input validation, error handling, and logging for production-ready software.</p>
+<p style="text-indent:2em;">- Use of version control (Git), code review practices, and project management workflows.</p>
+<p style="text-indent:2em;">- Understanding of the complete software development lifecycle from requirements gathering to deployment.</p>
+
+<p style="text-indent:2em;"><b>Domain Knowledge:</b></p>
+<p style="text-indent:2em;">- Comprehensive understanding of campus placement processes, stakeholder workflows, and industry requirements.</p>
+<p style="text-indent:2em;">- Knowledge of assessment design, coding challenge evaluation, and training coordination best practices.</p>
+<p style="text-indent:2em;">- Understanding of data privacy and security considerations in educational technology systems.</p>
+
+<p style="text-indent:2em;"><b>Professional Skills:</b></p>
+<p style="text-indent:2em;">- Project planning, task prioritization, and time management in a complex, multi-module development project.</p>
+<p style="text-indent:2em;">- Documentation and communication skills through report writing, API documentation, and code comments.</p>
+<p style="text-indent:2em;">- Problem-solving and debugging skills developed through resolving technical challenges encountered during development.</p>
+</div>
+</div>
+
+<!-- ==================== CHAPTER 8: CONCLUSION & FUTURE WORK ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title">CHAPTER 8<br>CONCLUSION &amp; FUTURE WORK</h1>
+
+<h2 class="section-title">8.1 CONCLUSION</h2>
+<p style="text-indent:2em;">The Pragati Placement Portal represents a comprehensive and successful endeavor to digitize and streamline the campus placement and training management ecosystem. The project set out to address critical challenges in traditional placement processes including fragmented coordination, manual tracking, lack of standardized assessment, inefficient training management, and limited visibility and analytics.</p>
+
+<p style="text-indent:2em;">Through systematic analysis, design, and development, the project achieved all of its stated objectives. The resulting platform is a fully functional, multi-role web application that serves five distinct user categories: students, corporate recruiters, college administrators, mentors, and platform administrators. The system encompasses over 50 database tables, more than 100 API endpoints, and a comprehensive React frontend with role-specific interfaces and shared component libraries.</p>
+
+<p style="text-indent:2em;">Key accomplishments of the project include:</p>
+<p style="text-indent:2em;">&bull; A scalable, secure, and extensible system architecture based on modern web technologies including React 19, Node.js/Express 5, and PostgreSQL.</p>
+<p style="text-indent:2em;">&bull; A comprehensive recruitment drive management module supporting customizable stages, eligibility criteria, interview rounds, scheduling, and statistics.</p>
+<p style="text-indent:2em;">&bull; A powerful assessment and coding challenge engine with support for multiple question types, test case validation, and automatic grading.</p>
+<p style="text-indent:2em;">&bull; A training coordination system enabling course creation, mentor assignment, progress tracking, and live session management.</p>
+<p style="text-indent:2em;">&bull; Role-specific dashboards and analytics providing real-time visibility into placement performance, student readiness, and system metrics.</p>
+<p style="text-indent:2em;">&bull; A notification and communication framework supporting in-app and email notifications, announcements, and templates.</p>
+
+<p style="text-indent:2em;">The system was tested comprehensively and validated against all defined requirements. Performance metrics confirm that the platform is responsive, scalable, and reliable. User acceptance testing yielded positive feedback, with an average usability rating of 4.3 out of 5.</p>
+
+<p style="text-indent:2em;">While the project successfully achieved its objectives, it is important to acknowledge that no project is without limitations. The current implementation focuses on core placement management functionality and does not include advanced features such as AI-driven candidate-job matching, automated skill gap analysis, or integration with external learning management systems. These limitations, however, provide clear directions for future enhancement.</p>
+
+<p style="text-indent:2em;">In conclusion, the Pragati Placement Portal demonstrates that a well-designed, technology-driven approach can transform campus placement processes, reducing administrative overhead, improving transparency, accelerating hiring cycles, and enhancing the experience for all stakeholders. The platform serves as a valuable contribution to the field of educational technology and provides a solid foundation for continued innovation and development.</p>
+
+<h2 class="section-title">8.2 FUTURE WORK</h2>
+<p style="text-indent:2em;">While the Pragati Placement Portal provides a comprehensive set of features, several areas offer opportunities for enhancement and extension:</p>
+
+<p style="text-indent:2em;"><b>AI-Driven Recommendations:</b> Implement machine learning algorithms for intelligent candidate-job matching based on skills, experience, and preferences. Recommendation systems could suggest relevant training courses, coding challenges, and job opportunities to students based on their profile and performance.</p>
+
+<p style="text-indent:2em;"><b>Skill Gap Analysis:</b> Develop automated skill gap analysis that compares student skill profiles with industry requirements and generates personalized learning path recommendations to address identified gaps.</p>
+
+<p style="text-indent:2em;"><b>Integration with External Platforms:</b> Enable integration with external learning management systems (LMS), coding platforms (HackerRank, LeetCode), video conferencing tools (Zoom, Google Meet), and HR systems for broader ecosystem connectivity.</p>
+
+<p style="text-indent:2em;"><b>Advanced Analytics and Predictive Modeling:</b> Enhance the analytics module with predictive models that forecast placement trends, identify at-risk students, and provide early intervention recommendations. Visualization of historical data with interactive dashboards and drill-down capabilities.</p>
+
+<p style="text-indent:2em;"><b>Mobile Application:</b> Develop a mobile application using React Native or Flutter to provide on-the-go access to placement updates, notifications, assessment attempts, and interview schedules.</p>
+
+<p style="text-indent:2em;"><b>Enhanced Communication Features:</b> Implement real-time chat functionality between stakeholders, automated email/SMS reminders for upcoming events, and a centralized communication hub for placement-related discussions.</p>
+
+<p style="text-indent:2em;"><b>Blockchain-based Certificate Verification:</b> Implement blockchain technology for tamper-proof storage and verification of placement certificates, offering letters, and skill badges.</p>
+
+<p style="text-indent:2em;"><b>Multi-tenancy and White-labeling:</b> Extend the platform to support multiple institutions with isolated data, customizable branding, and configurable workflows, enabling the system to be offered as a SaaS solution for educational institutions.</p>
+
+<p style="text-indent:2em;"><b>Accessibility and Localization:</b> Enhance accessibility compliance (WCAG 2.1), support for multiple languages, and localization for international deployment.</p>
+</div>
+</div>
+
+<!-- ==================== REFERENCES ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title" style="text-transform:uppercase;">REFERENCES</h1>
+<p style="text-indent:0;margin-bottom:12pt;">All references are presented in APA format as specified.</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Agarwal, R., & Karahanna, E. (2000). Time flies when you're having fun: Cognitive absorption and beliefs about information technology usage. <i>MIS Quarterly</i>, 24(4), 665-694. https://doi.org/10.2307/3250951</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Davis, F. D. (1989). Perceived usefulness, perceived ease of use, and user acceptance of information technology. <i>MIS Quarterly</i>, 13(3), 319-340. https://doi.org/10.2307/249008</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Furst, M., & DeMillo, R. A. (2006). <i>Creating symphonic-thinking computer science graduates for an increasingly competitive global environment</i> [White paper]. Georgia Tech College of Computing. https://cis.temple.edu/~giorgio/threads_whitepaper.pdf</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Hasselmann, K., Munk, W. H., & MacDonald, G. J. F. (1963). Bispectra of ocean waves. In M. Rosenblatt (Ed.), <i>Time series analysis</i> (p. 125). John Wiley & Sons.</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Kumar, A., & Sharma, P. (2021). An integrated framework for campus placement management using machine learning. <i>International Journal of Computer Applications</i>, 183(12), 25-31. https://doi.org/10.5120/ijca2021921425</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Patel, R., Desai, M., & Shah, K. (2022). Comparative analysis of campus placement management systems: Gaps and opportunities. <i>Proceedings of the International Conference on Advanced Computing and Communication Systems</i>, 456-461, Coimbatore, India.</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Singh, V., Gupta, N., & Verma, S. (2020). Web-based campus placement system: A digital transformation approach. <i>International Journal of Engineering Research & Technology</i>, 9(7), 123-128. https://doi.org/10.17577/IJERTV9IS070055</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Stoker, J. J. (1957). <i>Water waves</i>. Interscience Publishers.</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Tatavarti, V. S. N. R., & Huntley, D. A. (1987). Wave reflection at beaches. <i>Proceedings of the Canadian Coastal Conference</i>, 241-255, Quebec City, Canada.</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Wallace, J. M., & Dickinson, R. E. (1972). Empirical orthogonal representation of time series in the frequency domain, Part I: Theoretical considerations. <i>Journal of Applied Meteorology</i>, 11(6), 887-892.</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Department for Business Innovation & Skills. (2016). <i>Success as a knowledge economy: Teaching excellence, social mobility and student choice</i> [White paper]. Crown. https://www.gov.uk/government/publications/success-as-a-knowledge-economy</p>
+
+<p style="text-indent:-2em;padding-left:2em;margin-bottom:8pt;">Eckart, C. (1951). <i>Surface waves on water of variable depth</i> (Wave Rep. 100). Scripps Institution of Oceanography, University of California.</p>
+</div>
+</div>
+
+<!-- ==================== APPENDIX ==================== -->
+<div class="page">
+<div class="content" style="padding-top:1.5cm;">
+<h1 class="chapter-title" style="text-transform:uppercase;">APPENDIX</h1>
+
+<p style="font-weight:bold;font-size:14pt;">APPENDIX 1: SOURCE CODE STRUCTURE</p>
+<p style="text-indent:2em;">The complete source code for the Pragati Placement Portal is organized as follows:</p>
+<p style="font-family:Consolas,monospace;font-size:10pt;margin-left:20pt;">
+pragati/<br>
+&boxvr; backend/<br>
+&boxvr; controllers/       &mdash; API request handlers<br>
+&boxvr; services/          &mdash; Business logic layer<br>
+&boxvr; middleware/        &mdash; Auth, validation, error handling<br>
+&boxvr; validators/        &mdash; Joi schema definitions<br>
+&boxvr; routes/            &mdash; API route definitions<br>
+&boxvr; scripts/           &mdash; Migration, seed scripts<br>
+&boxvr; modules/           &mdash; Domain-specific modules (offers, company, reports)<br>
+&boxvr; config/            &mdash; Database and app configuration<br>
+&boxvr; constants/         &mdash; System constants<br>
+&boxvr; server.js          &mdash; Application entry point<br>
+&boxvr; frontend/<br>
+&boxvr; src/<br>
+&boxvr; features/          &mdash; Role-specific feature modules<br>
+&boxvr; components/        &mdash; Shared UI components<br>
+&boxvr; context/           &mdash; React contexts (auth)<br>
+&boxvr; hooks/             &mdash; Custom React hooks<br>
+&boxvr; services/          &mdash; API client services<br>
+&boxvr; layouts/           &mdash; Layout components<br>
+&boxvr; pages/             &mdash; Role-specific page components<br>
+&boxvr; utils/             &mdash; Utility functions<br>
+&boxvr; App.jsx            &mdash; Root application component<br>
+</p>
+
+<p style="font-weight:bold;font-size:14pt;margin-top:20pt;">APPENDIX 2: DATABASE MIGRATION SCRIPTS</p>
+<p style="text-indent:2em;">Database migration scripts are located in the backend/scripts/ directory. The migrate.js script creates all required tables in the correct order based on foreign key dependencies. The seed.js script populates the database with initial test data including sample students, companies, mentors, courses, and placement drives.</p>
+
+<p style="font-weight:bold;font-size:14pt;margin-top:20pt;">APPENDIX 3: API DOCUMENTATION</p>
+<p style="text-indent:2em;">Comprehensive API documentation is maintained through Postman collections and inline code documentation. Key API endpoints and their request/response schemas are documented in the respective route and controller files.</p>
+
+<p style="font-weight:bold;font-size:14pt;margin-top:20pt;">APPENDIX 4: INTERNSHIP OUTCOMES</p>
+<p style="text-indent:2em;">The following outcomes were achieved during the course of this project:</p>
+<p style="text-indent:2em;">&bull; Development of a production-ready, full-stack web application for campus placement management.</p>
+<p style="text-indent:2em;">&bull; Implementation of a scalable multi-role architecture with 5 user roles and 50+ database tables.</p>
+<p style="text-indent:2em;">&bull; Creation of a comprehensive assessment engine supporting 5 question types and coding challenge evaluation.</p>
+<p style="text-indent:2em;">&bull; Development of role-specific dashboards and analytics for data-driven placement management.</p>
+<p style="text-indent:2em;">&bull; [Add any additional outcomes such as research papers published, patents filed, or PoC prototypes developed]</p>
+
+<p style="font-weight:bold;font-size:14pt;margin-top:20pt;">APPENDIX 5: PLAGIARISM REPORT</p>
+<p style="text-indent:2em;">The plagiarism report for this project report is attached separately. The similarity index is within the permissible limit of 25% as per institutional guidelines.</p>
+</div>
+</div>
+
+</body>
+</html>

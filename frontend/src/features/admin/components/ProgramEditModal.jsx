@@ -88,17 +88,17 @@ const ProgramEditModal = ({
     onClose?.();
 
 };
-    const submitHandler = (data) => {
-
-    onSubmit?.({
-        ...programData,
-        ...data,
+ const submitHandler = async (data) => {
+  try {
+    await onSubmit?.({
+      ...programData,
+      ...data,
     });
 
-    reset();
-
     handleClose();
-
+  } catch (error) {
+    console.error("Failed to update program:", error);
+  }
 };
 
     return (
@@ -125,7 +125,7 @@ const ProgramEditModal = ({
                     <input
                         type="text"
                         {...register("title")}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-orange-500 outline-none"
                     />
 
                     {errors.title && (
@@ -144,7 +144,7 @@ const ProgramEditModal = ({
                     <input
                         type="text"
                         {...register("targetRole")}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-orange-500 outline-none"
                     />
 
                     {errors.targetRole && (
@@ -163,7 +163,7 @@ const ProgramEditModal = ({
                     <textarea
                         rows={4}
                         {...register("description")}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 resize-none focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 resize-none focus:ring-2 focus:ring-orange-500 outline-none"
                     />
                 </div>
 
@@ -176,7 +176,7 @@ const ProgramEditModal = ({
                     <input
                         type="number"
                         {...register("durationWeeks")}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-orange-500 outline-none"
                     />
 
                     {errors.durationWeeks && (
@@ -194,7 +194,7 @@ const ProgramEditModal = ({
 
                     <select
                         {...register("mentorId")}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-orange-500 outline-none"
                     >
                         <option value="">
                             Select Mentor

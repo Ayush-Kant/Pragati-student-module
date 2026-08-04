@@ -1,4 +1,10 @@
 import { useEffect, useState } from "react";
+import {
+  getDrives,
+  createDrive,
+  freezeDrive as apiFreezeDrive,
+  unfreezeDrive as apiUnfreezeDrive
+} from "../services/adminService";
 
 export default function useDriveManagement() {
   const [drives, setDrives] = useState([]);
@@ -17,34 +23,30 @@ export default function useDriveManagement() {
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Mock data
+  // Live Data Fetching
+  const fetchDrives = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const response = await getDrives();
+      // The API returns { drives: [...], total: ... }
+      if (response && Array.isArray(response.drives)) {
+        setDrives(response.drives);
+      } else if (Array.isArray(response)) {
+        setDrives(response);
+      } else {
+        setDrives([]);
+      }
+    } catch (err) {
+      console.error("fetchDrives error:", err);
+      setError("Unable to fetch drives");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setDrives([
-      {
-        id: "drive_101",
-        title: "MERN Batch 1",
-        company: { name: "TechCorp Ltd" },
-        status: "active",
-        currentStage: "training",
-        candidates: 120,
-      },
-      {
-        id: "drive_102",
-        title: "Java Dev Drive",
-        company: { name: "InfoSys" },
-        status: "active",
-        currentStage: "screening",
-        candidates: 80,
-      },
-      {
-        id: "drive_103",
-        title: "Data Science Drive",
-        company: { name: "Analytics Plus" },
-        status: "frozen",
-        currentStage: "shortlist",
-        candidates: 45,
-      },
-    ]);
+    fetchDrives();
   }, []);
 
   // Debounced Search
@@ -58,12 +60,14 @@ export default function useDriveManagement() {
 
   // Filter Drives
   const filteredDrives = drives.filter((drive) => {
-    const matchSearch = drive.title
+    const titleMatch = drive.title || "";
+    const matchSearch = titleMatch
       .toLowerCase()
       .includes(debouncedSearch.toLowerCase());
 
+    const companyName = drive.company?.name || "";
     const matchCompany =
-      company === "all" || drive.company.name === company;
+      company === "all" || companyName === company;
 
     const matchStatus =
       status === "all" || drive.status === status;
@@ -90,12 +94,36 @@ export default function useDriveManagement() {
   );
 
   // Add Drive
-  const addDrive = (newDrive) => {
-    setDrives((prevDrives) => [newDrive, ...prevDrives]);
-    setCurrentPage(1);
+  const addDrive = async (newDriveData) => {
+    try {
+      setLoading(true);
+      setError("");
+      // Map form fields to backend payload structure
+      const backendPayload = {
+        title: newDriveData.title,
+        companyId: Number(newDriveData.company),
+        criteria: {
+          minGpa: parseFloat(newDriveData.minGPA) || 0.0,
+          requiredSkills: newDriveData.requiredSkills
+            ? newDriveData.requiredSkills.split(",").map(s => s.trim())
+            : [],
+          maxOpenings: parseInt(newDriveData.maxOpenings, 10) || 1,
+        },
+        applicationDeadline: newDriveData.deadline || null,
+      };
+
+      await createDrive(backendPayload);
+      await fetchDrives();
+      setShowModal(false);
+    } catch (err) {
+      console.error("addDrive error:", err);
+      setError("Unable to create drive");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Delete Drive
+  // Delete Drive (local fallback since backend does not support deletion of recruitment drive)
   const deleteDrive = (id) => {
     setDrives((prev) =>
       prev.filter((drive) => drive.id !== id)
@@ -103,41 +131,34 @@ export default function useDriveManagement() {
   };
 
   // Freeze Drive
-  const freezeDrive = (id) => {
-    setDrives((prev) =>
-      prev.map((drive) =>
-        drive.id === id
-          ? { ...drive, status: "frozen" }
-          : drive
-      )
-    );
+  const freezeDrive = async (id) => {
+    try {
+      setError("");
+      const plainId = String(id).replace("drive_", "");
+      await apiFreezeDrive(plainId);
+      await fetchDrives();
+    } catch (err) {
+      console.error("freezeDrive error:", err);
+      setError("Unable to freeze drive");
+    }
   };
 
   // Unfreeze Drive
-  const unfreezeDrive = (id) => {
-    setDrives((prev) =>
-      prev.map((drive) =>
-        drive.id === id
-          ? { ...drive, status: "active" }
-          : drive
-      )
-    );
-  };
-
-  // Future API
-  const fetchDrives = async () => {
+  const unfreezeDrive = async (id) => {
     try {
-      setLoading(true);
       setError("");
-
-      // Future API Integration
-
+      const plainId = String(id).replace("drive_", "");
+      await apiUnfreezeDrive(plainId);
+      await fetchDrives();
     } catch (err) {
-      setError("Unable to fetch drives");
-    } finally {
-      setLoading(false);
+      console.error("unfreezeDrive error:", err);
+      setError("Unable to unfreeze drive");
     }
   };
+
+  useEffect(() => {
+  fetchDrives();
+  }, []);
 
   return {
     search,

@@ -1,13 +1,13 @@
 import { FileText, Calendar, CloudDownload, Award } from "lucide-react";
 
-export const ReportSummaryCards = ({ statistics }) => {
+export const ReportSummaryCards = ({ statistics, darkMode }) => {
   const cards = [
     {
       id: "total",
       label: "Total Reports",
       value: statistics?.totalReports || 0,
       icon: FileText,
-      color: "text-primary bg-orange-50 border-orange-100/50",
+      color: darkMode ? "text-[#ff6d34] bg-[#ff6d34]/10 border-[#ff6d34]/30" : "text-primary bg-orange-50 border-orange-100/50",
       description: "Lifetime reports compiled in the portal database"
     },
     {
@@ -15,7 +15,7 @@ export const ReportSummaryCards = ({ statistics }) => {
       label: "Generated Today",
       value: statistics?.generatedToday || 0,
       icon: Calendar,
-      color: "text-blue-600 bg-blue-50 border-blue-100/50",
+      color: darkMode ? "text-[#ff6d34] bg-[#ff6d34]/10 border-[#ff6d34]/30" : "text-blue-600 bg-blue-50 border-blue-100/50",
       description: "Reports generated during the current operational day"
     },
     {
@@ -23,7 +23,7 @@ export const ReportSummaryCards = ({ statistics }) => {
       label: "Downloaded Reports",
       value: statistics?.downloadedReports || 0,
       icon: CloudDownload,
-      color: "text-emerald-600 bg-emerald-50 border-emerald-100/50",
+      color: darkMode ? "text-[#ff6d34] bg-[#ff6d34]/10 border-[#ff6d34]/30" : "text-emerald-600 bg-emerald-50 border-emerald-100/50",
       description: "Documents exported as PDF, CSV, or Excel format"
     },
     {
@@ -31,7 +31,7 @@ export const ReportSummaryCards = ({ statistics }) => {
       label: "Active Pipelines",
       value: 6,
       icon: Award,
-      color: "text-purple-600 bg-purple-50 border-purple-100/50",
+      color: darkMode ? "text-[#ff6d34] bg-[#ff6d34]/10 border-[#ff6d34]/30" : "text-purple-600 bg-purple-50 border-purple-100/50",
       description: "Total automated report templates connected"
     }
   ];
@@ -43,20 +43,20 @@ export const ReportSummaryCards = ({ statistics }) => {
         return (
           <div
             key={card.id}
-            className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-150"
+            className={`rounded-2xl p-5 flex flex-col justify-between transition-all duration-150 ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D] shadow-sm hover:shadow-md' : 'bg-white border border-slate-100 shadow-sm hover:shadow-md'}`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{card.label}</span>
+              <span className={`text-xs font-bold uppercase tracking-widest ${darkMode ? 'text-gray-400' : 'text-slate-400'}`}>{card.label}</span>
               <div className={`p-2.5 rounded-xl border ${card.color}`}>
                 <IconComponent className="w-5 h-5" />
               </div>
             </div>
             
             <div className="mt-4">
-              <h3 className="text-3xl font-extrabold text-slate-800 leading-tight">
+              <h3 className={`text-3xl font-extrabold leading-tight ${darkMode ? 'text-white' : 'text-slate-800'}`}>
                 {card.value}
               </h3>
-              <p className="text-[11px] font-semibold text-slate-400 leading-relaxed mt-1">
+              <p className={`text-[11px] font-semibold leading-relaxed mt-1 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`}>
                 {card.description}
               </p>
             </div>

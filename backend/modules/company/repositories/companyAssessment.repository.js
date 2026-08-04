@@ -4,7 +4,7 @@ export const getAssessmentsRepo = async () => {
     `
     SELECT *
     FROM assessments
-    WHERE archived = false
+    WHERE status != 'archived'
     ORDER BY created_at DESC
     `
   );
@@ -32,17 +32,19 @@ export const createAssessmentRepo = async (data) => {
       type,
       difficulty,
       time_limit_minutes,
-      total_marks
+      total_marks,
+      status
     )
-    VALUES ($1,$2,$3,$4,$5)
+    VALUES ($1,$2,$3,$4,$5,$6)
     RETURNING *
     `,
     [
       data.title,
-      data.type,
-      data.difficulty,
-      data.time_limit_minutes,
-      data.total_marks,
+      data.type || 'MCQ',
+      data.difficulty || 'Medium',
+      data.time_limit_minutes || 60,
+      data.total_marks || 100,
+      data.status || 'active',
     ]
   );
 
@@ -57,16 +59,19 @@ export const updateAssessmentRepo = async (id, data) => {
       type = $2,
       difficulty = $3,
       time_limit_minutes = $4,
-      total_marks = $5
-    WHERE id = $6
+      total_marks = $5,
+      status = $6,
+      updated_at = NOW()
+    WHERE id = $7
     RETURNING *
     `,
     [
       data.title,
-      data.type,
-      data.difficulty,
-      data.time_limit_minutes,
-      data.total_marks,
+      data.type || 'MCQ',
+      data.difficulty || 'Medium',
+      data.time_limit_minutes || 60,
+      data.total_marks || 100,
+      data.status || 'active',
       id,
     ]
   );
@@ -77,7 +82,7 @@ export const deleteAssessmentRepo = async (id) => {
   await pool.query(
     `
     UPDATE assessments
-    SET archived = true
+    SET status = 'archived', archived_at = NOW()
     WHERE id = $1
     `,
     [id]
@@ -103,7 +108,7 @@ export const archiveAssessmentRepo = async (id) => {
   await pool.query(
     `
     UPDATE assessments
-    SET archived = true
+    SET status = 'archived', archived_at = NOW()
     WHERE id = $1
     `,
     [id]

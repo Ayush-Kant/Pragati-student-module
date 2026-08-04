@@ -6,7 +6,7 @@ import AcademicTimeline from "./AcademicTimeline";
 import CGPATrendChart from "../charts/CGPATrendChart";
 import PerformanceChart from "../charts/PerformanceChart";
 
-export const AcademicPerformance = ({ academics = [], student = {} }) => {
+export const AcademicPerformance = ({ academics = [], student = {}, darkMode }) => {
   const [selectedSemester, setSelectedSemester] = useState(null);
 
   const semestersCompleted = academics.length;
@@ -31,14 +31,14 @@ export const AcademicPerformance = ({ academics = [], student = {} }) => {
     <div className="space-y-6">
       {/* Top Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <CGPACard cgpa={parseFloat(cgpa)} semestersCompleted={semestersCompleted} />
-        <AttendanceCard attendancePercent={avgAttendance} />
+        <CGPACard cgpa={parseFloat(cgpa)} semestersCompleted={semestersCompleted} darkMode={darkMode} />
+        <AttendanceCard attendancePercent={avgAttendance} darkMode={darkMode} />
       </div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PerformanceChart data={academics} />
-        <CGPATrendChart data={academics} />
+        <PerformanceChart data={academics} darkMode={darkMode} />
+        <CGPATrendChart data={academics} darkMode={darkMode} />
       </div>
 
       {/* Semester details & Timelines */}
@@ -48,10 +48,11 @@ export const AcademicPerformance = ({ academics = [], student = {} }) => {
             academics={academics}
             selectedSemester={selectedSemester}
             onSelectSemester={setSelectedSemester}
+            darkMode={darkMode}
           />
         </div>
         <div className="lg:col-span-1">
-          <AcademicTimeline academics={academics} />
+          <AcademicTimeline academics={academics} darkMode={darkMode} />
         </div>
       </div>
     </div>

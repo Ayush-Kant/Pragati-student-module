@@ -17,7 +17,6 @@ import {
   checkEligibility,
   getEligibleDepartments,
   getEligibleBatches,
-  createEligibleStudent,
 } from '../controllers/collegeEligibilities.controller.js'
 import {
   getNominationStatistics,
@@ -35,7 +34,6 @@ router.use(sanitizeInput)
 
 // Eligibility Routes
 router.get('/nominations/eligible', getEligibleStudents)
-router.post('/nominations/eligible', createEligibleStudent)
 router.get('/nominations/eligible/departments', getEligibleDepartments)
 router.get('/nominations/eligible/batches', getEligibleBatches)
 router.get('/nominations/eligible/:studentId', checkEligibility)

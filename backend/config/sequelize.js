@@ -12,15 +12,20 @@ if (!connectionString) {
   );
 }
 
+const url = new URL(connectionString);
+const isProduction = process.env.NODE_ENV === "production";
+
 export const sequelize = new Sequelize({
   dialect: PostgresDialect,
-  url: connectionString,
+  host: url.hostname,
+  port: Number(url.port) || 5432,
+  database: url.pathname.replace(/^\//, ""),
+  user: url.username,
+  password: url.password,
   logging: false,
-  ssl:
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: true }
-      : false,
-
+  ssl: isProduction
+    ? { require: true, rejectUnauthorized: true }
+    : { require: true, rejectUnauthorized: false },
   define: {
     timestamps: true,
     underscored: true,

@@ -8,6 +8,10 @@ import * as validator from "../validators/college.departmentstatistics.validator
 import * as controller from "../controllers/college.departmentstatistics.controller.js";
 
 const router = express.Router();
+router.use((req, res, next) => {
+  console.log("******** Department Statistics Route Hit ********");
+  next();
+});
 
 // ------------------------------------------------------------
 // Public read endpoint
@@ -20,7 +24,7 @@ router.get("/", controller.getDepartmentStatistics);
 router.put(
   "/",
   authMiddleware,
-  roleMiddleware("admin", "hod"),
+  roleMiddleware("admin", "hod", "college"),
   validator.validateStatisticsUpdate,
   controller.updateDepartmentStatistics
 );

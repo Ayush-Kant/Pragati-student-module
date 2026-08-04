@@ -26,7 +26,7 @@ router.get("/:id/courses", courseController.getCoursesByDepartment);
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware("admin", "hod"),
+  roleMiddleware("admin", "hod", "college"),
   validator.sanitizeInput,
   validator.validateRequestBody,
   validator.validateDepartment,
@@ -36,13 +36,13 @@ router.post(
 router.put(
   "/:id",
   authMiddleware,
-  roleMiddleware("admin", "hod"),
+  roleMiddleware("admin", "hod", "college"),
   validator.sanitizeInput,
   validator.validateRequestBody,
   validator.validateDepartmentUpdate,
   controller.updateDepartment
 );
 
-router.delete("/:id", authMiddleware, roleMiddleware("admin"), controller.deleteDepartment);
+router.delete("/:id", authMiddleware, roleMiddleware("admin", "college"), controller.deleteDepartment);
 
 export default router;

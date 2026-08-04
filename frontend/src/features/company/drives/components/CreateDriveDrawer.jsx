@@ -3,8 +3,12 @@ import { X } from 'lucide-react';
 
 const defaultDriveForm = {
   driveName: '',
-  college: '',
-  date: '',
+  department: 'Engineering',
+  requiredSkills: 'React, Node.js',
+  salaryPackage: '8 LPA',
+  workMode: 'Hybrid',
+  location: 'Pune',
+  deadline: '',
   description: '',
 };
 
@@ -38,7 +42,16 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
   const handlePublish = () => {
     if (!form.driveName.trim()) return;
 
-    onCreate?.(form);
+    onCreate?.({
+      jobTitle: form.driveName,
+      department: form.department,
+      requiredSkills: form.requiredSkills.split(',').map(s => s.trim()),
+      salaryPackage: form.salaryPackage,
+      workMode: form.workMode,
+      location: form.location,
+      deadline: form.deadline || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      description: form.description
+    });
     setForm(defaultDriveForm);
     onClose();
   };
@@ -46,71 +59,28 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Overlay */}
-      <div
-        className="
-          fixed
-          inset-0
-          bg-black/30
-          backdrop-blur-sm
-          z-40
-        "
-        onClick={handleClose}
-      />
-
-      {/* Drawer */}
-      <div
-        className="
-          fixed
-          top-[68px]
-          right-0
-          h-[calc(100vh-68px)]
-          w-[420px]
-          bg-white
-          shadow-2xl
-          z-50
-          overflow-y-auto
-          flex
-          flex-col
-          rounded-l-3xl
-          responsive-drawer
-        "
-      >
-        <div className="pt-24">
-          {/* Header */}
-          <div className="px-7 pb-6 flex items-start justify-between">
-            <h2 className="text-[40px] leading-tight font-bold text-gray-900">
-              Create Recruitment Drive
-            </h2>
-
-            <button
-              onClick={handleClose}
-              className="
-                mt-2
-                ml-4
-                w-10
-                h-10
-                rounded-full
-                flex
-                items-center
-                justify-center
-                hover:bg-gray-100
-                transition
-                text-gray-500
-                hover:text-gray-800
-                shrink-0
-              "
-            >
-              <X size={22} />
-            </button>
+    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+      <div className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg max-h-[85vh] shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+        {/* Header */}
+        <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between shrink-0">
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900">Create Recruitment Drive</h3>
+            <p className="text-sm text-gray-500 mt-1">Start a new recruitment campaign</p>
           </div>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-gray-400 hover:text-gray-600 transition mt-1"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-          {/* Form Content */}
-          <div className="p-6 space-y-5">
+        {/* Scrollable Form Content */}
+        <div className="p-8 space-y-5 overflow-y-auto flex-1 text-left">
           {/* Drive Name */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Drive Name</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Drive Name / Job Title</label>
             <input
               name="driveName"
               type="text"
@@ -121,60 +91,41 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
             />
           </div>
 
-          {/* College */}
+          {/* Department */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">College</label>
-            <select
-              name="college"
-              value={form.college}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm appearance-none"
-            >
-              <option value="">Select college</option>
-              <option>IIT Hyderabad</option>
-              <option>NIT Warangal</option>
-              <option>VIT Chennai</option>
-              <option>SRM University</option>
-              <option>JNTU Hyderabad</option>
-            </select>
-          </div>
-
-          {/* Required Skills */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Required Skills</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Department</label>
             <input
+              name="department"
               type="text"
-              placeholder="React, Node.js, MongoDB"
+              placeholder="e.g., Engineering"
+              value={form.department}
+              onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
             />
           </div>
 
-          {/* Mini Info Cards 1 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-5">
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
-              <p className="text-xs font-medium text-blue-500">
-                Candidates
-              </p>
-              <h3 className="text-2xl font-bold text-blue-700 mt-1">
-                245
-              </h3>
-            </div>
-            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
-              <p className="text-xs font-medium text-emerald-500">
-                Active
-              </p>
-              <h3 className="text-2xl font-bold text-emerald-700 mt-1">
-                Live
-              </h3>
-            </div>
+          {/* Required Skills */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Required Skills (comma-separated)</label>
+            <input
+              name="requiredSkills"
+              type="text"
+              placeholder="React, Node.js, MongoDB"
+              value={form.requiredSkills}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+            />
           </div>
 
           {/* Salary Package */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Salary Package</label>
             <input
+              name="salaryPackage"
               type="text"
               placeholder="₹12-15 LPA"
+              value={form.salaryPackage}
+              onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
             />
           </div>
@@ -182,17 +133,17 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
           {/* Work Mode */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-3">Work Mode</label>
-            <div className="space-y-2">
+            <div className="flex gap-6">
               <label className="flex items-center gap-3 cursor-pointer">
-                <input type="radio" name="workMode" value="remote" defaultChecked className="w-4 h-4" />
+                <input type="radio" name="workMode" value="Remote" checked={form.workMode === 'Remote'} onChange={handleChange} className="w-4 h-4 text-blue-600" />
                 <span className="text-sm text-gray-700">Remote</span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer">
-                <input type="radio" name="workMode" value="onsite" className="w-4 h-4" />
+                <input type="radio" name="workMode" value="Onsite" checked={form.workMode === 'Onsite'} onChange={handleChange} className="w-4 h-4 text-blue-600" />
                 <span className="text-sm text-gray-700">On-site</span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer">
-                <input type="radio" name="workMode" value="hybrid" className="w-4 h-4" />
+                <input type="radio" name="workMode" value="Hybrid" checked={form.workMode === 'Hybrid'} onChange={handleChange} className="w-4 h-4 text-blue-600" />
                 <span className="text-sm text-gray-700">Hybrid</span>
               </label>
             </div>
@@ -201,49 +152,23 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
           {/* Job Location */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Job Location</label>
-            <div className="flex items-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-600">
-              <span className="text-lg">📍</span>
-              <span>Bangalore, India</span>
-            </div>
-          </div>
-
-          {/* Eligibility */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Eligibility</label>
             <input
+              name="location"
               type="text"
-              placeholder="B.Tech/M.Tech, 2024-2026 batch"
+              placeholder="e.g., Pune"
+              value={form.location}
+              onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
             />
           </div>
 
-          {/* Mini Info Cards 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-5">
-            <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4">
-              <p className="text-xs font-medium text-purple-500">
-                Interviews
-              </p>
-              <h3 className="text-2xl font-bold text-purple-700 mt-1">
-                148
-              </h3>
-            </div>
-            <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4">
-              <p className="text-xs font-medium text-orange-500">
-                Success
-              </p>
-              <h3 className="text-2xl font-bold text-orange-700 mt-1">
-                78%
-              </h3>
-            </div>
-          </div>
-
-          {/* Date */}
+          {/* Deadline */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Hiring Deadline</label>
             <input
-              name="date"
+              name="deadline"
               type="date"
-              value={form.date}
+              value={form.deadline}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
             />
@@ -255,34 +180,32 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
             <textarea
               name="description"
               placeholder="Describe the role, responsibilities, and requirements..."
-              rows="6"
+              rows="4"
               value={form.description}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm resize-none"
             />
           </div>
-
-          {/* Extra space for sticky buttons */}
-          <div className="h-24" />
-          </div>
         </div>
 
-        {/* Sticky Footer Buttons */}
-        <div className="responsive-drawer-footer fixed bottom-0 right-0 w-[420px] bg-white border-t border-gray-100 px-6 py-4 flex gap-3">
+        {/* Footer */}
+        <div className="responsive-modal-footer px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 shrink-0">
           <button
+            type="button"
             onClick={handleClose}
-            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition"
           >
-            Save Draft
+            Cancel
           </button>
           <button
+            type="button"
             onClick={handlePublish}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg transition-all"
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition"
           >
             Publish Drive
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };

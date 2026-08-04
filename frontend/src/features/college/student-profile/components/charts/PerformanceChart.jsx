@@ -9,28 +9,28 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, darkMode }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-2.5 shadow-lg">
-      <p className="text-xs font-semibold text-gray-500">Semester {label}</p>
-      <p className="text-sm font-bold text-indigo-600">
-        SGPA: <span className="text-gray-900">{payload[0].value.toFixed(2)}</span>
+    <div className={`rounded-lg border p-2.5 shadow-lg ${darkMode ? 'border-[#3D3D3D] bg-[#2D2D2D]' : 'border-gray-200 bg-white'}`}>
+      <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Semester {label}</p>
+      <p className={`text-sm font-bold ${darkMode ? 'text-[#ff6d34]' : 'text-indigo-600'}`}>
+        SGPA: <span className={`${darkMode ? 'text-white' : 'text-gray-900'}`}>{payload[0].value.toFixed(2)}</span>
       </p>
     </div>
   );
 };
 
-export const PerformanceChart = ({ data = [] }) => {
+export const PerformanceChart = ({ data = [], darkMode }) => {
   const chartData = data.map((item) => ({
     semester: item.semester,
     sgpa: parseFloat(item.sgpa)
   }));
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.015)]">
+    <div className={`rounded-2xl border p-5 shadow-[0_4px_20px_rgba(0,0,0,0.015)] ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D]' : 'bg-white border-gray-100'}`}>
       <div className="mb-4">
-        <h3 className="text-sm font-bold text-gray-800">SGPA Trend</h3>
+        <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>SGPA Trend</h3>
         <p className="text-xs text-gray-400">Semester-wise academic score trajectory</p>
       </div>
       <div className="h-64 w-full">
@@ -44,7 +44,7 @@ export const PerformanceChart = ({ data = [] }) => {
               data={chartData}
               margin={{ top: 10, right: 10, left: -25, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? "#3D3D3D" : "#F3F4F6"} vertical={false} />
               <XAxis
                 dataKey="semester"
                 tick={{ fill: "#9CA3AF", fontSize: 11 }}
@@ -59,13 +59,13 @@ export const PerformanceChart = ({ data = [] }) => {
                 tickLine={false}
                 width={36}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip darkMode={darkMode} />} />
               <Line
                 type="monotone"
                 dataKey="sgpa"
-                stroke="#6366F1"
+                stroke="#ff6d34"
                 strokeWidth={3}
-                dot={{ r: 4, fill: "#6366F1", strokeWidth: 2, stroke: "#fff" }}
+                dot={{ r: 4, fill: "#ff6d34", strokeWidth: 2, stroke: darkMode ? "#2D2D2D" : "#fff" }}
                 activeDot={{ r: 6, strokeWidth: 2, stroke: "#fff" }}
               />
             </LineChart>

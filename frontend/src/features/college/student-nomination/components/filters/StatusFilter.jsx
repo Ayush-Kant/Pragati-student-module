@@ -52,11 +52,11 @@ const StatusFilter = ({
         className={`flex items-center gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition-all duration-200 ease-out select-none
           ${
             darkMode
-              ? `border-slate-700/60 hover:border-slate-600 bg-[#151D30] ${
-                  isOpen ? "border-blue-500/70 ring-4 ring-blue-500/10" : ""
+              ? `border-[#3D3D3D] hover:border-[#4D4D4D] bg-[#2D2D2D] ${
+                  isOpen ? "border-[#ff6d34]/70 ring-4 ring-[#ff6d34]/10" : ""
                 }`
               : `border-slate-300 hover:border-slate-400 bg-white ${
-                  isOpen ? "border-blue-500 ring-4 ring-blue-500/10" : ""
+                  isOpen ? "border-[#ff7a00] ring-4 ring-[#ff7a00]/10" : ""
                 }`
           }`}
       >
@@ -70,7 +70,7 @@ const StatusFilter = ({
         <ChevronDown
           size={18}
           className={`shrink-0 transition-transform duration-200 ${
-            isOpen ? "rotate-180 text-blue-500" : darkMode ? "text-slate-400" : "text-slate-500"
+            isOpen ? `rotate-180 ${darkMode ? "text-[#ff6d34]" : "text-[#ff7a00]"}` : darkMode ? "text-slate-400" : "text-slate-500"
           }`}
         />
       </div>
@@ -79,12 +79,12 @@ const StatusFilter = ({
         <div
           onClick={(e) => e.stopPropagation()}
           className={`absolute left-0 right-0 mt-2 z-50 pointer-events-auto rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-64 ${
-            darkMode ? "border-slate-700 bg-[#1e293b] text-white" : "border-slate-200 bg-white text-slate-800"
+            darkMode ? "border-[#3D3D3D] bg-[#2D2D2D] text-white" : "border-slate-200 bg-white text-slate-800"
           }`}
         >
           <div
             className={`flex items-center gap-2 px-3 py-2 border-b shrink-0 ${
-              darkMode ? "border-slate-700 bg-slate-800/50" : "border-slate-100 bg-slate-50"
+              darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-100 bg-slate-50"
             }`}
           >
             <Search size={14} className={darkMode ? "text-slate-500" : "text-slate-400"} />
@@ -112,7 +112,7 @@ const StatusFilter = ({
             className={`overflow-y-auto flex-1 py-1 text-sm
               [&::-webkit-scrollbar]:w-1.5
               ${darkMode 
-                ? "[&::-webkit-scrollbar-track]:bg-[#1e293b] [&::-webkit-scrollbar-thumb]:bg-slate-700 hover:[&::-webkit-scrollbar-thumb]:bg-slate-600 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-thin] [scrollbar-color:#334155_#1e293b]" 
+                ? "[&::-webkit-scrollbar-track]:bg-[#2D2D2D] [&::-webkit-scrollbar-thumb]:bg-[#3D3D3D] hover:[&::-webkit-scrollbar-thumb]:bg-[#4D4D4D] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-thin] [scrollbar-color:#3D3D3D_#2D2D2D]" 
                 : "[&::-webkit-scrollbar-track]:bg-white [&::-webkit-scrollbar-thumb]:bg-slate-200 hover:[&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-thin] [scrollbar-color:#e2e8f0_#ffffff]"
               }`}
           >
@@ -122,7 +122,7 @@ const StatusFilter = ({
                 triggerChange("");
               }}
               className={`px-4 py-2.5 cursor-pointer font-medium transition-colors ${
-                value === "" ? (darkMode ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-600") : (darkMode ? "hover:bg-slate-700/60" : "hover:bg-slate-50")
+                value === "" ? (darkMode ? "bg-[#ff6d34] text-white" : "bg-orange-50 text-[#ff7a00]") : (darkMode ? "hover:bg-slate-700/60" : "hover:bg-slate-50")
               }`}
             >
               Status
@@ -137,7 +137,7 @@ const StatusFilter = ({
                     triggerChange(status);
                   }}
                   className={`px-4 py-2.5 cursor-pointer transition-colors ${
-                    value === status ? (darkMode ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-600") : (darkMode ? "hover:bg-slate-700/60" : "hover:bg-slate-50")
+                    value === status ? (darkMode ? "bg-[#ff6d34] text-white" : "bg-orange-50 text-[#ff7a00]") : (darkMode ? "hover:bg-slate-700/60" : "hover:bg-slate-50")
                   }`}
                 >
                   {status}

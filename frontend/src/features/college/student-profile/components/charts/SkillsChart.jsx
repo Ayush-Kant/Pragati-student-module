@@ -21,20 +21,20 @@ const LEVEL_COLORS = {
   Beginner: "#9CA3AF" // Gray
 };
 
-const CustomTooltip = ({ active, payload }) => {
+const CustomTooltip = ({ active, payload, darkMode }) => {
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-2 shadow-lg">
-      <p className="text-xs font-semibold text-gray-800">{data.name}</p>
-      <p className="text-xs font-medium text-gray-500">
+    <div className={`rounded-lg border p-2 shadow-lg ${darkMode ? 'border-[#3D3D3D] bg-[#2D2D2D]' : 'border-gray-200 bg-white'}`}>
+      <p className={`text-xs font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{data.name}</p>
+      <p className={`text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
         Proficiency: <span className="font-bold" style={{ color: data.color }}>{data.level}</span>
       </p>
     </div>
   );
 };
 
-export const SkillsChart = ({ technicalSkills = [] }) => {
+export const SkillsChart = ({ technicalSkills = [], darkMode }) => {
   const chartData = technicalSkills.map((skill) => ({
     name: skill.name,
     score: LEVEL_SCORES[skill.level] || 50,
@@ -43,9 +43,9 @@ export const SkillsChart = ({ technicalSkills = [] }) => {
   }));
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.015)]">
+    <div className={`rounded-2xl border p-5 shadow-[0_4px_20px_rgba(0,0,0,0.015)] ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D]' : 'bg-white border-gray-100'}`}>
       <div className="mb-4">
-        <h3 className="text-sm font-bold text-gray-800">Skill Proficiency</h3>
+        <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Skill Proficiency</h3>
         <p className="text-xs text-gray-400">Technical skills rating comparison</p>
       </div>
       <div className="h-64 w-full">
@@ -72,7 +72,7 @@ export const SkillsChart = ({ technicalSkills = [] }) => {
                 tickLine={false}
                 width={20}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "#F3F4F6", opacity: 0.4 }} />
+              <Tooltip content={<CustomTooltip darkMode={darkMode} />} cursor={{ fill: darkMode ? "#3D3D3D" : "#F3F4F6", opacity: 0.4 }} />
               <Bar dataKey="score" radius={[4, 4, 0, 0]} barSize={24}>
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />

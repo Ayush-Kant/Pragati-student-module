@@ -21,7 +21,7 @@ router.get("/:id", controller.getCourseById);
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware("admin", "hod"),
+  roleMiddleware("admin", "hod", "college"),
   validator.validateCourse,
   controller.createCourse
 );
@@ -29,11 +29,11 @@ router.post(
 router.put(
   "/:id",
   authMiddleware,
-  roleMiddleware("admin", "hod"),
+  roleMiddleware("admin", "hod", "college"),
   validator.validateCourseUpdate,
   controller.updateCourse
 );
 
-router.delete("/:id", authMiddleware, roleMiddleware("admin", "hod"), controller.deleteCourse);
+router.delete("/:id", authMiddleware, roleMiddleware("admin", "hod", "college"), controller.deleteCourse);
 
 export default router;

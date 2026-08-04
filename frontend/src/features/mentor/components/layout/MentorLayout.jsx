@@ -1,18 +1,21 @@
-import { useState, useEffect } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import {
   LayoutDashboard,
-  Users,
-  CalendarDays,
-  ClipboardList,
-  ListTodo,
   LineChart,
   Settings,
   Search,
   Bell,
   HelpCircle,
   Briefcase,
+  BookOpen,
+  Activity,
+  Database,
+  FlaskConical,
+  History,
+  Users,
+  LogOut,
 } from "lucide-react";
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -20,10 +23,26 @@ export default function MentorLayout() {
   const { logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     logout();
     navigate("/login", { replace: true });
   };
+
   const menuItems = [
     {
       name: "Dashboard",
@@ -31,29 +50,39 @@ export default function MentorLayout() {
       icon: <LayoutDashboard className="w-5 h-5" />,
     },
     {
+      name: "Mentees",
+      path: "/mentor/mentees",
+      icon: <Users className="w-5, h-5" />,
+    },
+    {
+      name: "Courses",
+      path: "/mentor/courses",
+      icon: <BookOpen className="w-5 h-5" />,
+    },
+    {
       name: "Projects",
       path: "/mentor/projects/create",
       icon: <Briefcase className="w-5 h-5" />,
     },
     {
-      name: "My Mentees",
-      path: "/mentor/mentees",
-      icon: <Users className="w-5 h-5" />,
+      name: "Activities",
+      path: "/mentor/activities",
+      icon: <Activity className="w-5 h-5" />,
     },
     {
-      name: "Sessions",
-      path: "/mentor/sessions",
-      icon: <CalendarDays className="w-5 h-5" />,
+      name: "Question Bank",
+      path: "/mentor/question-bank",
+      icon: <Database className="w-5 h-5" />,
     },
     {
-      name: "Assessments",
-      path: "/mentor/assessments",
-      icon: <ClipboardList className="w-5 h-5" />,
+      name: "Attempt History",
+      path: "/mentor/question-bank/attempts",
+      icon: <History className="w-5 h-5" />,
     },
     {
-      name: "Tasks & Assignments",
-      path: "/mentor/tasks",
-      icon: <ListTodo className="w-5 h-5" />,
+      name: "Challenge Creator",
+      path: "/mentor/challenge-creator",
+      icon: <FlaskConical className="w-5 h-5" />,
     },
     {
       name: "Reports & Analytics",
@@ -65,29 +94,29 @@ export default function MentorLayout() {
       path: "/mentor/settings",
       icon: <Settings className="w-5 h-5" />,
     },
+    // You can add as many items here as you want; the sidebar will now scroll!
   ];
 
   const isItemActive = (item) => {
+    const path = location.pathname;
     if (item.path === "#") return false;
     if (item.path === "/mentor/dashboard") {
-      return (
-        location.pathname === "/mentor/dashboard" ||
-        location.pathname === "/mentor"
-      );
+      return path === "/mentor/dashboard" || path === "/mentor";
     }
-    return location.pathname.startsWith(item.path);
+    if (
+      item.path === "/mentor/question-bank" ||
+      item.path === "/mentor/courses" ||
+      item.path === "/mentor/activities"
+    ) {
+      return path.startsWith(item.path);
+    }
+    return path === item.path;
   };
-  const [isOpen, setIsOpen] = useState(false);
+
   const [{ mentorName, initials }] = useState(() => {
     try {
       const token = localStorage.getItem("token");
-
-      if (!token) {
-        return {
-          mentorName: "Mentor User",
-          initials: "MU",
-        };
-      }
+      if (!token) return { mentorName: "Mentor User", initials: "MU" };
 
       const decoded = jwtDecode(token);
 
@@ -105,7 +134,6 @@ export default function MentorLayout() {
 
       if (decoded.email) {
         const emailName = decoded.email.split("@")[0];
-
         const formattedName =
           emailName.charAt(0).toUpperCase() +
           emailName.slice(1).replace(/[^a-zA-Z0-9]/g, " ");
@@ -118,288 +146,117 @@ export default function MentorLayout() {
     } catch (e) {
       console.error("Failed to decode token", e);
     }
-
-    return {
-      mentorName: "Mentor User",
-      initials: "MU",
-    };
+    return { mentorName: "Mentor User", initials: "MU" };
   });
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        backgroundColor: "#f8fafc",
-        fontFamily: '"Inter", sans-serif',
-        margin: 0,
-        padding: 0,
-        boxSizing: "border-box",
-      }}
-    >
+    <div className="flex min-h-screen bg-slate-50 font-sans m-0 p-0 box-border">
       {/* 1. FIXED LEFT SIDEBAR */}
-      <div
-        style={{
-          width: "260px",
-          height: "100vh",
-          backgroundColor: "#ffffff",
-          borderRight: "1px solid #e2e8f0",
-          display: "flex",
-          flexDirection: "column",
-          padding: "24px 16px",
-          boxSizing: "border-box",
-          position: "fixed",
-          left: 0,
-          top: 0,
-          zIndex: 30,
-        }}
-      >
-        {/* Logo */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginBottom: "32px",
-            paddingLeft: "12px",
-          }}
-        >
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              backgroundColor: "#0ea5e9",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#ffffff",
-              fontWeight: "800",
-            }}
-          >
-            U
-          </div>
-          <span
-            style={{
-              fontSize: "18px",
-              fontWeight: "800",
-              color: "#0f172a",
-              letterSpacing: "-0.03em",
-            }}
-          >
-            UPTOSKILLS
-          </span>
-        </div>
-
-        {/* Menu Items */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "4px",
-            flex: 1,
-          }}
-        >
-          {menuItems.map((item, idx) => (
-            <div
-              key={idx}
-              onClick={() => {
-                console.log("Clicked:", item);
-                navigate(item.path);
-              }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                padding: "12px 14px",
-                borderRadius: "10px",
-                cursor: "pointer",
-                backgroundColor: item.active ? "#f0f9ff" : "transparent",
-                color: item.active ? "#0284c7" : "#64748b",
-                fontWeight: item.active ? "600" : "500",
-                fontSize: "14px",
-                transition: "all 0.2s",
-              }}
-            >
-              {item.icon}
-              {item.name}
+      <aside className="fixed left-0 top-0 z-30 flex h-screen w-[260px] flex-col border-r border-slate-200 bg-white">
+        {/* Logo - Sticky at the top */}
+        <div className="shrink-0 p-6 pb-4">
+          <div className="flex items-center gap-2.5 pl-1">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500 font-extrabold text-white">
+              U
             </div>
-          ))}
+            <span className="text-lg font-extrabold tracking-tight text-slate-900">
+              UPTOSKILLS
+            </span>
+          </div>
         </div>
 
-        {/* Support Vector Box */}
-        <div
-          style={{
-            backgroundColor: "#f0f9ff",
-            padding: "16px",
-            borderRadius: "12px",
-            textAlign: "center",
-          }}
-        >
-          <div className="flex justify-center mb-2">
-            <HelpCircle className="w-8 h-8 text-sky-500" />
+        {/* Menu Items - Scrollable Middle Section */}
+        {/* Hide scrollbar for cleaner UI, but allow scrolling */}
+        <nav className="flex-1 overflow-y-auto px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex flex-col gap-1">
+            {menuItems.map((item, idx) => {
+              const active = isItemActive(item);
+              return (
+                <Link
+                  key={idx}
+                  to={item.path}
+                  className={`flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm transition-colors duration-200 ${
+                    active
+                      ? "bg-sky-50 text-sky-600 font-semibold"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 font-medium"
+                  }`}
+                >
+                  {item.icon}
+                  {item.name}
+                </Link>
+              );
+            })}
           </div>
-          <h4
-            style={{
-              margin: "6px 0 2px 0",
-              fontSize: "13px",
-              color: "#0f172a",
-              fontWeight: "700",
-            }}
-          >
-            Need Help?
-          </h4>
-          <p
-            style={{
-              margin: 0,
-              fontSize: "11px",
-              color: "#64748b",
-              marginBottom: "10px",
-            }}
-          >
-            Our Support Desk is open
-          </p>
-          <button
-            style={{
-              width: "100%",
-              padding: "8px",
-              backgroundColor: "#0ea5e9",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "12px",
-              fontWeight: "600",
-              cursor: "pointer",
-            }}
-          >
-            Get Support
-          </button>
+        </nav>
+
+        {/* Support Vector Box - Sticky at the bottom */}
+        <div className="shrink-0 border-t border-slate-100 p-4">
+          <div className="rounded-xl bg-sky-50 p-4 text-center">
+            <div className="mb-2 flex justify-center">
+              <HelpCircle className="h-8 w-8 text-sky-500" />
+            </div>
+            <h4 className="mb-1 text-[13px] font-bold text-slate-900">
+              Need Help?
+            </h4>
+            <p className="mb-3 text-[11px] text-slate-500">
+              Our Support Desk is open
+            </p>
+            <button className="w-full rounded-lg bg-sky-500 p-2 text-xs font-semibold text-white transition-colors hover:bg-sky-600">
+              Get Support
+            </button>
+          </div>
         </div>
-      </div>
+      </aside>
 
       {/* 2. RIGHT SIDE CONTENT CANVAS */}
-      <div
-        style={{
-          flex: 1,
-          marginLeft: "260px",
-          display: "flex",
-          flexDirection: "column",
-          minWidth: 0,
-        }}
-      >
+      <div className="ml-[260px] flex min-w-0 flex-1 flex-col">
         {/* Top Header Navigation Bar */}
-        <div
-          style={{
-            height: "70px",
-            backgroundColor: "#ffffff",
-            borderBottom: "1px solid #e2e8f0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 16px",
-            boxSizing: "border-box",
-            position: "sticky",
-            top: 0,
-            zIndex: 20,
-          }}
-        >
-          {/* Mockup Search */}
-          <div style={{ position: "relative", width: "320px" }}>
+        <header className="sticky top-0 z-20 flex h-[70px] items-center justify-between border-b border-slate-200 bg-white px-6">
+          {/* Search */}
+          <div className="relative w-[320px]">
             <input
               type="text"
               placeholder="Search for opportunities, profiles, faqs..."
-              style={{
-                width: "100%",
-                padding: "10px 16px 10px 38px",
-                borderRadius: "999px",
-                border: "1px solid #e2e8f0",
-                backgroundColor: "#f8fafc",
-                fontSize: "13px",
-                outline: "none",
-              }}
+              className="w-full rounded-full border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
             />
-            <span
-              style={{
-                position: "absolute",
-                left: "14px",
-                top: "10px",
-                color: "#94a3b8",
-              }}
-            >
-              <Search className="w-4 h-4 mt-0.5" />
+            <span className="absolute left-3.5 top-2.5 text-slate-400">
+              <Search className="h-4 w-4 mt-0.5" />
             </span>
           </div>
 
           {/* User Profile */}
-          <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-            <span style={{ cursor: "pointer", color: "#64748b" }}>
-              <Bell className="w-5 h-5" />
-            </span>
-            <div
-              onClick={() => setIsOpen(!isOpen)}
-              style={{ display: "flex", alignItems: "center", gap: "12px" }}
-            >
-              <div
-                style={{
-                  width: "38px",
-                  height: "38px",
-                  borderRadius: "50%",
-                  backgroundColor: "#0ea5e9",
-                  color: "#ffffff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: "700",
-                  fontSize: "14px",
-                }}
+          <div className="flex items-center gap-6">
+            <button className="text-slate-500 hover:text-slate-700 transition-colors">
+              <Bell className="h-5 w-5" />
+            </button>
+
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex items-center gap-3 focus:outline-none"
               >
-                {initials}
-              </div>
-              <div style={{ textAlign: "left" }}>
-                <div
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "700",
-                    color: "#1e293b",
-                    lineHeight: "1.2",
-                  }}
-                >
-                  {mentorName}
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-500 text-sm font-bold text-white">
+                  {initials}
                 </div>
-                <div
-                  style={{
-                    fontSize: "11px",
-                    color: "#64748b",
-                    marginTop: "2px",
-                  }}
-                >
-                  Mentor Console
+                <div className="text-left">
+                  <div className="text-sm font-bold leading-tight text-slate-800">
+                    {mentorName}
+                  </div>
+                  <div className="mt-0.5 text-xs text-slate-500">
+                    Mentor Console
+                  </div>
                 </div>
-              </div>
+              </button>
+
+              {/* Dropdown Menu */}
               {isOpen && (
-                <div className="absolute size-72 w-55 h-33 top-16 right-3 bg-white border border-t-2 border-t-blue-500 rounded-bl-lg flex flex-col">
-                  <div className="m-4">
+                <div className="absolute right-0 mt-3 w-48 rounded-lg border-t-2 border-t-sky-500 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div className="p-2">
                     <button
                       onClick={handleLogout}
-                      type="button"
-                      className="inline-flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-red-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-red-600 active:scale-95"
+                      className="flex w-full items-center gap-2 rounded-md bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:bg-red-500 hover:text-white"
                     >
-                      {/* Logout SVG Icon */}
-                      <svg
-                        xmlns="http://w3.org"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="h-5 w-5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          pathLength="1"
-                          d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-                        />
-                      </svg>
+                      <LogOut className="h-4 w-4" />
                       <span>Log out</span>
                     </button>
                   </div>
@@ -407,18 +264,12 @@ export default function MentorLayout() {
               )}
             </div>
           </div>
-        </div>
+        </header>
 
         {/* Inner Content Injection Frame */}
-        <div
-          style={{
-            padding: "12px 16px",
-            boxSizing: "border-box",
-            width: "100%",
-          }}
-        >
+        <main className="w-full p-6">
           <Outlet />
-        </div>
+        </main>
       </div>
     </div>
   );
