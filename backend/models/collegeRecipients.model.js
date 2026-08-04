@@ -72,9 +72,24 @@ export const getRecipientStatus = async (
   return rows[0];
 };
 
+// Update recipient status (B5 Delivery Status Tracking)
+export const updateRecipientStatus = async (recipientId, status) => {
+  const { rows } = await pool.query(
+    `UPDATE notification_recipients
+     SET status = $1,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE id = $2
+     RETURNING *`,
+    [status, recipientId]
+  );
+
+  return rows[0];
+};
+
 export default {
   getRecipients,
   addRecipient,
   removeRecipient,
   getRecipientStatus,
+  updateRecipientStatus,
 };

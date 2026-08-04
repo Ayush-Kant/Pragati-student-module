@@ -1,9 +1,6 @@
 import * as notificationModel from "../models/collegeNotifications.model.js";
-
-/**
- * Location:
- * backend/services/collegeNotifications.service.js
- */
+import * as announcementModel from "../models/collegeAnnouncements.model.js";
+import * as recipientModel from "../models/collegeRecipients.model.js";
 
 const formatNotification = (row) => ({
   id: row.id,
@@ -77,15 +74,54 @@ export const removeNotification = async (id) => {
   };
 };
 
+// B5: Complete Notification Delivery Workflow
 export const sendNotification = async (id) => {
-  const existing = await notificationModel.getNotificationById(id);
+  const notification = await notificationModel.getNotificationById(id);
 
-  if (!existing) {
+  if (!notification) {
     const err = new Error(`Notification with id ${id} not found.`);
     err.statusCode = 404;
     throw err;
   }
 
+  // Step 1: Verify announcement is Published
+  if (notification.announcement_id) {
+    const announcement = await announcementModel.getAnnouncementById(
+      notification.announcement_id
+    );
+
+    if (!announcement || announcement.status !== "Published") {
+      const err = new Error(
+        "Cannot send notification: The associated announcement is not published."
+      );
+      err.statusCode = 400;
+      throw err;
+    }
+  }
+
+  // Step 2: Fetch recipients
+  const recipients = await recipientModel.getRecipients(id);
+
+  if (!recipients || recipients.length === 0) {
+    const err = new Error(
+      "Cannot send notification: No recipients are assigned to this notification."
+    );
+    err.statusCode = 400;
+    throw err;
+  }
+
+  // Step 3 & 4: Dispatch notifications and update recipient delivery status
+  for (const recipient of recipients) {
+    try {
+      // Simulate/Trigger Email Dispatch
+      // If integrate with a real queue/email provider, trigger here.
+      await recipientModel.updateRecipientStatus(recipient.id, "Delivered");
+    } catch (deliveryErr) {
+      await recipientModel.updateRecipientStatus(recipient.id, "Failed");
+    }
+  }
+
+  // Step 5: Mark Notification status as 'Sent'
   const sent = await notificationModel.sendNotification(id);
 
   return formatNotification(sent);

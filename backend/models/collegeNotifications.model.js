@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import { NOTIFICATION_UPDATE_COLUMNS } from "../constants/collegeCommunication.constants.js";
 
 // Get all notifications
 export const getAllNotifications = async () => {
@@ -48,21 +49,25 @@ export const createNotification = async ({
   return rows[0];
 };
 
-// Update notification
+// Update notification (Protected against SQL Column Injection - B1)
 export const updateNotification = async (id, data) => {
   const fields = [];
   const values = [];
   let index = 1;
 
+  // Filter keys against allowlist
   Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (value !== undefined && NOTIFICATION_UPDATE_COLUMNS.has(key)) {
       fields.push(`${key} = $${index++}`);
       values.push(value);
     }
   });
 
-  fields.push(`updated_at = CURRENT_TIMESTAMP`);
+  if (fields.length === 0) {
+    throw new Error("No valid or editable fields provided for update.");
+  }
 
+  fields.push(`updated_at = CURRENT_TIMESTAMP`);
   values.push(id);
 
   const query = `
@@ -73,7 +78,6 @@ export const updateNotification = async (id, data) => {
   `;
 
   const { rows } = await pool.query(query, values);
-
   return rows[0];
 };
 

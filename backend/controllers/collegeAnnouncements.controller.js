@@ -1,67 +1,87 @@
 import * as service from "../services/collegeAnnouncements.service.js";
-import announcementModel from "../models/collegeAnnouncements.model.js";
 
 export const getAnnouncements = async (req, res) => {
   try {
-    const announcements = await service.getAnnouncements();
-    res.status(200).json(announcements);
+    const result = await service.getAnnouncements(req.query);
+    res.status(200).json({
+      success: true,
+      message: "Announcements fetched",
+      data: result,
+    });
   } catch (err) {
-    res.status(err.statusCode || 500).json({ error: err.message });
+    res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || "Failed to fetch announcements",
+      data: null,
+    });
   }
 };
 
 export const getAnnouncementById = async (req, res) => {
   try {
     const announcement = await service.getAnnouncement(req.params.id);
-    res.status(200).json(announcement);
+    res.status(200).json({
+      success: true,
+      message: "Announcement fetched successfully",
+      data: announcement,
+    });
   } catch (err) {
-    res.status(err.statusCode || 500).json({ error: err.message });
+    res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || "Failed to fetch announcement",
+      data: null,
+    });
   }
 };
 
 export const createAnnouncement = async (req, res) => {
   try {
-    // Fallback to req.user.id if attached by auth middleware, or convert payload created_by to integer
-    const createdBy = parseInt(req.body.created_by || req.user?.id || 1, 10);
-
-    if (isNaN(createdBy)) {
-      return res.status(400).json({ error: "created_by must be a valid integer." });
-    }
-
-    const announcementData = {
-      ...req.body,
-      created_by: createdBy,
-    };
-
-    const newAnnouncement = await announcementModel.createAnnouncement(announcementData);
-    res.status(201).json(newAnnouncement);
+    const newAnnouncement = await service.addAnnouncement(req.body, req.user?.id);
+    res.status(201).json({
+      success: true,
+      message: "Announcement created successfully",
+      data: newAnnouncement,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || "Failed to create announcement",
+      data: null,
+    });
   }
 };
 
 export const updateAnnouncement = async (req, res) => {
   try {
-    const payload = {
-      ...req.body,
-      updated_by: req.user?.id,
-    };
-    const announcement = await service.editAnnouncement(req.params.id, payload);
+    const announcement = await service.editAnnouncement(req.params.id, req.body);
     res.status(200).json({
-      message: "Announcement updated successfully.",
-      announcement,
+      success: true,
+      message: "Announcement updated successfully",
+      data: announcement,
     });
   } catch (err) {
-    res.status(err.statusCode || 500).json({ error: err.message });
+    res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || "Failed to update announcement",
+      data: null,
+    });
   }
 };
 
 export const deleteAnnouncement = async (req, res) => {
   try {
     const result = await service.removeAnnouncement(req.params.id);
-    res.status(200).json(result);
+    res.status(200).json({
+      success: true,
+      message: "Announcement deleted successfully",
+      data: result,
+    });
   } catch (err) {
-    res.status(err.statusCode || 500).json({ error: err.message });
+    res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || "Failed to delete announcement",
+      data: null,
+    });
   }
 };
 
@@ -69,11 +89,16 @@ export const publishAnnouncement = async (req, res) => {
   try {
     const announcement = await service.publishAnnouncement(req.params.id, req.user?.id);
     res.status(200).json({
-      message: "Announcement published successfully.",
-      announcement,
+      success: true,
+      message: "Announcement published successfully",
+      data: announcement,
     });
   } catch (err) {
-    res.status(err.statusCode || 500).json({ error: err.message });
+    res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || "Failed to publish announcement",
+      data: null,
+    });
   }
 };
 
@@ -81,11 +106,16 @@ export const unpublishAnnouncement = async (req, res) => {
   try {
     const announcement = await service.unpublishAnnouncement(req.params.id);
     res.status(200).json({
-      message: "Announcement unpublished successfully.",
-      announcement,
+      success: true,
+      message: "Announcement unpublished successfully",
+      data: announcement,
     });
   } catch (err) {
-    res.status(err.statusCode || 500).json({ error: err.message });
+    res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || "Failed to unpublish announcement",
+      data: null,
+    });
   }
 };
 
