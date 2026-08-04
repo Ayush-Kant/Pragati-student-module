@@ -4,7 +4,7 @@ import { SquarePen } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 
 const EditNominationForm = ({ student, onClose, onSave }) => {
-  const { darkMode } = useOutletContext();
+  const { darkMode = false } = useOutletContext() || {};
 
   // Strip non-numeric formatting values cleanly for the input state display
   const cleanPackageInput = (pkgStr) => {
@@ -258,7 +258,7 @@ const EditNominationForm = ({ student, onClose, onSave }) => {
           <button
             type="button"
             onClick={onClose}
-            className={`rounded-xl border px-6 py-3 font-medium transition ${
+            className={`rounded-xl border px-6 py-3 font-medium transition cursor-pointer ${
               darkMode ? "border-[#3D3D3D] hover:bg-[#1A1A1A]" : "border-slate-300 hover:bg-slate-100"
             }`}
           >
@@ -269,7 +269,7 @@ const EditNominationForm = ({ student, onClose, onSave }) => {
             disabled={!hasChanges || !confirmationValid}
             onClick={handleSave}
             className={`rounded-xl px-6 py-3 font-medium text-white transition ${
-              confirmationValid ? "bg-[#ff7a00] hover:bg-[#e06b00]" : "cursor-not-allowed bg-slate-400"
+              confirmationValid ? "bg-[#ff7a00] hover:bg-[#e06b00] cursor-pointer" : "cursor-not-allowed bg-slate-400 opacity-60"
             }`}
           >
             Save Changes

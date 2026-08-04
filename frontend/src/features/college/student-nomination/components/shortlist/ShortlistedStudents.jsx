@@ -1,23 +1,30 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-
-import { shortlistedStudents } from "../../types/studentNominationDummyData";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 
 import ShortlistCard from "./ShortlistCard";
 import CompanyShortlist from "./CompanyShortlist";
 
-// MODIFIED: Accept the limit prop here
-const ShortlistedStudents = ({ limit }) => {
-  const { darkMode } = useOutletContext();
+const ShortlistedStudents = ({ 
+  shortlistedData = [], 
+  isLoading = false, 
+  error = null,
+  limit,
+  onSelectStudent,
+  onRemoveShortlist,
+  onRefresh,
+}) => {
+  // Safe destructuring in case component is used outside an Outlet context
+  const outletContext = useOutletContext() || {};
+  const darkMode = outletContext.darkMode ?? false;
+
   const [showAll, setShowAll] = useState(false);
 
   /* =====================================
         Latest Shortlisted Students
   ====================================== */
-  // MODIFIED: Fallback to a default slice of 4 if limit isn't provided (e.g., on desktop)
   const currentLimit = limit !== undefined ? limit : 4;
-  const latestShortlists = shortlistedStudents.slice(0, currentLimit);
+  const latestShortlists = shortlistedData.slice(0, currentLimit);
 
   /* =====================================
         Company-wise View
@@ -63,7 +70,12 @@ const ShortlistedStudents = ({ limit }) => {
         </div>
 
         <div className="w-full max-w-full min-w-0 overflow-hidden">
-          <CompanyShortlist />
+          <CompanyShortlist 
+            data={shortlistedData}
+            onSelectStudent={onSelectStudent}
+            onRemoveShortlist={onRemoveShortlist}
+            onRefresh={onRefresh}
+          />
         </div>
       </div>
     );
@@ -117,24 +129,45 @@ const ShortlistedStudents = ({ limit }) => {
         </button>
       </div>
 
-      {/* Latest Shortlisted Students */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {latestShortlists.length > 0 ? (
-          latestShortlists.map((student) => (
-            <ShortlistCard key={student.id} student={student} />
-          ))
-        ) : (
-          <div
-            className={`col-span-full flex h-56 items-center justify-center rounded-2xl border ${
-              darkMode
-                ? "border-slate-700 bg-slate-800/30 text-slate-400"
-                : "border-slate-200 bg-slate-50 text-slate-500"
-            }`}
-          >
-            No shortlisted students available.
-          </div>
-        )}
-      </div>
+      {/* Loading State */}
+      {isLoading ? (
+        <div className="flex h-56 items-center justify-center gap-3">
+          <Loader2 className="animate-spin text-[#ff7a00]" size={28} />
+          <span className={darkMode ? "text-slate-400" : "text-slate-500"}>
+            Loading shortlist records...
+          </span>
+        </div>
+      ) : error ? (
+        <div className={`col-span-full flex h-56 items-center justify-center rounded-2xl border ${
+          darkMode ? "border-red-900/40 bg-red-950/20 text-red-400" : "border-red-200 bg-red-50 text-red-600"
+        }`}>
+          Failed to load shortlist data from backend.
+        </div>
+      ) : (
+        /* Latest Shortlisted Students */
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {latestShortlists.length > 0 ? (
+            latestShortlists.map((student, idx) => (
+              <ShortlistCard 
+                key={student.id || student._id || idx} 
+                student={student}
+                onSelectStudent={onSelectStudent}
+                onRemoveShortlist={onRemoveShortlist}
+              />
+            ))
+          ) : (
+            <div
+              className={`col-span-full flex h-56 items-center justify-center rounded-2xl border ${
+                darkMode
+                  ? "border-slate-700 bg-slate-800/30 text-slate-400"
+                  : "border-slate-200 bg-slate-50 text-slate-500"
+              }`}
+            >
+              No shortlisted students available.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

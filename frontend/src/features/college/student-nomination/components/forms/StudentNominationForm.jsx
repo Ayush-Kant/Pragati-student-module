@@ -1,25 +1,26 @@
-import { useOutletContext } from "react-router-dom";
 import { useState } from "react";
-import { UserPlus, Briefcase, Building2 } from "lucide-react";
+import { UserPlus, Briefcase } from "lucide-react";
 
 /**
  * StudentNominationForm
  *
  * Props
- *   student      — the eligible_student object being nominated
+ *   student       — the eligible_student object being nominated
  *   selectedDrive — full drive object (from DriveSelector) or null
  *   onClose       — close handler
  *   onSave        — async (nominationData) => void
  */
 const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
-  const { darkMode } = useOutletContext();
+  // Fallback to light mode if useOutletContext is not available
+  const outletContext = useOutletContext ? useOutletContext() : {};
+  const { darkMode = false } = outletContext || {};
 
   // When a drive is pre-selected, pre-fill and lock company/role/package
   const driveMode = !!selectedDrive;
 
   const [formData, setFormData] = useState({
-    role: driveMode ? (selectedDrive.role || "") : "",
-    package: driveMode ? (selectedDrive.package || "") : "",
+    role: driveMode ? selectedDrive.role || "" : "",
+    package: driveMode ? selectedDrive.package || "" : "",
     remarks: "",
   });
 
@@ -54,14 +55,14 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
 
     const nomination = {
       // frontend validation fields
-      company: driveMode ? selectedDrive.company : (formData.company || ""),
+      company: driveMode ? selectedDrive.company : formData.company || "",
       role: formData.role,
       package: formData.package,
       remarks: formData.remarks,
       // API fields
       student_id: student.id,
-      company_id: driveMode ? (selectedDrive.id || 1) : 1,
-      company_name: driveMode ? selectedDrive.company : (formData.company || ""),
+      company_id: driveMode ? selectedDrive.id || 1 : 1,
+      company_name: driveMode ? selectedDrive.company : formData.company || "",
       drive_id: driveMode ? selectedDrive.id : null,
     };
 
@@ -70,28 +71,32 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
 
   /* ── Shared input styles ────────────────────────────────────────── */
   const inputCls = (field) =>
-    `w-full rounded-xl border px-4 py-3 text-sm outline-none transition ${errors[field]
-      ? "border-red-500 focus:border-red-500"
-      : darkMode
-        ? "border-[#3D3D3D] bg-[#1A1A1A] focus:border-[#ff7a00]"
-        : "border-slate-300 bg-white focus:border-[#ff7a00]"
+    `w-full rounded-xl border px-4 py-3 text-sm outline-none transition ${
+      errors[field]
+        ? "border-red-500 focus:border-red-500"
+        : darkMode
+        ? "border-[#3D3D3D] bg-[#1A1A1A] focus:border-[#ff7a00] text-white"
+        : "border-slate-300 bg-white focus:border-[#ff7a00] text-slate-800"
     }`;
 
   const labelCls = `mb-1.5 block text-sm font-medium`;
 
   return (
     <div
-      className={`rounded-3xl border shadow-lg ${darkMode ? "border-[#3D3D3D] bg-[#2D2D2D]" : "border-slate-200 bg-white"
-        }`}
+      className={`mx-auto w-full max-w-5xl rounded-3xl border shadow-xl ${
+        darkMode ? "border-[#3D3D3D] bg-[#2D2D2D] text-white" : "border-slate-200 bg-white text-slate-800"
+      }`}
     >
       {/* ── Header ─────────────────────────────────────────────────── */}
       <div
-        className={`flex items-center gap-3 border-b px-8 py-6 ${darkMode ? "border-[#3D3D3D]" : "border-slate-200"
-          }`}
+        className={`flex items-center gap-3 border-b px-8 py-6 ${
+          darkMode ? "border-[#3D3D3D]" : "border-slate-200"
+        }`}
       >
         <div
-          className={`rounded-2xl p-3 ${darkMode ? "bg-[#ff6d34]/10 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"
-            }`}
+          className={`rounded-2xl p-3 ${
+            darkMode ? "bg-[#ff6d34]/10 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"
+          }`}
         >
           <UserPlus size={24} />
         </div>
@@ -109,22 +114,23 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
         {/* ── Drive banner (when drive is pre-selected) ───────────── */}
         {driveMode && (
           <div
-            className={`flex items-start gap-4 rounded-2xl border p-5 ${darkMode
-                ? "border-[#ff6d34]/20 bg-[#ff6d34]/5"
-                : "border-orange-200 bg-orange-50"
-              }`}
+            className={`flex items-start gap-4 rounded-2xl border p-5 ${
+              darkMode ? "border-[#ff6d34]/20 bg-[#ff6d34]/5" : "border-orange-200 bg-orange-50"
+            }`}
           >
             <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${darkMode ? "bg-[#ff6d34]/15 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"
-                }`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${
+                darkMode ? "bg-[#ff6d34]/15 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"
+              }`}
             >
               {selectedDrive.company?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold">{selectedDrive.company}</p>
               <div
-                className={`mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs ${darkMode ? "text-slate-400" : "text-slate-500"
-                  }`}
+                className={`mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs ${
+                  darkMode ? "text-slate-400" : "text-slate-500"
+                }`}
               >
                 <span className="flex items-center gap-1">
                   <Briefcase size={11} /> {selectedDrive.role}
@@ -154,13 +160,15 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
         <div>
           <h3 className="mb-4 text-base font-semibold">Student Information</h3>
           <div
-            className={`rounded-2xl border p-5 ${darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-200 bg-slate-50"
-              }`}
+            className={`rounded-2xl border p-5 ${
+              darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-200 bg-slate-50"
+            }`}
           >
             <div className="flex items-center gap-4">
               <div
-                className={`flex h-14 w-14 items-center justify-center rounded-2xl text-xl font-bold ${darkMode ? "bg-[#ff6d34]/10 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"
-                  }`}
+                className={`flex h-14 w-14 items-center justify-center rounded-2xl text-xl font-bold ${
+                  darkMode ? "bg-[#ff6d34]/10 text-[#ff6d34]" : "bg-orange-100 text-[#ff7a00]"
+                }`}
               >
                 {student?.name?.charAt(0)?.toUpperCase() || "S"}
               </div>
@@ -183,8 +191,9 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
               ].map(({ label, value }) => (
                 <div key={label}>
                   <p
-                    className={`text-[10px] uppercase tracking-wider ${darkMode ? "text-slate-500" : "text-slate-400"
-                      }`}
+                    className={`text-[10px] uppercase tracking-wider ${
+                      darkMode ? "text-slate-500" : "text-slate-400"
+                    }`}
                   >
                     {label}
                   </p>
@@ -199,7 +208,6 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
         <div>
           <h3 className="mb-4 text-base font-semibold">Nomination Details</h3>
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-
             {/* Company — locked when drive mode */}
             {!driveMode && (
               <div>
@@ -224,10 +232,11 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
               <label className={labelCls}>Job Role *</label>
               {driveMode ? (
                 <div
-                  className={`flex h-[46px] items-center rounded-xl border px-4 text-sm font-medium ${darkMode
+                  className={`flex h-[46px] items-center rounded-xl border px-4 text-sm font-medium ${
+                    darkMode
                       ? "border-[#3D3D3D] bg-[#1A1A1A] text-slate-300"
                       : "border-slate-200 bg-slate-50 text-slate-700"
-                    }`}
+                  }`}
                 >
                   {selectedDrive.role}
                 </div>
@@ -252,10 +261,11 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
               <label className={labelCls}>Package (LPA) *</label>
               {driveMode && selectedDrive.package ? (
                 <div
-                  className={`flex h-[46px] items-center rounded-xl border px-4 text-sm font-medium ${darkMode
+                  className={`flex h-[46px] items-center rounded-xl border px-4 text-sm font-medium ${
+                    darkMode
                       ? "border-[#3D3D3D] bg-[#1A1A1A] text-slate-300"
                       : "border-slate-200 bg-slate-50 text-slate-700"
-                    }`}
+                  }`}
                 >
                   {selectedDrive.package}
                 </div>
@@ -281,8 +291,9 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
             <div>
               <label className={labelCls}>Status</label>
               <div
-                className={`flex h-[46px] items-center rounded-xl border px-4 ${darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-200 bg-slate-50"
-                  }`}
+                className={`flex h-[46px] items-center rounded-xl border px-4 ${
+                  darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-200 bg-slate-50"
+                }`}
               >
                 <span className="rounded-full bg-[#ff6d34]/10 px-3 py-1 text-xs font-semibold text-[#ff6d34]">
                   Nominated
@@ -311,23 +322,25 @@ const StudentNominationForm = ({ student, selectedDrive, onClose, onSave }) => {
 
         {/* ── Actions ─────────────────────────────────────────────── */}
         <div
-          className={`flex items-center justify-end gap-4 border-t pt-6 ${darkMode ? "border-[#3D3D3D]" : "border-slate-200"
-            }`}
+          className={`flex items-center justify-end gap-4 border-t pt-6 ${
+            darkMode ? "border-[#3D3D3D]" : "border-slate-200"
+          }`}
         >
           <button
             type="button"
             onClick={onClose}
-            className={`rounded-xl border px-6 py-3 text-sm font-medium transition ${darkMode
-                ? "border-[#3D3D3D] hover:bg-[#3D3D3D]"
-                : "border-slate-300 hover:bg-slate-100"
-              }`}
+            className={`rounded-xl border px-6 py-3 text-sm font-medium transition cursor-pointer ${
+              darkMode
+                ? "border-[#3D3D3D] text-gray-300 hover:bg-[#1A1A1A]"
+                : "border-slate-300 text-slate-700 hover:bg-slate-100"
+            }`}
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleNominate}
-            className="rounded-xl bg-[#ff7a00] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#e06b00] active:scale-[0.98]"
+            className="rounded-xl bg-[#ff7a00] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#e06b00] active:scale-[0.98] cursor-pointer shadow-lg"
           >
             Nominate Student
           </button>

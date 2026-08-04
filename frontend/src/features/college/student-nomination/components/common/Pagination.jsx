@@ -2,126 +2,177 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 
 const Pagination = ({
-  currentPage,
-  totalPages,
+  currentPage = 1,
+  totalPages = 1,
+  pageSize = 10,
+  totalItems = 0,
   onPageChange,
+  onPageSizeChange,
+  pageSizeOptions = [10, 25, 50, 100],
 }) => {
-  const { darkMode } = useOutletContext();
+  const { darkMode = false } = useOutletContext() || {};
 
-  if (totalPages <= 1) return null;
+  // Ensure valid minimum bounds
+  const safeTotalPages = Math.max(1, totalPages);
+  const safeCurrentPage = Math.max(1, Math.min(currentPage, safeTotalPages));
 
+  if (safeTotalPages <= 1 && totalItems <= pageSizeOptions[0]) return null;
+
+  // Safe Page Change Execution
+  const handlePageClick = (page) => {
+    if (typeof page === "number" && page !== safeCurrentPage) {
+      const safePage = Math.max(1, Math.min(page, safeTotalPages));
+      onPageChange?.(safePage);
+    }
+  };
+
+  // Helper to generate dynamic page range buttons
   const getPageNumbers = () => {
-    // Small number of pages
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (safeTotalPages <= 7) {
+      return Array.from({ length: safeTotalPages }, (_, i) => i + 1);
     }
 
-    // Beginning
-    if (currentPage <= 4) {
-      return [1, 2, 3, 4, 5, "...", totalPages];
+    if (safeCurrentPage <= 4) {
+      return [1, 2, 3, 4, 5, "...", safeTotalPages];
     }
 
-    // End
-    if (currentPage >= totalPages - 3) {
+    if (safeCurrentPage >= safeTotalPages - 3) {
       return [
         1,
         "...",
-        totalPages - 4,
-        totalPages - 3,
-        totalPages - 2,
-        totalPages - 1,
-        totalPages,
+        safeTotalPages - 4,
+        safeTotalPages - 3,
+        safeTotalPages - 2,
+        safeTotalPages - 1,
+        safeTotalPages,
       ];
     }
 
-    // Middle
     return [
       1,
       "...",
-      currentPage - 1,
-      currentPage,
-      currentPage + 1,
+      safeCurrentPage - 1,
+      safeCurrentPage,
+      safeCurrentPage + 1,
       "...",
-      totalPages,
+      safeTotalPages,
     ];
   };
 
   const pages = getPageNumbers();
 
+  // Calculate current visible range
+  const startRange = totalItems === 0 ? 0 : (safeCurrentPage - 1) * pageSize + 1;
+  const endRange = Math.min(safeCurrentPage * pageSize, totalItems);
+
   return (
-    <div className="mt-6 grid grid-cols-[150px_1fr_150px] items-center">
-      {/* Previous */}
-
-      <div className="justify-self-start">
-        <button
-          disabled={currentPage === 1}
-          onClick={() => onPageChange(currentPage - 1)}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2 transition-all ${
-            currentPage === 1
-              ? "cursor-not-allowed opacity-50"
-              : ""
-          } ${
-                          darkMode
-              ? "bg-[#2D2D2D] hover:bg-[#3D3D3D]"
-              : "bg-white hover:bg-slate-100"
-          }`}
-        >
-          <ChevronLeft size={18} />
-          Previous
-        </button>
-      </div>
-
-      {/* Numbers */}
-
-      <div className="flex items-center justify-center gap-2">
-        {pages.map((page, index) => {
-          if (page === "...") {
-            return (
-              <span
-                key={`dots-${index}`}
-                className="w-8 text-center text-slate-400 font-semibold"
-              >
-                ...
-              </span>
-            );
-          }
-
-          return (
-            <button
-              key={`page-${page}`}
-              onClick={() => onPageChange(page)}
-              className={`h-10 w-10 rounded-xl font-medium transition-all ${
-                currentPage === page
-                  ? "bg-[#ff7a00] text-white shadow-md"
-                  : darkMode
-              ? "bg-[#2D2D2D] hover:bg-[#3D3D3D]"
-              : "bg-white hover:bg-slate-100"
+    <div className="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 px-2">
+      {/* 1. Page Size Selector & Record Count */}
+      <div className="flex items-center gap-4 text-xs md:text-sm">
+        {onPageSizeChange && (
+          <div className="flex items-center gap-2">
+            <span className={darkMode ? "text-slate-400" : "text-slate-500"}>
+              Rows per page:
+            </span>
+            <select
+              value={pageSize}
+              onChange={(e) => onPageSizeChange(Number(e.target.value))}
+              className={`rounded-xl px-2.5 py-1.5 text-xs font-medium border focus:outline-none transition-colors ${
+                darkMode
+                  ? "bg-[#2D2D2D] border-[#3D3D3D] text-white focus:border-[#ff7a00]"
+                  : "bg-white border-slate-200 text-slate-700 focus:border-[#ff7a00]"
               }`}
             >
-              {page}
-            </button>
-          );
-        })}
+              {pageSizeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {totalItems > 0 && (
+          <span className={`font-medium ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+            Showing <span className={darkMode ? "text-white" : "text-slate-800"}>{startRange}</span>–
+            <span className={darkMode ? "text-white" : "text-slate-800"}>{endRange}</span> of{" "}
+            <span className={darkMode ? "text-white" : "text-slate-800"}>{totalItems}</span>
+          </span>
+        )}
       </div>
 
-      {/* Next */}
-
-      <div className="justify-self-end">
+      {/* 2. Pagination Navigation Controls */}
+      <div className="flex items-center gap-2">
+        {/* Previous Button */}
         <button
-          disabled={currentPage === totalPages}
-          onClick={() => onPageChange(currentPage + 1)}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2 transition-all ${
-            currentPage === totalPages
-              ? "cursor-not-allowed opacity-50"
-              : ""
+          disabled={safeCurrentPage <= 1}
+          onClick={() => handlePageClick(safeCurrentPage - 1)}
+          aria-label="Previous Page"
+          className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all border ${
+            safeCurrentPage <= 1
+              ? "cursor-not-allowed opacity-40 border-transparent"
+              : "hover:scale-105 active:scale-95"
           } ${
             darkMode
-              ? "bg-[#2D2D2D] hover:bg-[#3D3D3D]"
-              : "bg-white hover:bg-slate-100"
+              ? "bg-[#2D2D2D] text-gray-300 border-[#3D3D3D] hover:bg-[#3D3D3D]"
+              : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-sm"
           }`}
         >
-          Next
-          <ChevronRight size={18} />
+          <ChevronLeft size={16} />
+          <span className="hidden sm:inline">Previous</span>
+        </button>
+
+        {/* Page Numbers */}
+        <div className="flex items-center gap-1">
+          {pages.map((page, index) => {
+            if (page === "...") {
+              return (
+                <span
+                  key={`dots-${index}`}
+                  className="w-7 text-center text-slate-400 font-semibold select-none text-xs"
+                >
+                  ...
+                </span>
+              );
+            }
+
+            const isSelected = safeCurrentPage === page;
+
+            return (
+              <button
+                key={`page-${page}`}
+                onClick={() => handlePageClick(page)}
+                className={`h-9 w-9 rounded-xl text-xs font-bold transition-all border ${
+                  isSelected
+                    ? "bg-[#ff7a00] text-white border-[#ff7a00] shadow-md shadow-orange-500/20"
+                    : darkMode
+                    ? "bg-[#2D2D2D] text-gray-300 border-[#3D3D3D] hover:bg-[#3D3D3D]"
+                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-sm"
+                }`}
+              >
+                {page}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Next Button */}
+        <button
+          disabled={safeCurrentPage >= safeTotalPages}
+          onClick={() => handlePageClick(safeCurrentPage + 1)}
+          aria-label="Next Page"
+          className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all border ${
+            safeCurrentPage >= safeTotalPages
+              ? "cursor-not-allowed opacity-40 border-transparent"
+              : "hover:scale-105 active:scale-95"
+          } ${
+            darkMode
+              ? "bg-[#2D2D2D] text-gray-300 border-[#3D3D3D] hover:bg-[#3D3D3D]"
+              : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-sm"
+          }`}
+        >
+          <span className="hidden sm:inline">Next</span>
+          <ChevronRight size={16} />
         </button>
       </div>
     </div>

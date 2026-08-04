@@ -1,16 +1,10 @@
-import { useEffect, useState, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import {
-  getEligibleForDrive,
-  getDriveNominations,
-  nominateStudentsToDrive,
-  shortlistStudentsForDrive,
-  setStudentEligibility,
-  // legacy (non-drive)
   getEligibleStudents,
   getNominations,
-  nominateStudent as nominateStudentLegacy,
-  updateNomination as updateNominationLegacy,
-  removeNomination as removeNominationLegacy,
+  nominateStudent as nominateStudentService,
+  updateNomination as updateNominationService,
+  removeNomination as removeNominationService,
 } from "../services/studentNominationService";
 import {
   validateNomination,
@@ -18,15 +12,24 @@ import {
   validateEditNomination,
 } from "../validations/studentNominationValidation";
 
-// ─── Normalise a raw eligible_student row ────────────────────────────────────
+// ─── Query Keys Definition ───────────────────────────────────────────────────
+export const nominationQueryKeys = {
+  all: ["nominations"],
+  eligible: (driveId, params) => ["nominations", "eligible", driveId || "global", params],
+  nominated: (driveId, params) => ["nominations", "nominated", driveId || "global", params],
+};
+
+// ─── Normalizer Helpers ──────────────────────────────────────────────────────
 const normaliseEligible = (s) => ({
   ...s,
-  id: s.id,
-  enrollmentNo: s.enrollment_no || s.enrollmentNo,
-  placementStatus: s.placement_status || s.placementStatus,
+  id: s.id || s.student_id,
+  student_id: s.student_id || s.id,
+  name: s.name || `${s.first_name || ""} ${s.last_name || ""}`.trim() || "—",
+  enrollmentNo: s.enrollment_no || s.enrollmentNo || "—",
+  placementStatus: s.placement_status || s.status || "Eligible",
   company: s.company_name || s.company || "—",
-  status: s.placement_status || "Eligible",
-  alreadyNominated: s.already_nominated || false,
+  status: s.status || "Eligible",
+  alreadyNominated: Boolean(s.already_nominated),
   timeline: {
     nominated: s.nomination_date
       ? new Date(s.nomination_date).toLocaleDateString("en-IN")
@@ -34,13 +37,14 @@ const normaliseEligible = (s) => ({
   },
 });
 
-// ─── Normalise a raw nomination row ──────────────────────────────────────────
 const normaliseNomination = (n) => ({
   ...n,
-  name: n.student_name || n.name,
-  enrollmentNo: n.enrollment_no || n.enrollmentNo,
+  id: n.id,
+  student_id: n.student_id || n.studentId,
+  name: n.student_name || n.name || `${n.first_name || ""} ${n.last_name || ""}`.trim() || "—",
+  enrollmentNo: n.enrollment_no || n.enrollmentNo || "—",
   company: n.company || n.company_name || "—",
-  status: n.status || "Nominated",
+  status: n.status || "PENDING",
   timeline: {
     nominated: n.nominated_at
       ? new Date(n.nominated_at).toLocaleDateString("en-IN")
@@ -50,226 +54,171 @@ const normaliseNomination = (n) => ({
   },
 });
 
-const useStudentNomination = (selectedDriveId = null) => {
-  const [eligibleStudentsList, setEligibleStudents] = useState([]);
-  const [nominatedStudentsList, setNominatedStudents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+/**
+ * Custom React Query Hook for Student Nomination & Shortlisting Workflows
+ * 
+ * @param {string|number|null} selectedDriveId - ID of active placement drive
+ * @param {Object} queryParams - Filters and pagination params ({ page, limit, search })
+ */
+const useStudentNomination = (selectedDriveId = null, queryParams = {}) => {
+  const queryClient = useQueryClient();
 
-  // ─── Fetch data ──────────────────────────────────────────────────────────
-  const fetchNominationData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Helper to invalidate all nomination & eligible query caches
+  const invalidateNominationQueries = () => {
+    queryClient.invalidateQueries({ queryKey: nominationQueryKeys.all });
+  };
 
-      if (selectedDriveId) {
-        // Drive-scoped fetch
-        const [eligibleRes, nominatedRes] = await Promise.all([
-          getEligibleForDrive(selectedDriveId),
-          getDriveNominations(selectedDriveId),
-        ]);
+  const combinedParams = { ...queryParams, ...(selectedDriveId ? { driveId: selectedDriveId } : {}) };
 
-        if (eligibleRes.success) {
-          setEligibleStudents((eligibleRes.data || []).map(normaliseEligible));
-        } else {
-          setError(eligibleRes.message || "Failed to load eligible students.");
-        }
-
-        if (nominatedRes.success) {
-          setNominatedStudents((nominatedRes.data || []).map(normaliseNomination));
-        }
-      } else {
-        // Legacy global fetch (no drive selected)
-        const [eligibleResponse, nominatedResponse] = await Promise.all([
-          getEligibleStudents(),
-          getNominations(),
-        ]);
-
-        if (eligibleResponse.success) {
-          setEligibleStudents((eligibleResponse.data || []).map(normaliseEligible));
-        }
-        if (nominatedResponse.success) {
-          setNominatedStudents((nominatedResponse.data || []).map(normaliseNomination));
-        }
-      }
-    } catch (err) {
-      setError(err.message || "Failed to load nomination data.");
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedDriveId]);
-
-  useEffect(() => {
-    fetchNominationData();
-  }, [fetchNominationData]);
-
-  // ─── Bulk nominate selected students to a drive ──────────────────────────
-  const bulkNominate = useCallback(
-    async (studentIds) => {
-      if (!selectedDriveId) {
-        return { success: false, message: "No drive selected." };
-      }
-      try {
-        setLoading(true);
-        const response = await nominateStudentsToDrive(selectedDriveId, studentIds);
-        if (response.success) {
-          await fetchNominationData();
-        }
-        return response;
-      } catch (err) {
-        return { success: false, message: err.message || "Bulk nomination failed." };
-      } finally {
-        setLoading(false);
-      }
+  // ─── 1. Fetch Eligible Students Query ─────────────────────────────────────
+  const eligibleQuery = useQuery({
+    queryKey: nominationQueryKeys.eligible(selectedDriveId, queryParams),
+    queryFn: async () => {
+      const res = await getEligibleStudents(combinedParams);
+      return {
+        data: (res.data || []).map(normaliseEligible),
+        pagination: res.pagination || null,
+      };
     },
-    [selectedDriveId, fetchNominationData]
-  );
+    placeholderData: keepPreviousData,
+  });
 
-  // ─── Bulk shortlist nominated students ───────────────────────────────────
-  const bulkShortlist = useCallback(
-    async (studentIds) => {
-      if (!selectedDriveId) {
-        return { success: false, message: "No drive selected." };
-      }
-      try {
-        setLoading(true);
-        const response = await shortlistStudentsForDrive(selectedDriveId, studentIds);
-        if (response.success) {
-          await fetchNominationData();
-        }
-        return response;
-      } catch (err) {
-        return { success: false, message: err.message || "Bulk shortlist failed." };
-      } finally {
-        setLoading(false);
-      }
+  // ─── 2. Fetch Nominated Students Query ────────────────────────────────────
+  const nominatedQuery = useQuery({
+    queryKey: nominationQueryKeys.nominated(selectedDriveId, queryParams),
+    queryFn: async () => {
+      const res = await getNominations(combinedParams);
+      return {
+        data: (res.data || []).map(normaliseNomination),
+        pagination: res.pagination || null,
+      };
     },
-    [selectedDriveId, fetchNominationData]
-  );
+    placeholderData: keepPreviousData,
+  });
 
-  // ─── Approve / reject a student's eligibility for the drive ─────────────
-  const approveEligibility = useCallback(
-    async (studentId, approved) => {
-      if (!selectedDriveId) {
-        return { success: false, message: "No drive selected." };
-      }
-      try {
-        setLoading(true);
-        const response = await setStudentEligibility(selectedDriveId, studentId, approved);
-        if (response.success) {
-          await fetchNominationData();
-        }
-        return response;
-      } catch (err) {
-        return { success: false, message: err.message || "Failed to update eligibility." };
-      } finally {
-        setLoading(false);
-      }
+  // ─── 3. Single / Bulk Nominate Mutation ──────────────────────────────────
+  const nominateStudentMutation = useMutation({
+    mutationFn: async (studentData) => {
+      const payload = {
+        studentId: Number(studentData.student_id || studentData.studentId),
+        companyId: Number(studentData.company_id || studentData.companyId),
+        driveId: Number(selectedDriveId || studentData.driveId || studentData.drive_id),
+        minCgpa: studentData.minCgpa ? Number(studentData.minCgpa) : undefined,
+        remarks: studentData.remarks || "",
+      };
+      return await nominateStudentService(payload);
     },
-    [selectedDriveId, fetchNominationData]
-  );
+    onSuccess: () => {
+      invalidateNominationQueries();
+    },
+  });
 
-  // ─── Legacy single-student nominate (used by the form) ───────────────────
+  // ─── 4. Update Nomination Mutation ───────────────────────────────────────
+  const updateNominationMutation = useMutation({
+    mutationFn: async ({ nominationId, formData }) => {
+      return await updateNominationService(nominationId, formData);
+    },
+    onSuccess: () => {
+      invalidateNominationQueries();
+    },
+  });
+
+  // ─── 5. Remove Nomination Mutation ───────────────────────────────────────
+  const removeNominationMutation = useMutation({
+    mutationFn: async (nominationId) => {
+      return await removeNominationService(nominationId);
+    },
+    onSuccess: () => {
+      invalidateNominationQueries();
+    },
+  });
+
+  // ─── Consumer Wrapper Methods ──────────────────────────────────────────────
+
   const nominateStudent = async (studentData) => {
     const validation = validateNomination(studentData);
     if (!validation.isValid) return validation;
 
+    const targetStudentId = studentData.student_id || studentData.studentId;
     const duplicate = validateDuplicateNomination(
-      studentData.student_id,
-      nominatedStudentsList
+      targetStudentId,
+      nominatedQuery.data?.data || []
     );
+    
     if (duplicate.isDuplicate) {
       return { isValid: false, errors: { student: duplicate.message } };
     }
 
-    // If a drive is selected, use bulk-nominate with a single student
-    if (selectedDriveId) {
-      try {
-        setLoading(true);
-        const response = await nominateStudentsToDrive(selectedDriveId, [
-          studentData.student_id,
-        ]);
-        if (response.success) {
-          await fetchNominationData();
-        }
-        return { isValid: response.success, message: response.message };
-      } catch (err) {
-        return { isValid: false, errors: { service: err.message } };
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    // Legacy path (no drive)
     try {
-      setLoading(true);
-      const apiPayload = {
-        student_id: studentData.student_id,
-        company_id: studentData.company_id,
-        company_name: studentData.company_name,
-        role: studentData.role || "",
-        package: studentData.package || 0,
-        remarks: studentData.remarks || "",
-      };
-      const response = await nominateStudentLegacy(apiPayload);
-      return { isValid: response.success, data: response.data, message: response.message };
+      const res = await nominateStudentMutation.mutateAsync(studentData);
+      return { isValid: true, data: res.data, message: res.message };
     } catch (err) {
-      return { isValid: false, errors: { service: err.message || "Unable to complete nomination." } };
-    } finally {
-      setLoading(false);
+      return {
+        isValid: false,
+        errors: { service: err.message || "Unable to complete nomination." },
+      };
     }
   };
 
-  // ─── Legacy: update nomination ────────────────────────────────────────────
-  const updateNomination = async (studentId, formData, originalData) => {
+  const updateNomination = async (nominationId, formData, originalData) => {
     const validation = validateEditNomination(formData, originalData);
     if (!validation.isValid) return validation;
+
     try {
-      setLoading(true);
-      const response = await updateNominationLegacy(studentId, formData);
-      if (response.success) {
-        setNominatedStudents((prev) =>
-          prev.map((s) => (s.id === studentId ? response.data : s))
-        );
-      }
-      return { isValid: response.success, data: response.data, message: response.message };
+      const res = await updateNominationMutation.mutateAsync({
+        nominationId,
+        formData,
+      });
+      return { isValid: true, data: res.data, message: res.message };
     } catch (err) {
-      return { isValid: false, errors: { service: err.message || "Unable to update nomination." } };
-    } finally {
-      setLoading(false);
+      return {
+        isValid: false,
+        errors: { service: err.message || "Unable to update nomination." },
+      };
     }
   };
 
-  // ─── Legacy: remove nomination ────────────────────────────────────────────
-  const removeNomination = async (studentId) => {
+  const removeNomination = async (nominationId) => {
     try {
-      setLoading(true);
-      const response = await removeNominationLegacy(studentId);
-      if (response.success) {
-        setNominatedStudents((prev) => prev.filter((s) => s.id !== studentId));
-      }
-      return response;
+      const res = await removeNominationMutation.mutateAsync(nominationId);
+      return res;
     } catch (err) {
-      return { success: false, message: err.message || "Unable to remove nomination." };
-    } finally {
-      setLoading(false);
+      return {
+        success: false,
+        message: err.message || "Unable to remove nomination.",
+      };
     }
   };
+
+  // Loading & Error composite state
+  const loading =
+    eligibleQuery.isLoading ||
+    nominatedQuery.isLoading ||
+    nominateStudentMutation.isPending ||
+    updateNominationMutation.isPending ||
+    removeNominationMutation.isPending;
+
+  const error = eligibleQuery.error?.message || nominatedQuery.error?.message || null;
 
   return {
-    eligibleStudents: eligibleStudentsList,
-    nominatedStudents: nominatedStudentsList,
+    // Data lists
+    eligibleStudents: eligibleQuery.data?.data || [],
+    eligiblePagination: eligibleQuery.data?.pagination || null,
+    nominatedStudents: nominatedQuery.data?.data || [],
+    nominatedPagination: nominatedQuery.data?.pagination || null,
+
+    // Loading & Error States
     loading,
+    isFetching: eligibleQuery.isFetching || nominatedQuery.isFetching,
     error,
-    // drive-scoped
-    bulkNominate,
-    bulkShortlist,
-    approveEligibility,
-    // legacy / single-student
+
+    // Action Methods
     nominateStudent,
     updateNomination,
     removeNomination,
-    refreshData: fetchNominationData,
+
+    // Query Refetch Trigger
+    refreshData: invalidateNominationQueries,
   };
 };
 

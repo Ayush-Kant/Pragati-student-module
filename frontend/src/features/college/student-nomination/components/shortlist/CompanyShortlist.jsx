@@ -12,29 +12,20 @@ import CompanyFilter from "../filters/CompanyFilter";
 import ShortlistCard from "./ShortlistCard";
 import Pagination from "../common/Pagination";
 
-import { shortlistedStudents } from "../../types/studentNominationDummyData";
-
-const CompanyShortlist = () => {
-  const { darkMode } = useOutletContext();
+const CompanyShortlist = ({ data = [] }) => {
+  // Safe destructuring fallback in case of missing Outlet context
+  const { darkMode = false } = useOutletContext() || {};
 
   /* =====================================
             STATES
   ====================================== */
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState(""); // Unified default value matching empty filter string
+  const [selectedCompany, setSelectedCompany] = useState("");
   const [expandedCompanies, setExpandedCompanies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   const scrollRefs = useRef({});
   const COMPANIES_PER_PAGE = 5;
-
-  /* =====================================
-        RESET PAGINATION
-  ====================================== */
-  useEffect(() => {
-    setCurrentPage(1);
-    setExpandedCompanies([]);
-  }, [searchTerm, selectedCompany]);
 
   /* =====================================
         EVENT HANDLERS
@@ -53,22 +44,23 @@ const CompanyShortlist = () => {
   const filteredStudents = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
 
-    return shortlistedStudents.filter((student) => {
-      const studentName = (student.student || "").toLowerCase();
-      const role = (student.role || "").toLowerCase();
-      const company = (student.company || "").toLowerCase();
+    return data.filter((student) => {
+      const studentName = (student.student || student.student_name || student.name || "").toLowerCase();
+      const role = (student.role || student.job_title || "").toLowerCase();
+      const company = (student.company || student.company_name || "").toLowerCase();
 
       const matchesSearch =
+        !query ||
         studentName.includes(query) ||
         role.includes(query) ||
         company.includes(query);
 
       const matchesCompany =
-        selectedCompany === "" || student.company === selectedCompany;
+        !selectedCompany || company === selectedCompany.toLowerCase();
 
       return matchesSearch && matchesCompany;
     });
-  }, [searchTerm, selectedCompany]);
+  }, [data, searchTerm, selectedCompany]);
 
   /* =====================================
           GROUP BY COMPANY
@@ -77,21 +69,42 @@ const CompanyShortlist = () => {
     const grouped = {};
 
     filteredStudents.forEach((student) => {
-      if (!grouped[student.company]) {
-        grouped[student.company] = [];
+      const compName = student.company || student.company_name || "Unassigned";
+      if (!grouped[compName]) {
+        grouped[compName] = [];
       }
-      grouped[student.company].push(student);
+      grouped[compName].push(student);
     });
 
     return Object.entries(grouped)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([company, students]) => ({
-        company,
-        students,
-        totalStudents: students.length,
-        selectedStudents: students.length,
-      }));
+      .map(([company, students]) => {
+        const selectedCount = students.filter(
+          (s) => s.selected || s.is_selected || (s.status || "").toLowerCase() === "selected"
+        ).length;
+
+        return {
+          company,
+          students,
+          totalStudents: students.length,
+          selectedStudents: selectedCount,
+        };
+      });
   }, [filteredStudents]);
+
+  /* =====================================
+        RESET PAGINATION & AUTO-EXPAND
+  ====================================== */
+  useEffect(() => {
+    setCurrentPage(1);
+
+    // Auto-expand accordions when active filter/search query is applied
+    if (searchTerm.trim() !== "" || selectedCompany !== "") {
+      setExpandedCompanies(companyGroups.map((g) => g.company));
+    } else {
+      setExpandedCompanies([]);
+    }
+  }, [searchTerm, selectedCompany, companyGroups]);
 
   /* =====================================
           PAGINATION
@@ -100,7 +113,7 @@ const CompanyShortlist = () => {
 
   const paginatedCompanies = companyGroups.slice(
     (currentPage - 1) * COMPANIES_PER_PAGE,
-    currentPage * COMPANIES_PER_PAGE,
+    currentPage * COMPANIES_PER_PAGE
   );
 
   /* =====================================
@@ -110,7 +123,7 @@ const CompanyShortlist = () => {
     setExpandedCompanies((prev) =>
       prev.includes(companyName)
         ? prev.filter((item) => item !== companyName)
-        : [...prev, companyName],
+        : [...prev, companyName]
     );
   };
 
@@ -187,7 +200,7 @@ const CompanyShortlist = () => {
                     <div className="text-left">
                       <h2 className="text-xl font-bold">{company.company}</h2>
                       <p className={`mt-1 text-sm ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
-                        {company.totalStudents} Students Shortlisted
+                        {company.totalStudents} {company.totalStudents === 1 ? "Student" : "Students"} Shortlisted
                       </p>
                     </div>
                   </div>
@@ -196,7 +209,7 @@ const CompanyShortlist = () => {
                   <div className="flex items-center gap-6">
                     <div className="text-center">
                       <p className={`text-xs uppercase tracking-wide ${darkMode ? "text-slate-500" : "text-slate-400"}`}>
-                        Shortlisted
+                        Selected
                       </p>
                       <p className="mt-1 text-2xl font-bold text-emerald-500">
                         {company.selectedStudents}
@@ -243,12 +256,15 @@ const CompanyShortlist = () => {
                     <div className="w-full max-w-full overflow-hidden">
                       {/* SCROLL AREA */}
                       <div
-                        ref={(el) => (scrollRefs.current[company.company] = el)}
+                        ref={(el) => {
+                          if (el) scrollRefs.current[company.company] = el;
+                          else delete scrollRefs.current[company.company];
+                        }}
                         className="flex flex-nowrap gap-6 overflow-x-auto overflow-y-hidden scroll-smooth snap-x snap-mandatory px-1 pb-2 scrollbar-hide [&::-webkit-scrollbar]:hidden w-full"
                       >
-                        {company.students.map((student) => (
+                        {company.students.map((student, idx) => (
                           <div
-                            key={student.id}
+                            key={student.id || student._id || idx}
                             data-shortlist-card
                             className="flex-none shrink-0 snap-start w-[280px] sm:w-[325px]"
                           >

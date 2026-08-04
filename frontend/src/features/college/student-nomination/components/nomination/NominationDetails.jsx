@@ -6,9 +6,26 @@ import NominationStatus from "./NominationStatus";
 import { formatPackage, getStudentName } from "../../utils/studentNominationHelpers";
 
 const NominationDetails = ({ student, isOpen, onClose }) => {
-  const { darkMode } = useOutletContext();
+  // Safe outlet context destructuring
+  const { darkMode = false } = useOutletContext() || {};
 
   if (!student || !isOpen) return null;
+
+  // Property normalization fallbacks
+  const enrollmentNo = student.enrollmentNo || student.enrollment_no || "--";
+  const department = student.department || student.dept || "--";
+  const company = student.company || student.company_name || "--";
+  const role = student.role || student.job_role || "--";
+  const rawPackage = student.package || student.package_amount || student.ctc;
+  const cgpa = student.cgpa ?? "--";
+  const email = student.email || student.email_id || "--";
+  const phone = student.phone || student.phone_number || student.mobile || "--";
+  const address = student.address || student.location || "--";
+
+  const labelClass = darkMode ? "text-slate-400" : "text-slate-500";
+  const cardBgClass = darkMode
+    ? "border-[#3D3D3D] bg-[#1A1A1A]"
+    : "border-slate-200 bg-slate-50";
 
   return (
     <div
@@ -18,10 +35,7 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
           : "border-slate-200 bg-white"
       }`}
     >
-      {/* =========================
-            Header
-      ========================== */}
-
+      {/* Header */}
       <div
         className={`flex items-center justify-between border-b p-6 ${
           darkMode ? "border-[#3D3D3D]" : "border-slate-200"
@@ -40,7 +54,9 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
         </div>
 
         <button
+          type="button"
           onClick={onClose}
+          aria-label="Close details drawer"
           className={`rounded-xl p-2 transition-colors ${
             darkMode ? "hover:bg-[#1A1A1A]" : "hover:bg-slate-100"
           }`}
@@ -49,15 +65,9 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
         </button>
       </div>
 
-      {/* =========================
-            Scrollable Content
-      ========================== */}
-
+      {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">
-        {/* =========================
-              Student Profile
-        ========================== */}
-
+        {/* Student Profile */}
         <div className="flex flex-col items-center p-6">
           <CircleUserRound
             size={72}
@@ -74,17 +84,15 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
               darkMode ? "text-slate-400" : "text-slate-500"
             }`}
           >
-            {student.enrollmentNo}
+            {enrollmentNo}
           </p>
 
           <div className="mt-4">
             <StatusBadge status={student.status} />
           </div>
         </div>
-        {/* =========================
-              Academic Details
-        ========================== */}
 
+        {/* Academic Details */}
         <div className="px-6">
           <h3
             className={`mb-5 text-sm font-semibold uppercase tracking-wider ${
@@ -94,55 +102,37 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
             Academic Details
           </h3>
 
-          <div
-            className={`space-y-4 rounded-2xl border p-5 ${
-              darkMode
-                ? "border-[#3D3D3D] bg-[#1A1A1A]"
-                : "border-slate-200 bg-slate-50"
-            }`}
-          >
+          <div className={`space-y-4 rounded-2xl border p-5 ${cardBgClass}`}>
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Department</span>
+              <span className={labelClass}>Department</span>
+              <span className="font-medium text-right">{department}</span>
+            </div>
 
+            <div className="flex items-center justify-between">
+              <span className={labelClass}>Company</span>
+              <span className="font-medium text-right">{company}</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className={labelClass}>Role</span>
+              <span className="font-medium text-right">{role}</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className={labelClass}>Package</span>
               <span className="font-medium text-right">
-                {student.department}
+                {rawPackage ? formatPackage(rawPackage) : "--"}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Company</span>
-
-              <span className="font-medium text-right">{student.company}</span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-slate-500">Role</span>
-
-              <span className="font-medium text-right">
-                {student.role || "--"}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-slate-500">Package</span>
-
-              <span className="font-medium text-right">
-                {formatPackage(student.package)}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-slate-500">CGPA</span>
-
-              <span className="font-medium">{student.cgpa}</span>
+              <span className={labelClass}>CGPA</span>
+              <span className="font-medium">{cgpa}</span>
             </div>
           </div>
         </div>
 
-        {/* =========================
-              Personal Details
-        ========================== */}
-
+        {/* Personal Details */}
         <div className="mt-8 px-6">
           <h3
             className={`mb-5 text-sm font-semibold uppercase tracking-wider ${
@@ -152,40 +142,29 @@ const NominationDetails = ({ student, isOpen, onClose }) => {
             Personal Details
           </h3>
 
-          <div
-            className={`space-y-4 rounded-2xl border p-5 ${
-              darkMode
-                ? "border-[#3D3D3D] bg-[#1A1A1A]"
-                : "border-slate-200 bg-slate-50"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-slate-500">Email</span>
-
+          <div className={`space-y-4 rounded-2xl border p-5 ${cardBgClass}`}>
+            <div className="flex items-center justify-between gap-4">
+              <span className={labelClass}>Email</span>
               <span className="max-w-[220px] text-right font-medium break-all">
-                {student.email || "--"}
+                {email}
               </span>
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="text-slate-500">Phone</span>
-
-              <span className="font-medium">{student.phone || "--"}</span>
+            <div className="flex items-center justify-between gap-4">
+              <span className={labelClass}>Phone</span>
+              <span className="font-medium">{phone}</span>
             </div>
 
             <div className="flex items-start justify-between gap-4">
-              <span className="text-slate-500">Address</span>
-
+              <span className={labelClass}>Address</span>
               <span className="max-w-[220px] text-right font-medium">
-                {student.address || "--"}
+                {address}
               </span>
             </div>
           </div>
         </div>
-        {/* =========================
-              Nomination Timeline
-        ========================== */}
 
+        {/* Nomination Timeline */}
         <div className="mt-8 mb-6 px-6">
           <NominationStatus
             status={student.status}

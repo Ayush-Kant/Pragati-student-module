@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 
 const RemoveNominationModal = ({ student, onClose, onRemove }) => {
-  const { darkMode } = useOutletContext();
+  const { darkMode = false } = useOutletContext() || {};
   const [reason, setReason] = useState("");
   const [confirmationText, setConfirmationText] = useState("");
 
@@ -86,7 +86,7 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
         <div>
           <h3 className="mb-5 text-lg font-semibold">Status Transition</h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-<div className={`rounded-2xl border p-5 ${darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-200 bg-slate-50"}`}>
+            <div className={`rounded-2xl border p-5 ${darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-200 bg-slate-50"}`}>
                <p className={`text-xs uppercase tracking-wider ${darkMode ? "text-slate-500" : "text-slate-400"}`}>Current Status</p>
               <div className="mt-4"><StatusBadge status={student?.status} /></div>
             </div>
@@ -105,7 +105,7 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
             <div>
               <h3 className={`text-lg font-semibold ${darkMode ? "text-red-400" : "text-red-700"}`}>This action requires confirmation</h3>
               <p className={`mt-3 text-sm leading-7 ${darkMode ? "text-slate-300" : "text-slate-700"}`}>
-                Removing this nomination will immediately remove the student from the active active nomination list.
+                Removing this nomination will immediately remove the student from the active nomination list.
               </p>
               <ul className={`mt-4 list-disc space-y-2 pl-5 text-sm ${darkMode ? "text-slate-300" : "text-slate-700"}`}>
                 <li>The nomination record will be removed.</li>
@@ -124,8 +124,8 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
             onChange={(e) => setReason(e.target.value)}
             placeholder="Duplicate nomination, student opted out..."
             className={`w-full rounded-2xl border px-4 py-3 outline-none transition ${
-              darkMode ? "border-slate-700 bg-slate-800 focus:border-red-500" : "border-slate-300 bg-white focus:border-red-500"
-                }`}
+              darkMode ? "border-slate-700 bg-slate-800 focus:border-red-500 text-white" : "border-slate-300 bg-white focus:border-red-500 text-slate-800"
+            }`}
           />
         </div>
 
@@ -137,7 +137,7 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
             onChange={(e) => setConfirmationText(e.target.value)}
             placeholder="REMOVE"
             className={`w-full rounded-2xl border px-4 py-3 outline-none transition ${
-              darkMode ? "border-slate-700 bg-slate-800 focus:border-red-500" : "border-slate-300 bg-white focus:border-red-500"
+              darkMode ? "border-slate-700 bg-slate-800 focus:border-red-500 text-white" : "border-slate-300 bg-white focus:border-red-500 text-slate-800"
             }`}
           />
         </div>
@@ -146,7 +146,7 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
           <button
             type="button"
             onClick={onClose}
-            className={`rounded-xl border px-6 py-3 font-medium transition ${
+            className={`rounded-xl border px-6 py-3 font-medium transition cursor-pointer ${
               darkMode ? "border-[#3D3D3D] text-gray-300 hover:bg-[#1A1A1A]" : "border-slate-300 text-slate-700 hover:bg-slate-100"
             }`}
           >
@@ -157,7 +157,7 @@ const RemoveNominationModal = ({ student, onClose, onRemove }) => {
             disabled={!confirmationValid}
             onClick={handleRemove}
             className={`rounded-xl px-6 py-3 font-medium text-white transition-all duration-200 ${
-              confirmationValid ? "bg-red-600 hover:bg-red-700 shadow-lg" : "cursor-not-allowed bg-slate-400"
+              confirmationValid ? "bg-red-600 hover:bg-red-700 shadow-lg cursor-pointer" : "cursor-not-allowed bg-slate-400 opacity-60"
             }`}
           >
             Remove Nomination

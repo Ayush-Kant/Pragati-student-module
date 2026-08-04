@@ -23,6 +23,18 @@ export const statusStyles = {
     },
   },
 
+  // College / Drive admin approved the student nomination
+  Approved: {
+    badge: {
+      light: "bg-indigo-100 text-indigo-700 border border-indigo-200",
+      dark: "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30",
+    },
+    avatar: {
+      light: "bg-indigo-50 text-indigo-600",
+      dark: "bg-indigo-950/40 text-indigo-400",
+    },
+  },
+
   // Student successfully passed resume/test filtering and advanced to interviews
   Shortlisted: {
     badge: {
@@ -38,28 +50,28 @@ export const statusStyles = {
   // Intermediate state for student evaluation verification queues
   Waiting: {
     badge: {
-      light: "bg-orange-100 text-orange-700 border border-orange-200",
-      dark: "bg-orange-500/15 text-orange-400 border border-orange-500/30",
+      light: "bg-amber-100 text-amber-700 border border-amber-200",
+      dark: "bg-amber-500/15 text-amber-400 border border-amber-500/30",
     },
     avatar: {
-      light: "bg-orange-50 text-orange-600",
-      dark: "bg-orange-950/40 text-orange-400",
+      light: "bg-amber-50 text-amber-600",
+      dark: "bg-amber-950/40 text-amber-400",
     },
   },
 
   // Candidate was rejected by company panel or failed preliminary matching metrics
   Rejected: {
     badge: {
-      light: "bg-red-100 text-red-700 border border-red-200",
-      dark: "bg-red-500/15 text-red-400 border border-red-500/30",
+      light: "bg-rose-100 text-rose-700 border border-rose-200",
+      dark: "bg-rose-500/15 text-rose-400 border border-rose-500/30",
     },
     avatar: {
-      light: "bg-red-50 text-red-600",
-      dark: "bg-red-950/40 text-red-400",
+      light: "bg-rose-50 text-rose-600",
+      dark: "bg-rose-950/40 text-rose-400",
     },
   },
-  
-  // Confirmed job offer selection achieved for corporate drive track
+
+  // Confirmed job offer selection 
   Selected: {
     badge: {
       light: "bg-teal-100 text-teal-700 border border-teal-200",
@@ -69,5 +81,53 @@ export const statusStyles = {
       light: "bg-teal-50 text-teal-600",
       dark: "bg-teal-950/40 text-teal-400",
     },
+  },
+
+  // Default fallback for unknown, inactive, or unmapped statuses
+  Default: {
+    badge: {
+      light: "bg-slate-100 text-slate-700 border border-slate-200",
+      dark: "bg-slate-500/15 text-slate-400 border border-slate-500/30",
+    },
+    avatar: {
+      light: "bg-slate-50 text-slate-600",
+      dark: "bg-slate-950/40 text-slate-400",
+    },
+  },
+};
+
+export const getStatusStyles = (status) => {
+  if (status === null || status === undefined) return statusStyles.Default;
+
+  const normalized = String(status).trim().toLowerCase();
+
+  switch (normalized) {
+    case "eligible":
+      return statusStyles.Eligible;
+    case "nominated":
+    case "already_nominated":
+      return statusStyles.Nominated;
+    case "approved":
+    case "accept":
+    case "accepted":
+      return statusStyles.Approved;
+    case "shortlisted":
+      return statusStyles.Shortlisted;
+    case "waiting":
+    case "waitlisted":
+    case "pending":
+    case "in_review":
+    case "in review":
+      return statusStyles.Waiting;
+    case "rejected":
+    case "reject":
+    case "withdrawn":
+      return statusStyles.Rejected;
+    case "selected":
+    case "placed":
+    case "hired":
+      return statusStyles.Selected;
+    default:
+      return statusStyles.Default;
   }
 };
