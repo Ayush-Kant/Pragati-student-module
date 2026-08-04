@@ -1,7 +1,9 @@
+import React from "react";
+import PropTypes from "prop-types";
 import LeaderboardCard from "./LeaderboardCard";
 import { LEADERBOARD_PREVIEW_LIMIT } from "../../constants/dashboardConstants";
 
-// Skeleton row
+// Skeleton row with a unique key pattern
 const SkeletonRow = () => (
   <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 animate-pulse">
     <div className="w-8 h-4 bg-gray-200 rounded" />
@@ -20,7 +22,9 @@ const LeaderboardPreview = ({
   error = null,
   currentUserName = "Vaishnavi Chaudhari",
 }) => {
-  const topEntries = leaderboard.slice(0, LEADERBOARD_PREVIEW_LIMIT);
+  // Ensure leaderboard is strictly treated as an array
+  const safeLeaderboard = Array.isArray(leaderboard) ? leaderboard : [];
+  const topEntries = safeLeaderboard.slice(0, LEADERBOARD_PREVIEW_LIMIT || 5);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 h-full flex flex-col">
@@ -30,7 +34,7 @@ const LeaderboardPreview = ({
           <span className="text-lg">🏆</span>
           <h3 className="text-base font-bold text-gray-800">Leaderboard</h3>
         </div>
-        <button className="text-xs font-semibold text-blue-600 hover:underline">
+        <button type="button" className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer">
           View All
         </button>
       </div>
@@ -45,7 +49,9 @@ const LeaderboardPreview = ({
       {/* Loading State */}
       {loading && (
         <div className="flex flex-col gap-2">
-          {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <SkeletonRow key={`skeleton-leaderboard-${i}`} />
+          ))}
         </div>
       )}
 
@@ -56,24 +62,34 @@ const LeaderboardPreview = ({
         </div>
       )}
 
-      {/* Data */}
+      {/* Data List */}
       {!loading && !error && topEntries.length > 0 && (
         <div className="flex flex-col gap-2">
-          {topEntries.map((entry) => (
-            <LeaderboardCard
-              key={entry.rank}
-              rank={entry.rank}
-              name={entry.name}
-              score={entry.score}
-              department={entry.department}
-              avatarColor={entry.avatarColor}
-              isCurrentUser={entry.name === currentUserName}
-            />
-          ))}
+          {topEntries.map((entry, index) => {
+            const uniqueKey = entry?.id || (entry?.rank ? `rank-${entry.rank}` : `leaderboard-item-${index}`);
+            return (
+              <LeaderboardCard
+                key={uniqueKey}
+                rank={entry?.rank || index + 1}
+                name={entry?.name || entry?.studentName}
+                score={entry?.score ?? entry?.xp ?? 0}
+                department={entry?.department || "Computer Science"}
+                avatarColor={entry?.avatarColor}
+                isCurrentUser={entry?.name === currentUserName}
+              />
+            );
+          })}
         </div>
       )}
     </div>
   );
+};
+
+LeaderboardPreview.propTypes = {
+  leaderboard: PropTypes.array,
+  loading: PropTypes.bool,
+  error: PropTypes.string,
+  currentUserName: PropTypes.string,
 };
 
 export default LeaderboardPreview;

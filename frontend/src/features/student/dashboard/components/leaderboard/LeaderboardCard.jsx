@@ -1,15 +1,28 @@
-
+import React from "react";
+import PropTypes from "prop-types";
 import { RANK_BADGE } from "../../constants/dashboardConstants";
 
-const LeaderboardCard = ({ rank, name, score, department, avatarColor, isCurrentUser }) => {
-  const badge = RANK_BADGE[rank];
+const LeaderboardCard = ({ 
+  rank = 0, 
+  name = "", 
+  score = 0, 
+  department = "Computer Science", 
+  avatarColor = "", 
+  isCurrentUser = false 
+}) => {
+  const badge = RANK_BADGE ? RANK_BADGE[rank] : null;
 
-  const initials = name
+  // Safe name resolution to avoid runtime crashes when name is missing or null
+  const displayName = name && name.trim() ? name.trim() : `Student ${rank ? `#${rank}` : ""}`;
+
+  // Safe initials extraction
+  const initials = displayName
     .split(" ")
+    .filter(Boolean)
     .map((w) => w[0])
     .join("")
     .slice(0, 2)
-    .toUpperCase();
+    .toUpperCase() || "ST";
 
   return (
     <div
@@ -19,26 +32,26 @@ const LeaderboardCard = ({ rank, name, score, department, avatarColor, isCurrent
           : "bg-white border border-gray-100 hover:bg-gray-50"
         }`}
     >
-      {/* Rank */}
+      {/* Rank Badge / Number */}
       <div className="w-8 flex items-center justify-center shrink-0">
         {badge ? (
           <span className={`text-lg ${badge.color}`}>{badge.emoji}</span>
         ) : (
-          <span className="text-sm font-bold text-gray-400">#{rank}</span>
+          <span className="text-sm font-bold text-gray-400">#{rank || "-"}</span>
         )}
       </div>
 
       {/* Avatar */}
-      <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${avatarColor || "bg-gray-100 text-gray-600"}`}>
+      <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${avatarColor || "bg-blue-100 text-blue-700"}`}>
         {initials}
       </div>
 
       {/* Name + Department */}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-gray-800 truncate">
-          {name} {isCurrentUser && <span className="text-xs text-blue-500 font-normal">(You)</span>}
+          {displayName} {isCurrentUser && <span className="text-xs text-blue-500 font-normal">(You)</span>}
         </p>
-        <p className="text-xs text-gray-400 truncate">{department}</p>
+        {department && <p className="text-xs text-gray-400 truncate">{department}</p>}
       </div>
 
       {/* Score */}
@@ -48,6 +61,15 @@ const LeaderboardCard = ({ rank, name, score, department, avatarColor, isCurrent
       </div>
     </div>
   );
+};
+
+LeaderboardCard.propTypes = {
+  rank: PropTypes.number,
+  name: PropTypes.string,
+  score: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  department: PropTypes.string,
+  avatarColor: PropTypes.string,
+  isCurrentUser: PropTypes.bool,
 };
 
 export default LeaderboardCard;
