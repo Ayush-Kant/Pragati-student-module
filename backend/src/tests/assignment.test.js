@@ -31,7 +31,21 @@ test('Validation: create assignment schema accepts valid payload', () => {
     const { error, value } = createAssignmentSchema.validate(payload);
     assert.equal(error, undefined);
     assert.equal(value.title, payload.title);
+    assert.ok(value.dueDate instanceof Date);
+    assert.equal(value.dueDate.toISOString().slice(0, 10), '2026-08-15');
     assert.equal(value.totalMarks, 100);
+});
+
+test('Validation: create assignment schema rejects invalid due date', () => {
+    const payload = {
+        title: 'React Basics',
+        subject: 'Frontend',
+        dueDate: 'not-a-date',
+        totalMarks: 100,
+    };
+
+    const { error } = createAssignmentSchema.validate(payload);
+    assert.ok(error);
 });
 
 test('Validation: submit assignment schema allows content and file url', () => {

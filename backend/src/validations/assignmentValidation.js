@@ -10,7 +10,7 @@ export const createAssignmentSchema = Joi.object({
     title: Joi.string().trim().min(3).max(ASSIGNMENT_TITLE_MAX_LENGTH).required(),
     subject: Joi.string().trim().min(2).max(ASSIGNMENT_TITLE_MAX_LENGTH).required(),
     description: Joi.string().trim().max(ASSIGNMENT_DESCRIPTION_MAX_LENGTH).optional(),
-    dueDate: Joi.date().iso().required(),
+    dueDate: Joi.date().required(),
     totalMarks: Joi.number().integer().min(1).required(),
     status: Joi.string().valid(...Object.values(ASSIGNMENT_STATUS)).default(ASSIGNMENT_STATUS.OPEN),
 }).required();
@@ -19,7 +19,7 @@ export const updateAssignmentSchema = Joi.object({
     title: Joi.string().trim().min(3).max(ASSIGNMENT_TITLE_MAX_LENGTH).optional(),
     subject: Joi.string().trim().min(2).max(ASSIGNMENT_TITLE_MAX_LENGTH).optional(),
     description: Joi.string().trim().max(ASSIGNMENT_DESCRIPTION_MAX_LENGTH).optional(),
-    dueDate: Joi.date().iso().optional(),
+    dueDate: Joi.date().optional(),
     totalMarks: Joi.number().integer().min(1).optional(),
     status: Joi.string().valid(...Object.values(ASSIGNMENT_STATUS)).optional(),
 }).required();

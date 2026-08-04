@@ -1,6 +1,6 @@
 import express from 'express';
 import assignmentController from '../controllers/assignmentController.js';
-import authMiddleware from '../../middleware/authMiddleware.js';
+import authenticateJWT from '../middleware/authenticateJWT.js';
 import uploadMiddleware from '../middleware/uploadMiddleware.js';
 import { validateRequest } from '../middleware/validateRequest.js';
 import {
@@ -15,7 +15,7 @@ import {
 
 const router = express.Router();
 
-router.use(authMiddleware);
+router.use(authenticateJWT);
 
 // Base queries & statistics
 router.post('/', validateRequest(createAssignmentSchema, 'body'), assignmentController.createAssignment);
