@@ -1,16 +1,17 @@
 import express from "express";
 import * as assessmentController from "../controllers/assessmentController.js";
-import { authenticate, authorize } from "../middleware/authMiddleware.js";
+import authMiddleware from "../middleware/authMiddleware.js";
+import roleMiddleware from "../middleware/roleMiddleware.js";
 import {
   validateAssessmentIdParam,
   validateSubmitAssessment,
   validateHistoryQuery,
-} from "../validations/assessmentValidation.js";
+} from "../validators/assessmentValidation.js";
 
 const router = express.Router();
 
 // All assessment routes require a valid student JWT.
-router.use(authenticate, authorize("student"));
+router.use(authMiddleware, roleMiddleware("student"));
 
 // NOTE: "/history" is registered before "/:assessmentId" so it isn't
 // swallowed by the dynamic param route.
