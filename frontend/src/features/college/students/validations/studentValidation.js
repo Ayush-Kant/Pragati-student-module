@@ -14,7 +14,7 @@ export const validateCGPA = (cgpa) => {
 }
 
 export const validateEnrollmentNo = (enrollmentNo) => {
-  return enrollmentNo && enrollmentNo.trim().length >= 5
+  return enrollmentNo && enrollmentNo.trim().length >= 5 && /^[A-Za-z0-9\-_\/]+$/.test(enrollmentNo.trim())
 }
 
 export const validateStudent = (data) => {
@@ -41,10 +41,12 @@ export const validateStudent = (data) => {
   if (!data.batch)
     errors.batch = "Batch is required"
 
-  if (!data.semester)
+  if (data.semester === null || data.semester === undefined || data.semester === "")
     errors.semester = "Semester is required"
 
-  if (!data.cgpa || !validateCGPA(data.cgpa))
+  if (data.cgpa === null || data.cgpa === undefined || data.cgpa === "")
+    errors.cgpa = "CGPA is required"
+  else if (!validateCGPA(data.cgpa))
     errors.cgpa = "CGPA must be between 0 and 10"
 
   if (!data.placementStatus)

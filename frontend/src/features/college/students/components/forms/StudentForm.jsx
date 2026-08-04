@@ -20,15 +20,34 @@ const lbl = (darkMode) => darkMode ? "text-xs text-gray-500 mb-1 block" : "text-
 const StudentForm = ({ onSubmit, onCancel, loading, darkMode }) => {
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
+  const [serverError, setServerError] = useState("")
 
   const set = (f) => (e) => setForm({ ...form, [f]: e.target.value })
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setServerError("")
     const skillsArray = form.skills ? form.skills.split(",").map((s) => s.trim()).filter(Boolean) : []
-    const data = { ...form, skills: skillsArray, cgpa: parseFloat(form.cgpa), semester: parseInt(form.semester) }
+
+    const parsedCgpa = form.cgpa !== "" ? parseFloat(form.cgpa) : null
+    const parsedSemester = form.semester !== "" ? parseInt(form.semester) : null
+
+    const data = {
+      ...form,
+      skills: skillsArray,
+      cgpa: parsedCgpa,
+      semester: parsedSemester,
+    }
+
     const { isValid, errors: err } = validateStudent(data)
     if (!isValid) { setErrors(err); return }
-    onSubmit(data)
+
+    const res = await onSubmit(data)
+    if (res && !res.success) {
+      const msg = res.errors?.length
+        ? res.errors.join(", ")
+        : res.message || "Failed to add student."
+      setServerError(msg)
+    }
   }
 
   return (
@@ -133,20 +152,25 @@ const StudentForm = ({ onSubmit, onCancel, loading, darkMode }) => {
           </div>
         </div>
 
-        <div className={`flex gap-3 p-5 border-t ${darkMode ? 'border-[#3D3D3D]' : 'border-gray-100'}`}>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="flex-1 bg-[#ff6d34] text-white rounded-xl h-10 text-sm font-semibold hover:bg-[#e85d2b] cursor-pointer disabled:opacity-60"
-          >
-            {loading ? "Adding..." : "Add Student"}
-          </button>
-          <button
-            onClick={onCancel}
-            className={`flex-1 rounded-xl h-10 text-sm font-semibold cursor-pointer ${darkMode ? 'bg-[#1A1A1A] text-gray-300 hover:bg-[#3D3D3D]' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            Cancel
-          </button>
+        <div className={`p-5 border-t ${darkMode ? 'border-[#3D3D3D]' : 'border-gray-100'}`}>
+          {serverError && (
+            <p className="text-red-400 text-xs mb-3">{serverError}</p>
+          )}
+          <div className="flex gap-3">
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="flex-1 bg-[#ff6d34] text-white rounded-xl h-10 text-sm font-semibold hover:bg-[#e85d2b] cursor-pointer disabled:opacity-60"
+            >
+              {loading ? "Adding..." : "Add Student"}
+            </button>
+            <button
+              onClick={onCancel}
+              className={`flex-1 rounded-xl h-10 text-sm font-semibold cursor-pointer ${darkMode ? 'bg-[#1A1A1A] text-gray-300 hover:bg-[#3D3D3D]' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </div>

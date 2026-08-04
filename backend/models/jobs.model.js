@@ -211,6 +211,7 @@ const createJobPosting = async (job) => {
         INSERT INTO job_postings
         (
             company_id,
+            title,
             role,
             department,
             location,
@@ -224,12 +225,13 @@ const createJobPosting = async (job) => {
         )
         VALUES
         (
-            $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
+            $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12
         )
         RETURNING *
         `,
         [
             job.company_id,
+            job.role,          // mirror role → title to satisfy NOT NULL
             job.role,
             job.department,
             job.location,
@@ -249,19 +251,19 @@ const updateJobPosting = async (id, job) => {
 
     console.log("MODEL RECEIVED UPDATE JOB:", job);
     console.log("MODEL UPDATE ARRAY:", [
-    job.company_id,
-    job.role,
-    job.department,
-    job.location,
-    job.package,
-    job.cgpa_limit,
-    job.batch,
-    job.application_deadline,
-    job.job_description,
-    job.hiring_process,
-    job.status || "Open",
-    id
-]);
+        job.company_id,
+        job.role,
+        job.department,
+        job.location,
+        job.package,
+        job.cgpa_limit,
+        job.batch,
+        job.application_deadline,
+        job.job_description,
+        job.hiring_process,
+        job.status || "Open",
+        id
+    ]);
 
     await pool.query(
         `
@@ -464,14 +466,14 @@ const deleteEligibility = async (jobId) => {
 };
 export {
 
-   // Company
-getAllCompanies,
-getCompanyById,
-getCompanyByName,
-createCompany,
-updateCompany,
-deleteCompany,
-searchCompanies,
+    // Company
+    getAllCompanies,
+    getCompanyById,
+    getCompanyByName,
+    createCompany,
+    updateCompany,
+    deleteCompany,
+    searchCompanies,
 
     // Job Posting
     getAllJobPostings,

@@ -52,9 +52,12 @@ const StudentDatabasePage = () => {
 
   const handleAddSubmit = async (data) => {
     setFormLoading(true)
-    await addStudent(data)
+    const res = await addStudent(data)
     setFormLoading(false)
-    setShowAddForm(false)
+    if (res?.success) {
+      setShowAddForm(false)
+    }
+    // form stays open on failure so the user can see/fix the error
   }
 
   const handleEditSubmit = async (data) => {
@@ -105,9 +108,8 @@ const StudentDatabasePage = () => {
           <select
             value={filters.semester}
             onChange={(e) => filters.setSemester(e.target.value)}
-            className={`h-10 px-3 rounded-xl text-sm outline-none cursor-pointer ${
-              darkMode ? 'bg-[#1A1A1A] border border-[#3D3D3D] text-gray-300 focus:border-[#ff6d34]' : 'bg-white border border-gray-200 text-gray-600'
-            }`}
+            className={`h-10 px-3 rounded-xl text-sm outline-none cursor-pointer ${darkMode ? 'bg-[#1A1A1A] border border-[#3D3D3D] text-gray-300 focus:border-[#ff6d34]' : 'bg-white border border-gray-200 text-gray-600'
+              }`}
           >
             {["All", "1", "2", "3", "4", "5", "6", "7", "8"].map((s) => (
               <option key={s} value={s}>{s === "All" ? "All Semesters" : `Sem ${s}`}</option>
@@ -117,9 +119,8 @@ const StudentDatabasePage = () => {
           {/* Reset filters */}
           <button
             onClick={filters.resetFilters}
-            className={`h-10 px-4 text-sm rounded-xl cursor-pointer ${
-              darkMode ? 'text-gray-400 border border-[#3D3D3D] hover:bg-[#3D3D3D]' : 'text-gray-500 border border-gray-200 hover:bg-gray-50'
-            }`}
+            className={`h-10 px-4 text-sm rounded-xl cursor-pointer ${darkMode ? 'text-gray-400 border border-[#3D3D3D] hover:bg-[#3D3D3D]' : 'text-gray-500 border border-gray-200 hover:bg-gray-50'
+              }`}
           >
             Reset
           </button>
@@ -128,21 +129,19 @@ const StudentDatabasePage = () => {
           <div className={`ml-auto flex rounded-xl p-1 gap-1 ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`}>
             <button
               onClick={() => setView("table")}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${
-                view === "table"
-                  ? darkMode ? 'bg-[#2D2D2D] text-[#ff6d34] shadow-sm' : 'bg-white text-blue-600 shadow-sm'
-                  : darkMode ? 'text-gray-400' : 'text-gray-500'
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${view === "table"
+                ? darkMode ? 'bg-[#2D2D2D] text-[#ff6d34] shadow-sm' : 'bg-white text-blue-600 shadow-sm'
+                : darkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}
             >
               Table
             </button>
             <button
               onClick={() => setView("card")}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${
-                view === "card"
-                  ? darkMode ? 'bg-[#2D2D2D] text-[#ff6d34] shadow-sm' : 'bg-white text-blue-600 shadow-sm'
-                  : darkMode ? 'text-gray-400' : 'text-gray-500'
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${view === "card"
+                ? darkMode ? 'bg-[#2D2D2D] text-[#ff6d34] shadow-sm' : 'bg-white text-blue-600 shadow-sm'
+                : darkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}
             >
               Cards
             </button>

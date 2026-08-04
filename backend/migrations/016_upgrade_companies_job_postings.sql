@@ -23,6 +23,11 @@ ALTER TABLE job_postings
   ADD COLUMN IF NOT EXISTS hiring_process    TEXT,
   ADD COLUMN IF NOT EXISTS updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
+-- title was created NOT NULL in 011 but the app uses `role` instead.
+-- Drop the NOT NULL constraint so inserts that don't supply title still work.
+ALTER TABLE job_postings
+  ALTER COLUMN title DROP NOT NULL;
+
 -- The original migration used posted_at; add created_at as an alias column
 -- so the model's `jp.created_at` reference works.
 ALTER TABLE job_postings
