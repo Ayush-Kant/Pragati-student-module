@@ -15,15 +15,15 @@ function AssessmentQuestionList({
       {questions.map((question) => (
         <div
           key={question.id}
-          className="border rounded-lg p-4 shadow-sm"
+          className="rounded-lg border border-gray-200 bg-white p-3 md:p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
           {question.type === "MCQ" ? (
             <>
-              <h4 className="font-semibold mb-2">
+              <h4 className="mb-2 text-base md:text-lg font-semibold">
                 {question.text}
               </h4>
 
-              <ul className="list-disc pl-5">
+              <ul className="list-disc pl-5 text-sm md:text-base wrap-break-word">
                 {question.options.map((option, index) => (
                   <li key={index}>{option}</li>
                 ))}
@@ -40,31 +40,32 @@ function AssessmentQuestionList({
             </>
           ) : (
             <>
-              <h4 className="font-semibold mb-2">
+              <h4 className="mb-2 text-base md:text-lg font-semibold wrap-break-word">
                 {question.problemStatement}
               </h4>
 
-              <p>
+              <p className="text-sm md:text-base wrap-break-word">
                 Languages: {question.languages.join(", ")}
               </p>
 
-              <p>
+              <p className="text-sm md:text-base">
                 Sample Input: {question.sampleInput}
               </p>
 
-              <p>
+              <p className="text-sm md:text-base">
                 Sample Output: {question.sampleOutput}
               </p>
 
-              <p>Marks: {question.marks}</p>
+              <p className="text-sm md:text-base">
+                Marks: {question.marks}
+              </p>
             </>
           )}
 
-          <div className="flex gap-2 mt-3">
+         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <button
               onClick={() => onEdit(question)}
-              className="px-3 py-1 bg-blue-500 text-white rounded"
-            >
+              className="rounded bg-blue-500 px-3 py-2 text-sm text-white transition hover:bg-blue-600 md:px-4 md:text-base">
               Edit
             </button>
 
@@ -72,7 +73,7 @@ function AssessmentQuestionList({
               onClick={() =>
                 onDelete(question.id)
               }
-              className="px-3 py-1 bg-red-500 text-white rounded"
+              className="px-3 py-2 text-sm md:px-4 md:text-base bg-red-500 text-white rounded"
             >
               Delete
             </button>

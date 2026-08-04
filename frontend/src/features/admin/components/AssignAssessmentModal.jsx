@@ -68,14 +68,14 @@ function AssignAssessment() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-bold mb-6">
+    <div className="mx-auto max-w-2xl p-4 md:p-6">
+      <div className="rounded-lg bg-white p-4 shadow md:p-6">
+        <h1 className="mb-6 text-xl font-bold md:text-2xl">
           Assign Assessment
         </h1>
 
         <form onSubmit={handleAssign}>
-          <label className="block mb-2">
+          <label className="mb-2 block text-sm font-medium md:text-base">
             Recruitment Drive
           </label>
 
@@ -86,7 +86,7 @@ function AssignAssessment() {
                 e.target.value
               )
             }
-            className="w-full border rounded p-2 mb-6"
+            className="mb-6 w-full rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
           >
             <option value="">
               Select Drive
@@ -102,13 +102,13 @@ function AssignAssessment() {
             ))}
           </select>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={() =>
                 navigate(-1)
               }
-              className="px-4 py-2 border rounded"
+              className="px-3 py-2 text-sm md:px-4 md:text-base border rounded"
             >
               Cancel
             </button>
@@ -116,7 +116,7 @@ function AssignAssessment() {
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-purple-600 text-white rounded"
+              className="px-3 py-2 text-sm md:px-4 md:text-base bg-purple-600 text-white rounded"
             >
               {loading
                 ? "Assigning..."

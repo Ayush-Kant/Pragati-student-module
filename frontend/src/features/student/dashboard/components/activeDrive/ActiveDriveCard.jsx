@@ -1,87 +1,26 @@
-import { activeDriveData } from "../../types/dashboardDummyData";
+import React from "react";
+import PropTypes from "prop-types";
 
-const ActiveDriveCard = ({ loading = false, error = false }) => {
-  if (loading) {
-    return <div className="text-gray-500">Loading drive...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500">Failed to load drive.</div>;
-  }
-
-  const { company, role, package: pkg, deadline, status } = activeDriveData;
-
-  return (
-    <div
-      className="
-        bg-white/90
-        backdrop-blur-md
-        p-6
-        rounded-3xl
-        shadow-md
-        w-full
-        max-w-[360px]
-        border
-        border-gray-200
-        border-t-4
-        border-t-blue-500
-        transition-all
-        duration-300
-        hover:-translate-y-1
-        hover:shadow-xl
-        cursor-pointer
-      "
-    >
-      <div
-        className="
-          inline-block
-          px-4
-          py-2
-          rounded-full
-          bg-green-100
-          text-green-600
-          text-sm
-          font-semibold
-          mb-5
-        "
-      >
-        {status}
+const ActiveDriveCard = ({ data, loading }) => (
+  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 h-full">
+    <h3 className="text-base font-bold text-gray-800 mb-3">🎯 Active Drive</h3>
+    {loading ? (
+      <div className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+    ) : data ? (
+      <div>
+        <p className="text-sm font-semibold text-gray-800">{data.companyName} — {data.role}</p>
+        <p className="text-xs text-gray-400 mt-1">Drive on {data.driveDate}</p>
+        <span className="inline-block mt-2 text-xs font-semibold text-green-600 bg-green-50 px-2.5 py-1 rounded-full">{data.eligibility}</span>
       </div>
+    ) : (
+      <p className="text-sm text-gray-400 italic">No active drives.</p>
+    )}
+  </div>
+);
 
-      <h2 className="text-3xl font-semibold text-gray-900 mb-3">{company}</h2>
-
-      <p className="text-gray-600 mb-3">
-        Role: <strong>{role}</strong>
-      </p>
-
-      <p className="text-gray-600 mb-3">
-        Package: <strong>{pkg}</strong>
-      </p>
-
-      <p className="text-gray-600 mb-6">
-        Deadline: <strong>{deadline}</strong>
-      </p>
-
-      <button
-        className="
-          w-full
-          bg-gradient-to-r
-          from-blue-500
-          to-blue-400
-          text-white
-          py-3
-          rounded-xl
-          font-semibold
-          shadow-md
-          transition-all
-          duration-300
-          hover:opacity-90
-        "
-      >
-        Apply Now
-      </button>
-    </div>
-  );
+ActiveDriveCard.propTypes = {
+  data: PropTypes.object,
+  loading: PropTypes.bool,
 };
 
 export default ActiveDriveCard;

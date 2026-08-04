@@ -19,10 +19,10 @@ export default function CompanyFilterBar({
             {/* Search */}
             <input
                 type="text"
-                placeholder="Search company..."
+                placeholder="Search by company name..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className={`w-full rounded border px-3 py-2 ${darkMode
+                className={`w-full md:flex-1 rounded border px-3 py-2 ${darkMode
                         ? "bg-slate-900 border-slate-700 text-white"
                         : "bg-white border-slate-300"
                     }`}
@@ -34,7 +34,7 @@ export default function CompanyFilterBar({
                 placeholder="Industry"
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
-                className={`rounded border px-3 py-2 ${darkMode
+                className={`w-full md:flex-1 rounded border px-3 py-2 ${darkMode
                         ? "bg-slate-900 border-slate-700 text-white"
                         : "bg-white border-slate-300"
                     }`}
@@ -46,7 +46,7 @@ export default function CompanyFilterBar({
                 placeholder="Location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className={`rounded border px-3 py-2 ${darkMode
+                className={`w-full md:flex-1 rounded border px-3 py-2 ${darkMode
                         ? "bg-slate-900 border-slate-700 text-white"
                         : "bg-white border-slate-300"
                     }`}
@@ -56,7 +56,7 @@ export default function CompanyFilterBar({
             <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className={`rounded border px-3 py-2 ${darkMode
+                className={`w-full md:flex-1 rounded border px-3 py-2 ${darkMode
                         ? "bg-slate-900 border-slate-700 text-white"
                         : "bg-white border-slate-300 cursor-pointer"
                     }`}
