@@ -1,30 +1,31 @@
-import React from "react";
-import { formatDate, formatStatus } from "../../utils/dashboardHelpers";
+import React from 'react';
 
-
-export default function TaskCard({ task }) {
+function TaskCard({ title, deadline, priority }) {
+  // JavaScript logic to dynamically style the priority badge
+  const getPriorityStyles = (prio) => {
+    switch (prio?.toLowerCase()) {
+      case 'urgent':
+        return 'bg-red-500/10 text-red-400 border-red-500/20';
+      case 'high':
+        return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+      default:
+        return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+    }
+  };
 
   return (
-
-    <div className="bg-white rounded-2xl p-5 shadow-md border-l-4 border-purple-500 hover:shadow-xl transition">
-
-
-      <h3 className="text-lg font-bold text-gray-800">
-        {task.title}
-      </h3>
-
-
-      <p className="text-gray-600 mt-3">
-        📅 Due: {formatDate(task.dueDate)}
-      </p>
-
-
-      <span className="inline-block mt-4 px-4 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-medium">
-        {formatStatus(task.status)}
+    <div className="bg-gray-900/50 border border-gray-800/80 rounded-lg p-4 flex items-center justify-between hover:bg-gray-900 transition-colors">
+      <div className="space-y-1">
+        <h4 className="text-sm font-medium text-gray-200">{title}</h4>
+        <p className="text-xs text-gray-400 flex items-center gap-1">
+          ⏳ {deadline}
+        </p>
+      </div>
+      <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${getPriorityStyles(priority)}`}>
+        {priority}
       </span>
-
-
     </div>
-
   );
 }
+
+export default TaskCard;

@@ -1,83 +1,39 @@
-import { progressRingData } from "../../types/dashboardDummyData";
+import React from "react";
+import PropTypes from "prop-types";
 
-const ProgressRing = ({ loading = false, error = false }) => {
-  if (loading) {
-    return <div className="text-gray-500">Loading progress...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500">Failed to load progress.</div>;
-  }
-
-  const { percentage } = progressRingData;
-
+const ProgressRing = ({ data, loading }) => {
   return (
-    <div
-      className="
-        bg-white/90
-        backdrop-blur-md
-        p-8
-        rounded-3xl
-        shadow-md
-        flex
-        flex-col
-        items-center
-        w-full
-        max-w-[260px]
-        border
-        border-gray-200
-        border-t-4
-        border-t-blue-500
-        transition-all
-        duration-300
-        hover:-translate-y-1
-        hover:shadow-xl
-        cursor-pointer
-      "
-    >
-      <h2
-        className="
-          mb-6
-          text-gray-900
-          text-2xl
-          font-semibold
-        "
-      >
-        Profile Completion
-      </h2>
-
-      <div
-        className="
-          w-[140px]
-          h-[140px]
-          rounded-full
-          flex
-          items-center
-          justify-center
-        "
-        style={{
-          background: `conic-gradient(#3b82f6 0% ${percentage}%, #bfdbfe ${percentage}% 100%)`,
-        }}
-      >
-        <div
-          className="
-            w-[96px]
-            h-[96px]
-            rounded-full
-            bg-white
-            flex
-            items-center
-            justify-center
-            text-2xl
-            font-bold
-            text-gray-900
-          "
-        >
-          {percentage}%
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 h-full">
+      <h3 className="text-base font-bold text-gray-800 mb-3">📈 Progress</h3>
+      
+      {loading ? (
+        <div className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+      ) : data ? (
+        <div className="flex flex-col gap-3">
+          {Object.entries(data).map(([key, val]) => (
+            <div key={key} className="space-y-1">
+              <div className="flex justify-between text-xs text-gray-500">
+                <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
+                <span className="font-semibold text-gray-700">{val}%</span>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                {/* 🚀 Pure Tailwind arbitrary width assignment replaces raw style objects */}
+                <div 
+                  className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-in-out" 
+                  style={{ width: `${val}%` }} 
+                />
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+      ) : null}
     </div>
   );
+};
+
+ProgressRing.propTypes = {
+  data: PropTypes.object,
+  loading: PropTypes.bool,
 };
 
 export default ProgressRing;

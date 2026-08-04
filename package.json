@@ -5,6 +5,8 @@
     "dev": "npm run dev --prefix frontend",
     "build": "npm run build --prefix frontend",
     "dev:backend": "npm run dev --prefix backend",
+    "lint": "npm run lint --prefix frontend",
+    "test": "npm run test --prefix frontend",
     "start:challenges": "node src/app.js",
     "dev:challenges": "nodemon src/app.js"
   },

@@ -1,39 +1,37 @@
 import React from "react";
+import PropTypes from "prop-types";
 import NotificationCard from "./NotificationCard";
-import { getEmptyMessage } from "../../utils/dashboardHelpers";
-import { recentNotificationsData } from "../../data/dashboardData";
 
-
-export default function NotificationList() {
-
-  if (recentNotificationsData.length === 0) {
+const NotificationList = ({ data = [], loading }) => {
+  if (loading) {
     return (
-      <p>
-        {getEmptyMessage("notifications")}
-      </p>
+      <div className="flex flex-col gap-2">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-12 bg-gray-100 rounded-xl animate-pulse" />
+        ))}
+      </div>
     );
   }
 
+  if (!data || data.length === 0) {
+    return <p className="text-sm text-gray-400 italic py-2 text-center">No notifications available.</p>;
+  }
 
   return (
-    <div className="bg-gray-50 rounded-2xl p-6 shadow-sm">
-
-      <h2 className="text-xl font-bold text-gray-800 mb-4">
-        Notifications
-      </h2>
-
-
-      <div className="grid md:grid-cols-2 gap-5">
-
-        {recentNotificationsData.map((notification) => (
-          <NotificationCard
-            key={notification.id}
-            notification={notification}
-          />
-        ))}
-
-      </div>
-
+    <div className="flex flex-col gap-1 divide-y divide-gray-50">
+      {data.map((item, idx) => (
+        <NotificationCard
+          key={item.id || item.title || idx}
+          notification={item}
+        />
+      ))}
     </div>
   );
-}
+};
+
+NotificationList.propTypes = {
+  data: PropTypes.array,
+  loading: PropTypes.bool,
+};
+
+export default NotificationList;
