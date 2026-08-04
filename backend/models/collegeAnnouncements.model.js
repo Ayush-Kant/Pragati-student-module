@@ -37,6 +37,38 @@ export const getAnnouncementById = async (id) => {
   return rows[0];
 };
 
+// Resolve category_id: returns a valid integer ID or null.
+// Throws a 400 error if the provided value doesn't exist in announcement_categories.
+const resolveCategory = async (category_id) => {
+  if (category_id === undefined || category_id === null || category_id === "") {
+    return null;
+  }
+  const parsed = parseInt(category_id, 10);
+  if (isNaN(parsed)) {
+    const err = new Error("category_id must be a valid integer.");
+    err.statusCode = 400;
+    throw err;
+  }
+  const { rows } = await pool.query(
+    "SELECT id FROM announcement_categories WHERE id = $1",
+    [parsed]
+  );
+  if (rows.length === 0) {
+    const err = new Error(`Category with id ${parsed} does not exist.`);
+    err.statusCode = 400;
+    throw err;
+  }
+  return parsed;
+};
+
+// Get all announcement categories
+export const getAllCategories = async () => {
+  const { rows } = await pool.query(
+    `SELECT id, name, description, created_at FROM announcement_categories ORDER BY name ASC`
+  );
+  return rows;
+};
+
 // Create announcement
 export const createAnnouncement = async ({
   title,
@@ -52,6 +84,8 @@ export const createAnnouncement = async ({
   attachment_url = null,
   image_url = null,
 }) => {
+  const resolvedCategoryId = await resolveCategory(category_id);
+
   const { rows } = await pool.query(
     `INSERT INTO announcements
       (title, description, category_id, created_by, priority, target_audience, announcement_type, visibility, tags, expiry_date, attachment_url, image_url)
@@ -60,7 +94,7 @@ export const createAnnouncement = async ({
     [
       title,
       description,
-      category_id || null,
+      resolvedCategoryId,
       created_by || 1,
       priority,
       target_audience,
@@ -81,6 +115,11 @@ export const updateAnnouncement = async (id, data) => {
   const fields = [];
   const values = [];
   let index = 1;
+
+  // Validate category_id if it's being updated
+  if ("category_id" in data) {
+    data = { ...data, category_id: await resolveCategory(data.category_id) };
+  }
 
   Object.entries(data).forEach(([key, value]) => {
     if (value !== undefined) {
@@ -145,6 +184,7 @@ export const unpublishAnnouncement = async (id) => {
 };
 
 export default {
+  getAllCategories,
   getAllAnnouncements,
   getAnnouncementById,
   createAnnouncement,

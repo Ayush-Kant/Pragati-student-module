@@ -1,6 +1,15 @@
 import * as service from "../services/collegeAnnouncements.service.js";
 import announcementModel from "../models/collegeAnnouncements.model.js";
 
+export const getCategories = async (req, res) => {
+  try {
+    const categories = await announcementModel.getAllCategories();
+    res.status(200).json(categories);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 export const getAnnouncements = async (req, res) => {
   try {
     const announcements = await service.getAnnouncements();
@@ -21,7 +30,6 @@ export const getAnnouncementById = async (req, res) => {
 
 export const createAnnouncement = async (req, res) => {
   try {
-    // Fallback to req.user.id if attached by auth middleware, or convert payload created_by to integer
     const createdBy = parseInt(req.body.created_by || req.user?.id || 1, 10);
 
     if (isNaN(createdBy)) {
@@ -36,7 +44,7 @@ export const createAnnouncement = async (req, res) => {
     const newAnnouncement = await announcementModel.createAnnouncement(announcementData);
     res.status(201).json(newAnnouncement);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
@@ -90,6 +98,7 @@ export const unpublishAnnouncement = async (req, res) => {
 };
 
 export default {
+  getCategories,
   getAnnouncements,
   getAnnouncementById,
   createAnnouncement,

@@ -19,6 +19,15 @@ const router = express.Router();
 router.use(authMiddleware, roleMiddleware("admin", "college"));
 
 /* ===========================
+   Announcement Categories
+=========================== */
+
+router.get(
+  "/announcement-categories",
+  announcementController.getCategories
+);
+
+/* ===========================
    Announcements
 =========================== */
 
