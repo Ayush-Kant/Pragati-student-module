@@ -430,7 +430,9 @@ export const deleteProjectFile = async (projectId, fileId, userId) => {
   if (fs.existsSync(fileRecord.filePath)) {
     try {
       fs.unlinkSync(fileRecord.filePath);
-    } catch (e) {}
+    } catch (error) {
+      console.warn(`Failed to delete physical file at ${fileRecord.filePath}:`, error);
+    }
   }
 
   await fileRecord.destroy();

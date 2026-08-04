@@ -13,7 +13,23 @@ import {
  * Get user ID from authenticated JWT payload
  */
 const getUserId = (req) => {
-  return req.user ? req.user.id || req.user.userId || req.user.uid || 1 : 1;
+  return req.user ? req.user.id || req.user.userId || req.user.uid || null : null;
+};
+
+/**
+ * Require valid authenticated user ID or send 401 response
+ */
+const requireUserId = (req, res) => {
+  const userId = getUserId(req);
+  if (!userId) {
+    res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+      message: "User authentication required.",
+    });
+    return null;
+  }
+  return userId;
 };
 
 // ─── GET /api/student/projects ────────────────────────────────────────────────
@@ -114,7 +130,9 @@ export const createProject = async (req, res, next) => {
       });
     }
 
-    const userId = getUserId(req);
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const result = await projectService.createProject(value, userId);
     return res.status(201).json(result);
   } catch (error) {
@@ -135,7 +153,9 @@ export const createMilestone = async (req, res, next) => {
       });
     }
 
-    const userId = getUserId(req);
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const result = await projectService.createMilestone(parseInt(projectId, 10), value, userId);
     if (!result.success) {
       return res.status(result.statusCode || 400).json(result);
@@ -159,7 +179,9 @@ export const createTask = async (req, res, next) => {
       });
     }
 
-    const userId = getUserId(req);
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const result = await projectService.createTask(parseInt(projectId, 10), value, userId);
     if (!result.success) {
       return res.status(result.statusCode || 400).json(result);
@@ -183,7 +205,9 @@ export const submitProject = async (req, res, next) => {
       });
     }
 
-    const userId = getUserId(req);
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const result = await projectService.submitProject(parseInt(projectId, 10), value, userId);
     if (!result.success) {
       return res.status(result.statusCode || 400).json(result);
@@ -207,7 +231,9 @@ export const uploadFiles = async (req, res, next) => {
       });
     }
 
-    const userId = getUserId(req);
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const result = await projectService.uploadProjectFiles(parseInt(projectId, 10), files, userId);
     if (!result.success) {
       return res.status(result.statusCode || 400).json(result);
@@ -231,7 +257,9 @@ export const updateProject = async (req, res, next) => {
       });
     }
 
-    const userId = getUserId(req);
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const result = await projectService.updateProject(parseInt(projectId, 10), value, userId);
     if (!result.success) {
       return res.status(result.statusCode || 400).json(result);
@@ -255,7 +283,9 @@ export const updateTask = async (req, res, next) => {
       });
     }
 
-    const userId = getUserId(req);
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const result = await projectService.updateTaskStatus(
       parseInt(projectId, 10),
       parseInt(taskId, 10),
@@ -284,7 +314,9 @@ export const updateMilestone = async (req, res, next) => {
       });
     }
 
-    const userId = getUserId(req);
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const result = await projectService.updateMilestone(
       parseInt(projectId, 10),
       parseInt(milestoneId, 10),
@@ -304,7 +336,9 @@ export const updateMilestone = async (req, res, next) => {
 export const deleteFile = async (req, res, next) => {
   try {
     const { projectId, fileId } = req.params;
-    const userId = getUserId(req);
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const result = await projectService.deleteProjectFile(
       parseInt(projectId, 10),
       parseInt(fileId, 10),

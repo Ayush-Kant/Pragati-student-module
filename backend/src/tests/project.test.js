@@ -40,6 +40,16 @@ describe("Projects Backend Unit Tests", () => {
       assert.strictEqual(isValidGitHubUrl("http://github.com/user/repo/"), true);
       assert.strictEqual(isValidGitHubUrl("https://gitlab.com/user/repo"), false);
       assert.strictEqual(isValidGitHubUrl("not-a-url"), false);
+      assert.strictEqual(isValidGitHubUrl(null), false);
+      assert.strictEqual(isValidGitHubUrl(""), false);
+    });
+
+    test("calculateProjectProgress handles milestone-only and task-only progress", () => {
+      const milestonesOnly = [{ status: "COMPLETED" }, { status: "COMPLETED" }];
+      assert.strictEqual(calculateProjectProgress(milestonesOnly, []), 100);
+
+      const tasksOnly = [{ status: "COMPLETED" }, { status: "TODO" }];
+      assert.strictEqual(calculateProjectProgress([], tasksOnly), 50);
     });
 
     test("generateProjectInsights returns structured analytics", () => {
