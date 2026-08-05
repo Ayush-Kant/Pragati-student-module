@@ -1,27 +1,29 @@
 import { useState, useEffect, useCallback } from "react";
 import * as service from "../services/reportsService";
 
-export const useReports = () => {
+export const useReports = (initialParams = {}) => {
   const [reports, setReports] = useState([]);
   const [statistics, setStatistics] = useState({
     totalReports: 0,
     generatedToday: 0,
-    downloadedReports: 0
+    downloadedReports: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchReports = useCallback(async () => {
+  const fetchReports = useCallback(async (params = initialParams) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await service.getReports();
-      if (response.success) {
-        setReports(response.data.reports);
-        setStatistics(response.data.reportStatistics);
+      const response = await service.getReports(params);
+      if (response?.success && response?.data) {
+        setReports(response.data.reports || []);
+        if (response.data.reportStatistics) {
+          setStatistics(response.data.reportStatistics);
+        }
       } else {
-        setError("Failed to fetch reports from server.");
+        setError(response?.message || "Failed to fetch reports from server.");
       }
     } catch (err) {
       setError(err.message || "An unexpected error occurred.");
@@ -35,12 +37,11 @@ export const useReports = () => {
     setError(null);
     try {
       const response = await service.generateReport(formData);
-      if (response.success) {
-        // Refresh local items
+      if (response?.success) {
         await fetchReports();
         return { success: true, report: response.data };
       } else {
-        throw new Error("Unable to create report.");
+        throw new Error(response?.message || "Unable to create report.");
       }
     } catch (err) {
       setError(err.message || "Failed to generate report.");
@@ -54,11 +55,11 @@ export const useReports = () => {
     setError(null);
     try {
       const response = await service.deleteReport(id);
-      if (response.success) {
+      if (response?.success) {
         await fetchReports();
         return { success: true };
       } else {
-        throw new Error("Unable to delete report.");
+        throw new Error(response?.message || "Unable to delete report.");
       }
     } catch (err) {
       setError(err.message || "Failed to delete report.");
@@ -78,7 +79,7 @@ export const useReports = () => {
     error,
     fetchReports,
     createReport,
-    removeReport
+    removeReport,
   };
 };
 

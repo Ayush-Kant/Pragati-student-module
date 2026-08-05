@@ -3,7 +3,7 @@ import { pool } from '../config/db.js';
 const getExports = async ({ page = 1, limit = 20, offset = 0, status } = {}) => {
     const values = [];
     let query = `
-        SELECT id, report_id AS "reportId", format, status, created_at AS "createdAt"
+        SELECT id, report_id AS "reportId", format, status, error_message AS "errorMessage", created_at AS "createdAt"
         FROM report_exports
         WHERE 1=1
     `;
@@ -36,11 +36,16 @@ const countExports = async ({ status } = {}) => {
 const createExport = async (payload = {}) => {
     const result = await pool.query(
         `
-        INSERT INTO report_exports (report_id, format, status, created_at)
-        VALUES ($1, $2, $3, NOW())
-        RETURNING id, report_id AS "reportId", format, status, created_at AS "createdAt"
+        INSERT INTO report_exports (report_id, format, status, error_message, created_at)
+        VALUES ($1, $2, $3, $4, NOW())
+        RETURNING id, report_id AS "reportId", format, status, error_message AS "errorMessage", created_at AS "createdAt"
         `,
-        [payload.reportId || payload.report_id || null, payload.format || 'pdf', payload.status || 'completed']
+        [
+            payload.reportId || payload.report_id || null,
+            payload.format || 'pdf',
+            payload.status || 'completed',
+            payload.errorMessage || payload.error_message || null,
+        ]
     );
 
     return result.rows[0];
@@ -49,7 +54,7 @@ const createExport = async (payload = {}) => {
 const getExportById = async (id) => {
     const result = await pool.query(
         `
-        SELECT id, report_id AS "reportId", format, status, created_at AS "createdAt"
+        SELECT id, report_id AS "reportId", format, status, error_message AS "errorMessage", created_at AS "createdAt"
         FROM report_exports
         WHERE id = $1
         `,

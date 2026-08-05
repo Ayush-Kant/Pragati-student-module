@@ -1,187 +1,162 @@
-import { reports as initialReports, reportStatistics as initialStats } from "../types/reportsDummyData";
-import { getReportMockDetails, generateCSVContent, generateExcelXMLContent, downloadBlob } from "../utils/reportsHelpers";
+import api from "../../../../services/api";
+import { downloadBlob } from "../utils/reportsHelpers";
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const getStoredReports = () => {
-  const data = localStorage.getItem("uptoskills_reports");
-  if (!data) {
-    localStorage.setItem("uptoskills_reports", JSON.stringify(initialReports));
-    return initialReports;
-  }
-  return JSON.parse(data);
-};
-
-const getStoredStats = () => {
-  const data = localStorage.getItem("uptoskills_report_stats");
-  if (!data) {
-    localStorage.setItem("uptoskills_report_stats", JSON.stringify(initialStats));
-    return initialStats;
-  }
-  return JSON.parse(data);
-};
-
-const saveReports = (reports) => {
-  localStorage.setItem("uptoskills_reports", JSON.stringify(reports));
-};
-
-const saveStats = (stats) => {
-  localStorage.setItem("uptoskills_report_stats", JSON.stringify(stats));
-};
-
-export const getReports = async () => {
-  await delay(600); // Simulate API latency
-  const reportsList = getStoredReports();
-  const statistics = getStoredStats();
+/**
+ * Maps raw backend report DB object to component-friendly properties.
+ */
+export const mapReport = (r) => {
+  if (!r) return null;
+  const content = typeof r.content === "string" ? JSON.parse(r.content || "{}") : (r.content || {});
   return {
-    success: true,
-    data: {
-      reports: reportsList,
-      reportStatistics: statistics
-    }
+    id: r.id,
+    reportName: r.title || r.reportName || "Generated Report",
+    title: r.title || r.reportName || "Generated Report",
+    type: r.type ? (r.type.charAt(0).toUpperCase() + r.type.slice(1)) : "Placement",
+    status: r.status ? (r.status.charAt(0).toUpperCase() + r.status.slice(1)) : "Completed",
+    format: r.format || "json",
+    generatedOn: r.createdAt ? r.createdAt.split("T")[0] : new Date().toISOString().split("T")[0],
+    createdAt: r.createdAt,
+    department: content.department || content.filtersApplied?.department || "CSE",
+    company: content.company || content.filtersApplied?.company || "Google",
+    batch: content.batch || content.filtersApplied?.batch || "2026",
+    description: content.description || `Report compiled for ${r.type || "placement"} scope.`,
+    generatedBy: content.generatedBy || "Placement Officer",
+    downloadCount: r.downloadCount || 0,
+    size: r.size || "1.2 MB",
+    content
   };
+};
+
+export const getReports = async (params = {}) => {
+  const { data } = await api.get("/reports", { params });
+  if (data?.success && data?.data) {
+    const rawReports = Array.isArray(data.data.reports) ? data.data.reports : [];
+    const mapped = rawReports.map(mapReport);
+    
+    // Compute stats
+    const totalReports = data.data.total || mapped.length;
+    const todayStr = new Date().toISOString().split("T")[0];
+    const generatedToday = mapped.filter((r) => r.generatedOn === todayStr).length;
+
+    return {
+      success: true,
+      data: {
+        reports: mapped,
+        reportStatistics: {
+          totalReports,
+          generatedToday,
+          downloadedReports: mapped.reduce((acc, r) => acc + (r.downloadCount || 0), 0)
+        }
+      }
+    };
+  }
+  return data;
 };
 
 export const generateReport = async (reportData) => {
-  await delay(1200); // Simulate processing latency for generation
-  const reportsList = getStoredReports();
-  const statistics = getStoredStats();
-
-  const sizeKb = Math.floor(Math.random() * 3500) + 450;
-  const sizeStr = sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`;
-
-  const newReport = {
-    id: reportsList.length > 0 ? Math.max(...reportsList.map(r => r.id)) + 1 : 1,
-    reportName: reportData.reportName,
-    type: reportData.type,
-    generatedOn: new Date().toISOString().split("T")[0],
-    status: "Generated",
-    department: reportData.department,
-    company: reportData.company,
-    batch: reportData.batch,
-    downloadCount: 0,
-    size: sizeStr,
-    generatedBy: reportData.generatedBy || "Placement Portal Admin",
-    description: reportData.description || `Report details compiled for ${reportData.type} matching department ${reportData.department}, batch ${reportData.batch}, and company ${reportData.company}.`
+  const payload = {
+    title: reportData.reportName || reportData.title,
+    type: reportData.type || "placement",
+    format: reportData.format || "json",
+    content: {
+      department: reportData.department,
+      company: reportData.company,
+      batch: reportData.batch,
+      startDate: reportData.startDate,
+      endDate: reportData.endDate,
+      description: reportData.description,
+      generatedBy: reportData.generatedBy || "Placement Officer",
+      filtersApplied: {
+        department: reportData.department,
+        company: reportData.company,
+        batch: reportData.batch
+      }
+    }
   };
 
-  const updatedReports = [newReport, ...reportsList];
-  saveReports(updatedReports);
-
-  const updatedStats = {
-    ...statistics,
-    totalReports: statistics.totalReports + 1,
-    generatedToday: statistics.generatedToday + 1
-  };
-  saveStats(updatedStats);
-
-  return {
-    success: true,
-    data: newReport
-  };
+  const { data } = await api.post("/reports/generate", payload);
+  if (data?.success && data?.data) {
+    return {
+      success: true,
+      data: mapReport(data.data)
+    };
+  }
+  return data;
 };
 
 export const previewReport = async (id) => {
-  await delay(450);
-  const reportsList = getStoredReports();
-  const report = reportsList.find(r => r.id === Number(id));
-  
-  if (!report) {
-    throw new Error(`Report with ID ${id} not found.`);
+  const { data } = await api.get(`/reports/${id}/preview`);
+  if (data?.success && data?.data) {
+    const previewObj = data.data;
+    return {
+      success: true,
+      data: {
+        ...previewObj,
+        title: previewObj.title || "Report Preview",
+        type: previewObj.type || "Placement"
+      }
+    };
   }
-
-  const previewDetails = getReportMockDetails(report);
-  return {
-    success: true,
-    data: previewDetails
-  };
+  return data;
 };
 
 export const deleteReport = async (id) => {
-  await delay(500);
-  const reportsList = getStoredReports();
-  const reportExists = reportsList.some(r => r.id === Number(id));
-  
-  if (!reportExists) {
-    throw new Error(`Report with ID ${id} not found.`);
-  }
-
-  const updatedReports = reportsList.filter(r => r.id !== Number(id));
-  saveReports(updatedReports);
-
-  const statistics = getStoredStats();
-  const updatedStats = {
-    ...statistics,
-    totalReports: Math.max(0, statistics.totalReports - 1)
-  };
-  saveStats(updatedStats);
-
-  return {
-    success: true,
-    data: { id }
-  };
+  const { data } = await api.delete(`/reports/${id}`);
+  return data;
 };
 
 export const exportPDF = async (id) => {
-  await delay(800);
-  const reportsList = getStoredReports();
-  const report = reportsList.find(r => r.id === Number(id));
-  if (!report) throw new Error("Report not found");
-
-  // Format printable stylesheet setup triggers
-  const stats = getStoredStats();
-  saveStats({
-    ...stats,
-    downloadedReports: stats.downloadedReports + 1
+  const response = await api.get(`/reports/${id}/export/pdf`, {
+    responseType: "blob"
   });
-
-  return {
-    success: true,
-    data: { url: `mock_pdf_stream_id_${id}.pdf`, report }
-  };
+  downloadBlob(response.data, `report_${id}.pdf`, "application/pdf");
+  return { success: true };
 };
 
 export const exportExcel = async (id) => {
-  await delay(700);
-  const reportsList = getStoredReports();
-  const report = reportsList.find(r => r.id === Number(id));
-  if (!report) throw new Error("Report not found");
-
-  // Build spreadsheet XML mock file
-  const xmlContent = generateExcelXMLContent([report]);
-  const safeName = report.reportName.replace(/\s+/g, "_").toLowerCase();
-  downloadBlob(xmlContent, `${safeName}.xls`, "application/vnd.ms-excel");
-
-  // Increment download counter
-  const updatedReports = reportsList.map(r => r.id === Number(id) ? { ...r, downloadCount: r.downloadCount + 1 } : r);
-  saveReports(updatedReports);
-  const stats = getStoredStats();
-  saveStats({ ...stats, downloadedReports: stats.downloadedReports + 1 });
-
+  const response = await api.get(`/reports/${id}/export/excel`, {
+    responseType: "blob"
+  });
+  downloadBlob(response.data, `report_${id}.csv`, "text/csv");
   return { success: true };
 };
 
 export const exportCSV = async (id) => {
-  await delay(500);
-  const reportsList = getStoredReports();
-  const report = reportsList.find(r => r.id === Number(id));
-  if (!report) throw new Error("Report not found");
-
-  // Build CSV content
-  const csvContent = generateCSVContent([report]);
-  const safeName = report.reportName.replace(/\s+/g, "_").toLowerCase();
-  downloadBlob(csvContent, `${safeName}.csv`, "text/csv");
-
-  // Increment download counter
-  const updatedReports = reportsList.map(r => r.id === Number(id) ? { ...r, downloadCount: r.downloadCount + 1 } : r);
-  saveReports(updatedReports);
-  const stats = getStoredStats();
-  saveStats({ ...stats, downloadedReports: stats.downloadedReports + 1 });
-
+  const response = await api.get(`/reports/${id}/export/csv`, {
+    responseType: "blob"
+  });
+  downloadBlob(response.data, `report_${id}.csv`, "text/csv");
   return { success: true };
 };
 
 export const downloadReport = async (id) => {
-  // Triggers default download (we fall back to CSV format for simplicity)
-  return await exportCSV(id);
+  const response = await api.get(`/reports/${id}/download`, {
+    responseType: "blob"
+  });
+  const contentType = response.headers["content-type"] || "application/octet-stream";
+  const contentDisposition = response.headers["content-disposition"] || "";
+  let filename = `report_${id}.pdf`;
+
+  const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+  if (filenameMatch && filenameMatch[1]) {
+    filename = filenameMatch[1];
+  } else if (contentType.includes("csv")) {
+    filename = `report_${id}.csv`;
+  } else if (contentType.includes("json")) {
+    filename = `report_${id}.json`;
+  }
+
+  downloadBlob(response.data, filename, contentType);
+  return { success: true };
+};
+
+export default {
+  getReports,
+  generateReport,
+  previewReport,
+  deleteReport,
+  exportPDF,
+  exportExcel,
+  exportCSV,
+  downloadReport,
 };

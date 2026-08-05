@@ -1,10 +1,16 @@
 export const REPORT_TYPES = {
     DASHBOARD: 'dashboard',
+    PLACEMENT: 'placement',
     PLACEMENTS: 'placements',
+    COMPANY: 'company',
     COMPANIES: 'companies',
+    DEPARTMENT: 'department',
     DEPARTMENTS: 'departments',
+    STUDENT: 'student',
     STUDENTS: 'students',
+    DRIVE: 'drive',
     DRIVES: 'drives',
+    ANALYTICS: 'analytics',
 };
 
 export const REPORT_FORMATS = {

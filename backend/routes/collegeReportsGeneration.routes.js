@@ -12,7 +12,7 @@ import * as historyValidator from '../validators/collegeReportHistory.validator.
 
 const router = express.Router();
 
-router.use(authMiddleware, roleMiddleware('admin'));
+router.use(authMiddleware, roleMiddleware('admin', 'college', 'college_admin'));
 
 router.get('/', reportValidator.validateListReports, reportController.getReports);
 router.post('/generate', reportValidator.sanitizeInput, reportValidator.validateRequestBody, reportValidator.validateGenerateReport, reportController.generateReport);
