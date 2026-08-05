@@ -1,6 +1,6 @@
 import express from "express";
 import * as assessmentController from "../controllers/assessmentController.js";
-import authMiddleware from "../middleware/authMiddleware.js";
++import authMiddleware from "../middleware/authMiddleware.js";
 import roleMiddleware from "../middleware/roleMiddleware.js";
 import {
   validateAssessmentIdParam,
