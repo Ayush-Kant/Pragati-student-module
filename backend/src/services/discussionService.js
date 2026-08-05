@@ -20,7 +20,7 @@ export const listDiscussions = async (query = {}) => {
 
   const likeCountLiteral = literal(`(
       SELECT COUNT(*) FROM discussion_reactions dr
-      WHERE dr.discussion_id = "Discussion".id AND dr.type = 'like'
+      WHERE dr.discussion_id = discussions.id AND dr.type = 'like'
   )`);
 
   const discussions = await Discussion.findAll({
@@ -71,10 +71,6 @@ export const getDiscussionById = async (discussionId) => {
         model: DiscussionReaction,
         as: "reactions",
       },
-      {
-        model: DiscussionReport,
-        as: "reports",
-      },
     ],
   });
 
@@ -90,7 +86,13 @@ export const editDiscussion = async (discussionId, changes, userId) => {
   if (!discussion) return { success: false, status: 404, message: "Discussion not found" };
   if (discussion.createdBy !== userId) return { success: false, status: 403, message: "Permission denied" };
 
-  await discussion.update(changes);
+  const allowedFields = ["title", "content", "category", "tags"];
+  const filteredChanges = Object.keys(changes || {}).reduce((acc, key) => {
+    if (allowedFields.includes(key)) acc[key] = changes[key];
+    return acc;
+  }, {});
+
+  await discussion.update(filteredChanges);
   return { success: true, data: discussion, message: "Discussion updated successfully" };
 };
 
@@ -172,11 +174,18 @@ export const reportDiscussion = async (discussionId, userId, { reason, reportTyp
   if (reportType === "comment") {
     const comment = await DiscussionComment.findByPk(commentId);
     if (!comment) return { success: false, status: 404, message: "Comment not found" };
+    if (comment.discussionId !== discussionId) {
+      return { success: false, status: 400, message: "Comment does not belong to this discussion" };
+    }
   }
 
   if (reportType === "reply") {
     const reply = await DiscussionReply.findByPk(replyId);
     if (!reply) return { success: false, status: 404, message: "Reply not found" };
+    const parentComment = await DiscussionComment.findByPk(reply.commentId);
+    if (!parentComment || parentComment.discussionId !== discussionId) {
+      return { success: false, status: 400, message: "Reply does not belong to this discussion" };
+    }
   }
 
   const reportPayload = {

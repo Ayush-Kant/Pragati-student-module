@@ -110,6 +110,34 @@ describe("discussion services", () => {
     expect(result).toEqual({ success: false, status: 403, message: "Permission denied" });
   });
 
+  it("filters disallowed fields during discussion update", async () => {
+    const discussion = { id: 2, createdBy: 1, update: jest.fn().mockResolvedValue(true) };
+    discussionModel.findByPk.mockResolvedValue(discussion);
+
+    await editDiscussion(2, { title: "New", id: 99, createdBy: 5, updatedAt: "2026-01-01" }, 1);
+
+    expect(discussion.update).toHaveBeenCalledWith({ title: "New" });
+  });
+
+  it("rejects a report for a comment that does not belong to the discussion", async () => {
+    discussionModel.findByPk.mockResolvedValue({ id: 1 });
+    commentModel.findByPk.mockResolvedValue({ id: 2, discussionId: 99 });
+
+    const result = await reportDiscussion(1, 1, { reason: "spam", reportType: "comment", commentId: 2 });
+
+    expect(result).toEqual({ success: false, status: 400, message: "Comment does not belong to this discussion" });
+  });
+
+  it("rejects a report for a reply that does not belong to the discussion", async () => {
+    discussionModel.findByPk.mockResolvedValue({ id: 1 });
+    replyModel.findByPk.mockResolvedValue({ id: 3, commentId: 7 });
+    commentModel.findByPk.mockResolvedValue({ id: 7, discussionId: 99 });
+
+    const result = await reportDiscussion(1, 1, { reason: "spam", reportType: "reply", replyId: 3 });
+
+    expect(result).toEqual({ success: false, status: 400, message: "Reply does not belong to this discussion" });
+  });
+
   it("removes a discussion after authorization", async () => {
     const discussion = { id: 2, createdBy: 1, destroy: jest.fn().mockResolvedValue(true) };
     discussionModel.findByPk.mockResolvedValue(discussion);
@@ -184,7 +212,7 @@ describe("discussion services", () => {
   it("reports a discussion and verifies the referenced comment", async () => {
     const discussion = { id: 1 };
     discussionModel.findByPk.mockResolvedValue(discussion);
-    commentModel.findByPk.mockResolvedValue({ id: 2 });
+    commentModel.findByPk.mockResolvedValue({ id: 2, discussionId: 1 });
     reportModel.create.mockResolvedValue({ id: 9 });
 
     const result = await reportDiscussion(1, 1, { reason: "spam", reportType: "comment", commentId: 2 });

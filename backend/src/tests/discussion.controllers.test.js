@@ -93,6 +93,15 @@ describe("discussion controllers", () => {
     expect(res.status).toHaveBeenCalledWith(201);
   });
 
+  it("returns 401 when the user is not authenticated for createDiscussion", async () => {
+    const res = buildRes();
+
+    await createDiscussion({ body: { title: "Hello" }, user: null }, res, jest.fn());
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Authentication required" });
+  });
+
   it("updates a discussion and forwards permission errors", async () => {
     const res = buildRes();
     mockDiscussionService.editDiscussion.mockResolvedValue({ success: false, status: 403, message: "Permission denied" });
@@ -182,6 +191,15 @@ describe("discussion controllers", () => {
 
     expect(mockDiscussionService.reportDiscussion).toHaveBeenCalledWith(1, 4, { reason: "spam" });
     expect(res.status).toHaveBeenCalledWith(201);
+  });
+
+  it("returns 401 when reporting a discussion without authentication", async () => {
+    const res = buildRes();
+
+    await reportDiscussion({ params: { discussionId: "1" }, body: { reason: "spam" }, user: null }, res, jest.fn());
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Authentication required" });
   });
 
   it("searches discussions through the service layer", async () => {

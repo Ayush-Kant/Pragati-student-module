@@ -31,9 +31,20 @@ export const getDiscussionDetails = async (req, res, next) => {
 
 const getUserId = (req) => req.user?.id || req.user?.userId || req.user?.uid;
 
+const requireUser = (req) => {
+  const userId = getUserId(req);
+  if (!req.user || !userId) {
+    return null;
+  }
+  return userId;
+};
+
 export const createDiscussion = async (req, res, next) => {
   try {
-    const payload = { ...req.body, createdBy: getUserId(req) };
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
+    const payload = { ...req.body, createdBy: userId };
     const result = await discussionService.createDiscussion(payload);
     if (!result.success) return res.status(400).json(result);
     return res.status(201).json(result);
@@ -44,8 +55,11 @@ export const createDiscussion = async (req, res, next) => {
 
 export const updateDiscussion = async (req, res, next) => {
   try {
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.editDiscussion(discussionId, req.body, getUserId(req));
+    const result = await discussionService.editDiscussion(discussionId, req.body, userId);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -55,8 +69,11 @@ export const updateDiscussion = async (req, res, next) => {
 
 export const deleteDiscussion = async (req, res, next) => {
   try {
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.removeDiscussion(discussionId, getUserId(req));
+    const result = await discussionService.removeDiscussion(discussionId, userId);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -66,8 +83,11 @@ export const deleteDiscussion = async (req, res, next) => {
 
 export const addDiscussionComment = async (req, res, next) => {
   try {
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.createComment(discussionId, getUserId(req), req.body.content);
+    const result = await discussionService.createComment(discussionId, userId, req.body.content);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(201).json(result);
   } catch (error) {
@@ -77,8 +97,11 @@ export const addDiscussionComment = async (req, res, next) => {
 
 export const addCommentReply = async (req, res, next) => {
   try {
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
     const commentId = Number(req.params.commentId);
-    const result = await discussionService.createReply(commentId, getUserId(req), req.body.content);
+    const result = await discussionService.createReply(commentId, userId, req.body.content);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(201).json(result);
   } catch (error) {
@@ -88,8 +111,11 @@ export const addCommentReply = async (req, res, next) => {
 
 export const updateDiscussionComment = async (req, res, next) => {
   try {
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
     const commentId = Number(req.params.commentId);
-    const result = await discussionService.editComment(commentId, getUserId(req), req.body.content);
+    const result = await discussionService.editComment(commentId, userId, req.body.content);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -99,8 +125,11 @@ export const updateDiscussionComment = async (req, res, next) => {
 
 export const removeDiscussionComment = async (req, res, next) => {
   try {
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
     const commentId = Number(req.params.commentId);
-    const result = await discussionService.deleteComment(commentId, getUserId(req));
+    const result = await discussionService.deleteComment(commentId, userId);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -110,8 +139,11 @@ export const removeDiscussionComment = async (req, res, next) => {
 
 export const toggleDiscussionLike = async (req, res, next) => {
   try {
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.toggleLike(discussionId, getUserId(req));
+    const result = await discussionService.toggleLike(discussionId, userId);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -121,8 +153,11 @@ export const toggleDiscussionLike = async (req, res, next) => {
 
 export const toggleCommentLike = async (req, res, next) => {
   try {
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
     const commentId = Number(req.params.commentId);
-    const result = await discussionService.toggleCommentLike(commentId, getUserId(req));
+    const result = await discussionService.toggleCommentLike(commentId, userId);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(200).json(result);
   } catch (error) {
@@ -132,8 +167,11 @@ export const toggleCommentLike = async (req, res, next) => {
 
 export const reportDiscussion = async (req, res, next) => {
   try {
+    const userId = requireUser(req);
+    if (!userId) return res.status(401).json({ success: false, message: "Authentication required" });
+
     const discussionId = Number(req.params.discussionId);
-    const result = await discussionService.reportDiscussion(discussionId, getUserId(req), req.body);
+    const result = await discussionService.reportDiscussion(discussionId, userId, req.body);
     if (!result.success) return res.status(result.status || 400).json(result);
     return res.status(201).json(result);
   } catch (error) {

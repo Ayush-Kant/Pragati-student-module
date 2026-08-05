@@ -38,6 +38,14 @@ export const validateCreateReply = Joi.object({
 export const validateReportDiscussion = Joi.object({
   reason: Joi.string().trim().min(5).max(1000).required(),
   reportType: Joi.string().valid("discussion", "comment", "reply").optional(),
-  commentId: Joi.number().integer().positive().optional(),
-  replyId: Joi.number().integer().positive().optional(),
+  commentId: Joi.when("reportType", {
+    is: "comment",
+    then: Joi.number().integer().positive().required(),
+    otherwise: Joi.number().integer().positive().optional(),
+  }),
+  replyId: Joi.when("reportType", {
+    is: "reply",
+    then: Joi.number().integer().positive().required(),
+    otherwise: Joi.number().integer().positive().optional(),
+  }),
 });

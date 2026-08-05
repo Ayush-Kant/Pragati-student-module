@@ -24,7 +24,7 @@ const discussionController = {
   reportDiscussion: jest.fn((req, res) => res.status(201).json({ success: true, data: { id: 5 } })),
 };
 
-jest.unstable_mockModule("../../middleware/authMiddleware.js", () => ({ default: authMiddleware }));
+jest.unstable_mockModule("../middleware/authMiddleware.js", () => ({ default: authMiddleware }));
 jest.unstable_mockModule("../middleware/validateRequest.js", () => ({ validateRequest: () => (req, _res, next) => next() }));
 jest.unstable_mockModule("../controllers/discussionController.js", () => discussionController);
 
@@ -38,6 +38,10 @@ app.use("/api/student", router);
 describe("discussion routes", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    authMiddleware.mockImplementation((req, _res, next) => {
+      req.user = { id: 1 };
+      next();
+    });
   });
 
   it("handles discussion statistics route", async () => {
@@ -86,5 +90,27 @@ describe("discussion routes", () => {
     expect(discussionLikeRes.status).toBe(200);
     expect(commentLikeRes.status).toBe(200);
     expect(reportRes.status).toBe(201);
+  });
+
+  it("returns 401 when auth token is missing", async () => {
+    authMiddleware.mockImplementationOnce((_req, res) => {
+      res.status(401).json({ success: false, message: "No token provided" });
+    });
+
+    const res = await request(app).post("/api/student/discussions").send({ title: "Hello", content: "World" });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toEqual({ success: false, message: "No token provided" });
+  });
+
+  it("returns 401 when auth token is invalid", async () => {
+    authMiddleware.mockImplementationOnce((_req, res) => {
+      res.status(401).json({ success: false, message: "Invalid token" });
+    });
+
+    const res = await request(app).post("/api/student/discussions").send({ title: "Hello", content: "World" });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toEqual({ success: false, message: "Invalid token" });
   });
 });
