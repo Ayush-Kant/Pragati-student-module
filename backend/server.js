@@ -127,6 +127,7 @@ app.use("/api/auth", authLimiter);
 app.use("/api", generalLimiter);
 
 // Routes
+app.use("/api/v1/auth", authRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
