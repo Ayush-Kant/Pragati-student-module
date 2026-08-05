@@ -7,7 +7,7 @@ export const StageBadge = ({ stage }) => {
     'Open': 'bg-emerald-100 text-emerald-700',
     'Upcoming': 'bg-amber-100 text-amber-700',
     'Completed': 'bg-indigo-100 text-indigo-700',
-    'Cancelled': 'bg-red-100 text-red-700',
+    'Closed': 'bg-red-100 text-red-700',
   };
 
   return (

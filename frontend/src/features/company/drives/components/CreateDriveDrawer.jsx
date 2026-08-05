@@ -14,18 +14,17 @@ const defaultDriveForm = {
 
 export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
   const [form, setForm] = useState(defaultDriveForm);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const handleEscape = (event) => {
-      if (event.key === 'Escape' && isOpen && !isSubmitting) {
+      if (event.key === 'Escape' && isOpen) {
         setForm(defaultDriveForm);
         onClose();
       }
     };
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose, isSubmitting]);
+  }, [isOpen, onClose]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -36,24 +35,13 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
   };
 
   const handleClose = () => {
-    if (isSubmitting) return;
     setForm(defaultDriveForm);
     onClose();
   };
 
-  const handlePublish = async () => {
-    if (!form.driveName.trim() || isSubmitting) return;
+  const handlePublish = () => {
+    if (!form.driveName.trim()) return;
 
-<<<<<<< HEAD
-    setIsSubmitting(true);
-    try {
-      await onCreate?.(form);
-      setForm(defaultDriveForm);
-      onClose();
-    } finally {
-      setIsSubmitting(false);
-    }
-=======
     onCreate?.({
       jobTitle: form.driveName,
       department: form.department,
@@ -66,7 +54,6 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
     });
     setForm(defaultDriveForm);
     onClose();
->>>>>>> college-team
   };
 
   if (!isOpen) return null;
@@ -206,36 +193,16 @@ export const CreateDriveDrawer = ({ isOpen, onClose, onCreate }) => {
           <button
             type="button"
             onClick={handleClose}
-<<<<<<< HEAD
-            disabled={isSubmitting}
-            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-=======
             className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition"
->>>>>>> college-team
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handlePublish}
-<<<<<<< HEAD
-            disabled={isSubmitting}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-=======
             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition"
->>>>>>> college-team
           >
-            {isSubmitting ? (
-              <>
-                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Publishing...
-              </>
-            ) : (
-              "Publish Drive"
-            )}
+            Publish Drive
           </button>
         </div>
       </div>

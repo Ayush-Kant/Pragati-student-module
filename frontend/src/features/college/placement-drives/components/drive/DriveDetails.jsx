@@ -6,15 +6,6 @@ import InterviewRounds from "../rounds/InterviewRounds";
 import DriveTimeline from "./DriveTimeline";
 
 const DriveDetails = ({ isOpen, onClose, drive, darkMode }) => {
-  React.useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === "Escape") onClose();
-    };
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-    }
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose]);
   if (!isOpen || !drive) return null;
 
   const enrichedDrive = {
@@ -36,14 +27,8 @@ const DriveDetails = ({ isOpen, onClose, drive, darkMode }) => {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-      onClick={onClose}
-    >
-      <div
-        className={`rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-200 ${darkMode ? 'bg-[#2D2D2D]' : 'bg-white'}`}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className={`rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-200 ${darkMode ? 'bg-[#2D2D2D]' : 'bg-white'}`}>
         {/* Header */}
         <div className={`flex items-center justify-between px-6 py-4 border-b shrink-0 ${darkMode ? 'border-[#3D3D3D]' : 'border-gray-150'}`}>
           <div className="flex items-center gap-3">

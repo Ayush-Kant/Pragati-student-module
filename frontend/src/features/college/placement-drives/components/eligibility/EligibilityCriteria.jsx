@@ -5,7 +5,7 @@ import BatchEligibility from "./BatchEligibility";
 import CGPACriteria from "./CGPACriteria";
 
 const EligibilityCriteria = ({
-  eligibility = { departments: [], courses: [], batches: [], cgpa: 0, skills: "" },
+  eligibility = { department: [], course: [], batch: [], cgpa: 0, skills: "" },
   onChange,
   isEditable = true,
   errors = {},
@@ -22,37 +22,37 @@ const EligibilityCriteria = ({
   return (
     <div className="space-y-6">
       <DepartmentEligibility
-        selectedDepartments={eligibility.departments || []}
-        onChange={(val) => handleChange("departments", val)}
+        selectedDepartments={eligibility.department || []}
+        onChange={(val) => handleChange("department", val)}
         isEditable={isEditable}
         darkMode={darkMode}
       />
-      {errors.departments && (
-        <p className="text-xs text-red-500 -mt-4">{errors.departments}</p>
+      {errors.department && (
+        <p className="text-xs text-red-500 -mt-4">{errors.department}</p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <CourseEligibility
-            selectedCourses={eligibility.courses || []}
-            onChange={(val) => handleChange("courses", val)}
+            selectedCourses={eligibility.course || []}
+            onChange={(val) => handleChange("course", val)}
             isEditable={isEditable}
             darkMode={darkMode}
           />
-          {errors.courses && (
-            <p className="text-xs text-red-500 mt-1">{errors.courses}</p>
+          {errors.course && (
+            <p className="text-xs text-red-500 mt-1">{errors.course}</p>
           )}
         </div>
 
         <div>
           <BatchEligibility
-            selectedBatches={eligibility.batches || []}
-            onChange={(val) => handleChange("batches", val)}
+            selectedBatches={eligibility.batch || []}
+            onChange={(val) => handleChange("batch", val)}
             isEditable={isEditable}
             darkMode={darkMode}
           />
-          {errors.batches && (
-            <p className="text-xs text-red-500 mt-1">{errors.batches}</p>
+          {errors.batch && (
+            <p className="text-xs text-red-500 mt-1">{errors.batch}</p>
           )}
         </div>
       </div>

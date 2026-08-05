@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   getPlacementDrives,
   createPlacementDrive,
@@ -10,12 +10,9 @@ const usePlacementDrives = () => {
   const [drives, setDrives] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const isFetching = useRef(false);
 
   // Fetch all drives
   const fetchDrives = useCallback(async () => {
-    if (isFetching.current) return;
-    isFetching.current = true;
     try {
       setLoading(true);
       setError("");
@@ -31,7 +28,6 @@ const usePlacementDrives = () => {
       setError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
-      isFetching.current = false;
     }
   }, []);
 
@@ -100,4 +96,4 @@ const usePlacementDrives = () => {
   };
 };
 
-export default usePlacementDrives;
+export default usePlacementDrives;
