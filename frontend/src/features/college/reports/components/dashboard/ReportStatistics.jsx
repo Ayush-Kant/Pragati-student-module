@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { TrendingUp, BarChart2, CheckCircle2 } from "lucide-react";
 
-export const ReportStatistics = ({ reports }) => {
+export const ReportStatistics = ({ reports, darkMode }) => {
   // Compute report distributions
   const typeDistribution = useMemo(() => {
     const counts = {};
@@ -73,31 +73,31 @@ export const ReportStatistics = ({ reports }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* Chart 1: Doughnut / Progress Distribution */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm lg:col-span-1 flex flex-col justify-between">
+      <div className={`rounded-2xl p-5 lg:col-span-1 flex flex-col justify-between ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white border border-slate-100 shadow-sm'}`}>
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-bold text-slate-800 text-sm">Reports by Type</h4>
-            <BarChart2 className="w-4 h-4 text-slate-400" />
+            <h4 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-800'}`}>Reports by Type</h4>
+            <BarChart2 className={`w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`} />
           </div>
           
           {/* Progress bar lists */}
           <div className="space-y-3.5 mt-6">
             {typeDistribution.length === 0 ? (
-              <p className="text-xs text-slate-400 font-semibold py-8 text-center">No category metrics compiled yet.</p>
+              <p className={`text-xs font-semibold py-8 text-center ${darkMode ? 'text-gray-400' : 'text-slate-400'}`}>No category metrics compiled yet.</p>
             ) : (
               typeDistribution.map((item, index) => {
                 const colors = getColorClass(index);
                 return (
                   <div key={item.name} className="space-y-1">
                     <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="text-slate-600 flex items-center space-x-1.5">
+                      <span className={`flex items-center space-x-1.5 ${darkMode ? 'text-gray-300' : 'text-slate-600'}`}>
                         <span className={`w-2 h-2 rounded-full ${colors.fill.split(" ")[0]}`}></span>
                         <span>{item.name}</span>
                       </span>
-                      <span className="text-slate-500">{item.count} ({item.percentage}%)</span>
+                      <span className={darkMode ? 'text-gray-400' : 'text-slate-500'}>{item.count} ({item.percentage}%)</span>
                     </div>
                     {/* Bar */}
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div className={`w-full h-2 rounded-full overflow-hidden ${darkMode ? 'bg-[#3D3D3D]' : 'bg-slate-100'}`}>
                       <div 
                         style={{ width: `${item.percentage}%` }}
                         className={`h-full transition-all duration-500 ${colors.fill.split(" ")[0]}`}
@@ -110,7 +110,7 @@ export const ReportStatistics = ({ reports }) => {
           </div>
         </div>
 
-        <div className="border-t border-slate-50 pt-4 mt-6 flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase">
+        <div className={`pt-4 mt-6 flex items-center justify-between text-[11px] font-bold uppercase ${darkMode ? 'border-t border-[#3D3D3D] text-gray-400' : 'border-t border-slate-50 text-slate-400'}`}>
           <span>Target Types: {typeDistribution.length}</span>
           <span className="text-primary flex items-center space-x-1">
             <CheckCircle2 className="w-3.5 h-3.5" />
@@ -120,18 +120,18 @@ export const ReportStatistics = ({ reports }) => {
       </div>
 
       {/* Chart 2: SVG Column bar chart (Generations trends) */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm lg:col-span-2 flex flex-col justify-between">
+      <div className={`rounded-2xl p-5 lg:col-span-2 flex flex-col justify-between ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white border border-slate-100 shadow-sm'}`}>
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h4 className="font-bold text-slate-800 text-sm font-sans">Report Compilation Trend</h4>
-            <div className="flex items-center space-x-1 text-xs text-slate-400 font-semibold bg-slate-50 border border-slate-100 rounded-lg px-2 py-1">
+            <h4 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-800'}`}>Report Compilation Trend</h4>
+            <div className={`flex items-center space-x-1 text-xs font-semibold rounded-lg px-2 py-1 ${darkMode ? 'text-gray-400 bg-[#1A1A1A] border border-[#3D3D3D]' : 'text-slate-400 bg-slate-50 border border-slate-100'}`}>
               <TrendingUp className="w-3.5 h-3.5 text-primary" />
-              <span className="text-slate-500">Live Trend</span>
+              <span className={darkMode ? 'text-gray-400' : 'text-slate-500'}>Live Trend</span>
             </div>
           </div>
           
           {/* Custom SVG bar chart */}
-          <div className="relative h-44 w-full flex items-end justify-between px-3 pb-2 border-b border-l border-slate-100 mt-6 gap-2">
+          <div className={`relative h-44 w-full flex items-end justify-between px-3 pb-2 mt-6 gap-2 ${darkMode ? 'border-b border-l border-[#3D3D3D]' : 'border-b border-l border-slate-100'}`}>
             {activityTrend.map((item, idx) => {
               const maxVal = Math.max(...activityTrend.map(d => d.count), 1);
               const pct = Math.round((item.count / maxVal) * 100);
@@ -139,7 +139,7 @@ export const ReportStatistics = ({ reports }) => {
               return (
                 <div key={idx} className="flex flex-col items-center flex-1 group">
                   {/* Tooltip on Hover */}
-                  <span className="absolute -translate-y-9 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow z-10">
+                  <span className={`absolute -translate-y-9 opacity-0 group-hover:opacity-100 transition-opacity text-white text-[9px] font-bold px-2 py-0.5 rounded shadow z-10 ${darkMode ? 'bg-gray-700' : 'bg-slate-800'}`}>
                     {item.count} Reports
                   </span>
 
@@ -150,16 +150,16 @@ export const ReportStatistics = ({ reports }) => {
                   ></div>
 
                   {/* Label */}
-                  <span className="text-[10px] font-bold text-slate-400 mt-2 select-none">{item.label}</span>
+                  <span className={`text-[10px] font-bold mt-2 select-none ${darkMode ? 'text-gray-400' : 'text-slate-400'}`}>{item.label}</span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        <div className="border-t border-slate-50 pt-4 mt-6 text-[11px] font-semibold text-slate-400 flex items-center justify-between leading-relaxed">
+        <div className={`pt-4 mt-6 text-[11px] font-semibold flex items-center justify-between leading-relaxed ${darkMode ? 'border-t border-[#3D3D3D] text-gray-400' : 'border-t border-slate-50 text-slate-400'}`}>
           <span>Metrics updated instantly as new operations occur.</span>
-          <span className="text-slate-500 font-bold">X-Axis: Date (DD/MM)</span>
+          <span className={`font-bold ${darkMode ? 'text-gray-500' : 'text-slate-500'}`}>X-Axis: Date (DD/MM)</span>
         </div>
       </div>
     </div>

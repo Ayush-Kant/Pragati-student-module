@@ -56,3 +56,44 @@ CREATE INDEX IF NOT EXISTS idx_students_college        ON students(college);
 CREATE INDEX IF NOT EXISTS idx_students_placement      ON students(placement_status);
 CREATE INDEX IF NOT EXISTS idx_student_skills_sid      ON student_skills(student_id);
 CREATE INDEX IF NOT EXISTS idx_student_academic_sid    ON student_academic_details(student_id);
+
+-- ============================================================
+-- eligible_students VIEW
+-- Defined here (after all ALTER TABLE ADD COLUMN statements)
+-- so enrollment_no and all other columns already exist.
+--
+-- This view replaces the old separate eligible_students table.
+-- Every student in the students table automatically appears in
+-- the nomination pool — no manual sync needed.
+-- ============================================================
+CREATE OR REPLACE VIEW eligible_students AS
+SELECT
+  s.id,
+  s.id              AS student_id,
+  s.enrollment_no,
+  s.name,
+  s.email,
+  s.phone,
+  s.department,
+  s.course,
+  s.semester,
+  s.batch,
+  s.cgpa,
+  s.placement_status,
+  s.college,
+  s.college_id,
+  s.linkedin,
+  s.github,
+  s.resume_status,
+  s.created_at,
+  s.updated_at,
+  COALESCE(
+    ARRAY(
+      SELECT skill_name
+      FROM student_skills sk
+      WHERE sk.student_id = s.id
+      ORDER BY sk.id
+    ),
+    '{}'::TEXT[]
+  ) AS skills
+FROM students s;

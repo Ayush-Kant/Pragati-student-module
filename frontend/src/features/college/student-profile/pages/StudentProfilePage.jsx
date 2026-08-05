@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useOutletContext } from "react-router-dom";
 import { ArrowLeft, User, GraduationCap, Briefcase, Award } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -39,6 +39,7 @@ import { PROFILE_TABS } from "../constants/studentProfileConstants";
 export const StudentProfilePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { darkMode } = useOutletContext();
   const [activeTab, setActiveTab] = useState("overview");
 
   const studentId = id || "1";
@@ -87,16 +88,17 @@ export const StudentProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className="p-6 min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner />
+      <div className={`p-6 min-h-screen flex items-center justify-center ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
+        <LoadingSpinner darkMode={darkMode} />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="p-6 min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className={`p-6 min-h-screen flex items-center justify-center ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
         <ErrorState
+          darkMode={darkMode}
           message={profileError || academicsError || placementsError}
           onRetry={handleRetry}
         />
@@ -105,31 +107,39 @@ export const StudentProfilePage = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen flex flex-col gap-6">
+    <div className={`p-6 min-h-screen flex flex-col gap-6 ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
       {/* Back Button & Header */}
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 bg-white rounded-xl border border-gray-200 text-gray-500 hover:text-gray-900 shadow-sm cursor-pointer hover:bg-slate-50 transition-colors"
+          className={`p-2 rounded-xl border shadow-sm cursor-pointer transition-colors ${
+            darkMode
+              ? 'bg-[#2D2D2D] border-[#3D3D3D] text-gray-400 hover:text-white hover:bg-[#3D3D3D]'
+              : 'bg-white border-gray-200 text-gray-500 hover:text-gray-900 hover:bg-slate-50'
+          }`}
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Student Profile Dashboard</h1>
+          <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Student Profile Dashboard</h1>
           <p className="text-xs text-gray-400">Detailed overview of student career, grades, and placements</p>
         </div>
       </div>
 
       {/* Tab pill-capsule switcher */}
-      <div className="flex bg-gray-100 rounded-xl p-1 gap-1 w-fit border border-gray-200/40">
+      <div className={`flex rounded-xl p-1 gap-1 w-fit border ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D]' : 'bg-gray-100 border-gray-200/40'}`}>
         {PROFILE_TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap cursor-pointer transition-all ${
               activeTab === tab.id
-                ? "bg-white text-indigo-600 shadow-sm font-bold"
-                : "text-gray-500 hover:text-gray-900"
+                ? darkMode
+                  ? "bg-[#3D3D3D] text-[#ff6d34] shadow-sm font-bold"
+                  : "bg-white text-[#ff6d34] shadow-sm font-bold"
+                : darkMode
+                  ? "text-gray-400 hover:text-white"
+                  : "text-gray-500 hover:text-gray-900"
             }`}
           >
             {tab.label}
@@ -142,46 +152,47 @@ export const StudentProfilePage = () => {
         {activeTab === "overview" && (
           <div className="space-y-6">
             {/* Header profile details */}
-            <StudentProfileCard student={profile} />
+            <StudentProfileCard student={profile} darkMode={darkMode} />
 
             {/* Overall numeric stats */}
-            <StudentStatistics student={profile} academics={academics} placements={placements} />
+            <StudentStatistics student={profile} academics={academics} placements={placements} darkMode={darkMode} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Profile details */}
               <div className="lg:col-span-2 space-y-6">
-                <StudentOverview student={profile} academics={academics} placements={placements} />
+                <StudentOverview student={profile} academics={academics} placements={placements} darkMode={darkMode} />
               </div>
 
               {/* Personal Info & Contacts */}
               <div className="lg:col-span-1 flex flex-col gap-6">
-                <StudentBasicInfo student={profile} />
-                <StudentContactInfo student={profile} />
+                <StudentBasicInfo student={profile} darkMode={darkMode} />
+                <StudentContactInfo student={profile} darkMode={darkMode} />
               </div>
             </div>
           </div>
         )}
 
         {activeTab === "academics" && (
-          <AcademicPerformance academics={academics} student={profile} />
+          <AcademicPerformance academics={academics} student={profile} darkMode={darkMode} />
         )}
 
         {activeTab === "placement" && (
           <div className="space-y-6">
-            <PlacementProgress studentStatus={profile.placementStatus} />
+            <PlacementProgress studentStatus={profile.placementStatus} darkMode={darkMode} />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1 flex flex-col gap-6">
-                <PlacementStatus student={profile} placements={placements} />
-                <PlacementChart placements={placements} />
+                <PlacementStatus student={profile} placements={placements} darkMode={darkMode} />
+                <PlacementChart placements={placements} darkMode={darkMode} />
                 <OfferHistory
                   placements={placements}
                   onAcceptOffer={handleAcceptOffer}
                   onRejectOffer={handleRejectOffer}
+                  darkMode={darkMode}
                 />
               </div>
               <div className="lg:col-span-2 flex flex-col gap-6">
-                <AppliedCompanies placements={placements} />
-                <InterviewHistory placements={placements} />
+                <AppliedCompanies placements={placements} darkMode={darkMode} />
+                <InterviewHistory placements={placements} darkMode={darkMode} />
               </div>
             </div>
           </div>
@@ -190,21 +201,21 @@ export const StudentProfilePage = () => {
         {activeTab === "skills" && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <SkillsCard skills={profile?.skills} />
-              <SkillsChart technicalSkills={profile?.skills?.technical} />
-              <Certifications certifications={profile?.certifications} />
+              <SkillsCard skills={profile?.skills} darkMode={darkMode} />
+              <SkillsChart technicalSkills={profile?.skills?.technical} darkMode={darkMode} />
+              <Certifications certifications={profile?.certifications} darkMode={darkMode} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <ProjectsCard projects={profile.projects} />
+                <ProjectsCard projects={profile.projects} darkMode={darkMode} />
               </div>
               <div className="lg:col-span-1">
-                <Achievements achievements={profile.achievements} />
+                <Achievements achievements={profile.achievements} darkMode={darkMode} />
               </div>
             </div>
 
-            <InternshipCard internships={profile.internships} />
+            <InternshipCard internships={profile.internships} darkMode={darkMode} />
           </div>
         )}
       </div>

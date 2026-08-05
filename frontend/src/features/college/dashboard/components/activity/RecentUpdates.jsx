@@ -5,10 +5,16 @@ const updates = [
   "New Company Registration Approved",
 ];
 
-const RecentUpdates = () => {
+const RecentUpdates = ({ darkMode }) => {
   return (
-    <div className="bg-white rounded-xl shadow border p-5">
-      <h2 className="text-lg font-semibold mb-5">
+    <div className={`rounded-xl border p-5 ${
+      darkMode
+        ? "bg-[#2D2D2D] border-[#3D3D3D]"
+        : "bg-white border-gray-200 shadow"
+    }`}>
+      <h2 className={`text-lg font-semibold mb-5 ${
+        darkMode ? "text-white" : "text-[#2D3436]"
+      }`}>
         Recent Updates
       </h2>
 
@@ -16,9 +22,11 @@ const RecentUpdates = () => {
         {updates.map((item, index) => (
           <li
             key={index}
-            className="border-b pb-2 text-gray-600"
+            className={`border-b pb-2 ${
+              darkMode ? "border-[#3D3D3D] text-gray-400" : "border-gray-100 text-gray-600"
+            }`}
           >
-            • {item}
+            <span className="text-[#ff6d34] mr-2">&#9656;</span> {item}
           </li>
         ))}
       </ul>

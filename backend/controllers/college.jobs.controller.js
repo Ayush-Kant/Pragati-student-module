@@ -1,5 +1,104 @@
 import * as service from '../services/college.jobs.service.js';
 
+
+/* ===========================
+   Company
+=========================== */
+
+const getCompanies = async (req, res) => {
+    try {
+        const companies = await service.getCompanies();
+
+        res.status(200).json({
+            success: true,
+            total: companies.length,
+            data: companies,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};
+
+const getCompanyById = async (req, res) => {
+    try {
+        const company = await service.getCompany(req.params.id);
+
+        if (!company) {
+            return res.status(404).json({
+                success: false,
+                message: "Company not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: company,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};
+
+const createCompany = async (req, res) => {
+    try {
+        const company = await service.addCompany(req.body);
+
+        res.status(201).json({
+            success: true,
+            message: "Company created successfully",
+            data: company,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};
+
+const updateCompany = async (req, res) => {
+    try {
+        const company = await service.editCompany(
+            req.params.id,
+            req.body
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Company updated successfully",
+            data: company,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};
+
+const deleteCompany = async (req, res) => {
+    try {
+        await service.removeCompany(req.params.id);
+
+        res.status(200).json({
+            success: true,
+            message: "Company deleted successfully",
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};
+
+
 /* ===========================
    Jobs
 =========================== */
@@ -256,7 +355,150 @@ const deleteEligibility = async (req, res) => {
     }
 };
 
+// ===============================
+// Hiring Rounds
+// ===============================
+export const createRound = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        const {
+            round_name,
+            round_order,
+            description
+        } = req.body;
+
+
+        const round = await service.createRound(
+            id,
+            round_name,
+            round_order,
+            description
+        );
+
+
+        res.status(201).json({
+            success: true,
+            message: "Hiring round created successfully",
+            data: round
+        });
+
+
+    } catch(error) {
+
+        console.error("Create Round Error:", error);
+
+        res.status(500).json({
+            success:false,
+            message:"Failed to create hiring round"
+        });
+
+    }
+};
+export const getRounds = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        const rounds = await service.getRounds(id);
+
+        res.status(200).json({
+            success: true,
+            data: rounds
+        });
+
+
+    } catch(error) {
+
+        console.error("Get Rounds Error:", error);
+
+        res.status(500).json({
+            success:false,
+            message:"Failed to fetch hiring rounds"
+        });
+
+    }
+};
+export const updateRound = async (req, res) => {
+
+    try {
+
+        const { roundId } = req.params;
+
+        const {
+            round_name,
+            round_order,
+            description
+        } = req.body;
+
+
+        const round = await service.updateRound(
+            roundId,
+            round_name,
+            round_order,
+            description
+        );
+
+
+        res.status(200).json({
+            success: true,
+            message: "Hiring round updated successfully",
+            data: round
+        });
+
+
+    } catch(error) {
+
+        console.error("Update Round Error:", error);
+
+        res.status(500).json({
+            success:false,
+            message:"Failed to update hiring round"
+        });
+
+    }
+};
+export const deleteRound = async (req, res) => {
+
+    try {
+
+        const { roundId } = req.params;
+
+
+        await service.deleteRound(roundId);
+
+
+        res.status(200).json({
+            success: true,
+            message: "Hiring round deleted successfully"
+        });
+
+
+    } catch(error) {
+
+        console.error("Delete Round Error:", error);
+
+        res.status(500).json({
+            success:false,
+            message:"Failed to delete hiring round"
+        });
+
+    }
+};
+
+
 export {
+
+    // Company
+    getCompanies,
+    getCompanyById,
+    createCompany,
+    updateCompany,
+    deleteCompany,
+
     // Jobs
     getAllJobs,
     getJobById,

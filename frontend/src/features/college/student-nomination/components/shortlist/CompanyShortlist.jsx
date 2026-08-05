@@ -159,7 +159,7 @@ const CompanyShortlist = () => {
               key={company.company}
               className={`overflow-hidden rounded-3xl border w-full min-w-0 transition-all duration-300 ${
                 darkMode
-                  ? "border-slate-700 bg-[#151D30]"
+                  ? "border-[#3D3D3D] bg-[#2D2D2D]"
                   : "border-slate-200 bg-white"
               }`}
             >
@@ -168,7 +168,7 @@ const CompanyShortlist = () => {
                 type="button"
                 onClick={() => toggleCompany(company.company)}
                 className={`w-full px-6 py-5 transition-colors ${
-                  darkMode ? "hover:bg-slate-800/40" : "hover:bg-slate-50"
+                  darkMode ? "hover:bg-[#1A1A1A]" : "hover:bg-slate-50"
                 }`}
               >
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -177,8 +177,8 @@ const CompanyShortlist = () => {
                     <div
                       className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
                         darkMode
-                          ? "bg-slate-800 text-blue-400"
-                          : "bg-slate-100 text-blue-600"
+                          ? "bg-[#1A1A1A] text-[#ff6d34]"
+                          : "bg-orange-50 text-[#ff7a00]"
                       }`}
                     >
                       <Building2 size={24} strokeWidth={2} />
@@ -203,7 +203,7 @@ const CompanyShortlist = () => {
                       </p>
                     </div>
 
-                    <div className={`rounded-xl p-2 ${darkMode ? "bg-slate-800" : "bg-slate-100"}`}>
+                    <div className={`rounded-xl p-2 ${darkMode ? "bg-[#1A1A1A]" : "bg-slate-100"}`}>
                       {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                     </div>
                   </div>
@@ -220,7 +220,7 @@ const CompanyShortlist = () => {
                       onClick={() => scrollCards(company.company, "left")}
                       className={`absolute left-0 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full p-3 shadow-xl ${
                         darkMode
-                          ? "bg-slate-800 hover:bg-slate-700 text-white"
+                          ? "bg-[#2D2D2D] hover:bg-[#1A1A1A] text-white"
                           : "bg-white hover:bg-slate-100 text-slate-700"
                       }`}
                     >
@@ -233,7 +233,7 @@ const CompanyShortlist = () => {
                       onClick={() => scrollCards(company.company, "right")}
                       className={`absolute right-0 top-1/2 z-20 translate-x-1/2 -translate-y-1/2 rounded-full p-3 shadow-xl ${
                         darkMode
-                          ? "bg-slate-800 hover:bg-slate-700 text-white"
+                          ? "bg-[#2D2D2D] hover:bg-[#1A1A1A] text-white"
                           : "bg-white hover:bg-slate-100 text-slate-700"
                       }`}
                     >
@@ -267,7 +267,7 @@ const CompanyShortlist = () => {
 
       {/* EMPTY STATE */}
       {companyGroups.length === 0 && (
-        <div className={`flex h-72 flex-col items-center justify-center rounded-3xl border ${darkMode ? "border-slate-700 bg-[#151D30]" : "border-slate-200 bg-white"}`}>
+        <div className={`flex h-72 flex-col items-center justify-center rounded-3xl border ${darkMode ? "border-[#3D3D3D] bg-[#2D2D2D]" : "border-slate-200 bg-white"}`}>
           <Building2 size={48} className={darkMode ? "text-slate-600" : "text-slate-400"} />
           <h3 className="mt-5 text-xl font-semibold">No Companies Found</h3>
           <p className={`mt-2 max-w-md text-center text-sm ${darkMode ? "text-slate-400" : "text-slate-500"}`}>

@@ -24,7 +24,7 @@ const formReducer = (state, action) => {
   }
 };
 
-const CompanyForm = ({ onSubmit, editingCompany, companies = [] }) => {
+const CompanyForm = ({ onSubmit, editingCompany, companies = [], darkMode }) => {
   const [formData, dispatch] = useReducer(
     formReducer,
     editingCompany,
@@ -99,8 +99,8 @@ const CompanyForm = ({ onSubmit, editingCompany, companies = [] }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-bold mb-6">
+    <div className={`rounded-xl shadow-md p-6 ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white'}`}>
+      <h2 className={`text-xl font-bold mb-6 ${darkMode ? 'text-white' : ''}`}>
         {editingCompany ? "Edit Company" : "Add Company"}
       </h2>
 
@@ -120,9 +120,11 @@ const CompanyForm = ({ onSubmit, editingCompany, companies = [] }) => {
               placeholder="Company Name"
               value={formData.company}
               onChange={handleChange}
-              className={`w-full rounded-lg pl-10 py-3 outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.company ? "border border-red-500" : "border"
-              }`}
+              className={`w-full rounded-lg pl-10 py-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+                darkMode
+                  ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                  : 'border'
+              } ${errors.company ? "border-red-500" : darkMode ? '' : "border"}`}
             />
           </div>
 
@@ -148,9 +150,11 @@ const CompanyForm = ({ onSubmit, editingCompany, companies = [] }) => {
               placeholder="Location"
               value={formData.location}
               onChange={handleChange}
-              className={`w-full rounded-lg pl-10 py-3 outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.location ? "border border-red-500" : "border"
-              }`}
+              className={`w-full rounded-lg pl-10 py-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+                darkMode
+                  ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                  : 'border'
+              } ${errors.location ? "border-red-500" : darkMode ? '' : "border"}`}
             />
           </div>
 
@@ -176,9 +180,11 @@ const CompanyForm = ({ onSubmit, editingCompany, companies = [] }) => {
               placeholder="Package"
               value={formData.package}
               onChange={handleChange}
-              className={`w-full rounded-lg pl-10 py-3 outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.package ? "border border-red-500" : "border"
-              }`}
+              className={`w-full rounded-lg pl-10 py-3 outline-none focus:ring-2 focus:ring-[#ff6d34] ${
+                darkMode
+                  ? 'bg-[#1A1A1A] border-[#3D3D3D] text-white placeholder-gray-500'
+                  : 'border'
+              } ${errors.package ? "border-red-500" : darkMode ? '' : "border"}`}
             />
           </div>
 
@@ -192,7 +198,7 @@ const CompanyForm = ({ onSubmit, editingCompany, companies = [] }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg flex justify-center items-center gap-2 ${
+          className={`w-full bg-[#ff6d34] hover:bg-[#ff6d34]/90 text-white py-3 rounded-lg flex justify-center items-center gap-2 ${
             isSubmitting ? "opacity-75 cursor-not-allowed" : ""
           }`}
         >

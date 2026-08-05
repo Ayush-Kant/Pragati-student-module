@@ -13,7 +13,7 @@ import {
   DRIVE_STATUS,
 } from "../../constants/placementDriveConstants";
 
-const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
+const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData, darkMode }) => {
   const defaultState = {
     company: "",
     role: "",
@@ -153,31 +153,31 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
       }}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-200"
+        className={`rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-200 ${darkMode ? 'bg-[#2D2D2D]' : 'bg-white'}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-150">
-          <h2 className="text-lg font-bold text-gray-900">
+        <div className={`flex items-center justify-between px-6 py-4 border-b ${darkMode ? 'border-[#3D3D3D]' : 'border-gray-150'}`}>
+          <h2 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
             {initialData ? "Edit Placement Drive" : "Create Placement Drive"}
           </h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className={`p-1.5 rounded-lg transition-colors ${darkMode ? 'text-gray-400 hover:text-gray-300 hover:bg-[#1A1A1A]' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Tabs navigation */}
-        <div className="flex border-b border-gray-150 px-6 shrink-0 bg-gray-50/50">
+        <div className={`flex border-b px-6 shrink-0 ${darkMode ? 'border-[#3D3D3D] bg-[#1A1A1A]' : 'border-gray-150 bg-gray-50/50'}`}>
           <button
             type="button"
             onClick={() => setActiveTab("details")}
             className={`py-3 px-4 text-sm font-semibold border-b-2 transition-all ${
               activeTab === "details"
-                ? "border-[#ff7a00] text-[#ff7a00]"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? darkMode ? "border-[#ff6d34] text-[#ff6d34]" : "border-[#ff7a00] text-[#ff7a00]"
+                : darkMode ? "border-transparent text-gray-400 hover:text-gray-300" : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
             Drive & Job Details
@@ -187,8 +187,8 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             onClick={() => setActiveTab("eligibility")}
             className={`py-3 px-4 text-sm font-semibold border-b-2 transition-all ${
               activeTab === "eligibility"
-                ? "border-[#ff7a00] text-[#ff7a00]"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? darkMode ? "border-[#ff6d34] text-[#ff6d34]" : "border-[#ff7a00] text-[#ff7a00]"
+                : darkMode ? "border-transparent text-gray-400 hover:text-gray-300" : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
             Eligibility Criteria
@@ -198,8 +198,8 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
             onClick={() => setActiveTab("rounds")}
             className={`py-3 px-4 text-sm font-semibold border-b-2 transition-all ${
               activeTab === "rounds"
-                ? "border-[#ff7a00] text-[#ff7a00]"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? darkMode ? "border-[#ff6d34] text-[#ff6d34]" : "border-[#ff7a00] text-[#ff7a00]"
+                : darkMode ? "border-transparent text-gray-400 hover:text-gray-300" : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
             Hiring Process & Rounds
@@ -213,16 +213,18 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Company Name */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
+                  <label className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Company Name <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formData.company}
                     onChange={(e) => handleChange("company", e.target.value)}
-                    className={`w-full rounded-lg border px-4 py-2.5 text-sm bg-white outline-none transition focus:ring-2 ${
+                    className={`w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition focus:ring-2 ${
                       errors.company
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-300 focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
+                        : darkMode
+                          ? "border-[#3D3D3D] bg-[#1A1A1A] text-white focus:border-[#ff6d34] focus:ring-[#ff6d34]/20"
+                          : "border-gray-300 bg-white focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
                     }`}
                   >
                     <option value="">-- Select Company --</option>
@@ -239,7 +241,7 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
                 {/* Job Role */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
+                  <label className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Job Role <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -250,7 +252,9 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                     className={`w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition focus:ring-2 ${
                       errors.role
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-300 focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
+                        : darkMode
+                          ? "border-[#3D3D3D] bg-[#1A1A1A] text-white placeholder-gray-500 focus:border-[#ff6d34] focus:ring-[#ff6d34]/20"
+                          : "border-gray-300 bg-white focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
                     }`}
                   />
                   {errors.role && (
@@ -262,7 +266,7 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Package Offered */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
+                  <label className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Package Offered <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -273,7 +277,9 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                     className={`w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition focus:ring-2 ${
                       errors.package
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-300 focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
+                        : darkMode
+                          ? "border-[#3D3D3D] bg-[#1A1A1A] text-white placeholder-gray-500 focus:border-[#ff6d34] focus:ring-[#ff6d34]/20"
+                          : "border-gray-300 bg-white focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
                     }`}
                   />
                   {errors.package && (
@@ -283,13 +289,17 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
                 {/* Job Location */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
+                  <label className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Job Location <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formData.location}
                     onChange={(e) => handleChange("location", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm bg-white outline-none transition focus:border-[#ff7a00] focus:ring-2 focus:ring-[#ff7a00]/20"
+                    className={`w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition focus:ring-2 ${
+                      darkMode
+                        ? "border-[#3D3D3D] bg-[#1A1A1A] text-white focus:border-[#ff6d34] focus:ring-[#ff6d34]/20"
+                        : "border-gray-300 bg-white focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
+                    }`}
                   >
                     {JOB_LOCATIONS.map((loc) => (
                       <option key={loc} value={loc}>
@@ -303,7 +313,7 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Drive Date */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
+                  <label className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Drive Date <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -313,7 +323,9 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                     className={`w-full rounded-lg border px-4 py-2 text-sm outline-none transition focus:ring-2 ${
                       errors.driveDate
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-300 focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
+                        : darkMode
+                          ? "border-[#3D3D3D] bg-[#1A1A1A] text-white focus:border-[#ff6d34] focus:ring-[#ff6d34]/20"
+                          : "border-gray-300 bg-white focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
                     }`}
                   />
                   {errors.driveDate && (
@@ -323,7 +335,7 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
                 {/* Registration Deadline */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
+                  <label className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Registration Deadline <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -333,7 +345,9 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                     className={`w-full rounded-lg border px-4 py-2 text-sm outline-none transition focus:ring-2 ${
                       errors.deadline
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-300 focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
+                        : darkMode
+                          ? "border-[#3D3D3D] bg-[#1A1A1A] text-white focus:border-[#ff6d34] focus:ring-[#ff6d34]/20"
+                          : "border-gray-300 bg-white focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
                     }`}
                   />
                   {errors.deadline && (
@@ -343,13 +357,17 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
                 {/* Drive Status */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
+                  <label className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Status
                   </label>
                   <select
                     value={formData.status}
                     onChange={(e) => handleChange("status", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm bg-white outline-none transition focus:border-[#ff7a00] focus:ring-2 focus:ring-[#ff7a00]/20"
+                    className={`w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition focus:ring-2 ${
+                      darkMode
+                        ? "border-[#3D3D3D] bg-[#1A1A1A] text-white focus:border-[#ff6d34] focus:ring-[#ff6d34]/20"
+                        : "border-gray-300 bg-white focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
+                    }`}
                   >
                     {DRIVE_STATUS.map((s) => (
                       <option key={s} value={s}>
@@ -362,7 +380,7 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
 
               {/* Hiring Process / Description */}
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+                <label className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Hiring Process Description
                 </label>
                 <textarea
@@ -370,7 +388,11 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
                   value={formData.hiringProcess}
                   onChange={(e) => handleChange("hiringProcess", e.target.value)}
                   placeholder="e.g. 1. Online Aptitude Test, 2. Technical Interview, 3. HR Round"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#ff7a00] focus:ring-2 focus:ring-[#ff7a00]/20 resize-none"
+                  className={`w-full rounded-lg border px-4 py-2.5 text-sm outline-none transition focus:ring-2 resize-none ${
+                    darkMode
+                      ? "border-[#3D3D3D] bg-[#1A1A1A] text-white placeholder-gray-500 focus:border-[#ff6d34] focus:ring-[#ff6d34]/20"
+                      : "border-gray-300 bg-white focus:border-[#ff7a00] focus:ring-[#ff7a00]/20"
+                  }`}
                 />
               </div>
             </div>
@@ -382,6 +404,7 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               onChange={handleEligibilityChange}
               isEditable={true}
               errors={errors}
+              darkMode={darkMode}
             />
           )}
 
@@ -390,16 +413,17 @@ const PlacementDriveForm = ({ isOpen, onClose, onSubmit, initialData }) => {
               rounds={formData.rounds}
               onChange={handleRoundsChange}
               isEditable={true}
+              darkMode={darkMode}
             />
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-150 shrink-0 bg-gray-50/50 rounded-b-2xl">
+        <div className={`flex items-center justify-end gap-3 px-6 py-4 border-t shrink-0 rounded-b-2xl ${darkMode ? 'border-[#3D3D3D] bg-[#1A1A1A]' : 'border-gray-150 bg-gray-50/50'}`}>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className={`px-4 py-2 text-sm font-semibold border rounded-lg transition-colors ${darkMode ? 'text-gray-300 border-[#3D3D3D] hover:bg-[#1A1A1A]' : 'text-gray-600 border-gray-200 hover:bg-gray-50'}`}
           >
             Cancel
           </button>

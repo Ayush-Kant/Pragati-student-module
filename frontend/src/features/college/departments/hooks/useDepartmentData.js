@@ -10,13 +10,16 @@ import {
   updateCourse,
   deleteCourse,
 } from "../services/departmentService";
-
 import { DEFAULT_FILTER } from "../constants/departmentConstants";
 
 import {
   searchDepartments,
   filterDepartments,
 } from "../utils/departmentHelpers";
+ 
+import {
+  updateDepartmentStatistics,
+} from "../services/departmentStatisticsService";
 
 export const useDepartmentData = () => {
   // ================= Data =================
@@ -66,26 +69,25 @@ export const useDepartmentData = () => {
 
   // ================= Load Data =================
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const departmentData =
-        await getDepartments();
+    const departmentResponse = await getDepartments();
+    const courseResponse = await getCourses();
 
-      const courseData =
-        await getCourses();
+   setDepartments(departmentResponse.data || departmentResponse);
+   setCourses(courseResponse.data || courseResponse);
+  } catch (error) {
+    console.error("Error loading data:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
-      setDepartments(departmentData);
-      setCourses(courseData);
-    } finally {
-      setLoading(false);
-    }
-  };
+useEffect(() => {
+  loadData();
+}, []);
 
   // ================= Filtered Departments =================
 
@@ -200,87 +202,85 @@ export const useDepartmentData = () => {
 
   // ================= Department CRUD =================
     const handleAddDepartment = async (data) => {
-    const updatedDepartments =
-      await addDepartment(
-        departments,
-        data
-      );
+  try {
+    await addDepartment(data);
 
-    setDepartments(updatedDepartments);
+    await loadData();
 
     closeDepartmentForm();
-  };
+  } catch (error) {
+    console.error("Error adding department:", error);
+  }
+};
 
-  const handleEditDepartment = async (data) => {
-    const updatedDepartments =
-      await updateDepartment(
-        departments,
-        data
-      );
+const handleEditDepartment = async (data) => {
+  try {
+    await updateDepartment(selectedDepartment.id, {
+      name: data.name,
+      code: data.code,
+      hod: data.hod,
+      description: data.description,
+    });
 
-    setDepartments(updatedDepartments);
+    if (data.totalStudents !== undefined && data.totalStudents !== "" && !Number.isNaN(Number(data.totalStudents))) {
+    await updateDepartmentStatistics({
+      departmentId: selectedDepartment.id,
+      totalStudents: Number(data.totalStudents),
+    });
+}
+    await loadData();
 
     closeEditDepartment();
-  };
+  } catch (error) {
+    console.error("Error updating department:", error);
+  }
+};
 
-  const handleDeleteDepartment = async () => {
-    if (!departmentToDelete) return;
+const handleDeleteDepartment = async () => {
+  if (!departmentToDelete) return;
 
-    const updatedDepartments =
-      await deleteDepartment(
-        departments,
-        departmentToDelete.id
-      );
+  try {
+    await deleteDepartment(departmentToDelete.id);
 
-    setDepartments(updatedDepartments);
+    await loadData();
 
     closeDeleteDepartment();
-  };
+  } catch (error) {
+    console.error("Error deleting department:", error);
+  }
+};
 
   // ================= Course CRUD =================
 
-  const handleCourseSubmit = async (
-    data
-  ) => {
-    let updatedCourses;
-
+  const handleCourseSubmit = async (data) => {
+  try {
     if (selectedCourse) {
-      updatedCourses =
-        await updateCourse(
-          courses,
-          {
-            ...data,
-            id: selectedCourse.id,
-          }
-        );
+      await updateCourse(selectedCourse.id, data);
     } else {
-      updatedCourses =
-        await addCourse(
-          courses,
-          data
-        );
+      await addCourse(data);
     }
 
-    setCourses(updatedCourses);
+    await loadData();
 
     closeCourseForm();
-  };
+  } catch (error) {
+    console.error("Error saving course:", error);
+  }
+};
 
-  const handleDeleteCourse =
-    async () => {
-      if (!courseToDelete)
-        return;
+const handleDeleteCourse = async () => {
+  if (!courseToDelete) return;
 
-      const updatedCourses =
-        await deleteCourse(
-          courses,
-          courseToDelete.id
-        );
+  try {
+    await deleteCourse(courseToDelete.id);
 
-      setCourses(updatedCourses);
+    await loadData();
 
-      closeCourseDelete();
-    };
+    closeCourseDelete();
+  } catch (error) {
+    console.error("Error deleting course:", error);
+  }
+};
 
   // ================= Return =================
 

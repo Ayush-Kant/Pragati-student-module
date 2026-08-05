@@ -78,7 +78,8 @@ export const createPlacementDrive = async (data) => {
       }
       await client.query(
         `INSERT INTO drive_eligibility (drive_id, cgpa_cutoff, allowed_branches)
-         VALUES ($1, $2, $3)`,
+         VALUES ($1, $2, $3)
+         ON CONFLICT (drive_id) DO NOTHING`,
         [newDrive.id, cgpa, branches]
       );
     }
@@ -124,25 +125,32 @@ export const updatePlacementDrive = async (id, data) => {
   try {
     await client.query("BEGIN");
 
-    const driveResult = await client.query(
-      `UPDATE placement_drives
-       SET company = $1,
-           role = $2,
-           package = $3,
-           location = $4,
-           hiring_process = $5,
-           drive_date = $6,
-           deadline = $7,
-           status = $8,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = $9
-       RETURNING *`,
-      [company, role, pkg, location, hiring_process, drive_date, deadline, status, id]
-    );
+    const setClauses = [];
+    const values = [];
+    let idx = 1;
 
-    if (driveResult.rows.length === 0) {
-      await client.query("ROLLBACK");
-      return null;
+    if (company !== undefined) { setClauses.push(`company = $${idx++}`); values.push(company); }
+    if (role !== undefined) { setClauses.push(`role = $${idx++}`); values.push(role); }
+    if (pkg !== undefined) { setClauses.push(`package = $${idx++}`); values.push(pkg); }
+    if (location !== undefined) { setClauses.push(`location = $${idx++}`); values.push(location); }
+    if (hiring_process !== undefined) { setClauses.push(`hiring_process = $${idx++}`); values.push(hiring_process); }
+    if (drive_date !== undefined) { setClauses.push(`drive_date = $${idx++}`); values.push(drive_date); }
+    if (deadline !== undefined) { setClauses.push(`deadline = $${idx++}`); values.push(deadline); }
+    if (status !== undefined) { setClauses.push(`status = $${idx++}`); values.push(status); }
+
+    let driveResult;
+    if (setClauses.length > 0) {
+      setClauses.push(`updated_at = CURRENT_TIMESTAMP`);
+      values.push(id);
+      driveResult = await client.query(
+        `UPDATE placement_drives SET ${setClauses.join(', ')} WHERE id = $${idx} RETURNING *`,
+        values
+      );
+
+      if (driveResult.rows.length === 0) {
+        await client.query("ROLLBACK");
+        return null;
+      }
     }
 
     // Update eligibility if provided
@@ -155,12 +163,12 @@ export const updatePlacementDrive = async (id, data) => {
       await client.query(
         `INSERT INTO drive_eligibility (drive_id, cgpa_cutoff, allowed_branches)
          VALUES ($1, $2, $3)
-         ON CONFLICT (id) DO UPDATE SET cgpa_cutoff = EXCLUDED.cgpa_cutoff, allowed_branches = EXCLUDED.allowed_branches`,
+         ON CONFLICT (drive_id) DO UPDATE SET cgpa_cutoff = EXCLUDED.cgpa_cutoff, allowed_branches = EXCLUDED.allowed_branches`,
         [id, cgpa, branches]
       );
     }
 
-    // Re-sync rounds if provided
+    // Upsert rounds (preserve IDs and timestamps)
     if (Array.isArray(rounds)) {
       const activeOrders = rounds.map((r, i) => r.round_order || r.order || (i + 1));
       

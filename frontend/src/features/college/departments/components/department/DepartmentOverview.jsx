@@ -1,6 +1,6 @@
 import React from "react";
 
-const DepartmentOverview = ({ departments = [] }) => {
+const DepartmentOverview = ({ departments = [], darkMode }) => {
   const totalDepartments = departments.length;
 
   const totalStudents = departments.reduce(
@@ -17,17 +17,17 @@ const DepartmentOverview = ({ departments = [] }) => {
     {
       title: "Departments",
       value: totalDepartments,
-      color: "bg-orange-100 text-orange-600",
+      color: darkMode ? "bg-[#ff6d34]/20 text-[#ff6d34]" : "bg-orange-100 text-orange-600",
     },
     {
       title: "Students",
       value: totalStudents,
-      color: "bg-green-100 text-green-600",
+      color: darkMode ? "bg-[#00bea3]/20 text-[#00bea3]" : "bg-teal-100 text-teal-600",
     },
     {
       title: "Courses",
       value: totalCourses,
-      color: "bg-blue-100 text-blue-600",
+      color: darkMode ? "bg-[#00bea3]/20 text-[#00bea3]" : "bg-teal-100 text-teal-600",
     },
   ];
 
@@ -36,15 +36,15 @@ const DepartmentOverview = ({ departments = [] }) => {
       {cards.map((card) => (
         <div
           key={card.title}
-          className="bg-white border border-gray-100 rounded-xl shadow-sm p-6 hover:shadow-md transition"
+          className={`rounded-xl shadow-sm p-6 hover:shadow-md transition ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white border border-gray-100'}`}
         >
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-gray-500 text-sm">
+              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 {card.title}
               </p>
 
-              <h2 className="text-3xl font-bold mt-2 text-gray-900">
+              <h2 className={`text-3xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 {card.value}
               </h2>
             </div>

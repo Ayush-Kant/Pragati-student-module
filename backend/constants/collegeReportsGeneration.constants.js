@@ -1,6 +1,8 @@
 export const REPORT_TYPES = {
     DASHBOARD: 'dashboard',
     PLACEMENTS: 'placements',
+    COMPANIES: 'companies',
+    DEPARTMENTS: 'departments',
     STUDENTS: 'students',
     DRIVES: 'drives',
 };

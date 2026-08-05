@@ -14,8 +14,9 @@ import * as requestValidator from "../validators/collegeRequests.validator.js";
 
 const router = express.Router();
 
+
 // Protect all routes
-router.use(authMiddleware, roleMiddleware("admin"));
+router.use(authMiddleware, roleMiddleware("admin", "college"));
 
 /* ===========================
    Announcements

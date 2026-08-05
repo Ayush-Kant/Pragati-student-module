@@ -1,6 +1,7 @@
 import "./Offers.css";
 import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 import {
   FiSearch,
@@ -413,8 +414,11 @@ const EditOfferModal = ({ offer, onClose, onSave }) => {
 
 // ─── Create Offer Modal ─────────────────────────────────────────────────────────
 
-const CreateOfferModal = ({ offer, onClose, onSave }) => {
+const CreateOfferModal = ({ onClose, onSave }) => {
+  const [candidates, setCandidates] = useState([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(true);
   const [form, setForm] = useState({
+    candidateId: "",
     name: "",
     role: "",
     package: "",
@@ -423,6 +427,23 @@ const CreateOfferModal = ({ offer, onClose, onSave }) => {
   });
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    const loadCandidates = async () => {
+      try {
+        setLoadingCandidates(true);
+        const res = await api.get('/v1/company/candidates');
+        const list = res.data.data || res.data.candidates || [];
+        setCandidates(list);
+      } catch (err) {
+        console.error("Failed to load candidates", err);
+        toast.error("Failed to load candidates list");
+      } finally {
+        setLoadingCandidates(false);
+      }
+    };
+    loadCandidates();
+  }, []);
+
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -430,11 +451,9 @@ const CreateOfferModal = ({ offer, onClose, onSave }) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!form.name.trim()) newErrors.name = "Candidate name is required";
-    if (!form.role.trim()) newErrors.role = "Role is required";
+    if (!form.candidateId) newErrors.candidateId = "Candidate selection is required";
     if (!form.package.trim()) newErrors.package = "Package is required";
     if (!form.status) newErrors.status = "Status is required";
-    if (!form.joining.trim()) newErrors.joining = "Joining date is required";
     return newErrors;
   };
 
@@ -446,13 +465,11 @@ const CreateOfferModal = ({ offer, onClose, onSave }) => {
       return;
     }
     onSave({
-      ...offer,
-      name: form.name.trim(),
-      role: form.role.trim(),
+      candidateId: form.candidateId,
+      name: form.name,
       package: form.package.trim(),
       status: form.status,
       joining: form.joining.trim(),
-      initials: form.name.trim().slice(0, 2).toUpperCase(),
     });
   };
 
@@ -479,41 +496,39 @@ const CreateOfferModal = ({ offer, onClose, onSave }) => {
 
         {/* Fields */}
         <div className="p-8 space-y-5">
-          {/* Candidate Name */}
+          {/* Candidate Dropdown */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Candidate <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${
-                errors.name ? "border-red-400 bg-red-50" : "border-gray-200"
-              }`}
-              placeholder="e.g. Rahul Patil"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            {loadingCandidates ? (
+              <p className="text-xs text-gray-400">Loading candidates...</p>
+            ) : (
+              <select
+                value={form.candidateId}
+                onChange={(e) => {
+                  const cand = candidates.find(c => String(c.id || c.studentId) === String(e.target.value));
+                  setForm(prev => ({
+                    ...prev,
+                    candidateId: e.target.value,
+                    name: cand ? (cand.name || cand.candidateName) : ""
+                  }));
+                  if (errors.candidateId) setErrors(prev => ({ ...prev, candidateId: "" }));
+                }}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm bg-white ${
+                  errors.candidateId ? "border-red-400 bg-red-50" : "border-gray-200"
+                }`}
+              >
+                <option value="">-- Select Candidate --</option>
+                {candidates.map((c) => (
+                  <option key={c.id || c.studentId} value={c.id || c.studentId}>
+                    {c.name || c.candidateName} ({c.email || c.college || "Applied"})
+                  </option>
+                ))}
+              </select>
             )}
-          </div>
-
-          {/* Role */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Role <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={form.role}
-              onChange={(e) => handleChange("role", e.target.value)}
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${
-                errors.role ? "border-red-400 bg-red-50" : "border-gray-200"
-              }`}
-              placeholder="e.g. Software Engineer"
-            />
-            {errors.role && (
-              <p className="text-red-500 text-xs mt-1">{errors.role}</p>
+            {errors.candidateId && (
+              <p className="text-red-500 text-xs mt-1">{errors.candidateId}</p>
             )}
           </div>
 
@@ -529,7 +544,7 @@ const CreateOfferModal = ({ offer, onClose, onSave }) => {
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${
                 errors.package ? "border-red-400 bg-red-50" : "border-gray-200"
               }`}
-              placeholder="e.g. ₹18 LPA"
+              placeholder="e.g. 8 LPA"
             />
             {errors.package && (
               <p className="text-red-500 text-xs mt-1">{errors.package}</p>
@@ -548,7 +563,6 @@ const CreateOfferModal = ({ offer, onClose, onSave }) => {
                 errors.status ? "border-red-400 bg-red-50" : "border-gray-200"
               }`}
             >
-              <option value="">Select status</option>
               {OFFER_STATUSES.map((s) => (
                 <option key={s} value={s}>
                   {s}
@@ -563,20 +577,14 @@ const CreateOfferModal = ({ offer, onClose, onSave }) => {
           {/* Joining Date */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Joining Date <span className="text-red-500">*</span>
+              Joining Date
             </label>
             <input
-              type="text"
+              type="date"
               value={form.joining}
               onChange={(e) => handleChange("joining", e.target.value)}
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm ${
-                errors.joining ? "border-red-400 bg-red-50" : "border-gray-200"
-              }`}
-              placeholder="e.g. Jul 1, 2026"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
             />
-            {errors.joining && (
-              <p className="text-red-500 text-xs mt-1">{errors.joining}</p>
-            )}
           </div>
         </div>
 
@@ -613,7 +621,7 @@ const DeleteOfferModal = ({ offer, onClose, onDelete }) => (
         <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Offer</h3>
         <p className="text-sm text-gray-500">
           Are you sure you want to delete the offer for{" "}
-          <span className="font-semibold text-gray-700">{offer.name}</span>?
+          <span className="font-semibold text-gray-700">{offer.name || offer.candidateName}</span>?
           This action cannot be undone.
         </p>
       </div>
@@ -640,7 +648,8 @@ const DeleteOfferModal = ({ offer, onClose, onDelete }) => (
 // ─── Main Offers Component ────────────────────────────────────────────────────
 
 const Offers = () => {
-  const [offers, setOffers] = useState(initialOffersData);
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState({
     search: "",
@@ -656,12 +665,41 @@ const Offers = () => {
   const [selectedOffer, setSelectedOffer] = useState(null);
 
   const statuses = OFFER_STATUSES;
-  const roles = [...new Set(offers.map((o) => o.role))].sort();
+  const roles = [...new Set(offers.map((o) => o.role || ""))].filter(Boolean).sort();
+
+  const fetchOffers = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/v1/company/offers');
+      const data = res.data.data || [];
+      // Normalize statuses to match OFFER_STATUSES titlecase formatting
+      const normalized = data.map(o => ({
+        ...o,
+        initials: (o.name || o.candidateName || "Candidate")
+          .split(" ")
+          .map((word) => word[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase(),
+        status: o.status ? (o.status[0] + o.status.slice(1).toLowerCase()) : "Pending"
+      }));
+      setOffers(normalized);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load offers");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOffers();
+  }, []);
 
   const filteredOffers = offers.filter((offer) => {
     const matchSearch =
-      offer.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-      offer.role.toLowerCase().includes(filters.search.toLowerCase());
+      (offer.name || offer.candidateName || "").toLowerCase().includes(filters.search.toLowerCase()) ||
+      (offer.role || "").toLowerCase().includes(filters.search.toLowerCase());
     const matchStatus = !filters.status || offer.status === filters.status;
     const matchRole = !filters.role || offer.role === filters.role;
     return matchSearch && matchStatus && matchRole;
@@ -694,7 +732,7 @@ const Offers = () => {
   };
 
   const handleDownload = (offer) => {
-    toast.success(`Offer for ${offer.name} downloaded successfully`);
+    toast.success(`Offer for ${offer.name || offer.candidateName} downloaded successfully`);
   };
 
   const handleDeleteRequest = (offer) => {
@@ -702,40 +740,51 @@ const Offers = () => {
     setActiveModal("delete");
   };
 
-  const handleConfirmDelete = () => {
-    setOffers((prev) => prev.filter((o) => o.id !== selectedOffer.id));
-    toast.success("Offer deleted successfully");
-    setActiveModal(null);
-    setSelectedOffer(null);
-  };
-
-  const handleSaveEdit = (updatedOffer) => {
-    setOffers((prev) =>
-      prev.map((o) => (o.id === updatedOffer.id ? updatedOffer : o))
-    );
-    toast.success("Offer updated successfully");
-    setActiveModal(null);
-    setSelectedOffer(null);
-  };
-
-  const handleCreateOffer = (newOffer) => {
-    const offer = {
-      ...newOffer,
-      id: Date.now(),
-      initials: newOffer.name
-          .split(" ")
-          .map((word) => word[0])
-          .join("")
-          .slice(0, 2)
-          .toUpperCase(),
+  const handleConfirmDelete = async () => {
+    try {
+      await api.delete(`/v1/company/offers/${selectedOffer.id}`);
+      toast.success("Offer deleted successfully");
+      setActiveModal(null);
+      setSelectedOffer(null);
+      fetchOffers();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete offer");
     }
+  };
 
-    setOffers((prev) => [offer, ...prev])
+  const handleSaveEdit = async (updatedOffer) => {
+    try {
+      await api.patch(`/v1/company/offers/${updatedOffer.id}/status`, {
+        status: updatedOffer.status.toUpperCase()
+      });
+      toast.success("Offer updated successfully");
+      setActiveModal(null);
+      setSelectedOffer(null);
+      fetchOffers();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update offer status");
+    }
+  };
 
-    toast.success("Offer generated successfully");
+  const handleCreateOffer = async (newOffer) => {
+    try {
+      await api.post('/v1/company/offers', {
+        candidateId: newOffer.candidateId,
+        package: newOffer.package,
+        joining: newOffer.joining,
+        status: newOffer.status
+      });
 
-    setActiveModal(null)
-  }
+      toast.success("Offer generated successfully");
+      setActiveModal(null);
+      fetchOffers();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.error || "Failed to generate offer");
+    }
+  };
 
   const handleCloseModal = () => {
     setActiveModal(null);
@@ -758,19 +807,19 @@ const Offers = () => {
 
       <div className="offers-stats grid grid-cols-4">
         <div className="stat-card">
-          <h2 style={{ color: "#101828" }}>42</h2>
+          <h2 style={{ color: "#101828" }}>{offers.length}</h2>
           <p>Total Offers</p>
         </div>
         <div className="stat-card">
-          <h2 style={{ color: "#22c55e" }}>28</h2>
+          <h2 style={{ color: "#22c55e" }}>{offers.filter(o => o.status === 'Accepted').length}</h2>
           <p>Accepted</p>
         </div>
         <div className="stat-card">
-          <h2 style={{ color: "#f59e0b" }}>9</h2>
+          <h2 style={{ color: "#f59e0b" }}>{offers.filter(o => o.status === 'Pending').length}</h2>
           <p>Pending</p>
         </div>
         <div className="stat-card">
-          <h2 style={{ color: "#ef4444" }}>5</h2>
+          <h2 style={{ color: "#ef4444" }}>{offers.filter(o => o.status === 'Declined').length}</h2>
           <p>Declined</p>
         </div>
       </div>
@@ -856,7 +905,11 @@ const Offers = () => {
         </div>
 
         <div className="table-wrapper">
-          {filteredOffers.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <span className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" />
+            </div>
+          ) : filteredOffers.length === 0 ? (
             <div className="empty-state">
               <p>No offers found</p>
             </div>
@@ -881,7 +934,7 @@ const Offers = () => {
                     <td>
                       <div className="candidate-cell">
                         <div className="avatar">{offer.initials}</div>
-                        <span>{offer.name}</span>
+                        <span>{offer.name || offer.candidateName}</span>
                       </div>
                     </td>
 
@@ -898,7 +951,7 @@ const Offers = () => {
                     <td>
                       <div className="joining-date">
                         <FiCalendar />
-                        {offer.joining}
+                        {offer.joining || "—"}
                       </div>
                     </td>
 

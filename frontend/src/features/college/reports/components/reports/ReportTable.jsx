@@ -9,7 +9,8 @@ export const ReportTable = ({
   onPreview, 
   onDelete, 
   onDownload, 
-  downloadingId 
+  downloadingId,
+  darkMode 
 }) => {
   const [sortField, setSortField] = useState("generatedOn");
   const [sortDirection, setSortDirection] = useState("desc");
@@ -68,62 +69,62 @@ export const ReportTable = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full">
+    <div className={`rounded-2xl border overflow-hidden flex flex-col h-full ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D]' : 'bg-white border-slate-100 shadow-sm'}`}>
       {/* Table Area */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-150">
+            <tr className={`border-b ${darkMode ? 'bg-[#1A1A1A] border-[#3D3D3D]' : 'bg-slate-50 border-slate-150'}`}>
               <th 
                 onClick={() => handleSort("reportName")}
-                className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 select-none group"
+                className={`p-4 text-xs font-semibold uppercase tracking-wider cursor-pointer select-none group ${darkMode ? 'text-gray-400 hover:bg-[#1A1A1A]' : 'text-slate-500 hover:bg-slate-100'}`}
               >
                 <div className="flex items-center space-x-1">
                   <span>Report Name</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition" />
+                  <ArrowUpDown className={`w-3 h-3 transition ${darkMode ? 'text-gray-500 group-hover:text-white' : 'text-slate-400 group-hover:text-slate-600'}`} />
                 </div>
               </th>
               <th 
                 onClick={() => handleSort("type")}
-                className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 select-none group"
+                className={`p-4 text-xs font-semibold uppercase tracking-wider cursor-pointer select-none group ${darkMode ? 'text-gray-400 hover:bg-[#1A1A1A]' : 'text-slate-500 hover:bg-slate-100'}`}
               >
                 <div className="flex items-center space-x-1">
                   <span>Type</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition" />
+                  <ArrowUpDown className={`w-3 h-3 transition ${darkMode ? 'text-gray-500 group-hover:text-white' : 'text-slate-400 group-hover:text-slate-600'}`} />
                 </div>
               </th>
               <th 
                 onClick={() => handleSort("generatedOn")}
-                className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 select-none group"
+                className={`p-4 text-xs font-semibold uppercase tracking-wider cursor-pointer select-none group ${darkMode ? 'text-gray-400 hover:bg-[#1A1A1A]' : 'text-slate-500 hover:bg-slate-100'}`}
               >
                 <div className="flex items-center space-x-1">
                   <span>Generated On</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition" />
+                  <ArrowUpDown className={`w-3 h-3 transition ${darkMode ? 'text-gray-500 group-hover:text-white' : 'text-slate-400 group-hover:text-slate-600'}`} />
                 </div>
               </th>
-              <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider select-none">
+              <th className={`p-4 text-xs font-semibold uppercase tracking-wider select-none ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                 Scope & Tags
               </th>
-              <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider select-none">
+              <th className={`p-4 text-xs font-semibold uppercase tracking-wider select-none ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                 Status
               </th>
-              <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider select-none">
+              <th className={`p-4 text-xs font-semibold uppercase tracking-wider select-none ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                 Size
               </th>
-              <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right select-none">
+              <th className={`p-4 text-xs font-semibold uppercase tracking-wider text-right select-none ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className={`divide-y ${darkMode ? 'divide-[#3D3D3D]' : 'divide-slate-100'}`}>
             {paginatedReports.map((report) => (
-              <tr key={report.id} className="hover:bg-slate-50/50 transition duration-150">
+              <tr key={report.id} className={`transition duration-150 ${darkMode ? 'border-b border-[#3D3D3D] hover:bg-[#1A1A1A]/50' : 'border-b border-slate-50 hover:bg-slate-50/50'}`}>
                 <td className="p-4">
-                  <div className="font-semibold text-slate-800 text-sm">{report.reportName}</div>
-                  <div className="text-xs text-slate-400 font-medium truncate max-w-xs">{report.description}</div>
+                  <div className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-slate-800'}`}>{report.reportName}</div>
+                  <div className={`text-xs font-medium truncate max-w-xs ${darkMode ? 'text-gray-400' : 'text-slate-400'}`}>{report.description}</div>
                 </td>
-                <td className="p-4 text-sm font-medium text-slate-600">{report.type}</td>
-                <td className="p-4 text-sm font-medium text-slate-500">
+                <td className={`p-4 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-slate-600'}`}>{report.type}</td>
+                <td className={`p-4 text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                   {formatDate(report.generatedOn)}
                 </td>
                 <td className="p-4">
@@ -148,12 +149,12 @@ export const ReportTable = ({
                 <td className="p-4">
                   <StatusBadge status={report.status} />
                 </td>
-                <td className="p-4 text-xs font-semibold text-slate-500">{report.size || "1.2 MB"}</td>
+                <td className={`p-4 text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>{report.size || "1.2 MB"}</td>
                 <td className="p-4">
                   <div className="flex items-center justify-end space-x-1.5">
                     <button
                       onClick={() => onPreview(report)}
-                      className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 rounded-lg transition duration-150 cursor-pointer"
+                      className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${darkMode ? 'text-gray-400 hover:text-white hover:bg-[#1A1A1A]' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800'}`}
                       title="Preview Report Details"
                     >
                       <Eye className="w-4 h-4" />
@@ -162,10 +163,11 @@ export const ReportTable = ({
                       onClick={() => onDownload(report)}
                       isDownloading={downloadingId === report.id}
                       isIcon={true}
+                      darkMode={darkMode}
                     />
                     <button
                       onClick={() => onDelete(report.id)}
-                      className="p-1.5 bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 rounded-lg transition duration-150 cursor-pointer"
+                      className={`p-1.5 rounded-lg transition duration-150 cursor-pointer ${darkMode ? 'text-gray-400 hover:text-red-400 hover:bg-[#1A1A1A]' : 'bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600'}`}
                       title="Delete Report"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -180,25 +182,25 @@ export const ReportTable = ({
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between p-4 bg-slate-50/50 border-t border-slate-100 mt-auto">
-          <span className="text-xs font-semibold text-slate-500">
+        <div className={`flex items-center justify-between p-4 mt-auto ${darkMode ? 'bg-[#1A1A1A]/50 border-t border-[#3D3D3D]' : 'bg-slate-50/50 border-t border-slate-100'}`}>
+          <span className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
             Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, sortedReports.length)} of {sortedReports.length} reports
           </span>
           <div className="flex items-center space-x-2">
             <button
               onClick={handlePrevPage}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 disabled:opacity-40 transition cursor-pointer"
+              className={`p-1.5 rounded-lg border transition cursor-pointer disabled:opacity-40 ${darkMode ? 'border-[#3D3D3D] bg-[#2D2D2D] hover:bg-[#1A1A1A] text-gray-400' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-500'}`}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-xs font-bold text-slate-700">
+            <span className={`text-xs font-bold ${darkMode ? 'text-gray-300' : 'text-slate-700'}`}>
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 disabled:opacity-40 transition cursor-pointer"
+              className={`p-1.5 rounded-lg border transition cursor-pointer disabled:opacity-40 ${darkMode ? 'border-[#3D3D3D] bg-[#2D2D2D] hover:bg-[#1A1A1A] text-gray-400' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-500'}`}
             >
               <ChevronRight className="w-4 h-4" />
             </button>

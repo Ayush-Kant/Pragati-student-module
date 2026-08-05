@@ -10,27 +10,27 @@ const CollegeFooter = ({ darkMode }) => {
         transition-all duration-300
         ${
           darkMode
-            ? "bg-slate-900 border-slate-800 text-gray-400"
-            : "bg-white border-gray-200 text-gray-600"
+            ? "bg-[#1A1A1A] border-[#2D2D2D] text-gray-400"
+            : "bg-white border-gray-200 text-gray-500"
         }
       `}
     >
       <div className="flex flex-col md:flex-row items-center justify-between gap-2">
         <p>
-          © {new Date().getFullYear()} <strong>Pragati</strong>. All rights
+          &copy; {new Date().getFullYear()} <strong>Uptoskills LMS</strong>. All rights
           reserved.
         </p>
 
         <div className="flex items-center gap-5">
-          <button className="hover:text-blue-600 transition-colors">
+          <button className="hover:text-[#ff6d34] transition-colors">
             Privacy Policy
           </button>
 
-          <button className="hover:text-blue-600 transition-colors">
+          <button className="hover:text-[#ff6d34] transition-colors">
             Terms & Conditions
           </button>
 
-          <button className="hover:text-blue-600 transition-colors">
+          <button className="hover:text-[#ff6d34] transition-colors">
             Help
           </button>
         </div>

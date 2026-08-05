@@ -22,15 +22,13 @@ const normalizeDrive = (drive) => {
     ? Number(drive.cgpa_cutoff)
     : (drive.eligibility?.cgpa !== undefined ? Number(drive.eligibility.cgpa) : 6.0);
 
-  // Normalize rounds
+  // Normalize rounds (canonical camelCase keys)
   const rawRounds = Array.isArray(drive.rounds) ? drive.rounds : [];
   const rounds = rawRounds.map((r, index) => ({
     id: r.id || index + 1,
     name: r.round_name || r.name || `Round ${index + 1}`,
-    round_name: r.round_name || r.name || `Round ${index + 1}`,
     description: r.description || "",
     order: r.round_order || r.order || index + 1,
-    round_order: r.round_order || r.order || index + 1,
   }));
 
   return {
@@ -39,7 +37,6 @@ const normalizeDrive = (drive) => {
     role: drive.role || "",
     package: drive.package || "",
     driveDate,
-    drive_date: driveDate,
     deadline,
     status: drive.status || "Upcoming",
     location: drive.location || "Bangalore",
@@ -61,18 +58,24 @@ const normalizeDrive = (drive) => {
  * Normalizes frontend payload to backend database structure
  */
 const toBackendPayload = (drive) => {
-  const driveDate = drive.driveDate || drive.drive_date;
   return {
     company: drive.company,
     role: drive.role,
     package: drive.package,
-    drive_date: driveDate,
+    drive_date: drive.driveDate,
     deadline: drive.deadline,
     status: drive.status || "Upcoming",
     location: drive.location,
-    hiring_process: drive.hiringProcess || drive.hiring_process,
-    eligibility: drive.eligibility,
-    rounds: drive.rounds,
+    hiring_process: drive.hiringProcess,
+    eligibility: drive.eligibility && {
+      ...drive.eligibility,
+      department: drive.eligibility.department,
+    },
+    rounds: drive.rounds?.map((r) => ({
+      round_name: r.name,
+      description: r.description,
+      round_order: r.order,
+    })),
   };
 };
 

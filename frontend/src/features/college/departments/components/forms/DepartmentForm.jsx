@@ -9,7 +9,7 @@ const initialValues = {
   totalCourses: "",
 };
 
-const DepartmentForm = ({ onSubmit, onCancel }) => {
+const DepartmentForm = ({ onSubmit, onCancel, darkMode }) => {
   const [formData, setFormData] = useState(initialValues);
   const [errors, setErrors] = useState({});
 
@@ -46,17 +46,17 @@ const DepartmentForm = ({ onSubmit, onCancel }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white p-10">
+    <div className={`w-full min-h-screen p-10 ${darkMode ? 'bg-[#2D2D2D]' : 'bg-white'}`}>
       <form
         onSubmit={handleSubmit}
-        className="w-full min-h-screen bg-white p-10"
+        className={`w-full min-h-screen p-10 ${darkMode ? 'bg-[#2D2D2D]' : 'bg-white'}`}
       >
         {/* Header */}
-        <div className="border-b border-gray-200 pb-5 mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">
+        <div className={`border-b pb-5 mb-8 ${darkMode ? 'border-[#3D3D3D]' : 'border-gray-200'}`}>
+          <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
             Add Department
           </h2>
-          <p className="text-gray-500 mt-2">
+          <p className={`mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             Enter the department details below.
           </p>
         </div>
@@ -70,6 +70,7 @@ const DepartmentForm = ({ onSubmit, onCancel }) => {
             value={formData.name}
             onChange={handleChange}
             error={errors.name}
+            darkMode={darkMode}
           />
 
           <InputField
@@ -79,6 +80,7 @@ const DepartmentForm = ({ onSubmit, onCancel }) => {
             value={formData.code}
             onChange={handleChange}
             error={errors.code}
+            darkMode={darkMode}
           />
 
           <InputField
@@ -88,6 +90,7 @@ const DepartmentForm = ({ onSubmit, onCancel }) => {
             value={formData.hod}
             onChange={handleChange}
             error={errors.hod}
+            darkMode={darkMode}
           />
 
           <InputField
@@ -98,6 +101,7 @@ const DepartmentForm = ({ onSubmit, onCancel }) => {
             value={formData.totalStudents}
             onChange={handleChange}
             error={errors.totalStudents}
+            darkMode={darkMode}
           />
 
           <InputField
@@ -108,6 +112,7 @@ const DepartmentForm = ({ onSubmit, onCancel }) => {
             value={formData.totalCourses}
             onChange={handleChange}
             error={errors.totalCourses}
+            darkMode={darkMode}
           />
         </div>
 
@@ -116,14 +121,14 @@ const DepartmentForm = ({ onSubmit, onCancel }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 transition duration-200"
+            className={`px-6 py-3 rounded-lg border font-medium transition duration-200 ${darkMode ? 'border-[#3D3D3D] text-gray-300 hover:bg-[#3D3D3D]' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="px-6 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-md transition duration-200"
+            className="px-6 py-3 rounded-lg bg-[#ff6d34] hover:bg-[#e85d2b] text-white font-semibold shadow-md transition duration-200"
           >
             Save Department
           </button>
@@ -133,20 +138,22 @@ const DepartmentForm = ({ onSubmit, onCancel }) => {
   );
 };
 
-const InputField = ({ label, error, ...props }) => {
+const InputField = ({ label, error, darkMode, ...props }) => {
   return (
     <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-2">
+      <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
         {label}
       </label>
 
       <input
         {...props}
-        className={`w-full rounded-lg border px-4 py-3 text-gray-700 placeholder-gray-400 outline-none transition-all duration-200
+        className={`w-full rounded-lg border px-4 py-3 outline-none transition-all duration-200
         ${
           error
             ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-200"
-            : "border-gray-300 focus:border-orange-500 focus:ring-4 focus:ring-orange-200"
+            : darkMode
+              ? "border-[#3D3D3D] bg-[#1A1A1A] text-white placeholder-gray-500 focus:border-[#ff6d34] focus:ring-4 focus:ring-[#ff6d34]/20"
+              : "border-gray-300 text-gray-700 placeholder-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-200"
         }`}
       />
 

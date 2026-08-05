@@ -18,10 +18,23 @@ const useNominationFilters = (students = [], pageSize = 8) => {
     const searchedStudents = searchStudents(students, searchQuery);
 
     return searchedStudents.filter((student) => {
-      const matchesCompany = company === "All" || student.company === company;
-      const matchesDepartment = department === "All" || student.department === department;
-      const matchesBatch = batch === "All" || student.batch === batch;
-      const matchesStatus = status === "All" || student.status === status;
+      const matchesCompany =
+  company === "All" ||
+  student.company === company ||
+  student.company_name === company;
+
+const matchesDepartment =
+  department === "All" ||
+  student.department === department;
+
+const matchesBatch =
+  batch === "All" ||
+  student.batch === batch;
+
+const matchesStatus =
+  status === "All" ||
+  student.status === status ||
+  student.placementStatus === status;
 
       return matchesCompany && matchesDepartment && matchesBatch && matchesStatus;
     });

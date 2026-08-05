@@ -10,7 +10,7 @@ const steps = [
   { label: "Placed", icon: Landmark }
 ];
 
-export const PlacementProgress = ({ studentStatus = "Eligible" }) => {
+export const PlacementProgress = ({ studentStatus = "Eligible", darkMode }) => {
 
   // Determine current active index based on placementStatus
   let activeIndex = 3; // default: eligibility check
@@ -25,35 +25,35 @@ export const PlacementProgress = ({ studentStatus = "Eligible" }) => {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+    <div className={`rounded-2xl border p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] ${darkMode ? 'bg-[#2D2D2D] border-[#3D3D3D]' : 'bg-white border-gray-100'}`}>
       <div className="mb-6">
-        <h3 className="text-sm font-bold text-gray-800">Placement Pipeline</h3>
+        <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Placement Pipeline</h3>
         <p className="text-xs text-gray-400">Chronological stages of your placement lifecycle</p>
       </div>
 
       {studentStatus === "Not Eligible" ? (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 text-xs font-semibold">
+        <div className={`p-4 rounded-xl border text-xs font-semibold ${darkMode ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
           Your pipeline is currently paused due to eligibility status: Not Eligible. Please clear backlogs or contact your placement administrator.
         </div>
       ) : (
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-4">
           {/* Connector Line (Desktop) */}
-          <div className="absolute top-[17px] left-8 right-8 h-0.5 bg-gray-100 hidden md:block z-0" />
+          <div className={`absolute top-[17px] left-8 right-8 h-0.5 hidden md:block z-0 ${darkMode ? 'bg-[#3D3D3D]' : 'bg-gray-100'}`} />
 
           {steps.map((step, idx) => {
             const StepIcon = step.icon;
             const isCompleted = idx < activeIndex;
             const isActive = idx === activeIndex;
 
-            let circleClass = "border-gray-200 bg-white text-gray-400";
+            let circleClass = darkMode ? "border-[#3D3D3D] bg-[#2D2D2D] text-gray-500" : "border-gray-200 bg-white text-gray-400";
             let labelClass = "text-gray-400";
 
             if (isCompleted) {
-              circleClass = "border-indigo-600 bg-indigo-600 text-white shadow-sm shadow-indigo-100";
-              labelClass = "text-indigo-600 font-bold";
+              circleClass = darkMode ? "border-[#ff6d34] bg-[#ff6d34] text-white" : "border-indigo-600 bg-indigo-600 text-white shadow-sm shadow-indigo-100";
+              labelClass = darkMode ? "text-[#ff6d34] font-bold" : "text-indigo-600 font-bold";
             } else if (isActive) {
-              circleClass = "border-indigo-600 bg-white text-indigo-600 animate-pulse border-2 shadow-sm shadow-indigo-50";
-              labelClass = "text-gray-800 font-bold";
+              circleClass = darkMode ? "border-[#00bea3] bg-[#2D2D2D] text-[#00bea3] animate-pulse border-2" : "border-indigo-600 bg-white text-indigo-600 animate-pulse border-2 shadow-sm shadow-indigo-50";
+              labelClass = darkMode ? "text-white font-bold" : "text-gray-800 font-bold";
             }
 
             return (

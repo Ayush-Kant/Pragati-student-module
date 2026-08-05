@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from "react";
 import { getShortlistedStudents } from "../services/studentNominationService";
 import { validateShortlist } from "../validations/studentNominationValidation";
@@ -13,7 +14,18 @@ const useShortlistedStudents = () => {
       setError(null);
       const response = await getShortlistedStudents();
       if (response.success) {
-        setShortlistedStudents(response.data);
+        setShortlistedStudents(
+  (response.data || []).map((s) => ({
+    ...s,
+    enrollmentNo: s.enrollment_no || s.enrollmentNo,
+    company: s.company_name || s.company,
+    timeline: {
+      shortlisted: s.shortlisted_date
+        ? new Date(s.shortlisted_date).toLocaleDateString("en-IN")
+        : "—",
+    },
+  }))
+);
       } else {
         setError(response.message);
       }

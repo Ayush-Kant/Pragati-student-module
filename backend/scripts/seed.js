@@ -92,19 +92,27 @@ async function seedData() {
 
     console.log("Inserting recruitment drives...");
     const driveResult = await client.query(`
-      INSERT INTO recruitment_drives (id, title, company_id, mentor_id, status) VALUES 
-      (1, 'Summer Internship Drive 2026', 1, 1, 'active'),
-      (2, 'Tech Trainee Hiring 2026', 2, 1, 'active')
+      INSERT INTO recruitment_drives (id, title, job_title, company_id, mentor_id, status) VALUES 
+      (1, 'Summer Internship Drive 2026', 'Summer Internship Drive 2026', 1, 1, 'active'),
+      (2, 'Tech Trainee Hiring 2026', 'Tech Trainee Hiring 2026', 2, 1, 'active')
       RETURNING id, title;
     `);
     const drive = driveResult.rows[0];
 
     console.log("Inserting mock students...");
     await client.query(`
-      INSERT INTO students (id, name, email, phone, gpa, skills, enrollment_year, status, profile_verified) VALUES
-      (1, 'Rahul Sharma', 'rahul@test.com', '+91 98765 43210', 8.5, ARRAY['MERN', 'Node.js'], 2023, 'verified', true),
-      (2, 'Priya Patel', 'priya@test.com', '+91 98765 43211', 9.1, ARRAY['Python', 'AI'], 2022, 'verified', true),
-      (3, 'Arjun Kumar', 'arjun@test.com', '+91 98765 43212', 7.8, ARRAY['Java', 'Spring Boot'], 2023, 'verified', true);
+      INSERT INTO students (id, name, email, phone, gpa, skills, enrollment_year, status, profile_verified, college, resume_url, graduation_year) VALUES
+      (1, 'Rahul Sharma', 'rahul@test.com', '+91 98765 43210', 8.5, ARRAY['MERN', 'Node.js'], 2023, 'verified', true, 'IIT Bombay', 'rahul_patil_resume.pdf', 2026),
+      (2, 'Priya Patel', 'priya@test.com', '+91 98765 43211', 9.1, ARRAY['Python', 'AI'], 2022, 'verified', true, 'IIT Delhi', 'priya_sharma_resume.pdf', 2026),
+      (3, 'Arjun Kumar', 'arjun@test.com', '+91 98765 43212', 7.8, ARRAY['Java', 'Spring Boot'], 2023, 'verified', true, 'BITS Pilani', 'amit_kumar_resume.pdf', 2026);
+    `);
+
+    console.log("Inserting student drive progress...");
+    await client.query(`
+      INSERT INTO student_drive_progress (id, student_id, drive_id, current_stage, stage, company_id, assessment_score, training_completion, notes, interview_feedback) VALUES
+      (1, 1, 2, 'shortlist', 'Shortlisted', 2, 92.00, 90.00, 'Strong technical skills with excellent problem-solving abilities. Demonstrated good communication and teamwork during the interview. Highly recommended for the next round.', 'Excellent performance in technical round.'),
+      (2, 2, 2, 'screening', 'Assessment', 2, 88.00, 50.00, 'Awaiting assessment completion. Initial aptitude scores look promising.', 'Pending screening results.'),
+      (3, 3, 2, 'interviews', 'Interview', 2, 85.00, 0.00, 'Interview scheduled for next week. Candidate shows good leadership potential.', 'Scheduled for final HR round.');
     `);
 
     console.log("Inserting training programs...");
@@ -127,6 +135,18 @@ async function seedData() {
       ('tp6', 't4', 3, 100, 78, 7.5, 3, 'COMPLETED');
     `);
 
+    console.log("Inserting mock interviews...");
+    await client.query(`
+      INSERT INTO interviews (id, application_id, interviewer_id, meeting_link, result, attendance, scheduled_at, interview_type) VALUES
+      (1, 3, 1, 'https://meet.google.com/abc-defg-hij', 'PENDING', 'pending', NOW() + INTERVAL '1 day', 'Technical Interview');
+    `);
+
+    console.log("Inserting mock offers...");
+    await client.query(`
+      INSERT INTO offers (id, drive_id, student_id, offer_letter_number, package, joining_date, offer_status) VALUES
+      (1, 2, 1, 'OFFER-1784311066131', '10 LPA', CURRENT_DATE + INTERVAL '30 days', 'ACCEPTED');
+    `);
+
     console.log("Resetting primary key sequences...");
     await client.query(`
       SELECT setval('auth_users_id_seq', COALESCE((SELECT MAX(id) FROM auth_users), 1));
@@ -135,6 +155,9 @@ async function seedData() {
       SELECT setval('companies_id_seq', COALESCE((SELECT MAX(id) FROM companies), 1));
       SELECT setval('recruitment_drives_id_seq', COALESCE((SELECT MAX(id) FROM recruitment_drives), 1));
       SELECT setval('students_id_seq', COALESCE((SELECT MAX(id) FROM students), 1));
+      SELECT setval('student_drive_progress_id_seq', COALESCE((SELECT MAX(id) FROM student_drive_progress), 1));
+      SELECT setval('interviews_id_seq', COALESCE((SELECT MAX(id) FROM interviews), 1));
+      SELECT setval('offers_id_seq', COALESCE((SELECT MAX(id) FROM offers), 1));
     `);
 
     await client.query("COMMIT");

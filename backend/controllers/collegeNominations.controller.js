@@ -7,6 +7,7 @@ import {
 } from '../services/collegeNominations.service.js'
 import { validateNomination, validateNominationUpdate } from '../validators/collegeNominations.validator.js'
 import { successResponse, errorResponse, paginatedResponse } from '../utils/responseHandler.js'
+import { pool } from "../config/db.js";
 
 export const getNominations = async (req, res, next) => {
   try {
@@ -19,19 +20,18 @@ export const getNominations = async (req, res, next) => {
 
 export const nominateStudent = async (req, res, next) => {
   try {
-    // Inject the logged-in user's ID securely before validation
-    req.body.nominated_by = req.body.nominated_by || req.user?.userId || req.user?.id
-
     const { isValid, errors } = validateNomination(req.body)
     if (!isValid) return errorResponse(res, 'Validation failed', 400, errors)
 
-    const nomination = await nominateStudentService(req.body)
+    const nomination = await nominateStudentService({
+      ...req.body,
+      nominated_by: req.user?.authUserId || req.user?.id || 1,
+    })
     return successResponse(res, nomination, 'Student nominated successfully', 201)
   } catch (err) {
     next(err)
   }
 }
-
 export const updateNomination = async (req, res, next) => {
   try {
     const { isValid, errors } = validateNominationUpdate(req.body)

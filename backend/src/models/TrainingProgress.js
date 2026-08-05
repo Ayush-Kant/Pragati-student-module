@@ -10,12 +10,12 @@ TrainingProgress.init(
     progressId: {
       type: DataTypes.STRING,
       primaryKey: true,
-      field: "progress_id",
+      columnName: "progress_id",
     },
     trainingId: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: "training_id",
+      columnName: "training_id",
       references: {
         model: Training,
         key: "training_id",
@@ -24,7 +24,7 @@ TrainingProgress.init(
     candidateId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: "candidate_id",
+      columnName: "candidate_id",
       references: {
         model: Student,
         key: "id",
@@ -36,28 +36,28 @@ TrainingProgress.init(
     },
     assignmentScore: {
       type: DataTypes.INTEGER,
-      field: "assignment_score",
+      columnName: "assignment_score",
       allowNull: true,
     },
     engagementScore: {
       type: DataTypes.DOUBLE,
       defaultValue: 0.0,
-      field: "engagement_score",
+      columnName: "engagement_score",
     },
     performanceRating: {
       type: DataTypes.INTEGER,
-      field: "performance_rating",
+      columnName: "performance_rating",
       allowNull: true,
     },
     readinessScore: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
-      field: "readiness_score",
+      columnName: "readiness_score",
     },
     completionDate: {
       type: DataTypes.DATE,
       allowNull: true,
-      field: "completion_date",
+      columnName: "completion_date",
     },
     status: {
       type: DataTypes.ENUM("ENROLLED", "IN_PROGRESS", "COMPLETED", "DROPPED"),

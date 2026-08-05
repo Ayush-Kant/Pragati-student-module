@@ -83,6 +83,26 @@ const createJob = async ({
     return result.rows[0].id;
 };
 
+const getCompanies = async () => {
+    return await jobModel.getAllCompanies();
+};
+
+const getCompany = async (id) => {
+    return await jobModel.getCompanyById(id);
+};
+
+const addCompany = async (data) => {
+    return await jobModel.createCompany(data);
+};
+
+const editCompany = async (id, data) => {
+    return await jobModel.updateCompany(id, data);
+};
+
+const removeCompany = async (id) => {
+    return await jobModel.deleteCompany(id);
+};
+
 /* ===========================
    Job Posting
 =========================== */
@@ -161,11 +181,102 @@ const removeEligibility = async (jobPostingId) => {
     return await jobModel.deleteEligibility(jobPostingId);
 };
 
+export const createRound = async (
+    job_posting_id,
+    round_name,
+    round_order,
+    description
+) => {
+
+    const result = await pool.query(
+        `
+        INSERT INTO hiring_rounds
+        (
+            job_posting_id,
+            round_name,
+            round_order,
+            description
+        )
+        VALUES ($1,$2,$3,$4)
+        RETURNING *
+        `,
+        [
+            job_posting_id,
+            round_name,
+            round_order,
+            description
+        ]
+    );
+
+    return result.rows[0];
+};
+export const getRounds = async (job_posting_id) => {
+
+    const result = await pool.query(
+        `
+        SELECT *
+        FROM hiring_rounds
+        WHERE job_posting_id = $1
+        ORDER BY round_order ASC
+        `,
+        [job_posting_id]
+    );
+
+    return result.rows;
+};
+export const updateRound = async (
+    id,
+    round_name,
+    round_order,
+    description
+) => {
+
+    const result = await pool.query(
+        `
+        UPDATE hiring_rounds
+        SET
+            round_name = $1,
+            round_order = $2,
+            description = $3
+        WHERE id = $4
+        RETURNING *
+        `,
+        [
+            round_name,
+            round_order,
+            description,
+            id
+        ]
+    );
+
+    return result.rows[0];
+};
+export const deleteRound = async (id) => {
+
+    const result = await pool.query(
+        `
+        DELETE FROM hiring_rounds
+        WHERE id = $1
+        RETURNING *
+        `,
+        [id]
+    );
+
+    return result.rows[0];
+};
+
 export {
     // Jobs
     getAllJobs,
     getJobById,
     createJob,
+
+    // Company
+    getCompanies,
+    getCompany,
+    addCompany,
+    editCompany,
+    removeCompany,
 
     // Job Posting
     getJobPostings,

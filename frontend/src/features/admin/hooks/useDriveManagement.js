@@ -156,6 +156,10 @@ export default function useDriveManagement() {
     }
   };
 
+  useEffect(() => {
+  fetchDrives();
+  }, []);
+
   return {
     search,
     setSearch,
