@@ -48,7 +48,7 @@ ProjectActivity.init(
   }
 );
 
-Project.hasMany(ProjectActivity, { foreignKey: "projectId", as: "activities", onDelete: "CASCADE" });
-ProjectActivity.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+Project.hasMany(ProjectActivity, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "activities" });
+ProjectActivity.belongsTo(Project, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "project" });
 
 export default ProjectActivity;

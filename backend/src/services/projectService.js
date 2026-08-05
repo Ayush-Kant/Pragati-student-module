@@ -7,21 +7,6 @@ import MentorReview from "../models/mentorReviewModel.js";
 import ProjectMember from "../models/projectMemberModel.js";
 import ProjectActivity from "../models/projectActivityModel.js";
 import {
-  StudentProject,
-  ProjectMilestone,
-  ActivitySubmission,
-} from "../models/projectModel.js";
-import {
-  validateGithubUrl,
-  validateDeploymentUrl,
-  validatePdfReport,
-  validateProgressNotes,
-  validateDeadline,
-} from "../validations/projectValidation.js";
-import { uploadReport } from "../config/aws.js";
-import {
-  ApiError,
-  formatProject,
   calculateProjectProgress,
   generateProjectInsights,
 } from "../utils/projectHelpers.js";

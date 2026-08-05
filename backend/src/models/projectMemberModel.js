@@ -40,7 +40,7 @@ ProjectMember.init(
   }
 );
 
-Project.hasMany(ProjectMember, { foreignKey: "projectId", as: "members", onDelete: "CASCADE" });
-ProjectMember.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+Project.hasMany(ProjectMember, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "members" });
+ProjectMember.belongsTo(Project, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "project" });
 
 export default ProjectMember;
