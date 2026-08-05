@@ -54,6 +54,18 @@ export const RecruitmentDrives = () => {
     }
   }, [location.pathname, navigate, shouldOpenCreateDrive]);
 
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && activeModal === 'view') {
+        setActiveModal(null);
+      }
+    };
+    if (activeModal === 'view') {
+      window.addEventListener('keydown', handleEscape);
+    }
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [activeModal]);
+
   const updateFilter = (key, value) => {
     setFilters(prev => ({
       ...prev,
@@ -72,15 +84,54 @@ export const RecruitmentDrives = () => {
 
   const handleCreateDrive = async (driveData) => {
     try {
+<<<<<<< HEAD
+      const payload = {
+        company: companyName,
+        role: drive.driveName || 'Campus Drive',
+        package: drive.salary || 'Competitive',
+        drive_date: drive.date || new Date().toISOString().split('T')[0],
+        deadline: drive.date || new Date().toISOString().split('T')[0],
+        status: 'Open',
+        eligibility: {
+          cgpa: 6.0,
+          departments: drive.college ? [drive.college] : []
+        },
+        rounds: []
+      };
+
+      await placementDriveService.createPlacementDrive(payload);
+      toast.success('Drive created successfully');
+      await fetchDrivesList();
+=======
       await createDrive(driveData);
       toast.success('Recruitment drive created successfully');
+>>>>>>> college-team
     } catch (err) {
       toast.error('Failed to create recruitment drive');
     }
   };
 
   const filteredDrives = drives.filter(drive => {
-    const matchSearch = drive.driveName.toLowerCase().includes(filters.search.toLowerCase());
+    const search = filters.search.trim().toLowerCase();
+    const matchSearch = !search || (() => {
+      const company = (drive.company || "").toLowerCase();
+      const role = (drive.role || drive.driveName || "").toLowerCase();
+      const location = (drive.location || "").toLowerCase();
+      const skills = (drive.skills || drive.eligibility?.skills || "").toLowerCase();
+      const hiringProcess = (drive.hiringProcess || "").toLowerCase();
+      const status = (drive.stage || drive.status || "").toLowerCase();
+      const eligibilityStr = JSON.stringify(drive.eligibility || {}).toLowerCase();
+      
+      return (
+        company.includes(search) ||
+        role.includes(search) ||
+        location.includes(search) ||
+        skills.includes(search) ||
+        hiringProcess.includes(search) ||
+        status.includes(search) ||
+        eligibilityStr.includes(search)
+      );
+    })();
     const matchStatus = !filters.status || drive.stage === filters.status;
     const matchDepartment = !filters.department || drive.role === filters.department;
     const driveYear = getDriveYear(drive);
@@ -146,8 +197,14 @@ export const RecruitmentDrives = () => {
 
       {/* View Drive Modal */}
       {activeModal === 'view' && selectedDrive && (
-        <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div
+          className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          onClick={() => setActiveModal(null)}
+        >
+          <div
+            className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
               <h3 className="text-2xl font-bold text-gray-900">Drive Details</h3>
               <button
@@ -214,6 +271,17 @@ export const RecruitmentDrives = () => {
           onClose={() => setActiveModal(null)}
           onSave={async (updatedDrive) => {
             try {
+<<<<<<< HEAD
+              const payload = {
+                company: updatedDrive.company || companyName,
+                role: updatedDrive.role,
+                package: updatedDrive.package || 'Competitive',
+                drive_date: updatedDrive.rawDriveDate || new Date().toISOString().split('T')[0],
+                deadline: updatedDrive.rawDeadline || new Date().toISOString().split('T')[0],
+                status: updatedDrive.stage === 'Active' ? 'Open' : (updatedDrive.stage === 'Screening' ? 'Upcoming' : (updatedDrive.stage === 'Cancelled' ? 'Cancelled' : 'Completed')),
+              };
+              await placementDriveService.updatePlacementDrive(updatedDrive.id, payload);
+=======
               await updateDrive(selectedDrive.id, {
                 jobTitle: updatedDrive.jobTitle,
                 department: updatedDrive.department,
@@ -223,6 +291,7 @@ export const RecruitmentDrives = () => {
                 location: updatedDrive.location,
                 deadline: updatedDrive.rawDeadline
               });
+>>>>>>> college-team
               toast.success('Drive updated successfully');
               setActiveModal(null);
             } catch (err) {
@@ -248,6 +317,17 @@ export const RecruitmentDrives = () => {
           onClose={() => setActiveModal(null)}
           onSave={async (newStage) => {
             try {
+<<<<<<< HEAD
+              const payload = {
+                company: selectedDrive.company || companyName,
+                role: selectedDrive.role,
+                package: selectedDrive.package || 'Competitive',
+                drive_date: selectedDrive.rawDriveDate || new Date().toISOString().split('T')[0],
+                deadline: selectedDrive.rawDeadline || new Date().toISOString().split('T')[0],
+                status: newStage === 'Active' ? 'Open' : (newStage === 'Screening' ? 'Upcoming' : (newStage === 'Cancelled' ? 'Cancelled' : 'Completed')),
+              };
+              await placementDriveService.updatePlacementDrive(selectedDrive.id, payload);
+=======
               if (newStage === 'CLOSED') {
                 await closeDrive(selectedDrive.id);
               } else if (newStage === 'PAUSED') {
@@ -255,6 +335,7 @@ export const RecruitmentDrives = () => {
               } else {
                 await updateDrive(selectedDrive.id, { status: 'active' });
               }
+>>>>>>> college-team
               toast.success('Stage updated successfully');
               setActiveModal(null);
             } catch (err) {
@@ -294,8 +375,37 @@ const EditDriveModal = ({ drive, onClose, onSave }) => {
   const [location, setLocation] = useState(drive.location);
   const [rawDeadline, setRawDeadline] = useState(drive.rawDeadline);
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && !isSubmitting) onClose();
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose, isSubmitting]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+<<<<<<< HEAD
+    if (isSubmitting) return;
+    if (!driveName.trim() || !role.trim()) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await onSave({
+        ...drive,
+        driveName,
+        role,
+        stage,
+        deadline
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+=======
     if (!jobTitle.trim()) {
       toast.error('Please fill in all required fields');
       return;
@@ -309,11 +419,19 @@ const EditDriveModal = ({ drive, onClose, onSave }) => {
       location,
       rawDeadline
     });
+>>>>>>> college-team
   };
 
   return (
-    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div
+      className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+      onClick={() => !isSubmitting && onClose()}
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="responsive-modal-panel bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
           <h3 className="text-2xl font-bold text-gray-900">Edit Drive</h3>
           <button
@@ -412,15 +530,23 @@ const EditDriveModal = ({ drive, onClose, onSave }) => {
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition"
+            disabled={isSubmitting}
+            className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition"
+            disabled={isSubmitting}
+            className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Save Changes
+            {isSubmitting && (
+              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>
@@ -448,9 +574,23 @@ const ViewCandidatesModal = ({ drive, fetchCandidates, onClose }) => {
     loadCandidates();
   }, [drive.id, fetchCandidates]);
 
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
   return (
-    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-      <div className="responsive-modal-panel bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div
+      className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="responsive-modal-panel bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
           <div>
             <h3 className="text-2xl font-bold text-gray-900">Candidates</h3>
@@ -513,9 +653,25 @@ const ChangeStageModal = ({ drive, onClose, onSave }) => {
   const [selectedStage, setSelectedStage] = useState(drive.stage);
   const stages = ['ACTIVE', 'PAUSED', 'CLOSED'];
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && !isSubmitting) onClose();
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose, isSubmitting]);
+
   return (
-    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-      <div className="responsive-modal-panel bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div
+      className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+      onClick={() => !isSubmitting && onClose()}
+    >
+      <div
+        className="responsive-modal-panel bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="px-8 pt-8 pb-6 border-b border-gray-100 flex items-start justify-between">
           <h3 className="text-2xl font-bold text-gray-900">Change Stage</h3>
           <button
@@ -557,16 +713,32 @@ const ChangeStageModal = ({ drive, onClose, onSave }) => {
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition"
+            disabled={isSubmitting}
+            className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             type="button"
-            onClick={() => onSave(selectedStage)}
-            className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition"
+            disabled={isSubmitting}
+            onClick={async () => {
+              if (isSubmitting) return;
+              setIsSubmitting(true);
+              try {
+                await onSave(selectedStage);
+              } finally {
+                setIsSubmitting(false);
+              }
+            }}
+            className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Update Stage
+            {isSubmitting && (
+              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
+            {isSubmitting ? "Updating..." : "Update Stage"}
           </button>
         </div>
       </div>
@@ -576,9 +748,25 @@ const ChangeStageModal = ({ drive, onClose, onSave }) => {
 
 // Delete Confirmation Modal Component
 const DeleteConfirmationModal = ({ drive, onClose, onDelete }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && !isSubmitting) onClose();
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose, isSubmitting]);
+
   return (
-    <div className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-      <div className="responsive-modal-panel bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div
+      className="responsive-modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+      onClick={() => !isSubmitting && onClose()}
+    >
+      <div
+        className="responsive-modal-panel bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-8">
           <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-6">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -594,16 +782,39 @@ const DeleteConfirmationModal = ({ drive, onClose, onDelete }) => {
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition"
+            disabled={isSubmitting}
+            className="px-5 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             type="button"
+<<<<<<< HEAD
+            disabled={isSubmitting}
+            onClick={async () => {
+              if (isSubmitting) return;
+              setIsSubmitting(true);
+              try {
+                await onDelete();
+              } finally {
+                setIsSubmitting(false);
+              }
+            }}
+            className="px-5 py-2.5 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-700 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {isSubmitting && (
+              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
+            {isSubmitting ? "Deleting..." : "Delete"}
+=======
             onClick={onDelete}
             className="px-5 py-2.5 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-750 transition"
           >
             Close Drive
+>>>>>>> college-team
           </button>
         </div>
       </div>

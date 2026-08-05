@@ -4,6 +4,7 @@ const DeletePlacementDriveModal = ({
   isOpen,
   onConfirm,
   onCancel,
+  isLoading,
   darkMode,
 }) => {
   return (
@@ -15,6 +16,7 @@ const DeletePlacementDriveModal = ({
       cancelText="Cancel"
       onConfirm={onConfirm}
       onCancel={onCancel}
+      isLoading={isLoading}
       darkMode={darkMode}
     />
   );

@@ -6,6 +6,8 @@ const BASE_DRIVE_QUERY = `
     pd.company,
     pd.role,
     pd.package,
+    pd.location,
+    pd.hiring_process,
     pd.drive_date,
     pd.deadline,
     pd.status,
@@ -51,7 +53,7 @@ export const getPlacementDriveById = async (id) => {
 };
 
 export const createPlacementDrive = async (data) => {
-  const { company, role, package: pkg, drive_date, deadline, status, eligibility, rounds } = data;
+  const { company, role, package: pkg, location, hiring_process, drive_date, deadline, status, eligibility, rounds } = data;
 
   const client = await pool.connect();
   try {
@@ -59,10 +61,10 @@ export const createPlacementDrive = async (data) => {
 
     const driveResult = await client.query(
       `INSERT INTO placement_drives
-      (company, role, package, drive_date, deadline, status)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      (company, role, package, location, hiring_process, drive_date, deadline, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *`,
-      [company, role, pkg, drive_date, deadline, status || "Upcoming"]
+      [company, role, pkg, location, hiring_process, drive_date, deadline, status || "Upcoming"]
     );
 
     const newDrive = driveResult.rows[0];
@@ -117,7 +119,7 @@ export const createPlacementDrive = async (data) => {
 };
 
 export const updatePlacementDrive = async (id, data) => {
-  const { company, role, package: pkg, drive_date, deadline, status, eligibility, rounds } = data;
+  const { company, role, package: pkg, location, hiring_process, drive_date, deadline, status, eligibility, rounds } = data;
 
   const client = await pool.connect();
   try {
@@ -130,6 +132,8 @@ export const updatePlacementDrive = async (id, data) => {
     if (company !== undefined) { setClauses.push(`company = $${idx++}`); values.push(company); }
     if (role !== undefined) { setClauses.push(`role = $${idx++}`); values.push(role); }
     if (pkg !== undefined) { setClauses.push(`package = $${idx++}`); values.push(pkg); }
+    if (location !== undefined) { setClauses.push(`location = $${idx++}`); values.push(location); }
+    if (hiring_process !== undefined) { setClauses.push(`hiring_process = $${idx++}`); values.push(hiring_process); }
     if (drive_date !== undefined) { setClauses.push(`drive_date = $${idx++}`); values.push(drive_date); }
     if (deadline !== undefined) { setClauses.push(`deadline = $${idx++}`); values.push(deadline); }
     if (status !== undefined) { setClauses.push(`status = $${idx++}`); values.push(status); }
@@ -166,6 +170,14 @@ export const updatePlacementDrive = async (id, data) => {
 
     // Upsert rounds (preserve IDs and timestamps)
     if (Array.isArray(rounds)) {
+      const activeOrders = rounds.map((r, i) => r.round_order || r.order || (i + 1));
+      
+      if (activeOrders.length > 0) {
+        await client.query(`DELETE FROM interview_rounds WHERE drive_id = $1 AND round_order != ALL($2::int[])`, [id, activeOrders]);
+      } else {
+        await client.query(`DELETE FROM interview_rounds WHERE drive_id = $1`, [id]);
+      }
+
       for (let i = 0; i < rounds.length; i++) {
         const r = rounds[i];
         const roundName = r.round_name || r.name || `Round ${i + 1}`;
@@ -174,16 +186,13 @@ export const updatePlacementDrive = async (id, data) => {
         await client.query(
           `INSERT INTO interview_rounds (drive_id, round_name, description, round_order)
            VALUES ($1, $2, $3, $4)
-           ON CONFLICT (drive_id, round_order)
-           DO UPDATE SET round_name = EXCLUDED.round_name,
-                         description = EXCLUDED.description`,
+           ON CONFLICT (drive_id, round_order) 
+           DO UPDATE SET 
+             round_name = EXCLUDED.round_name,
+             description = EXCLUDED.description`,
           [id, roundName, desc, order]
         );
       }
-      await client.query(
-        `DELETE FROM interview_rounds WHERE drive_id = $1 AND round_order > $2`,
-        [id, rounds.length]
-      );
     }
 
     await client.query("COMMIT");
@@ -222,22 +231,20 @@ export const searchPlacementDrives = async (query) => {
 export const getDriveStatistics = async () => {
   const result = await pool.query(`
     SELECT
-      pd.id,
-      pd.company,
-      pd.role,
-      pd.package,
-      pd.drive_date,
-      pd.deadline,
-      pd.status,
-      COALESCE(ds.total_applied,0) AS registered_students,
-      0 AS eligible_students,
-      COALESCE(ds.total_selected,0) AS selected_students,
-      0 AS rejected_students
-    FROM placement_drives pd
-    LEFT JOIN drive_statistics ds
-      ON pd.id = ds.drive_id
-    ORDER BY pd.drive_date DESC;
+      COUNT(*) AS "totalDrives",
+      COUNT(*) FILTER (WHERE status = 'Open') AS "openDrives",
+      COUNT(*) FILTER (WHERE status = 'Upcoming') AS "upcomingDrives",
+      COUNT(*) FILTER (WHERE status = 'Completed') AS "completedDrives",
+      COUNT(*) FILTER (WHERE status = 'Cancelled') AS "cancelledDrives"
+    FROM placement_drives;
   `);
 
-  return result.rows;
+  const row = result.rows[0] || {};
+  return {
+    totalDrives: parseInt(row.totalDrives || 0, 10),
+    openDrives: parseInt(row.openDrives || 0, 10),
+    upcomingDrives: parseInt(row.upcomingDrives || 0, 10),
+    completedDrives: parseInt(row.completedDrives || 0, 10),
+    cancelledDrives: parseInt(row.cancelledDrives || 0, 10)
+  };
 };
