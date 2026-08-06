@@ -1,13 +1,10 @@
-﻿import { jest } from "@jest/globals";
+import { jest } from "@jest/globals";
 import request from "supertest";
 import jwt from "jsonwebtoken";
 import express from "express";
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret";
 
-// Mock only the data-accessing functions; keep the real ServiceError class
-// so `err instanceof assessmentService.ServiceError` still works in the
-// controller's error handler.
 jest.unstable_mockModule("../services/assessmentService.js", () => {
   class ServiceError extends Error {
     constructor(statusCode, message) {
@@ -32,17 +29,13 @@ const { default: assessmentRoutes } = await import("../routes/assessmentRoutes.j
 const app = express();
 app.use(express.json());
 app.use("/api/student/assessments", assessmentRoutes);
-// Minimal fallback handler, standing in for the project's real errorMiddleware.
 app.use((err, req, res, next) => {
   res.status(err.statusCode || 500).json({ success: false, message: err.message || "Server error" });
 });
 
-const studentToken = jwt.sign(
-  { id: "a1111111-1111-4111-8111-111111111111", role: "student" },
-  process.env.JWT_SECRET
-);
+const studentToken = jwt.sign({ id: 1, role: "student" }, process.env.JWT_SECRET);
 
-const assessmentId = "b2222222-2222-4222-8222-222222222222";
+const assessmentId = 42;
 
 describe("Assessments Backend", () => {
   afterEach(() => {
@@ -87,7 +80,7 @@ describe("Assessments Backend", () => {
 
     it("rejects a malformed assessment id", async () => {
       const res = await request(app)
-        .get("/api/student/assessments/not-a-uuid")
+        .get("/api/student/assessments/not-a-number")
         .set("Authorization", `Bearer ${studentToken}`);
 
       expect(res.status).toBe(400);
@@ -96,10 +89,7 @@ describe("Assessments Backend", () => {
 
   describe("POST /api/student/assessments/:assessmentId/start", () => {
     it("starts a new attempt", async () => {
-      assessmentService.startAssessment.mockResolvedValue({
-        id: "c3333333-3333-4333-8333-333333333333",
-        status: "in_progress",
-      });
+      assessmentService.startAssessment.mockResolvedValue({ id: 7, status: "in_progress" });
 
       const res = await request(app)
         .post(`/api/student/assessments/${assessmentId}/start`)
@@ -111,8 +101,8 @@ describe("Assessments Backend", () => {
   });
 
   describe("POST /api/student/assessments/:assessmentId/submit", () => {
-    const attemptId = "c3333333-3333-4333-8333-333333333333";
-    const questionId = "d4444444-4444-4444-8444-444444444444";
+    const attemptId = 7;
+    const questionId = 3;
 
     it("rejects a submission with no answers", async () => {
       const res = await request(app)
@@ -124,19 +114,12 @@ describe("Assessments Backend", () => {
     });
 
     it("submits and scores an assessment", async () => {
-      assessmentService.submitAssessment.mockResolvedValue({
-        id: "e5555555-5555-4555-8555-555555555555",
-        percentage: 100,
-        status: "passed",
-      });
+      assessmentService.submitAssessment.mockResolvedValue({ id: 9, percentage: 100, status: "passed" });
 
       const res = await request(app)
         .post(`/api/student/assessments/${assessmentId}/submit`)
         .set("Authorization", `Bearer ${studentToken}`)
-        .send({
-          attemptId,
-          answers: [{ questionId, selectedOption: 0 }],
-        });
+        .send({ attemptId, answers: [{ questionId, selectedOption: 0 }] });
 
       expect(res.status).toBe(200);
       expect(res.body.data.status).toBe("passed");
@@ -158,10 +141,7 @@ describe("Assessments Backend", () => {
 
   describe("GET /api/student/assessments/:assessmentId/result", () => {
     it("returns the result for the assessment", async () => {
-      assessmentService.getAssessmentResult.mockResolvedValue({
-        percentage: 80,
-        status: "passed",
-      });
+      assessmentService.getAssessmentResult.mockResolvedValue({ percentage: 80, status: "passed" });
 
       const res = await request(app)
         .get(`/api/student/assessments/${assessmentId}/result`)
@@ -181,9 +161,7 @@ describe("Assessments Backend", () => {
 
       const res = await request(app)
         .get("/api/student/assessments/history?page=1&limit=10")
-        .set("Authorization", `Bearer ${studentToken}`);
-
-      expect(res.status).toBe(200);
+        .set("Authorization", `Bearer ${studentToken}`);expect(res.status).toBe(200);
       expect(res.body.data.pagination.total).toBe(0);
     });
   });
