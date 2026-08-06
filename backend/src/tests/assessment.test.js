@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+﻿import { jest } from "@jest/globals";
 import request from "supertest";
 import jwt from "jsonwebtoken";
 import express from "express";
@@ -135,7 +135,7 @@ describe("Assessments Backend", () => {
         .set("Authorization", `Bearer ${studentToken}`)
         .send({
           attemptId,
-          answers: [{ questionId, selectedOptionIds: [] }],
+          answers: [{ questionId, selectedOption: 0 }],
         });
 
       expect(res.status).toBe(200);
@@ -150,7 +150,7 @@ describe("Assessments Backend", () => {
       const res = await request(app)
         .post(`/api/student/assessments/${assessmentId}/submit`)
         .set("Authorization", `Bearer ${studentToken}`)
-        .send({ attemptId, answers: [{ questionId, selectedOptionIds: [] }] });
+        .send({ attemptId, answers: [{ questionId, selectedOption: 0 }] });
 
       expect(res.status).toBe(409);
     });

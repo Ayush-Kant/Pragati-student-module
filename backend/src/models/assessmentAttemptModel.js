@@ -1,5 +1,5 @@
-import { DataTypes, Model } from "@sequelize/core";
-import { sequelize } from "../config/sequelize.js";
+﻿import { DataTypes, Model } from "@sequelize/core";
+import { sequelize } from "../../config/sequelize.js";
 
 export class AssessmentAttempt extends Model {}
 
