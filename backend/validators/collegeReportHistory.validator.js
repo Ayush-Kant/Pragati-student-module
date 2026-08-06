@@ -27,11 +27,11 @@ const validateListHistory = (req, res, next) => {
     const { page, limit } = req.query;
 
     if (page && !isPositiveInteger(page)) {
-        return res.status(400).json({ message: 'Page must be a positive number' });
+        return res.status(400).json({ success: false, message: 'Page must be a positive number', data: null });
     }
 
     if (limit && !isPositiveInteger(limit)) {
-        return res.status(400).json({ message: 'Limit must be a positive number' });
+        return res.status(400).json({ success: false, message: 'Limit must be a positive number', data: null });
     }
 
     next();
@@ -41,13 +41,18 @@ const validateHistoryId = (req, res, next) => {
     const { id } = req.params;
 
     if (!id || !isPositiveInteger(id)) {
-        return res.status(400).json({ message: 'Invalid history ID' });
+        return res.status(400).json({ success: false, message: 'Invalid history ID', data: null });
     }
 
     next();
 };
 
 export {
+    sanitizeInput,
+    validateListHistory,
+    validateHistoryId,
+};
+export default {
     sanitizeInput,
     validateListHistory,
     validateHistoryId,
