@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Filter, X, UserPlus, Users, CheckSquare, ListChecks } from "lucide-react";
+import { Filter, X, UserPlus, ListChecks } from "lucide-react";
 import toast from "react-hot-toast";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Pagination from "../components/common/Pagination";
 import BatchFilter from "../components/filters/BatchFilter";
@@ -28,8 +29,20 @@ import ErrorState from "../components/common/ErrorState";
 import useStudentNomination from "../hooks/useStudentNomination";
 import { getPlacementDrives } from "../../placement-drives/services/placementDriveService";
 
-const StudentNominationPage = () => {
-  const { darkMode } = useOutletContext();
+/* ── Isolated Module Query Client ───────────────────────────────── */
+const moduleQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes cache
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+/* ── Main Page Logic Component ───────────────────────────────────── */
+const StudentNominationContent = () => {
+  const { darkMode } = useOutletContext() || {};
 
   /* ── Drive selection ────────────────────────────────────────────── */
   const [selectedDriveId, setSelectedDriveId] = useState(null);
@@ -38,7 +51,7 @@ const StudentNominationPage = () => {
 
   useEffect(() => {
     getPlacementDrives().then((res) => {
-      if (res.success) setAllDrives(res.data || []);
+      if (res?.success) setAllDrives(res.data || []);
     });
   }, []);
 
@@ -51,15 +64,13 @@ const StudentNominationPage = () => {
 
   /* ── Hook (re-fetches whenever selectedDriveId changes) ────────── */
   const {
-    eligibleStudents,
-    nominatedStudents,
+    eligibleStudents = [],
+    nominatedStudents = [],
     loading,
     error,
     bulkNominate,
     bulkShortlist,
     nominateStudent,
-    updateNomination,
-    removeNomination,
     refreshData,
   } = useStudentNomination(selectedDriveId);
 
@@ -68,6 +79,7 @@ const StudentNominationPage = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   /* ── Bulk selection ─────────────────────────────────────────────── */
@@ -88,19 +100,6 @@ const StudentNominationPage = () => {
   const [editingStudent, setEditingStudent] = useState(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removingStudent, setRemovingStudent] = useState(null);
-
-  /* ── Responsive page size ───────────────────────────────────────── */
-  const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 8);
-  const [shortlistLimit, setShortlistLimit] = useState(window.innerWidth < 768 ? 3 : undefined);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setItemsPerPage(window.innerWidth < 768 ? 2 : 8);
-      setShortlistLimit(window.innerWidth < 768 ? 3 : undefined);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   /* ── Handlers ───────────────────────────────────────────────────── */
   const handleTabChange = (tab) => {
@@ -144,52 +143,66 @@ const StudentNominationPage = () => {
   /* ── Bulk actions ───────────────────────────────────────────────── */
   const handleBulkNominate = async () => {
     if (!selectedDriveId) {
-      toast.error("Please select a drive first.");
+      toast.error("Please select a placement drive first.");
       return;
     }
     if (selectedStudentIds.length === 0) {
-      toast.error("Select at least one student.");
+      toast.error("Select at least one candidate.");
       return;
     }
     setBulkLoading(true);
-    const res = await bulkNominate(selectedStudentIds);
-    setBulkLoading(false);
-    if (res.success) {
-      toast.success(res.message || `${selectedStudentIds.length} student(s) nominated.`);
-      setSelectedStudentIds([]);
-    } else {
-      toast.error(res.message || "Nomination failed.");
+    try {
+      const res = await bulkNominate(selectedStudentIds);
+      if (res?.success) {
+        toast.success(res.message || `${selectedStudentIds.length} candidate(s) nominated.`);
+        setSelectedStudentIds([]);
+        refreshData();
+      } else {
+        toast.error(res?.message || "Bulk nomination failed.");
+      }
+    } catch (err) {
+      toast.error(err.message || "An unexpected error occurred.");
+    } finally {
+      setBulkLoading(false);
     }
   };
 
   const handleBulkShortlist = async () => {
     if (!selectedDriveId) {
-      toast.error("Please select a drive first.");
+      toast.error("Please select a placement drive first.");
       return;
     }
     if (selectedStudentIds.length === 0) {
-      toast.error("Select at least one student.");
+      toast.error("Select at least one candidate.");
       return;
     }
     setBulkLoading(true);
-    const res = await bulkShortlist(selectedStudentIds);
-    setBulkLoading(false);
-    if (res.success) {
-      toast.success(res.message || `${selectedStudentIds.length} student(s) shortlisted.`);
-      setSelectedStudentIds([]);
-    } else {
-      toast.error(res.message || "Shortlisting failed.");
+    try {
+      const res = await bulkShortlist(selectedStudentIds);
+      if (res?.success) {
+        toast.success(res.message || `${selectedStudentIds.length} candidate(s) shortlisted.`);
+        setSelectedStudentIds([]);
+        refreshData();
+      } else {
+        toast.error(res?.message || "Bulk shortlisting failed.");
+      }
+    } catch (err) {
+      toast.error(err.message || "An unexpected error occurred.");
+    } finally {
+      setBulkLoading(false);
     }
   };
 
-  /* ── Filtering ──────────────────────────────────────────────────── */
+  /* ── Filtering Logic ───────────────────────────────────────────── */
   const students = activeTab === "eligible" ? eligibleStudents : nominatedStudents;
 
   const filteredStudents = useMemo(() => {
     return students.filter((s) => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        if (!s.name?.toLowerCase().startsWith(q) && !s.enrollmentNo?.toLowerCase().startsWith(q)) return false;
+        const matchesName = s.name?.toLowerCase().includes(q);
+        const matchesEnrollment = s.enrollmentNo?.toLowerCase().includes(q);
+        if (!matchesName && !matchesEnrollment) return false;
       }
       if (selectedCompany && s.company !== selectedCompany) return false;
       if (selectedDepartment && s.department !== selectedDepartment) return false;
@@ -199,9 +212,9 @@ const StudentNominationPage = () => {
     });
   }, [students, searchQuery, selectedCompany, selectedDepartment, selectedBatch, selectedStatus, activeTab]);
 
-  /* ── Pagination ─────────────────────────────────────────────────── */
+  /* ── Pagination calculations ───────────────────────────────────── */
   const totalStudents = filteredStudents.length;
-  const totalPages = Math.ceil(totalStudents / itemsPerPage);
+  const totalPages = Math.ceil(totalStudents / itemsPerPage) || 1;
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentStudents = filteredStudents.slice(indexOfFirst, indexOfLast);
@@ -212,14 +225,17 @@ const StudentNominationPage = () => {
     selectedBatch !== "" ||
     (activeTab === "nominated" && selectedStatus !== "");
 
-  /* ── Bulk action bar (shown when checkboxes are ticked) ─────────── */
+  /* ── Bulk Action Bar UI ─────────────────────────────────────────── */
   const BulkActionBar = () => {
     if (selectedStudentIds.length === 0) return null;
     return (
-      <div className={`flex items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 ${darkMode ? "bg-[#2D2D2D] border-[#ff6d34]/30" : "bg-orange-50 border-orange-200"
-        }`}>
+      <div
+        className={`flex items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 transition-all ${
+          darkMode ? "bg-[#2D2D2D] border-[#ff6d34]/30" : "bg-orange-50 border-orange-200"
+        }`}
+      >
         <span className={`text-sm font-semibold ${darkMode ? "text-[#ff6d34]" : "text-[#ff7a00]"}`}>
-          {selectedStudentIds.length} student{selectedStudentIds.length > 1 ? "s" : ""} selected
+          {selectedStudentIds.length} candidate{selectedStudentIds.length > 1 ? "s" : ""} selected
         </span>
         <div className="flex items-center gap-2">
           {activeTab === "eligible" && (
@@ -244,8 +260,9 @@ const StudentNominationPage = () => {
           )}
           <button
             onClick={() => setSelectedStudentIds([])}
-            className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${darkMode ? "border-[#3D3D3D] hover:bg-[#3D3D3D]" : "border-slate-300 hover:bg-slate-100"
-              }`}
+            className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${
+              darkMode ? "border-[#3D3D3D] hover:bg-[#3D3D3D]" : "border-slate-300 hover:bg-slate-100"
+            }`}
           >
             Clear
           </button>
@@ -254,7 +271,7 @@ const StudentNominationPage = () => {
     );
   };
 
-  /* ── Checkable NominationTable wrapper ──────────────────────────── */
+  /* ── Checkable Nomination Table Wrapper ────────────────────────── */
   const CheckableTable = ({ isNominated }) => {
     const tableStudents = currentStudents;
     const visibleIds = tableStudents.map((s) => s.id);
@@ -263,20 +280,27 @@ const StudentNominationPage = () => {
 
     return (
       <div className="flex min-w-0 h-full flex-1 flex-col">
-        {/* Select-all row */}
+        {/* Select-all top toolbar */}
         {selectedDriveId && tableStudents.length > 0 && (
-          <div className={`flex items-center gap-3 px-5 py-2.5 rounded-t-2xl border-b text-sm ${darkMode ? "bg-[#1A1A1A]/60 border-[#3D3D3D] text-slate-400" : "bg-slate-50 border-slate-200 text-slate-600"
-            }`}>
+          <div
+            className={`flex items-center gap-3 px-5 py-2.5 rounded-t-2xl border-b text-sm ${
+              darkMode
+                ? "bg-[#1A1A1A]/60 border-[#3D3D3D] text-slate-400"
+                : "bg-slate-50 border-slate-200 text-slate-600"
+            }`}
+          >
             <input
               type="checkbox"
               checked={allChecked}
-              ref={(el) => { if (el) el.indeterminate = someChecked && !allChecked; }}
+              ref={(el) => {
+                if (el) el.indeterminate = someChecked && !allChecked;
+              }}
               onChange={() => toggleSelectAll(tableStudents)}
               className="h-4 w-4 rounded accent-[#ff7a00] cursor-pointer"
-              aria-label="Select all visible students"
+              aria-label="Select all visible candidates"
             />
-            <span className="font-medium">
-              {allChecked ? "Deselect all" : `Select all ${visibleIds.length}`}
+            <span className="font-medium text-xs">
+              {allChecked ? "Deselect page" : `Select page (${visibleIds.length})`}
             </span>
           </div>
         )}
@@ -291,12 +315,15 @@ const StudentNominationPage = () => {
             setIsDetailOpen={setIsDetailOpen}
             onNominate={(s) => {
               if (selectedDriveId) {
-                // single nominate via bulk with one student
                 setBulkLoading(true);
                 bulkNominate([s.id]).then((res) => {
                   setBulkLoading(false);
-                  if (res.success) toast.success(`${s.name} nominated.`);
-                  else toast.error(res.message || "Nomination failed.");
+                  if (res?.success) {
+                    toast.success(`${s.name} nominated.`);
+                    refreshData();
+                  } else {
+                    toast.error(res?.message || "Nomination failed.");
+                  }
                 });
               } else {
                 setNominatingStudent(s);
@@ -314,9 +341,18 @@ const StudentNominationPage = () => {
             isDetailOpen={isDetailOpen}
             setSelectedStudent={setSelectedStudent}
             setIsDetailOpen={setIsDetailOpen}
-            onEditNomination={(s) => { setEditingStudent(s); setShowEditForm(true); }}
-            onRemoveNomination={(s) => { setRemovingStudent(s); setShowRemoveModal(true); }}
-            onReNominate={(s) => { setNominatingStudent(s); setShowNominationForm(true); }}
+            onEditNomination={(s) => {
+              setEditingStudent(s);
+              setShowEditForm(true);
+            }}
+            onRemoveNomination={(s) => {
+              setRemovingStudent(s);
+              setShowRemoveModal(true);
+            }}
+            onReNominate={(s) => {
+              setNominatingStudent(s);
+              setShowNominationForm(true);
+            }}
             onMarkSelected={() => refreshData()}
             selectedIds={selectedStudentIds}
             onToggleSelect={selectedDriveId ? toggleStudentSelect : null}
@@ -326,23 +362,20 @@ const StudentNominationPage = () => {
     );
   };
 
-  /* ── Render ─────────────────────────────────────────────────────── */
+  /* ── Render Component ───────────────────────────────────────────── */
   return (
     <div className="flex w-full max-w-full min-w-0 flex-col gap-6 px-2 py-4 sm:px-4 lg:px-6 overflow-hidden">
       <NominationStatistics />
 
-      {/* Drive selector — full width, prominent */}
+      {/* Drive Selector */}
       <div className="w-full">
         <p className={`mb-2 text-xs font-semibold uppercase tracking-wider ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
-          Select Placement Drive
+          Select Active Placement Drive
         </p>
-        <DriveSelector
-          selectedDriveId={selectedDriveId}
-          onDriveChange={handleDriveChange}
-        />
+        <DriveSelector selectedDriveId={selectedDriveId} onDriveChange={handleDriveChange} />
         {selectedDriveId && (
           <p className={`mt-1.5 text-xs ${darkMode ? "text-slate-500" : "text-slate-400"}`}>
-            Showing eligible students and nominations for the selected drive only.
+            Showing eligible candidates and active nominations filtered for selected drive.
           </p>
         )}
       </div>
@@ -354,7 +387,7 @@ const StudentNominationPage = () => {
         nominatedCount={nominatedStudents.length}
       />
 
-      {/* Search + mobile filter toggle */}
+      {/* Search Bar + Mobile Filter Toggle */}
       <div className="mt-2 flex gap-3 items-center w-full">
         <div className="flex-1 min-w-0">
           <SearchStudent value={searchQuery} onChange={handleFilterChange(setSearchQuery)} />
@@ -362,10 +395,11 @@ const StudentNominationPage = () => {
         <button
           onClick={() => setIsMobileFilterOpen(true)}
           aria-label="Toggle filters"
-          className={`md:hidden flex items-center justify-center p-3.5 rounded-2xl border relative shrink-0 transition-all duration-200 ${darkMode
-            ? "border-[#3D3D3D] bg-[#2D2D2D] hover:bg-[#3D3D3D] text-gray-300"
-            : "border-slate-300 bg-white hover:bg-slate-50 text-slate-600"
-            }`}
+          className={`md:hidden flex items-center justify-center p-3.5 rounded-2xl border relative shrink-0 transition-all ${
+            darkMode
+              ? "border-[#3D3D3D] bg-[#2D2D2D] text-gray-300 hover:bg-[#3D3D3D]"
+              : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
+          }`}
         >
           <Filter size={18} strokeWidth={2.2} />
           {hasActiveFilters && (
@@ -374,9 +408,12 @@ const StudentNominationPage = () => {
         </button>
       </div>
 
-      {/* Desktop filters */}
-      <div className={`hidden md:grid grid-cols-1 gap-4 w-full ${activeTab === "eligible" ? "md:grid-cols-3" : "md:grid-cols-2 xl:grid-cols-4"
-        }`}>
+      {/* Desktop Filters */}
+      <div
+        className={`hidden md:grid grid-cols-1 gap-4 w-full ${
+          activeTab === "eligible" ? "md:grid-cols-3" : "md:grid-cols-2 xl:grid-cols-4"
+        }`}
+      >
         <CompanyFilter value={selectedCompany} onChange={handleFilterChange(setSelectedCompany)} />
         <DepartmentFilter value={selectedDepartment} onChange={handleFilterChange(setSelectedDepartment)} />
         {activeTab === "nominated" && (
@@ -385,17 +422,23 @@ const StudentNominationPage = () => {
         <BatchFilter value={selectedBatch} onChange={handleFilterChange(setSelectedBatch)} />
       </div>
 
-      {/* Bulk action bar */}
+      {/* Bulk Action Bar */}
       <BulkActionBar />
 
-      {/* Mobile filter drawer */}
+      {/* Mobile Filter Drawer */}
       {isMobileFilterOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs md:hidden">
-          <div className={`w-full max-w-md rounded-t-3xl border-t shadow-2xl flex flex-col max-h-[85vh] ${darkMode ? "bg-[#1A1A1A] border-[#3D3D3D] text-white" : "bg-white border-slate-200 text-slate-800"
-            }`}>
+          <div
+            className={`w-full max-w-md rounded-t-3xl border-t shadow-2xl flex flex-col max-h-[85vh] ${
+              darkMode ? "bg-[#1A1A1A] border-[#3D3D3D] text-white" : "bg-white border-slate-200 text-slate-800"
+            }`}
+          >
             <div className={`flex items-center justify-between border-b p-5 shrink-0 ${darkMode ? "border-[#3D3D3D]" : "border-slate-100"}`}>
               <h3 className="text-base font-bold">Filter Options</h3>
-              <button onClick={() => setIsMobileFilterOpen(false)} className={`p-1.5 rounded-xl border ${darkMode ? "border-[#3D3D3D] bg-[#2D2D2D]" : "border-slate-200 bg-slate-50"}`}>
+              <button
+                onClick={() => setIsMobileFilterOpen(false)}
+                className={`p-1.5 rounded-xl border ${darkMode ? "border-[#3D3D3D] bg-[#2D2D2D]" : "border-slate-200 bg-slate-50"}`}
+              >
                 <X size={16} />
               </button>
             </div>
@@ -421,12 +464,25 @@ const StudentNominationPage = () => {
             </div>
             <div className={`grid grid-cols-2 gap-3 p-4 border-t shrink-0 ${darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-100 bg-white"}`}>
               <button
-                onClick={() => { setSelectedCompany(""); setSelectedDepartment(""); setSelectedBatch(""); setSelectedStatus(""); setIsMobileFilterOpen(false); }}
-                className={`w-full py-3 text-sm font-semibold rounded-xl border transition-colors ${darkMode ? "border-[#3D3D3D] text-gray-400 hover:text-white hover:bg-[#2D2D2D]" : "border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
+                onClick={() => {
+                  setSelectedCompany("");
+                  setSelectedDepartment("");
+                  setSelectedBatch("");
+                  setSelectedStatus("");
+                  setIsMobileFilterOpen(false);
+                }}
+                className={`w-full py-3 text-sm font-semibold rounded-xl border transition-colors ${
+                  darkMode
+                    ? "border-[#3D3D3D] text-gray-400 hover:text-white hover:bg-[#2D2D2D]"
+                    : "border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                }`}
               >
                 Clear
               </button>
-              <button onClick={() => setIsMobileFilterOpen(false)} className="w-full py-3 text-sm font-semibold rounded-xl bg-[#ff7a00] hover:bg-[#e06b00] text-white shadow-lg">
+              <button
+                onClick={() => setIsMobileFilterOpen(false)}
+                className="w-full py-3 text-sm font-semibold rounded-xl bg-[#ff7a00] hover:bg-[#e06b00] text-white shadow-lg"
+              >
                 Apply
               </button>
             </div>
@@ -434,7 +490,7 @@ const StudentNominationPage = () => {
         </div>
       )}
 
-      {/* Main content area */}
+      {/* Main Content Area */}
       {loading ? (
         <LoadingSpinner />
       ) : error ? (
@@ -443,64 +499,110 @@ const StudentNominationPage = () => {
         <StudentNominationForm
           student={nominatingStudent}
           selectedDrive={selectedDrive}
-          onClose={() => { setShowNominationForm(false); setNominatingStudent(null); }}
+          onClose={() => {
+            setShowNominationForm(false);
+            setNominatingStudent(null);
+          }}
           onSave={async (data) => {
             const res = await nominateStudent(data);
-            if (res.isValid) {
+            if (res?.isValid) {
               setShowNominationForm(false);
               setNominatingStudent(null);
-              toast.success(res.message || "Student nominated.");
+              toast.success(res.message || "Candidate nominated.");
+              refreshData();
             } else {
-              toast.error(res.errors?.service || res.errors?.student || "Failed to nominate.");
+              toast.error(res?.errors?.service || res?.errors?.student || "Failed to nominate.");
             }
           }}
         />
       ) : showEditForm ? (
         <EditNominationForm
           student={editingStudent}
-          onClose={() => { setShowEditForm(false); setEditingStudent(null); }}
-          onSave={async () => { await refreshData(); setShowEditForm(false); setEditingStudent(null); }}
+          onClose={() => {
+            setShowEditForm(false);
+            setEditingStudent(null);
+          }}
+          onSave={async () => {
+            await refreshData();
+            setShowEditForm(false);
+            setEditingStudent(null);
+          }}
         />
       ) : showRemoveModal ? (
         <RemoveNominationModal
           student={removingStudent}
-          onClose={() => { setShowRemoveModal(false); setRemovingStudent(null); }}
-          onRemove={async () => { await refreshData(); setShowRemoveModal(false); setRemovingStudent(null); }}
+          onClose={() => {
+            setShowRemoveModal(false);
+            setRemovingStudent(null);
+          }}
+          onRemove={async () => {
+            await refreshData();
+            setShowRemoveModal(false);
+            setRemovingStudent(null);
+          }}
         />
       ) : totalStudents === 0 ? (
         <EmptyState
-          title={selectedDriveId ? "No students match this drive" : "No students found"}
-          description={selectedDriveId ? "No eligible students meet this drive's criteria." : "Try clearing filters or selecting a drive."}
+          title={selectedDriveId ? "No candidates match this drive" : "No candidates found"}
+          description={
+            selectedDriveId
+              ? "No eligible candidates meet this drive's criteria."
+              : "Try clearing active search filters or selecting a placement drive."
+          }
         />
       ) : (
         <>
-          {/* Desktop table + details panel */}
+          {/* Desktop View */}
           <div className="hidden md:flex h-167 gap-4 min-w-0">
             <CheckableTable isNominated={activeTab === "nominated"} />
             <div className={`h-full overflow-hidden transition-all duration-300 ease-in-out ${isDetailOpen ? "w-[520px] shrink-0" : "w-0"}`}>
-              <NominationDetails student={selectedStudent} isOpen={isDetailOpen} onClose={() => { setSelectedStudent(null); setIsDetailOpen(false); }} />
+              <NominationDetails
+                student={selectedStudent}
+                isOpen={isDetailOpen}
+                onClose={() => {
+                  setSelectedStudent(null);
+                  setIsDetailOpen(false);
+                }}
+              />
             </div>
           </div>
 
-          {/* Mobile card layout */}
+          {/* Mobile Card View */}
           <div className="block md:hidden">
             <NominationCard
               students={currentStudents}
               hasSearched={true}
               activeTab={activeTab}
-              onNominate={(s) => { setNominatingStudent(s); setShowNominationForm(true); }}
-              onEditNomination={(s) => { setEditingStudent(s); setShowEditForm(true); }}
-              onRemoveNomination={(s) => { setRemovingStudent(s); setShowRemoveModal(true); }}
-              onReNominate={(s) => { setNominatingStudent(s); setShowNominationForm(true); }}
+              onNominate={(s) => {
+                setNominatingStudent(s);
+                setShowNominationForm(true);
+              }}
+              onEditNomination={(s) => {
+                setEditingStudent(s);
+                setShowEditForm(true);
+              }}
+              onRemoveNomination={(s) => {
+                setRemovingStudent(s);
+                setShowRemoveModal(true);
+              }}
+              onReNominate={(s) => {
+                setNominatingStudent(s);
+                setShowNominationForm(true);
+              }}
               onMarkSelected={() => refreshData()}
               getStudentActions={(s) => {
                 switch (s.status) {
                   case "Waiting":
-                  case "Nominated": return { canEdit: true, canRemove: true };
-                  case "Rejected": return { canReNominate: true };
-                  case "Shortlisted": return { canMarkSelected: true };
-                  case "Selected": return { isSelected: true };
-                  default: return {};
+                  case "Nominated":
+                    return { canEdit: true, canRemove: true };
+                  case "Rejected":
+                    return { canReNominate: true };
+                  case "Shortlisted":
+                    return { canMarkSelected: true };
+                  case "Selected":
+                    return { isSelected: true };
+                  default:
+                    return {};
                 }
               }}
             />
@@ -508,15 +610,31 @@ const StudentNominationPage = () => {
         </>
       )}
 
-      {totalStudents > itemsPerPage && (
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-      )}
+      {/* Dynamic Server/Client Pagination Component */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        pageSize={itemsPerPage}
+        totalItems={totalStudents}
+        onPageChange={(page) => setCurrentPage(page)}
+        onPageSizeChange={(size) => {
+          setItemsPerPage(size);
+          setCurrentPage(1);
+        }}
+      />
 
       <div className="w-full min-w-0 max-w-full overflow-hidden">
-        <ShortlistedStudents limit={shortlistLimit} />
+        <ShortlistedStudents />
       </div>
     </div>
   );
 };
 
-export default StudentNominationPage;
+/* ── Exported Page Wrapper Component ──────────────────────────────── */
+export default function StudentNominationPage(props) {
+  return (
+    <QueryClientProvider client={moduleQueryClient}>
+      <StudentNominationContent {...props} />
+    </QueryClientProvider>
+  );
+}

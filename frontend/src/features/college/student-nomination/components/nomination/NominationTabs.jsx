@@ -1,28 +1,30 @@
 import { useOutletContext } from "react-router-dom";
 
 const NominationTabs = ({
-  activeTab,
+  activeTab = "eligible",
   setActiveTab,
-  eligibleCount,
-  nominatedCount,
+  eligibleCount = 0,
+  nominatedCount = 0,
 }) => {
-  const { darkMode } = useOutletContext();
+  // Safe destructuring in case component is used outside an Outlet context
+  const { darkMode = false } = useOutletContext() || {};
 
   const tabs = [
     {
       id: "eligible",
       label: "Eligible Students",
-      count: eligibleCount,
+      count: Number(eligibleCount) || 0,
     },
     {
       id: "nominated",
       label: "Nominated Students",
-      count: nominatedCount,
+      count: Number(nominatedCount) || 0,
     },
   ];
 
   return (
     <div
+      role="tablist"
       className={`mb-6 flex items-center rounded-2xl border p-1 ${
         darkMode
           ? "border-[#3D3D3D] bg-[#2D2D2D]"
@@ -35,10 +37,14 @@ const NominationTabs = ({
         return (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            role="tab"
+            aria-selected={active}
+            onClick={() => setActiveTab && setActiveTab(tab.id)}
             className={`flex flex-1 items-center justify-center gap-3 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 ${
               active
-                ? darkMode ? "bg-[#ff6d34] text-white shadow-lg" : "bg-[#ff7a00] text-white shadow-lg"
+                ? darkMode
+                  ? "bg-[#ff6d34] text-white shadow-lg"
+                  : "bg-[#ff7a00] text-white shadow-lg"
                 : darkMode
                   ? "text-gray-300 hover:bg-[#3D3D3D]"
                   : "text-slate-600 hover:bg-slate-100"
@@ -47,7 +53,7 @@ const NominationTabs = ({
             <span>{tab.label}</span>
 
             <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+              className={`rounded-full px-2.5 py-0.5 text-xs font-bold transition-colors ${
                 active
                   ? "bg-white/20 text-white"
                   : darkMode

@@ -7,7 +7,8 @@ const DepartmentFilter = ({
   onChange,
   departments = ["Computer Science", "Information Technology", "Electronics", "Mechanical"],
 }) => {
-  const { darkMode } = useOutletContext();
+  // Safe outlet context fallback
+  const { darkMode = false } = useOutletContext() || {};
   const [isOpen, setIsOpen] = useState(false);
   const [typeQuery, setTypeQuery] = useState("");
   const dropdownRef = useRef(null);
@@ -36,11 +37,13 @@ const DepartmentFilter = ({
   }, [typeQuery, departments]);
 
   const triggerChange = (targetValue) => {
-    onChange({
-      target: {
-        value: targetValue,
-      },
-    });
+    if (onChange) {
+      onChange({
+        target: {
+          value: targetValue,
+        },
+      });
+    }
     setIsOpen(false);
     setTypeQuery("");
   };
@@ -64,7 +67,7 @@ const DepartmentFilter = ({
           size={18}
           className={`shrink-0 ${darkMode ? "text-slate-400" : "text-slate-500"}`}
         />
-        <div className={`flex-1 text-sm font-medium ${darkMode ? "text-white" : "text-slate-700"}`}>
+        <div className={`flex-1 text-sm font-medium truncate ${darkMode ? "text-white" : "text-slate-700"}`}>
           {displayLabel}
         </div>
         <ChevronDown
@@ -79,7 +82,7 @@ const DepartmentFilter = ({
         <div
           onClick={(e) => e.stopPropagation()}
           className={`absolute left-0 right-0 mt-2 z-50 pointer-events-auto rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-64 ${
-            darkMode               ? "border-[#3D3D3D] bg-[#2D2D2D] text-white" : "border-slate-200 bg-white text-slate-800"
+            darkMode ? "border-[#3D3D3D] bg-[#2D2D2D] text-white" : "border-slate-200 bg-white text-slate-800"
           }`}
         >
           <div
@@ -93,27 +96,39 @@ const DepartmentFilter = ({
               placeholder="Type to filter..."
               value={typeQuery}
               onChange={(e) => setTypeQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-xs py-1 placeholder:text-slate-400"
+              className={`flex-1 bg-transparent border-none outline-none text-xs py-1 ${
+                darkMode
+                  ? "text-white placeholder:text-slate-500"
+                  : "text-slate-800 placeholder:text-slate-400"
+              }`}
               autoFocus
             />
             {typeQuery && (
               <button
                 type="button"
                 onClick={() => setTypeQuery("")}
-                className={`p-0.5 rounded-full ${darkMode ? "hover:bg-slate-700" : "hover:bg-slate-200"}`}
+                aria-label="Clear filter search"
+                className={`p-0.5 rounded-full ${darkMode ? "hover:bg-slate-700 text-slate-300" : "hover:bg-slate-200 text-slate-600"}`}
               >
                 <X size={12} />
               </button>
             )}
           </div>
 
-          <div className="overflow-y-auto flex-1 py-1 custom-scrollbar">
+          <div
+            className={`overflow-y-auto flex-1 py-1 text-sm
+              [&::-webkit-scrollbar]:w-1.5
+              ${darkMode 
+                ? "[&::-webkit-scrollbar-track]:bg-[#2D2D2D] [&::-webkit-scrollbar-thumb]:bg-[#3D3D3D] hover:[&::-webkit-scrollbar-thumb]:bg-[#4D4D4D] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-thin] [scrollbar-color:#3D3D3D_#2D2D2D]" 
+                : "[&::-webkit-scrollbar-track]:bg-white [&::-webkit-scrollbar-thumb]:bg-slate-200 hover:[&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-thin] [scrollbar-color:#e2e8f0_#ffffff]"
+              }`}
+          >
             <div
               onMouseDown={(e) => {
                 e.preventDefault();
                 triggerChange("");
               }}
-              className={`px-4 py-2.5 text-sm cursor-pointer font-medium transition-colors ${
+              className={`px-4 py-2.5 cursor-pointer font-medium transition-colors ${
                 value === "" ? (darkMode ? "bg-[#ff6d34] text-white" : "bg-orange-50 text-[#ff7a00]") : (darkMode ? "hover:bg-slate-700/60" : "hover:bg-slate-50")
               }`}
             >
@@ -121,14 +136,14 @@ const DepartmentFilter = ({
             </div>
 
             {filteredOptions.length > 0 ? (
-              filteredOptions.map((dept, index) => (
+              filteredOptions.map((dept) => (
                 <div
-                  key={index}
+                  key={dept}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     triggerChange(dept);
                   }}
-                  className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
+                  className={`px-4 py-2.5 cursor-pointer transition-colors ${
                     value === dept ? (darkMode ? "bg-[#ff6d34] text-white" : "bg-orange-50 text-[#ff7a00]") : (darkMode ? "hover:bg-slate-700/60" : "hover:bg-slate-50")
                   }`}
                 >
@@ -136,7 +151,7 @@ const DepartmentFilter = ({
                 </div>
               ))
             ) : (
-              <div className={`px-4 py-3 text-xs text-center select-none italic ${darkMode ? "text-slate-500" : "text-slate-400"}`}>
+              <div className={`px-4 py-8 text-xs text-center select-none italic ${darkMode ? "text-slate-500" : "text-slate-400"}`}>
                 No matching departments found
               </div>
             )}

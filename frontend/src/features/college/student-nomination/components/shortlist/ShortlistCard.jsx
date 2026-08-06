@@ -1,20 +1,33 @@
 import { Building2, Briefcase, IndianRupee, CircleCheckBig } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
-import { formatPackage } from "../../utils/studentNominationHelpers";
+import { formatPackage, formatDate } from "../../utils/studentNominationHelpers";
 import StatusBadge from "../common/StatusBadge";
 
 const ShortlistCard = ({ student, variant = "dashboard" }) => {
-  const { darkMode } = useOutletContext();
+  // Safe destructuring in case component is used outside an Outlet context
+  const { darkMode = false } = useOutletContext() || {};
 
   /* =====================================
-        FALLBACK VALUES
+        FALLBACK & NORMALIZED VALUES
   ====================================== */
-  const studentName = student?.student || "--";
-  const company = student?.company || "--";
-  const role = student?.role || "--";
-  const packageValue = formatPackage(student?.package);
-  const shortlistedDate = student?.shortlistedDate || "--";
-  const companyInitial = student?.company?.charAt(0) || "?";
+  const studentName =
+    student?.student ||
+    student?.student_name ||
+    student?.name ||
+    (`${student?.first_name || ""} ${student?.last_name || ""}`.trim()) ||
+    "--";
+
+  const company = student?.company || student?.company_name || "--";
+  const role = student?.role || student?.job_title || "--";
+  const packageValue = formatPackage(student?.package || student?.ctc);
+  
+  const rawDate = student?.shortlistedDate || student?.shortlisted_date || student?.created_at;
+  const shortlistedDate = rawDate ? formatDate(rawDate) : "--";
+
+  const companyInitial = company !== "--" ? company.charAt(0).toUpperCase() : "?";
+  
+  const statusUpper = (student?.status || "").toUpperCase();
+  const isSelected = student?.selected || student?.is_selected || statusUpper === "SELECTED";
 
   /* =====================================
         Compact Variant
@@ -30,7 +43,7 @@ const ShortlistCard = ({ student, variant = "dashboard" }) => {
       >
         <div>
           {/* Selected Badge */}
-          {student?.selected && (
+          {isSelected && (
             <div
               className={`absolute right-4 top-4 flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold ${
                 darkMode
@@ -63,7 +76,7 @@ const ShortlistCard = ({ student, variant = "dashboard" }) => {
 
         {/* Status */}
         <div className="mt-5 pt-2">
-          <StatusBadge status={student.status} />
+          <StatusBadge status={student?.status || "SHORTLISTED"} />
         </div>
       </div>
     );
@@ -88,7 +101,7 @@ const ShortlistCard = ({ student, variant = "dashboard" }) => {
               : "border-slate-200 bg-slate-100 text-slate-700 group-hover:shadow-[#ff7a00]/40"
           }`}
         >
-          {student.logo ? (
+          {student?.logo ? (
             <img src={student.logo} alt={company} className="h-full w-full rounded-2xl object-cover" />
           ) : (
             companyInitial

@@ -1,8 +1,9 @@
 import { Check, Clock3, X, BadgeCheck } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 
-const NominationStatus = ({ status, timeline = {} }) => {
-  const { darkMode } = useOutletContext();
+const NominationStatus = ({ status = "Nominated", timeline = {} }) => {
+  // Safe outlet context destructuring
+  const { darkMode = false } = useOutletContext() || {};
 
   // 1. COMPLETELY ISOLATED PATHS: A candidate can never be both Shortlisted and Rejected
   const getStatusFlow = () => {
@@ -14,7 +15,7 @@ const NominationStatus = ({ status, timeline = {} }) => {
     if (status === "Rejected") {
       return [...baseFlow, { key: "rejected", label: "Rejected" }];
     }
-    
+
     if (status === "Selected") {
       return [
         ...baseFlow,
@@ -27,7 +28,7 @@ const NominationStatus = ({ status, timeline = {} }) => {
       return [...baseFlow, { key: "shortlisted", label: "Shortlisted" }];
     }
 
-    // Default fallback line for "Nominated" or "Waiting" statuses
+    // Default fallback line for "Nominated", "Waiting", or unknown statuses
     return baseFlow;
   };
 
@@ -36,10 +37,13 @@ const NominationStatus = ({ status, timeline = {} }) => {
   const getStatusState = (stepLabel) => {
     const labels = currentFlow.map((item) => item.label);
     const currentIndex = labels.indexOf(status);
+
+    // Fallback if status isn't directly in the flow list
+    const activeIndex = currentIndex !== -1 ? currentIndex : 0;
     const stepIndex = labels.indexOf(stepLabel);
 
-    if (stepIndex < currentIndex) return "completed";
-    if (stepIndex === currentIndex) return "current";
+    if (stepIndex < activeIndex) return "completed";
+    if (stepIndex === activeIndex) return "current";
     return "upcoming";
   };
 
@@ -54,7 +58,7 @@ const NominationStatus = ({ status, timeline = {} }) => {
           </div>
         );
 
-      case "current":
+      case "current": {
         let bgClass = "bg-amber-500";
         let Icon = Clock3;
 
@@ -71,6 +75,7 @@ const NominationStatus = ({ status, timeline = {} }) => {
             <Icon size={18} strokeWidth={2.5} />
           </div>
         );
+      }
 
       default:
         return (
@@ -85,6 +90,24 @@ const NominationStatus = ({ status, timeline = {} }) => {
     }
   };
 
+  const formatTimestamp = (val) => {
+    if (!val) return "Pending";
+    // If it's an ISO date string, format nicely
+    if (typeof val === "string" && val.includes("T")) {
+      const parsed = new Date(val);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+    }
+    return val;
+  };
+
   return (
     <div
       className={`rounded-3xl border p-6 ${
@@ -97,8 +120,8 @@ const NominationStatus = ({ status, timeline = {} }) => {
           status === "Shortlisted" || status === "Selected"
             ? "border-emerald-500/20 bg-emerald-500/10"
             : status === "Rejected"
-              ? "border-red-500/20 bg-red-500/10"
-              : "border-amber-500/20 bg-amber-500/10"
+            ? "border-red-500/20 bg-red-500/10"
+            : "border-amber-500/20 bg-amber-500/10"
         }`}
       >
         <p
@@ -114,8 +137,8 @@ const NominationStatus = ({ status, timeline = {} }) => {
             status === "Shortlisted" || status === "Selected"
               ? "text-emerald-500"
               : status === "Rejected"
-                ? "text-red-500"
-                : "text-amber-500"
+              ? "text-red-500"
+              : "text-amber-500"
           }`}
         >
           {status}
@@ -138,43 +161,46 @@ const NominationStatus = ({ status, timeline = {} }) => {
           return (
             <div key={step.key} className="relative flex items-start gap-4">
               {/* Indicator */}
-              <div className="relative z-10">{getIndicator(step.label)}</div>
+              <div className="relative z-10 shrink-0">{getIndicator(step.label)}</div>
 
-              {/* Connector */}
+              {/* Seamless Connector Line */}
               {index !== currentFlow.length - 1 && (
                 <div
-                  className={`absolute left-[19px] top-10 h-12 w-0.5 ${
-                    state === "completed" || (state === "current" && step.label !== "Rejected" && step.label !== "Selected")
+                  className={`absolute left-[19px] top-10 bottom-0 w-0.5 ${
+                    state === "completed" ||
+                    (state === "current" &&
+                      step.label !== "Rejected" &&
+                      step.label !== "Selected")
                       ? "bg-emerald-500"
                       : darkMode
-                        ? "bg-slate-700"
-                        : "bg-slate-300"
+                      ? "bg-slate-700"
+                      : "bg-slate-300"
                   }`}
                 />
               )}
 
               {/* Content text */}
-              <div className="pt-1">
+              <div className="pt-1 pb-2">
                 <h4
                   className={`font-semibold ${
                     state === "completed"
                       ? "text-emerald-500"
                       : state === "current"
-                        ? step.label === "Rejected"
-                          ? "text-red-500"
-                          : step.label === "Selected"
-                            ? "text-emerald-600"
-                            : "text-amber-500"
-                        : darkMode
-                          ? "text-slate-300"
-                          : "text-slate-600"
+                      ? step.label === "Rejected"
+                        ? "text-red-500"
+                        : step.label === "Selected"
+                        ? "text-emerald-600"
+                        : "text-amber-500"
+                      : darkMode
+                      ? "text-slate-300"
+                      : "text-slate-600"
                   }`}
                 >
                   {step.label}
                 </h4>
 
                 <p className={`mt-1 text-sm ${darkMode ? "text-slate-500" : "text-slate-400"}`}>
-                  {timeline?.[step.key] || "Pending"}
+                  {formatTimestamp(timeline?.[step.key])}
                 </p>
               </div>
             </div>

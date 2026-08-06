@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import {
   Building2,
@@ -15,13 +15,13 @@ import api from "../../../../../services/api";
  * CompanyDropdown
  *
  * Props:
- *   value        — currently selected company object { id, name, industry, logo_url } or null
- *   onChange     — (company | null) => void
- *   error        — error string from parent validation
- *   disabled     — boolean
+ *  value       — currently selected company object { id, name, industry, logo_url } or null
+ *  onChange    — (company | null) => void
+ *  error       — error string from parent validation
+ *  disabled    — boolean
  */
 const CompanyDropdown = ({ value, onChange, error, disabled = false }) => {
-  const { darkMode } = useOutletContext();
+  const { darkMode = false } = useOutletContext() || {};
 
   const [companies, setCompanies]   = useState([]);
   const [filtered, setFiltered]     = useState([]);
@@ -145,7 +145,6 @@ const CompanyDropdown = ({ value, onChange, error, disabled = false }) => {
           break;
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isOpen, filtered, focusedIdx]
   );
 
@@ -251,7 +250,7 @@ const CompanyDropdown = ({ value, onChange, error, disabled = false }) => {
             tabIndex={0}
             onClick={clear}
             onKeyDown={(e) => e.key === "Enter" && clear(e)}
-            className={`shrink-0 rounded-md p-0.5 transition
+            className={`shrink-0 rounded-md p-0.5 transition cursor-pointer
               ${darkMode ? "hover:bg-[#3D3D3D] text-slate-400" : "hover:bg-slate-200 text-slate-500"}`}
           >
             <X size={14} />
@@ -293,7 +292,7 @@ const CompanyDropdown = ({ value, onChange, error, disabled = false }) => {
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className={`rounded p-0.5 ${darkMode ? "hover:bg-[#3D3D3D] text-slate-400" : "hover:bg-slate-100 text-slate-400"}`}
+                className={`rounded p-0.5 cursor-pointer ${darkMode ? "hover:bg-[#3D3D3D] text-slate-400" : "hover:bg-slate-100 text-slate-400"}`}
               >
                 <X size={12} />
               </button>
@@ -381,7 +380,7 @@ const CompanyDropdown = ({ value, onChange, error, disabled = false }) => {
                     {isSelected && (
                       <CheckCircle2
                         size={15}
-                        className="shrink-0 text-[#ff7a00]"
+                        className={`shrink-0 ${darkMode ? "text-[#ff6d34]" : "text-[#ff7a00]"}`}
                       />
                     )}
                   </div>

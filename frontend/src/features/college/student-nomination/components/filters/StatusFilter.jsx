@@ -7,7 +7,8 @@ const StatusFilter = ({
   onChange,
   statuses = ["Eligible", "Nominated", "Shortlisted", "Waiting", "Rejected"],
 }) => {
-  const { darkMode } = useOutletContext();
+  // Safe outlet context fallback
+  const { darkMode = false } = useOutletContext() || {};
   const [isOpen, setIsOpen] = useState(false);
   const [typeQuery, setTypeQuery] = useState("");
   const dropdownRef = useRef(null);
@@ -36,11 +37,13 @@ const StatusFilter = ({
   }, [typeQuery, statuses]);
 
   const triggerChange = (targetValue) => {
-    onChange({
-      target: {
-        value: targetValue,
-      },
-    });
+    if (onChange) {
+      onChange({
+        target: {
+          value: targetValue,
+        },
+      });
+    }
     setIsOpen(false);
     setTypeQuery("");
   };
@@ -64,7 +67,7 @@ const StatusFilter = ({
           size={18}
           className={`shrink-0 ${darkMode ? "text-slate-400" : "text-slate-500"}`}
         />
-        <div className={`flex-1 text-sm font-medium ${darkMode ? "text-white" : "text-slate-700"}`}>
+        <div className={`flex-1 text-sm font-medium truncate ${darkMode ? "text-white" : "text-slate-700"}`}>
           {displayLabel}
         </div>
         <ChevronDown
@@ -93,20 +96,24 @@ const StatusFilter = ({
               placeholder="Type to filter..."
               value={typeQuery}
               onChange={(e) => setTypeQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-xs py-1 placeholder:text-slate-400"
+              className={`flex-1 bg-transparent border-none outline-none text-xs py-1 ${
+                darkMode
+                  ? "text-white placeholder:text-slate-500"
+                  : "text-slate-800 placeholder:text-slate-400"
+              }`}
               autoFocus
             />
             {typeQuery && (
               <button
                 type="button"
                 onClick={() => setTypeQuery("")}
-                className={`p-0.5 rounded-full ${darkMode ? "hover:bg-slate-700" : "hover:bg-slate-200"}`}
+                className={`p-0.5 rounded-full ${darkMode ? "hover:bg-slate-700 text-slate-300" : "hover:bg-slate-200 text-slate-600"}`}
+                aria-label="Clear filter search"
               >
                 <X size={12} />
               </button>
             )}
           </div>
-
 
           <div 
             className={`overflow-y-auto flex-1 py-1 text-sm
@@ -125,13 +132,13 @@ const StatusFilter = ({
                 value === "" ? (darkMode ? "bg-[#ff6d34] text-white" : "bg-orange-50 text-[#ff7a00]") : (darkMode ? "hover:bg-slate-700/60" : "hover:bg-slate-50")
               }`}
             >
-              Status
+              All Statuses
             </div>
 
             {filteredOptions.length > 0 ? (
-              filteredOptions.map((status, index) => (
+              filteredOptions.map((status) => (
                 <div
-                  key={index}
+                  key={status}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     triggerChange(status);

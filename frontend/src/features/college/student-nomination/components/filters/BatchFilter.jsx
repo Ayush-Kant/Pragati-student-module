@@ -9,11 +9,13 @@ const defaultBatches = Array.from(
 );
 
 const BatchFilter = ({ value, onChange, batches = defaultBatches }) => {
-  const { darkMode } = useOutletContext();
+  // Safe context fallback prevents crashes outside Outlet context
+  const { darkMode = false } = useOutletContext() || {};
   const [isOpen, setIsOpen] = useState(false);
   const [typeQuery, setTypeQuery] = useState("");
   const dropdownRef = useRef(null);
 
+  // Close dropdown on outside clicks
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -24,11 +26,13 @@ const BatchFilter = ({ value, onChange, batches = defaultBatches }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Compute label shown in the selected header box
   const displayLabel = useMemo(() => {
     if (!value) return "All Batches";
     return value;
   }, [value]);
 
+  // Filter options dynamically based on search query
   const filteredOptions = useMemo(() => {
     const query = typeQuery.trim().toLowerCase();
     if (!query) return batches;
@@ -37,18 +41,22 @@ const BatchFilter = ({ value, onChange, batches = defaultBatches }) => {
     );
   }, [typeQuery, batches]);
 
+  // Formats synthetic target event structure safely
   const triggerChange = (targetValue) => {
-    onChange({
-      target: {
-        value: targetValue,
-      },
-    });
+    if (onChange) {
+      onChange({
+        target: {
+          value: targetValue,
+        },
+      });
+    }
     setIsOpen(false);
     setTypeQuery("");
   };
 
   return (
     <div ref={dropdownRef} className="relative w-full">
+      {/* Selection Box Shell Frame */}
       <div
         onClick={() => setIsOpen((prev) => !prev)}
         className={`flex items-center gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition-all duration-200 ease-out select-none
@@ -66,7 +74,7 @@ const BatchFilter = ({ value, onChange, batches = defaultBatches }) => {
           size={18}
           className={`shrink-0 ${darkMode ? "text-slate-400" : "text-slate-500"}`}
         />
-        <div className={`flex-1 text-sm font-medium ${darkMode ? "text-white" : "text-slate-700"}`}>
+        <div className={`flex-1 text-sm font-medium truncate ${darkMode ? "text-white" : "text-slate-700"}`}>
           {displayLabel}
         </div>
         <ChevronDown
@@ -77,6 +85,7 @@ const BatchFilter = ({ value, onChange, batches = defaultBatches }) => {
         />
       </div>
 
+      {/* Floating Dropdown Layer */}
       {isOpen && (
         <div
           onClick={(e) => e.stopPropagation()}
@@ -84,6 +93,7 @@ const BatchFilter = ({ value, onChange, batches = defaultBatches }) => {
             darkMode ? "border-[#3D3D3D] bg-[#2D2D2D] text-white" : "border-slate-200 bg-white text-slate-800"
           }`}
         >
+          {/* Internal Input Search Engine */}
           <div
             className={`flex items-center gap-2 px-3 py-2 border-b shrink-0 ${
               darkMode ? "border-[#3D3D3D] bg-[#1A1A1A]" : "border-slate-100 bg-slate-50"
@@ -95,27 +105,41 @@ const BatchFilter = ({ value, onChange, batches = defaultBatches }) => {
               placeholder="Type to filter..."
               value={typeQuery}
               onChange={(e) => setTypeQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-xs py-1 placeholder:text-slate-400"
+              className={`flex-1 bg-transparent border-none outline-none text-xs py-1 ${
+                darkMode
+                  ? "text-white placeholder:text-slate-500"
+                  : "text-slate-800 placeholder:text-slate-400"
+              }`}
               autoFocus
             />
             {typeQuery && (
               <button
                 type="button"
                 onClick={() => setTypeQuery("")}
-                className={`p-0.5 rounded-full ${darkMode ? "hover:bg-slate-700" : "hover:bg-slate-200"}`}
+                aria-label="Clear batch filter search"
+                className={`p-0.5 rounded-full ${darkMode ? "hover:bg-slate-700 text-slate-300" : "hover:bg-slate-200 text-slate-600"}`}
               >
                 <X size={12} />
               </button>
             )}
           </div>
 
-          <div className="overflow-y-auto flex-1 py-1 custom-scrollbar">
+          {/* Scrollable Options List */}
+          <div
+            className={`overflow-y-auto flex-1 py-1 text-sm
+              [&::-webkit-scrollbar]:w-1.5
+              ${
+                darkMode
+                  ? "[&::-webkit-scrollbar-track]:bg-[#2D2D2D] [&::-webkit-scrollbar-thumb]:bg-[#3D3D3D] hover:[&::-webkit-scrollbar-thumb]:bg-[#4D4D4D] [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-thin] [scrollbar-color:#3D3D3D_#2D2D2D]"
+                  : "[&::-webkit-scrollbar-track]:bg-white [&::-webkit-scrollbar-thumb]:bg-slate-200 hover:[&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-thin] [scrollbar-color:#e2e8f0_#ffffff]"
+              }`}
+          >
             <div
               onMouseDown={(e) => {
                 e.preventDefault();
                 triggerChange("");
               }}
-              className={`px-4 py-2.5 text-sm cursor-pointer font-medium transition-colors ${
+              className={`px-4 py-2.5 cursor-pointer font-medium transition-colors ${
                 value === "" ? (darkMode ? "bg-[#ff6d34] text-white" : "bg-orange-50 text-[#ff7a00]") : (darkMode ? "hover:bg-slate-700/60" : "hover:bg-slate-50")
               }`}
             >
@@ -123,14 +147,14 @@ const BatchFilter = ({ value, onChange, batches = defaultBatches }) => {
             </div>
 
             {filteredOptions.length > 0 ? (
-              filteredOptions.map((batch, index) => (
+              filteredOptions.map((batch) => (
                 <div
-                  key={index}
+                  key={batch}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     triggerChange(batch.toString());
                   }}
-                  className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
+                  className={`px-4 py-2.5 cursor-pointer transition-colors ${
                     value === batch.toString() ? (darkMode ? "bg-[#ff6d34] text-white" : "bg-orange-50 text-[#ff7a00]") : (darkMode ? "hover:bg-slate-700/60" : "hover:bg-slate-50")
                   }`}
                 >
@@ -138,7 +162,7 @@ const BatchFilter = ({ value, onChange, batches = defaultBatches }) => {
                 </div>
               ))
             ) : (
-              <div className={`px-4 py-3 text-xs text-center select-none italic ${darkMode ? "text-slate-500" : "text-slate-400"}`}>
+              <div className={`px-4 py-8 text-xs text-center select-none italic ${darkMode ? "text-slate-500" : "text-slate-400"}`}>
                 No matching batches found
               </div>
             )}

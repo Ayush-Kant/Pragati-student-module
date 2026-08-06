@@ -1,12 +1,23 @@
 import { useOutletContext } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 const SearchStudent = ({
-  value,
+  value = "",
   onChange,
   placeholder = "Search Name or Enrollment Number",
 }) => {
-  const { darkMode } = useOutletContext();
+  // Safe outlet context fallback
+  const { darkMode = false } = useOutletContext() || {};
+
+  const handleClear = () => {
+    if (onChange) {
+      onChange({
+        target: {
+          value: "",
+        },
+      });
+    }
+  };
 
   return (
     <div
@@ -29,10 +40,26 @@ const SearchStudent = ({
         placeholder={placeholder}
         autoComplete="off"
         aria-label="Search Students"
-        className={`flex-1 bg-transparent outline-none text-sm ${
-          darkMode ? "text-white placeholder:text-slate-500" : "text-slate-900 placeholder:text-slate-400"
+        className={`flex-1 bg-transparent outline-none text-sm [&::-webkit-search-cancel-button]:appearance-none ${
+          darkMode
+            ? "text-white placeholder:text-slate-500"
+            : "text-slate-900 placeholder:text-slate-400"
         }`}
       />
+      {value && (
+        <button
+          type="button"
+          onClick={handleClear}
+          aria-label="Clear search input"
+          className={`p-0.5 rounded-full transition-colors shrink-0 ${
+            darkMode
+              ? "text-slate-400 hover:text-white hover:bg-[#3D3D3D]"
+              : "text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+          }`}
+        >
+          <X size={16} />
+        </button>
+      )}
     </div>
   );
 };
