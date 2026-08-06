@@ -1,54 +1,60 @@
-import React from 'react';
-import { Calendar, User, Code, Layers, ShieldCheck } from 'lucide-react';
-import { formatDate } from '../../utils/projectHelpers';
+import React from "react";
+import { CheckCircle2, Clock, ListTodo, Award } from "lucide-react";
 
-export const ProjectOverview = ({ project }) => {
-  const { category, course, startDate, dueDate, techStack = [], mentor } = project;
+export const ProjectOverview = ({ project, milestones = [] }) => {
+  const totalTasks = milestones.reduce((acc, m) => acc + (m.tasks?.length || 0), 0);
+  const completedTasks = milestones.reduce(
+    (acc, m) => acc + (m.tasks?.filter((t) => t.status === "COMPLETED").length || 0),
+    0
+  );
+  const completedMilestones = milestones.filter((m) => m.status === "COMPLETED").length;
+
+  const stats = [
+    {
+      label: "Overall Completion",
+      value: `${project?.progressPercent || 0}%`,
+      icon: CheckCircle2,
+      color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50",
+    },
+    {
+      label: "Milestones Reached",
+      value: `${completedMilestones} / ${milestones.length}`,
+      icon: Award,
+      color: "text-brand-600 bg-brand-50 dark:bg-brand-950/50",
+    },
+    {
+      label: "Tasks Completed",
+      value: `${completedTasks} / ${totalTasks}`,
+      icon: ListTodo,
+      color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-950/50",
+    },
+    {
+      label: "Status",
+      value: project?.status?.replace("_", " ") || "In Progress",
+      icon: Clock,
+      color: "text-amber-600 bg-amber-50 dark:bg-amber-950/50",
+    },
+  ];
 
   return (
-    <div className="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 shadow-md">
-      <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center gap-2">
-        <Layers className="w-4 h-4 text-indigo-400" /> Project Metadata Overview
-      </h3>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-700/40">
-          <p className="text-xs text-slate-400 font-medium mb-1">Course / Domain</p>
-          <p className="text-sm font-semibold text-slate-200">{course || category}</p>
-        </div>
-
-        <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-700/40">
-          <p className="text-xs text-slate-400 font-medium mb-1">Start Date</p>
-          <p className="text-sm font-semibold text-slate-200">{formatDate(startDate)}</p>
-        </div>
-
-        <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-700/40">
-          <p className="text-xs text-slate-400 font-medium mb-1">Target Submission</p>
-          <p className="text-sm font-semibold text-indigo-400">{formatDate(dueDate)}</p>
-        </div>
-
-        <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-700/40">
-          <p className="text-xs text-slate-400 font-medium mb-1">Assigned Mentor</p>
-          <p className="text-sm font-semibold text-slate-200">{mentor?.name || 'Unassigned'}</p>
-        </div>
-      </div>
-
-      {/* Tech Stack */}
-      <div>
-        <p className="text-xs text-slate-400 font-medium mb-2 flex items-center gap-1.5">
-          <Code className="w-3.5 h-3.5 text-indigo-400" /> Technology Stack
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {techStack.map((tech, idx) => (
-            <span
-              key={idx}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {stats.map((stat, idx) => {
+        const Icon = stat.icon;
+        return (
+          <div
+            key={idx}
+            className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-5 shadow-sm flex items-center space-x-4"
+          >
+            <div className={`p-3 rounded-xl ${stat.color}`}>
+              <Icon className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-surface-500 dark:text-surface-400">{stat.label}</p>
+              <p className="text-lg font-extrabold text-surface-900 dark:text-white capitalize">{stat.value}</p>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };

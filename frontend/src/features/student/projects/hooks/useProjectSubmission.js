@@ -1,29 +1,26 @@
-import { useState, useEffect, useCallback } from 'react';
-import { submitProject as submitService, uploadProjectFiles as uploadService } from '../services/projectService';
-import { dummySubmissions } from '../types/projectDummyData';
+import { useState, useEffect, useCallback } from "react";
+import { projectService } from "../services/projectService";
+import { validateSubmissionForm } from "../validations/projectValidation";
 
 export const useProjectSubmission = (projectId) => {
-  const [submissionHistory, setSubmissionHistory] = useState([]);
-  const [submission, setSubmission] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [submittedData, setSubmittedData] = useState(null);
+  const [submissions, setSubmissions] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
 
   const fetchSubmissions = useCallback(async () => {
     if (!projectId) return;
-    setIsLoading(true);
-    setError(null);
     try {
-      // Load submission history for this project
-      const history = dummySubmissions[projectId] || [];
-      setSubmissionHistory([...history]);
-      if (history.length > 0) {
-        setSubmission(history[0]);
-      }
+      setHistoryLoading(true);
+      const data = await projectService.getProjectSubmissions(projectId);
+      setSubmissions(data);
     } catch (err) {
-      setError(err.message || 'Failed to load submission history.');
+      console.error("Failed to fetch submission history", err);
     } finally {
-      setIsLoading(false);
+      setHistoryLoading(false);
     }
   }, [projectId]);
 
@@ -31,40 +28,53 @@ export const useProjectSubmission = (projectId) => {
     fetchSubmissions();
   }, [fetchSubmissions]);
 
-  const submitProject = async (payload) => {
-    setIsSubmitting(true);
-    setError(null);
+  const submitProjectWork = async (formData, files = []) => {
     try {
-      const created = await submitService(projectId, payload);
-      setSubmission(created);
-      setSubmissionHistory((prev) => [created, ...prev]);
-      return created;
-    } catch (err) {
-      setError(err.message || 'Failed to submit project deliverable.');
-      throw err;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      setSubmitting(true);
+      setError(null);
+      setValidationErrors({});
 
-  const uploadFiles = async (files) => {
-    try {
-      const uploaded = await uploadService(projectId, files);
-      return uploaded;
+      // Validate inputs
+      const { isValid, errors } = validateSubmissionForm(formData, files);
+      if (!isValid) {
+        setValidationErrors(errors);
+        setSubmitting(false);
+        return false;
+      }
+
+      let uploadedFileList = [];
+      if (files.length > 0) {
+        setUploading(true);
+        uploadedFileList = await projectService.uploadProjectFiles(projectId, files);
+        setUploading(false);
+      }
+
+      const result = await projectService.submitProject(projectId, {
+        ...formData,
+        files: uploadedFileList,
+      });
+
+      setSubmittedData(result);
+      setSubmissions((prev) => [result, ...prev]);
+      return result;
     } catch (err) {
-      setError(err.message || 'Failed to process files upload.');
-      throw err;
+      setError(err.message || "Failed to submit project work.");
+      return false;
+    } finally {
+      setSubmitting(false);
+      setUploading(false);
     }
   };
 
   return {
-    submission,
-    submissionHistory,
-    isLoading,
-    isSubmitting,
+    submitProjectWork,
+    submitting,
+    uploading,
     error,
-    submitProject,
-    uploadFiles,
-    refetch: fetchSubmissions,
+    validationErrors,
+    submittedData,
+    submissions,
+    historyLoading,
+    refetchHistory: fetchSubmissions,
   };
 };

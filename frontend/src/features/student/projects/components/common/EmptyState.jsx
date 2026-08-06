@@ -1,26 +1,25 @@
-import React from 'react';
-import { FolderKanban, Plus } from 'lucide-react';
+import React from "react";
+import { FolderOpen } from "lucide-react";
 
 export const EmptyState = ({
-  icon: Icon = FolderKanban,
-  title = 'No Projects Found',
-  description = 'You have not been assigned to any projects yet or your search filter yielded zero matches.',
+  icon: Icon = FolderOpen,
+  title = "No data found",
+  description = "There are no items to display at this moment.",
   actionLabel,
   onAction,
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-12 text-center bg-slate-800/40 border border-slate-700/60 rounded-2xl shadow-inner my-6">
-      <div className="w-16 h-16 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 shadow-lg shadow-indigo-500/5">
-        <Icon className="w-8 h-8" />
+    <div className="flex flex-col items-center justify-center p-8 md:p-12 text-center bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 shadow-sm my-4">
+      <div className="p-4 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl mb-4">
+        <Icon className="w-10 h-10 stroke-[1.5]" />
       </div>
-      <h3 className="text-xl font-semibold text-slate-100 mb-2">{title}</h3>
-      <p className="text-slate-400 text-sm max-w-md mb-6 leading-relaxed">{description}</p>
+      <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-1">{title}</h3>
+      <p className="text-sm text-surface-500 dark:text-surface-400 max-w-md mb-6">{description}</p>
       {actionLabel && onAction && (
         <button
           onClick={onAction}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-xl shadow-lg shadow-indigo-600/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          className="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm rounded-xl transition-all shadow-md shadow-brand-500/20 active:scale-95"
         >
-          <Plus className="w-4 h-4" />
           {actionLabel}
         </button>
       )}

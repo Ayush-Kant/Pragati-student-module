@@ -1,64 +1,44 @@
-import { FILE_UPLOAD_CONSTRAINTS } from '../constants/projectConstants';
-
 /**
- * Validates a GitHub repository URL format
+ * Validation rules for Project Submission Form
  */
-export const isValidGitHubUrl = (url) => {
-  if (!url || typeof url !== 'string') return false;
-  const githubRegex = /^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(\/.*)?$/;
-  return githubRegex.test(url.trim());
-};
+import { isValidGitHubUrl } from "../utils/projectHelpers";
+import { FILE_UPLOAD_LIMITS } from "../constants/projectConstants";
 
-/**
- * Validates project submission form inputs
- * @param {Object} payload - { title, notes, githubRepoUrl, files }
- * @returns {Object} { isValid: boolean, errors: Object }
- */
-export const validateSubmissionForm = (payload = {}) => {
+export const validateSubmissionForm = (formData, files = []) => {
   const errors = {};
 
-  // Deliverable Title
-  if (!payload.title || !payload.title.trim()) {
-    errors.title = 'Deliverable title is required.';
-  } else if (payload.title.trim().length < 5) {
-    errors.title = 'Title must be at least 5 characters long.';
+  // Submission Title
+  if (!formData.title || !formData.title.trim()) {
+    errors.title = "Submission title is required.";
+  } else if (formData.title.trim().length < 5) {
+    errors.title = "Submission title must be at least 5 characters long.";
   }
 
   // Submission Notes / Description
-  if (!payload.notes || !payload.notes.trim()) {
-    errors.notes = 'Submission notes / summary are required.';
-  } else if (payload.notes.trim().length < 15) {
-    errors.notes = 'Please provide detailed notes (at least 15 characters).';
+  if (!formData.notes || !formData.notes.trim()) {
+    errors.notes = "Please provide detailed notes or description of your work.";
+  } else if (formData.notes.trim().length < 20) {
+    errors.notes = "Submission notes must be at least 20 characters long.";
   }
 
   // GitHub Repository URL
-  if (!payload.githubRepoUrl || !payload.githubRepoUrl.trim()) {
-    errors.githubRepoUrl = 'GitHub repository URL is required.';
-  } else if (!isValidGitHubUrl(payload.githubRepoUrl)) {
-    errors.githubRepoUrl = 'Must be a valid GitHub URL (e.g. https://github.com/owner/repo).';
+  if (!formData.githubRepoUrl || !formData.githubRepoUrl.trim()) {
+    errors.githubRepoUrl = "GitHub Repository URL is required.";
+  } else if (!isValidGitHubUrl(formData.githubRepoUrl.trim())) {
+    errors.githubRepoUrl = "Please enter a valid GitHub repository URL (e.g. https://github.com/org/repo).";
   }
 
-  // Files validation
-  if (payload.files && Array.isArray(payload.files) && payload.files.length > 0) {
-    const fileErrors = [];
-    const maxSizeBytes = FILE_UPLOAD_CONSTRAINTS.MAX_FILE_SIZE_MB * 1024 * 1024;
-
-    payload.files.forEach((file) => {
-      if (file.size > maxSizeBytes) {
-        fileErrors.push(`"${file.name}" exceeds the maximum allowed size of ${FILE_UPLOAD_CONSTRAINTS.MAX_FILE_SIZE_MB}MB.`);
-      }
-      
-      // Extension check if file name is available
-      if (file.name) {
-        const ext = '.' + file.name.split('.').pop().toLowerCase();
-        if (!FILE_UPLOAD_CONSTRAINTS.ALLOWED_EXTENSIONS.includes(ext)) {
-          fileErrors.push(`"${file.name}" has an unsupported format. Allowed: ${FILE_UPLOAD_CONSTRAINTS.ALLOWED_EXTENSIONS.join(', ')}.`);
-        }
+  // Files validation (optional or restricted size/types)
+  if (files && files.length > 0) {
+    const invalidFiles = [];
+    files.forEach((file) => {
+      if (file.size > FILE_UPLOAD_LIMITS.MAX_FILE_SIZE_BYTES) {
+        invalidFiles.push(`${file.name} exceeds maximum 25MB limit.`);
       }
     });
 
-    if (fileErrors.length > 0) {
-      errors.files = fileErrors.join(' ');
+    if (invalidFiles.length > 0) {
+      errors.files = invalidFiles.join(" ");
     }
   }
 

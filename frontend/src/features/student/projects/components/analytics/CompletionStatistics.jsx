@@ -1,59 +1,59 @@
-import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { CheckCircle2, Clock, Calendar, Zap } from 'lucide-react';
+import React from "react";
+import { CheckCircle, Clock, Zap, GitCommit } from "lucide-react";
 
-export const CompletionStatistics = ({ analytics }) => {
-  const {
-    completionPercentage = 0,
-    tasksCompleted = 0,
-    totalTasks = 0,
-    milestonesCompleted = 0,
-    totalMilestones = 0,
-    daysRemaining = 0,
-    taskDistribution = [],
-  } = analytics || {};
+export const CompletionStatistics = ({ overview }) => {
+  if (!overview) return null;
 
-  const statCards = [
+  const cards = [
     {
-      title: 'Overall Progress',
-      value: `${completionPercentage}%`,
-      subtitle: `${milestonesCompleted}/${totalMilestones} Milestones Met`,
-      icon: CheckCircle2,
-      color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+      title: "Completion Rate",
+      value: `${overview.completionRate}%`,
+      subtitle: `${overview.completedTasks} of ${overview.totalTasks} tasks done`,
+      icon: CheckCircle,
+      color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400",
     },
     {
-      title: 'Tasks Finished',
-      value: `${tasksCompleted} / ${totalTasks}`,
-      subtitle: `${totalTasks - tasksCompleted} tasks remaining`,
+      title: "Sprint Velocity",
+      value: overview.velocityScore,
+      subtitle: "Based on milestone cadence",
       icon: Zap,
-      color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
+      color: "bg-brand-50 text-brand-600 dark:bg-brand-950/60 dark:text-brand-400",
     },
     {
-      title: 'Submission Target',
-      value: `${daysRemaining} Days`,
-      subtitle: 'Until target final defense',
+      title: "Commits This Month",
+      value: overview.commitsThisMonth,
+      subtitle: "Across active branches",
+      icon: GitCommit,
+      color: "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400",
+    },
+    {
+      title: "Logged Effort",
+      value: `${overview.hoursLogged} hrs`,
+      subtitle: "Team total work time",
       icon: Clock,
-      color: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+      color: "bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {statCards.map((card, idx) => {
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {cards.map((card, idx) => {
         const Icon = card.icon;
         return (
           <div
             key={idx}
-            className="bg-slate-800/70 border border-slate-700/60 rounded-2xl p-5 shadow-lg flex items-center justify-between gap-4"
+            className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-5 shadow-sm"
           >
-            <div>
-              <p className="text-xs font-medium text-slate-400">{card.title}</p>
-              <h3 className="text-2xl font-extrabold text-white mt-1">{card.value}</h3>
-              <p className="text-[11px] text-slate-400 mt-0.5">{card.subtitle}</p>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-surface-500 dark:text-surface-400 uppercase tracking-wider">
+                {card.title}
+              </span>
+              <div className={`p-2 rounded-xl ${card.color}`}>
+                <Icon className="w-5 h-5" />
+              </div>
             </div>
-            <div className={`p-3 rounded-2xl border ${card.color} shrink-0`}>
-              <Icon className="w-6 h-6" />
-            </div>
+            <h3 className="text-2xl font-extrabold text-surface-900 dark:text-white mb-1">{card.value}</h3>
+            <p className="text-xs text-surface-500 dark:text-surface-400">{card.subtitle}</p>
           </div>
         );
       })}

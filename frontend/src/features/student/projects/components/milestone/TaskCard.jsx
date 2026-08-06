@@ -1,73 +1,48 @@
-import React from 'react';
-import { CheckSquare, Square, Clock, User } from 'lucide-react';
-import TaskStatusBadge from './TaskStatusBadge';
-import { TASK_STATUS } from '../../constants/projectConstants';
+import React from "react";
+import { Calendar } from "lucide-react";
+import TaskStatusBadge from "./TaskStatusBadge";
+import TaskChecklist from "./TaskChecklist";
+import { formatDate } from "../../utils/projectHelpers";
 
-export const TaskCard = ({ task, onStatusChange }) => {
-  const { id, title, status, assignee } = task;
-
-  const handleToggle = () => {
-    if (!onStatusChange) return;
-    const nextStatus =
-      status === TASK_STATUS.DONE
-        ? TASK_STATUS.TODO
-        : status === TASK_STATUS.TODO
-        ? TASK_STATUS.IN_PROGRESS
-        : TASK_STATUS.DONE;
-
-    onStatusChange(id, nextStatus);
-  };
-
+export const TaskCard = ({ task, milestoneId, onToggleChecklist }) => {
   return (
-    <div
-      className={`p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 ${
-        status === TASK_STATUS.DONE
-          ? 'bg-slate-900/40 border-slate-800/80 text-slate-400'
-          : 'bg-slate-900/90 border-slate-700/60 hover:border-indigo-500/40 text-slate-200 shadow-sm'
-      }`}
-    >
-      <div className="flex items-center gap-3">
-        <button
-          onClick={handleToggle}
-          className="text-slate-400 hover:text-indigo-400 transition-colors shrink-0"
-          title="Click to toggle task status"
-        >
-          {status === TASK_STATUS.DONE ? (
-            <CheckSquare className="w-5 h-5 text-emerald-400" />
-          ) : (
-            <Square className="w-5 h-5 text-slate-500 hover:text-indigo-400" />
-          )}
-        </button>
+    <div className="bg-surface-50/80 dark:bg-surface-900/60 rounded-xl border border-surface-200/80 dark:border-surface-700/80 p-4 transition-all">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <h5 className="text-sm font-bold text-surface-900 dark:text-white leading-snug">{task.title}</h5>
+        <TaskStatusBadge status={task.status} />
+      </div>
 
-        <div>
-          <h5
-            className={`text-xs font-semibold ${
-              status === TASK_STATUS.DONE ? 'line-through text-slate-400' : 'text-slate-200'
-            }`}
-          >
-            {title}
-          </h5>
-          {assignee && (
-            <span className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
-              <User className="w-3 h-3 text-slate-400" /> {assignee}
-            </span>
-          )}
+      {task.description && (
+        <p className="text-xs text-surface-600 dark:text-surface-400 mb-3 leading-relaxed">
+          {task.description}
+        </p>
+      )}
+
+      {/* Assignee & Due Date */}
+      <div className="flex items-center justify-between text-[11px] text-surface-500 dark:text-surface-400 pb-2">
+        {task.assignee && (
+          <div className="flex items-center space-x-1.5">
+            <img
+              src={task.assignee.avatar}
+              alt={task.assignee.name}
+              className="w-5 h-5 rounded-full object-cover"
+            />
+            <span className="font-medium text-surface-700 dark:text-surface-300">{task.assignee.name}</span>
+          </div>
+        )}
+        <div className="flex items-center space-x-1">
+          <Calendar className="w-3 h-3 text-surface-400" />
+          <span>Due {formatDate(task.dueDate)}</span>
         </div>
       </div>
 
-      {/* Select Dropdown to change status directly */}
-      <div className="flex items-center gap-2">
-        <select
-          value={status}
-          onChange={(e) => onStatusChange && onStatusChange(id, e.target.value)}
-          className="bg-slate-800 border border-slate-700 text-slate-300 text-[11px] font-semibold rounded-lg px-2 py-1 focus:outline-none focus:border-indigo-500"
-        >
-          <option value={TASK_STATUS.TODO}>To Do</option>
-          <option value={TASK_STATUS.IN_PROGRESS}>In Progress</option>
-          <option value={TASK_STATUS.DONE}>Done</option>
-        </select>
-        <TaskStatusBadge status={status} />
-      </div>
+      {/* Checklist */}
+      <TaskChecklist
+        checklist={task.checklist}
+        milestoneId={milestoneId}
+        taskId={task.id}
+        onToggle={onToggleChecklist}
+      />
     </div>
   );
 };

@@ -1,70 +1,63 @@
-import React from 'react';
-import { History, FileText, Github, Clock } from 'lucide-react';
-import { formatDateTime, getSubmissionStatusBadgeColor, formatStatusLabel, formatFileSize } from '../../utils/projectHelpers';
+import React from "react";
+import { Clock, FileCheck, ExternalLink, Paperclip } from "lucide-react";
+import ProjectStatusBadge from "../project/ProjectStatusBadge";
+import { formatDate } from "../../utils/projectHelpers";
 
-export const SubmissionHistory = ({ history = [] }) => {
+export const SubmissionHistory = ({ submissions = [] }) => {
+  if (!submissions || submissions.length === 0) return null;
+
   return (
-    <div className="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 shadow-md">
-      <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center gap-2">
-        <History className="w-4 h-4 text-indigo-400" /> Submission Audit Log ({history.length})
-      </h3>
+    <div className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 shadow-sm mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-bold text-surface-900 dark:text-white">Submission History</h3>
+        <span className="text-xs text-surface-500">{submissions.length} Total Submissions</span>
+      </div>
 
-      {history.length === 0 ? (
-        <p className="text-xs text-slate-400 italic">No previous deliverables submitted for this project yet.</p>
-      ) : (
-        <div className="space-y-4">
-          {history.map((sub) => (
-            <div
-              key={sub.id}
-              className="bg-slate-900/70 border border-slate-700/40 rounded-xl p-4 transition-all hover:border-slate-600"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-md bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-mono">
-                    {sub.version}
-                  </span>
-                  <h4 className="text-sm font-bold text-slate-100">{sub.title}</h4>
+      <div className="space-y-4">
+        {submissions.map((sub) => (
+          <div
+            key={sub.id}
+            className="p-4 bg-surface-50 dark:bg-surface-900/50 rounded-xl border border-surface-200/70 dark:border-surface-700/70"
+          >
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div>
+                <h4 className="text-sm font-bold text-surface-900 dark:text-white">{sub.title}</h4>
+                <div className="flex items-center space-x-2 text-xs text-surface-500 dark:text-surface-400 mt-0.5">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Submitted on {formatDate(sub.submittedAt, true)}</span>
+                  <span>by {sub.submittedBy?.name || "Student"}</span>
                 </div>
-                <span className={`px-2.5 py-0.5 text-[11px] font-bold rounded-full border ${getSubmissionStatusBadgeColor(sub.status)}`}>
-                  {formatStatusLabel(sub.status)}
-                </span>
               </div>
+              <ProjectStatusBadge status={sub.status} size="sm" />
+            </div>
 
-              <p className="text-xs text-slate-300 mb-3">{sub.notes}</p>
+            <p className="text-xs text-surface-700 dark:text-surface-300 mb-3 bg-white dark:bg-surface-800 p-3 rounded-lg border border-surface-100 dark:border-surface-700">
+              {sub.notes}
+            </p>
 
-              <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 pt-2 border-t border-slate-800">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" /> Submitted on {formatDateTime(sub.submittedAt)}
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-2 border-t border-surface-200/60 dark:border-surface-700">
+              {sub.githubRepoUrl && (
+                <a
+                  href={sub.githubRepoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center space-x-1 font-medium text-brand-600 dark:text-brand-400 hover:underline"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Commit {sub.commitHash || "link"}</span>
+                </a>
+              )}
+
+              {sub.uploadedFiles && sub.uploadedFiles.length > 0 && (
+                <span className="inline-flex items-center space-x-1 text-surface-500 font-medium">
+                  <Paperclip className="w-3.5 h-3.5" />
+                  <span>{sub.uploadedFiles.length} files attached</span>
                 </span>
-
-                {sub.githubRepoUrl && (
-                  <a
-                    href={sub.githubRepoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-indigo-400 hover:underline flex items-center gap-1 font-semibold"
-                  >
-                    <Github className="w-3.5 h-3.5" /> Repository Commit ({sub.commitHash || 'main'})
-                  </a>
-                )}
-              </div>
-
-              {sub.files && sub.files.length > 0 && (
-                <div className="mt-3 pt-2 border-t border-slate-800 flex flex-wrap gap-2">
-                  {sub.files.map((file, i) => (
-                    <span
-                      key={i}
-                      className="text-[10px] px-2 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1"
-                    >
-                      <FileText className="w-3 h-3 text-indigo-400" /> {file.name} ({formatFileSize(file.size)})
-                    </span>
-                  ))}
-                </div>
               )}
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

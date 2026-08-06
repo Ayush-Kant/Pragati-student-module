@@ -1,15 +1,14 @@
-import React from 'react';
-import { TASK_STATUS } from '../../constants/projectConstants';
-import { getTaskStatusBadgeColor, formatStatusLabel } from '../../utils/projectHelpers';
+import React from "react";
+import { getTaskStatusStyle } from "../../utils/projectHelpers";
 
 export const TaskStatusBadge = ({ status }) => {
+  const style = getTaskStatusStyle(status);
+
   return (
     <span
-      className={`px-2.5 py-0.5 text-[11px] font-bold rounded-md border ${getTaskStatusBadgeColor(
-        status
-      )}`}
+      className={`px-2 py-0.5 text-[11px] font-semibold rounded-md border ${style.badgeBg} transition-all`}
     >
-      {formatStatusLabel(status)}
+      {style.label}
     </span>
   );
 };
