@@ -10,6 +10,7 @@ import {
 
 const router = express.Router();
 
+// All assessment routes require a valid student JWT.
 router.use(authMiddleware, roleMiddleware("student"));
 
 router.get("/history", validateHistoryQuery, assessmentController.getAssessmentHistory);
