@@ -1,0 +1,50 @@
+[33mcommit 0aa4d847effa013b338c5b2283c36bed83a78ac2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32m504-fe-mod-09-projects-frontend-1[m[33m)[m
+Author: musthafa-cse <musthafasx@gmail.com>
+Date:   Thu Aug 6 22:09:37 2026 +0530
+
+    feat: add student projects frontend module
+
+M	frontend/src/features/student/projects/components/analytics/ActivityTimeline.jsx
+M	frontend/src/features/student/projects/components/analytics/CompletionStatistics.jsx
+A	frontend/src/features/student/projects/components/analytics/PerformanceSummary.jsx
+M	frontend/src/features/student/projects/components/analytics/ProgressChart.jsx
+M	frontend/src/features/student/projects/components/common/ConfirmationModal.jsx
+M	frontend/src/features/student/projects/components/common/EmptyState.jsx
+M	frontend/src/features/student/projects/components/common/ErrorState.jsx
+M	frontend/src/features/student/projects/components/common/LoadingSpinner.jsx
+M	frontend/src/features/student/projects/components/common/SectionHeader.jsx
+M	frontend/src/features/student/projects/components/milestone/MilestoneCard.jsx
+M	frontend/src/features/student/projects/components/milestone/MilestoneProgress.jsx
+M	frontend/src/features/student/projects/components/milestone/TaskCard.jsx
+A	frontend/src/features/student/projects/components/milestone/TaskChecklist.jsx
+M	frontend/src/features/student/projects/components/milestone/TaskStatusBadge.jsx
+M	frontend/src/features/student/projects/components/project/ProjectCard.jsx
+M	frontend/src/features/student/projects/components/project/ProjectDescription.jsx
+M	frontend/src/features/student/projects/components/project/ProjectHeader.jsx
+M	frontend/src/features/student/projects/components/project/ProjectMembers.jsx
+M	frontend/src/features/student/projects/components/project/ProjectOverview.jsx
+A	frontend/src/features/student/projects/components/project/ProjectStatusBadge.jsx
+A	frontend/src/features/student/projects/components/review/FeedbackTimeline.jsx
+A	frontend/src/features/student/projects/components/review/MentorReview.jsx
+M	frontend/src/features/student/projects/components/review/ReviewComments.jsx
+A	frontend/src/features/student/projects/components/review/ReviewScore.jsx
+A	frontend/src/features/student/projects/components/submission/FileUpload.jsx
+A	frontend/src/features/student/projects/components/submission/GitHubRepository.jsx
+M	frontend/src/features/student/projects/components/submission/SubmissionForm.jsx
+M	frontend/src/features/student/projects/components/submission/SubmissionHistory.jsx
+A	frontend/src/features/student/projects/components/submission/UploadedFiles.jsx
+M	frontend/src/features/student/projects/constants/projectConstants.js
+M	frontend/src/features/student/projects/hooks/useMilestones.js
+M	frontend/src/features/student/projects/hooks/useProjectAnalytics.js
+M	frontend/src/features/student/projects/hooks/useProjectDetails.js
+A	frontend/src/features/student/projects/hooks/useProjectReviews.js
+M	frontend/src/features/student/projects/hooks/useProjectSubmission.js
+M	frontend/src/features/student/projects/hooks/useProjects.js
+A	frontend/src/features/student/projects/pages/ProjectAnalyticsPage.jsx
+M	frontend/src/features/student/projects/pages/ProjectDetailsPage.jsx
+M	frontend/src/features/student/projects/pages/ProjectSubmissionPage.jsx
+M	frontend/src/features/student/projects/pages/ProjectsPage.jsx
+M	frontend/src/features/student/projects/services/projectService.js
+M	frontend/src/features/student/projects/types/projectDummyData.js
+M	frontend/src/features/student/projects/utils/projectHelpers.js
+M	frontend/src/features/student/projects/validations/projectValidation.js
