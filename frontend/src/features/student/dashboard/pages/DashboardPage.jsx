@@ -67,7 +67,7 @@ const ProgressRing = ({ data, loading }) => (
 // ── Temporary placeholder cards (Mounika's section) ───
 const UpcomingSessions = ({ data = [], loading }) => (
   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 h-full">
-    <h3 className="text-base font-bold text-gray-800 mb-3">🗓️ Upcoming Sessions</h3>
+    <h3 className="text-base font-bold text-gray-800 mb-3">🗓️ Upcoming Slots</h3>
     {loading ? (
       <div className="flex flex-col gap-2">{Array.from({ length: 2 }).map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />)}</div>
     ) : data.length > 0 ? (
@@ -79,7 +79,7 @@ const UpcomingSessions = ({ data = [], loading }) => (
           </div>
         ))}
       </div>
-    ) : <p className="text-sm text-gray-400 italic">No upcoming sessions.</p>}
+    ) : <p className="text-sm text-gray-400 italic">No upcoming slots.</p>}
   </div>
 );
 

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Upload, HelpCircle, X } from "lucide-react";
+import api from "../../../../services/api.js";
 
 export default function Step1BasicInfo({
   courseData,
@@ -9,6 +10,7 @@ export default function Step1BasicInfo({
 }) {
   const [tagInput, setTagInput] = useState("");
   const [touched, setTouched] = useState({});
+  const [drives, setDrives] = useState([]);
   const editorRef = useRef(null);
 
   // Sync initial data into the editor ONLY once when it mounts
@@ -21,6 +23,17 @@ export default function Step1BasicInfo({
       editorRef.current.innerHTML = courseData.fullDescription;
     }
   }, []); // Empty dependency array stops React from resetting your cursor!
+
+  useEffect(() => {
+    const fetchDrives = async () => {
+      try {
+        const response = await api.get("/v1/drives/mentor/active");
+        setDrives(response.data.data || []);
+      } catch {}
+    };
+
+    fetchDrives();
+  }, []);
 
   const handleBlur = (field) =>
     setTouched((prev) => ({ ...prev, [field]: true }));
@@ -64,10 +77,6 @@ export default function Step1BasicInfo({
     onUpdate({ fullDescription: editorRef.current.innerHTML });
   };
 
-  const drives = [
-    { driveId: 1, driveName: "Winter Backend Engineering cohort 2026" },
-    { driveId: 2, driveName: "Happy" },
-  ];
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Left Form Content Pane Column */}

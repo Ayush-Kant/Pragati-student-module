@@ -4,19 +4,25 @@ import roleMiddleware from "../middleware/roleMiddleware.js";
 import {
   getNotifications,
   markAsRead,
-  sendNotification
+  sendNotification,
 } from "../controllers/notifications.controller.js";
+import {
+  validateSendNotification,
+  validateMarkAsRead,
+  validateGetNotifications,
+} from "../validators/notifications.validator.js";
 
 const router = express.Router();
 
-router.get("/", authMiddleware, getNotifications);
-router.put("/read", authMiddleware, markAsRead);
+router.get("/", authMiddleware, validateGetNotifications, getNotifications);
+router.put("/read", authMiddleware, validateMarkAsRead, markAsRead);
 
 router.post(
   "/send",
   authMiddleware,
   roleMiddleware("admin", "mentor"),
-  sendNotification
+  validateSendNotification,
+  sendNotification,
 );
 
 export default router;

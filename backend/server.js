@@ -1,9 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import { connectDB } from "./config/db.js";
 import { initializeLiveSessionModule } from "./src/database/migrations/liveSessionSchema.js";
+import { initializeAssignmentModule } from "./src/database/migrations/assignmentSchema.js";
 
 // Admin Routes
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
@@ -36,6 +39,7 @@ import interviewRoutes from "./routes/interview.routes.js";
 import mentorRoutes from "./routes/mentor.routes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import drivesRoutes from "./routes/drives.routes.js";
 import collegeDashboardRoutes from "./routes/college.dashboard.routes.js";
 import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 import nominationRoutes from "./routes/collegeStudentNominations.routes.js";
@@ -48,9 +52,14 @@ import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
 import placementDriveRoutes from "./routes/placementDrives.routes.js";
 import collegeCommunicationAnnouncementsRoutes from "./routes/collegeCommunicationAnnouncements.routes.js";
-
-
 import companiesRoutes from "./routes/companies.routes.js";
+import assignmentRoutes from "./src/routes/assignmentRoutes.js";
+import certificatesRouter from "./routes/certificates.routes.js";
+import badgesRouter from "./routes/badges.routes.js";
+import { getStudentBadgesController } from "./controllers/badges.controller.js";
+import authMiddleware from "./middleware/authMiddleware.js";
+import mentorHiringRoutes from "./routes/mentorHiring.routes.js";
+import notificationsRoutes from "./routes/notifications.routes.js";
 
 // Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
@@ -61,6 +70,8 @@ console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ================= MIDDLEWARE =================
 
@@ -114,8 +125,10 @@ app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
 
 // Mentor
+app.use("/api/mentor/content", contentRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
+app.use("/api/v1/mentor", mentorHiringRoutes);
 
 // Company
 app.use("/api/v1/company", companyProfileRoutes);
@@ -129,36 +142,42 @@ app.use("/api/v1/company/notifications", companyNotificationRoutes);
 app.use("/api/v1/company/offers", companyOfferRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
+app.use("/api/v1/company/jobs", collegeJobsRoutes);
 
+// Assignments, Drives & General
+app.use("/api/assignments", assignmentRoutes);
+app.use("/api/v1/drives", drivesRoutes);
 
 // College
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
 app.use("/api/college", nominationRoutes);
 app.use("/api/college", collegeJobsRoutes);
-app.use("/api/departments/statistics", departmentStatisticsRoutes);
-app.use("/api/departments", departmentRoutes);
-app.use("/api/courses", courseRoutes);
-app.use("/api/companies", companiesRoutes);
-app.use("/api/v1/admin/disputes", adminDisputeRoutes);
-app.use("/api/placement-drives", placementDriveRoutes);
 app.use("/api/college/communication", collegeCommunicationAnnouncementsRoutes);
-
-app.use("/api/reports", collegeReportsGenerationRoutes);
-app.use("/api/analytics", collegeAnalyticsDashboardRouter);
 
 // Departments, Courses & Statistics
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
-console.log("✅ Department Statistics Route Registered");
-
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
+
+// Companies
+app.use("/api/companies", companiesRoutes);
 
 // Placement
 app.use("/api/placement-drives", placementDriveRoutes);
 
-// Communication
+// Notifications, Certificates, Badges
+app.use("/api/v1/notifications", notificationsRoutes);
+app.use("/api/v1/certificates", certificatesRouter);
+app.use("/api/v1/badges", badgesRouter);
+app.get(
+  "/api/v1/students/:id/badges",
+  authMiddleware,
+  getStudentBadgesController,
+);
 
+app.use("/api/reports", collegeReportsGenerationRoutes);
+app.use("/api/analytics", collegeAnalyticsDashboardRouter);
 
 // Health Check
 app.get("/", (req, res) => {
@@ -180,8 +199,15 @@ connectDB()
     } catch (error) {
       console.error(
         "⚠️ Live session module initialization failed:",
-        error.message
+        error.message,
       );
+    }
+
+    try {
+      await initializeAssignmentModule();
+      console.log("✅ Assignment module initialized");
+    } catch (error) {
+      console.error("⚠️ Assignment module initialization failed:", error.message);
     }
 
     app.listen(PORT, () => {
@@ -189,6 +215,11 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error("❌ PostgreSQL connection failed:", err.message);
-    process.exit(1);
+    console.error("⚠️ PostgreSQL connection failed:", err.message);
+    console.warn(
+      "Starting server without a database connection. Routes that require PostgreSQL will fail until the database is reachable.",
+    );
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on PORT : ${PORT} (database unavailable)`);
+    });
   });
