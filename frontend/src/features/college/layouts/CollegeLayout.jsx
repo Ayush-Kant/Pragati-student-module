@@ -80,9 +80,9 @@ const CollegeLayout = () => {
         />
 
         {/* Main Section */}
-        <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
+        <div className="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden">
           {/* Page Content */}
-          <main className="flex-1 pt-20 p-6">
+          <main className="flex-1 pt-20 p-6 overflow-y-auto">
             <Outlet
               context={{
                 darkMode,
