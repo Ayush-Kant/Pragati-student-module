@@ -73,10 +73,10 @@ Task.init(
   }
 );
 
-Project.hasMany(Task, { foreignKey: "projectId", as: "tasks", onDelete: "CASCADE" });
-Task.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+Project.hasMany(Task, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "tasks" });
+Task.belongsTo(Project, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "project" });
 
-Milestone.hasMany(Task, { foreignKey: "milestoneId", as: "tasks", onDelete: "SET NULL" });
-Task.belongsTo(Milestone, { foreignKey: "milestoneId", as: "milestone" });
+Milestone.hasMany(Task, { foreignKey: { name: "milestoneId", onDelete: "SET NULL" }, as: "tasks" });
+Task.belongsTo(Milestone, { foreignKey: { name: "milestoneId", onDelete: "SET NULL" }, as: "milestone" });
 
 export default Task;

@@ -86,3 +86,11 @@ export const generateProjectInsights = (projectData) => {
     overallHealth: blockedTasks > 2 ? "NEEDS_ATTENTION" : completedTasks / (totalTasks || 1) >= 0.75 ? "EXCELLENT" : "ON_TRACK",
   };
 };
+
+export class ApiError extends Error {
+  constructor(statusCode = 400, message = "Error") {
+    super(message);
+    this.name = "ApiError";
+    this.statusCode = statusCode;
+  }
+}

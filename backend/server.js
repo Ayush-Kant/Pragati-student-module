@@ -67,6 +67,7 @@ import deadlineRoutes from "./src/routes/deadlineRoutes.js";
 import projectRoutes from "./src/routes/projectRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
 import { initializeQuizModule } from "./models/quizModel.js";
+import discussionRoutes from "./src/routes/discussionRoutes.js";
 
 // Student profile routes
 import studentProfileRouter from "./src/routes/index.js";
@@ -126,6 +127,7 @@ app.use("/api/auth", authLimiter);
 app.use("/api", generalLimiter);
 
 // Routes
+app.use("/api/v1/auth", authRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
@@ -182,6 +184,7 @@ app.use("/api/student/assignments", gradeRoutes);
 app.use("/api/student/assignments", deadlineRoutes);
 app.use("/api/student/projects", projectRoutes);
 app.use("/api/student", quizRoutes);
+app.use("/api/student", discussionRoutes);
 
 app.use(studentProfileRouter);
 

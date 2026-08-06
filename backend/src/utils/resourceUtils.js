@@ -60,7 +60,7 @@ const verifySecureResourceToken = (resourceId, token, expiresAt, secret = null) 
       Buffer.from(token, "hex"),
       Buffer.from(expectedToken, "hex")
     );
-  } catch (error) {
+  } catch {
     return false;
   }
 };

@@ -33,12 +33,6 @@ export const resolveAssignmentStudentId = (req) => {
   return Number.isFinite(studentId) ? studentId : null;
 };
 
-export const normalizeRole = (role) => String(role || "").toLowerCase();
-
-export const isStudentRole = ({ role }) => role === "student";
-
-export const isInstructorOrAdmin = ({ role }) => role === "instructor" || role === "admin";
-
 export const createError = (message, statusCode = 500) => {
   const error = new Error(message);
   error.statusCode = statusCode;
@@ -47,10 +41,10 @@ export const createError = (message, statusCode = 500) => {
 
 export default {
   sanitizeInput,
+  normalizeRole,
+  isInstructorOrAdmin,
+  isStudentRole,
   normalizeStudentId,
   resolveAssignmentStudentId,
-  normalizeRole,
-  isStudentRole,
-  isInstructorOrAdmin,
   createError,
 };

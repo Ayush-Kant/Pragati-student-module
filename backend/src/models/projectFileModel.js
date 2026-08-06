@@ -60,7 +60,7 @@ ProjectFile.init(
   }
 );
 
-Project.hasMany(ProjectFile, { foreignKey: "projectId", as: "files", onDelete: "CASCADE" });
-ProjectFile.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+Project.hasMany(ProjectFile, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "files" });
+ProjectFile.belongsTo(Project, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "project" });
 
 export default ProjectFile;

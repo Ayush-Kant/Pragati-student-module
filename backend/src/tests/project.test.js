@@ -1,5 +1,12 @@
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  src/tests/project.test.js
+//  Unit and Integration tests for Projects Backend Module
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { jest, describe, it, expect, afterEach, beforeEach } from "@jest/globals";
 import assert from "assert";
-import { test, describe } from "node:test";
+
 import {
   calculateProjectProgress,
   isValidGitHubUrl,

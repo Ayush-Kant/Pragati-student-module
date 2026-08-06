@@ -40,7 +40,7 @@ const ALLOWED_DOCUMENT_TYPES = [
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const isValidUrl = (v) => {
-    try { new URL(v); return true; } catch { return false; }
+    try { new globalThis.URL(v); return true; } catch { return false; }
 };
 
 // ── Validators ────────────────────────────────────────────────────────────────

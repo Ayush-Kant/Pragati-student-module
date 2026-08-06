@@ -125,7 +125,7 @@ export const validateCertification = (body) => {
         const v = sanitizeUrl(body.credentialUrl);
         if (v) {
             try {
-                new URL(v); // Throws if invalid
+                new globalThis.URL(v); // Throws if invalid
                 sanitized.credentialUrl = v;
             } catch {
                 errors.push('Credential URL must be a valid URL');

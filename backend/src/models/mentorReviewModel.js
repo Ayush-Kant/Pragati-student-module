@@ -58,10 +58,10 @@ MentorReview.init(
   }
 );
 
-Project.hasMany(MentorReview, { foreignKey: "projectId", as: "reviews", onDelete: "CASCADE" });
-MentorReview.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+Project.hasMany(MentorReview, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "reviews" });
+MentorReview.belongsTo(Project, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "project" });
 
-ProjectSubmission.hasMany(MentorReview, { foreignKey: "submissionId", as: "reviews", onDelete: "SET NULL" });
-MentorReview.belongsTo(ProjectSubmission, { foreignKey: "submissionId", as: "submission" });
+ProjectSubmission.hasMany(MentorReview, { foreignKey: { name: "submissionId", onDelete: "SET NULL" }, as: "reviews" });
+MentorReview.belongsTo(ProjectSubmission, { foreignKey: { name: "submissionId", onDelete: "SET NULL" }, as: "submission" });
 
 export default MentorReview;

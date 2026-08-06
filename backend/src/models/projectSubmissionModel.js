@@ -66,7 +66,7 @@ ProjectSubmission.init(
   }
 );
 
-Project.hasMany(ProjectSubmission, { foreignKey: "projectId", as: "submissions", onDelete: "CASCADE" });
-ProjectSubmission.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+Project.hasMany(ProjectSubmission, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "submissions" });
+ProjectSubmission.belongsTo(Project, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "project" });
 
 export default ProjectSubmission;

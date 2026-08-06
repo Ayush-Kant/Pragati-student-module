@@ -58,7 +58,7 @@ Milestone.init(
   }
 );
 
-Project.hasMany(Milestone, { foreignKey: "projectId", as: "milestones", onDelete: "CASCADE" });
-Milestone.belongsTo(Project, { foreignKey: "projectId", as: "project" });
+Project.hasMany(Milestone, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "milestones" });
+Milestone.belongsTo(Project, { foreignKey: { name: "projectId", onDelete: "CASCADE" }, as: "project" });
 
 export default Milestone;

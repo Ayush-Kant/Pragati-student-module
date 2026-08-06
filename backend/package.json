@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --detectOpenHandles --forceExit",
+    "lint": "eslint \"src/**/*.js\"",
     "dev": "nodemon server.js"
   },
   "author": "",
