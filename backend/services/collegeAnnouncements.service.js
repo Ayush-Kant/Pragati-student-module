@@ -24,9 +24,12 @@ const formatAnnouncement = (row) => ({
   updatedAt: row.updated_at,
 });
 
-export const getAnnouncements = async () => {
-  const rows = await announcementModel.getAllAnnouncements();
-  return rows.map(formatAnnouncement);
+export const getAnnouncements = async (queryParams) => {
+  const { rows, meta } = await announcementModel.getAllAnnouncements(queryParams);
+  return {
+    data: rows.map(formatAnnouncement),
+    meta,
+  };
 };
 
 export const getAnnouncement = async (id) => {
@@ -39,11 +42,14 @@ export const getAnnouncement = async (id) => {
   return formatAnnouncement(announcement);
 };
 
-export const addAnnouncement = async (payload) => {
+export const addAnnouncement = async (payload, userId) => {
+  const createdBy = parseInt(userId || payload.created_by, 10);
+
   const created = await announcementModel.createAnnouncement({
     ...payload,
-    title: payload.title.trim(),
-    description: payload.description.trim(),
+    title: payload.title?.trim(),
+    description: payload.description?.trim(),
+    created_by: isNaN(createdBy) ? 1 : createdBy,
   });
   return formatAnnouncement(created);
 };
@@ -67,7 +73,7 @@ export const removeAnnouncement = async (id) => {
     throw err;
   }
   await announcementModel.deleteAnnouncement(id);
-  return { id: Number(id), message: "Announcement deleted successfully." };
+  return { id: Number(id) };
 };
 
 export const publishAnnouncement = async (id, userId = null) => {

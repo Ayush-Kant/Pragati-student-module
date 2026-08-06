@@ -6,25 +6,30 @@ export const useCommunicationFilters = (announcements = []) => {
   const [status, setStatus] = useState("");
   const [date, setDate] = useState("");
 
+  const safeAnnouncements = Array.isArray(announcements) ? announcements : [];
+
   const filteredAnnouncements = useMemo(() => {
-    return announcements.filter((announcement) => {
+    return safeAnnouncements.filter((announcement) => {
+      if (!announcement) return false;
+
       const matchesSearch =
         !search ||
-        announcement.title
-          ?.toLowerCase()
-          .includes(search.toLowerCase());
+        (announcement.title &&
+          announcement.title.toLowerCase().includes(search.toLowerCase()));
 
       const matchesCategory =
         !category ||
-        announcement.category === category;
+        String(announcement.category) === String(category) ||
+        String(announcement.category_id) === String(category);
 
       const matchesStatus =
         !status ||
-        announcement.status === status;
+        announcement.status?.toLowerCase() === status.toLowerCase();
 
       const matchesDate =
         !date ||
-        announcement.publishDate === date;
+        announcement.publishDate === date ||
+        announcement.created_at?.startsWith(date);
 
       return (
         matchesSearch &&
@@ -34,7 +39,7 @@ export const useCommunicationFilters = (announcements = []) => {
       );
     });
   }, [
-    announcements,
+    safeAnnouncements,
     search,
     category,
     status,
@@ -66,3 +71,5 @@ export const useCommunicationFilters = (announcements = []) => {
     resetFilters,
   };
 };
+
+export default useCommunicationFilters;

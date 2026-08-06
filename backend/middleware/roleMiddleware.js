@@ -1,15 +1,15 @@
-const roleMiddleware = (...roles) => {
+const roleMiddleware = (...allowedRoles) => {
   return (req, res, next) => {
-    console.log("==================================");
-    console.log("URL:", req.originalUrl);
-    console.log("METHOD:", req.method);
-    console.log("Allowed:", roles);
-    console.log("User Role:", req.user?.role);
+    // Gate debug logging behind process.env.DEBUG (B6)
+    if (process.env.DEBUG) {
+      console.log(`[RoleMiddleware] Checking user role '${req.user?.role}' against allowed roles:`, allowedRoles);
+    }
 
-    if (!roles.includes(req.user?.role)) {
-      console.log("❌ ACCESS FORBIDDEN");
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
-        error: "Access forbidden",
+        success: false,
+        message: "Access forbidden: insufficient permissions",
+        data: null,
       });
     }
 

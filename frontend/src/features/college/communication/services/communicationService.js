@@ -4,8 +4,8 @@ import api from "../../../../services/api";
       ANNOUNCEMENTS
 ===================================== */
 
-export const getAnnouncements = async () => {
-  const { data } = await api.get("/college/communication/announcements");
+export const getAnnouncements = async (params = {}) => {
+  const { data } = await api.get("/college/communication/announcements", { params });
   return data;
 };
 

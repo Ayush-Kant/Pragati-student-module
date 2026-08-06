@@ -1,21 +1,96 @@
 import { pool } from "../config/db.js";
+import {
+  ANNOUNCEMENT_UPDATE_COLUMNS,
+  DEFAULT_PAGE,
+  DEFAULT_LIMIT,
+  MAX_LIMIT,
+} from "../constants/collegeCommunication.constants.js";
 
-// Safe SQL to join creator/publisher without assuming user column names
-export const getAllAnnouncements = async () => {
-  const { rows } = await pool.query(
-    `SELECT
+// Fetch announcements with Pagination, Search, and Filtering (B2)
+export const getAllAnnouncements = async (queryParams = {}) => {
+  const {
+    page = DEFAULT_PAGE,
+    limit = DEFAULT_LIMIT,
+    title,
+    status,
+    priority,
+    category_id,
+  } = queryParams;
+
+  // Sanitize & Clamp pagination parameters
+  const pageNum = Math.max(1, parseInt(page, 10) || DEFAULT_PAGE);
+  const limitNum = Math.min(
+    MAX_LIMIT,
+    Math.max(1, parseInt(limit, 10) || DEFAULT_LIMIT)
+  );
+  const offset = (pageNum - 1) * limitNum;
+
+  const conditions = [];
+  const values = [];
+  let paramIndex = 1;
+
+  // Filter: Title / Search
+  if (title) {
+    conditions.push(`a.title ILIKE $${paramIndex++}`);
+    values.push(`%${title}%`);
+  }
+
+  // Filter: Status
+  if (status) {
+    conditions.push(`a.status = $${paramIndex++}`);
+    values.push(status);
+  }
+
+  // Filter: Priority
+  if (priority) {
+    conditions.push(`a.priority = $${paramIndex++}`);
+    values.push(priority);
+  }
+
+  // Filter: Category ID
+  if (category_id) {
+    conditions.push(`a.category_id = $${paramIndex++}`);
+    values.push(parseInt(category_id, 10));
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  // Append limit and offset values to query params
+  values.push(limitNum, offset);
+  const limitIndex = paramIndex++;
+  const offsetIndex = paramIndex++;
+
+  const query = `
+    SELECT
         a.*,
         c.name AS category_name,
         COALESCE(u_create.email, 'Admin (' || a.created_by || ')') AS creator_name,
-        COALESCE(u_pub.email, 'Admin') AS publisher_name
+        COALESCE(u_pub.email, 'Admin') AS publisher_name,
+        COUNT(*) OVER() AS total_count
      FROM announcements a
      LEFT JOIN announcement_categories c ON a.category_id = c.id
      LEFT JOIN users u_create ON a.created_by = u_create.id
      LEFT JOIN users u_pub ON a.published_by = u_pub.id
-     ORDER BY a.created_at DESC`
-  );
+     ${whereClause}
+     ORDER BY a.created_at DESC
+     LIMIT $${limitIndex} OFFSET $${offsetIndex};
+  `;
 
-  return rows;
+  const { rows } = await pool.query(query, values);
+
+  const total = rows.length > 0 ? parseInt(rows[0].total_count, 10) : 0;
+  const totalPages = Math.ceil(total / limitNum) || 0;
+
+  return {
+    rows,
+    meta: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages,
+    },
+  };
 };
 
 // Get announcement by ID
@@ -110,7 +185,7 @@ export const createAnnouncement = async ({
   return getAnnouncementById(rows[0].id);
 };
 
-// Update announcement
+// Update announcement (Protected against SQL Column Injection - B1)
 export const updateAnnouncement = async (id, data) => {
   const fields = [];
   const values = [];
@@ -122,11 +197,15 @@ export const updateAnnouncement = async (id, data) => {
   }
 
   Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (value !== undefined && ANNOUNCEMENT_UPDATE_COLUMNS.has(key)) {
       fields.push(`${key} = $${index++}`);
       values.push(value);
     }
   });
+
+  if (fields.length === 0) {
+    throw new Error("No valid or editable fields provided for update.");
+  }
 
   fields.push(`updated_at = CURRENT_TIMESTAMP`);
   values.push(id);
@@ -139,6 +218,7 @@ export const updateAnnouncement = async (id, data) => {
   `;
 
   const { rows } = await pool.query(query, values);
+  if (!rows[0]) return null;
   return getAnnouncementById(rows[0].id);
 };
 
