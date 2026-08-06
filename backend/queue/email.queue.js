@@ -4,6 +4,10 @@ import { pool } from "../config/db.js";
 
 const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 
+let redisAvailable = true;
+
+export const isEmailQueueAvailable = () => redisAvailable;
+
 const getResendClient = () => {
   return new Resend(process.env.RESEND_API_KEY);
 };
@@ -48,4 +52,20 @@ emailQueue.on("failed", (job, err) => {
     `Email job ${job.id} failed for user ${job.data.userId}:`,
     err.message,
   );
+});
+
+emailQueue.on("error", (err) => {
+  if (err && err.code === "ECONNREFUSED") {
+    redisAvailable = false;
+    console.warn(
+      "⚠️ Redis is not available (ECONNREFUSED). Email notifications are disabled; " +
+        "notifications will still be saved in the database.",
+    );
+  } else {
+    console.error("Email queue error:", err.message);
+  }
+});
+
+emailQueue.on("ready", () => {
+  redisAvailable = true;
 });

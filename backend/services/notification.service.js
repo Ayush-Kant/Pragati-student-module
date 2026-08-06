@@ -1,5 +1,8 @@
 import { pool } from "../config/db.js";
-import { emailQueue } from "../queue/email.queue.js";
+import {
+  emailQueue,
+  isEmailQueueAvailable,
+} from "../queue/email.queue.js";
 
 export const getNotifications = async ({ userId, page = 1, limit = 20 }) => {
   page = parseInt(page) || 1;
@@ -102,7 +105,7 @@ export const sendNotification = async ({
     values,
   );
 
-  if (sendEmail) {
+  if (sendEmail && isEmailQueueAvailable()) {
     for (const userId of userIds) {
       await emailQueue.add({ userId, title, message, type: type || "info" });
     }

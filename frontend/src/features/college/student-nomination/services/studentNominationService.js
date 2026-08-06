@@ -12,7 +12,7 @@ import api from "../../../../services/api";
  */
 export const getEligibleStudents = async (params = {}) => {
   try {
-    const response = await api.get("/nominations/eligible", { params });
+    const response = await api.get("/college/nominations/eligible", { params });
     return {
       success: true,
       data: response.data.data || [],
@@ -31,7 +31,7 @@ export const getEligibleStudents = async (params = {}) => {
  */
 export const getNominations = async (params = {}) => {
   try {
-    const response = await api.get("/nominations", { params });
+    const response = await api.get("/college/nominations", { params });
     return {
       success: true,
       data: response.data.data || [],
@@ -50,7 +50,7 @@ export const getNominations = async (params = {}) => {
  */
 export const nominateStudent = async (payload) => {
   try {
-    const response = await api.post("/nominations", payload);
+    const response = await api.post("/college/nominations", payload);
     return {
       success: true,
       data: response.data.data,
@@ -70,7 +70,7 @@ export const nominateStudent = async (payload) => {
  */
 export const updateNomination = async (id, data) => {
   try {
-    const response = await api.put(`/nominations/${id}`, data);
+    const response = await api.put(`/college/nominations/${id}`, data);
     return {
       success: true,
       data: response.data.data,
@@ -89,7 +89,7 @@ export const updateNomination = async (id, data) => {
  */
 export const removeNomination = async (id) => {
   try {
-    const response = await api.delete(`/nominations/${id}`);
+    const response = await api.delete(`/college/nominations/${id}`);
     return {
       success: true,
       message: response.data.message || "Nomination removed successfully",
@@ -109,7 +109,7 @@ export const removeNomination = async (id) => {
  */
 export const getShortlistedStudents = async (params = {}) => {
   try {
-    const response = await api.get("/shortlists", { params });
+    const response = await api.get("/college/shortlists", { params });
     return {
       success: true,
       data: response.data.data || [],
@@ -129,7 +129,7 @@ export const getShortlistedStudents = async (params = {}) => {
  */
 export const getCompanyShortlist = async (companyId, params = {}) => {
   try {
-    const response = await api.get(`/shortlists/company/${companyId}`, {
+    const response = await api.get(`/college/shortlists/company/${companyId}`, {
       params,
     });
     return {
@@ -151,7 +151,7 @@ export const getCompanyShortlist = async (companyId, params = {}) => {
  */
 export const updateShortlistStatus = async (shortlistId, data) => {
   try {
-    const response = await api.put(`/shortlists/${shortlistId}`, data);
+    const response = await api.put(`/college/shortlists/${shortlistId}`, data);
     return {
       success: true,
       data: response.data.data,
@@ -170,7 +170,7 @@ export const updateShortlistStatus = async (shortlistId, data) => {
  */
 export const removeShortlistEntry = async (shortlistId) => {
   try {
-    const response = await api.delete(`/shortlists/${shortlistId}`);
+    const response = await api.delete(`/college/shortlists/${shortlistId}`);
     return {
       success: true,
       message: response.data.message || "Student removed from shortlist",
@@ -189,7 +189,7 @@ export const removeShortlistEntry = async (shortlistId) => {
  */
 export const getNominationStatistics = async () => {
   try {
-    const response = await api.get("/nominations/statistics");
+    const response = await api.get("/college/nominations/statistics");
     return {
       success: true,
       data: response.data.data || null,
