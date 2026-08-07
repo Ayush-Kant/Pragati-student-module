@@ -1,5 +1,10 @@
 export default {
   testEnvironment: "node",
+  verbose: true,
+  testMatch: ["<rootDir>/src/tests/**/*.test.js"],
   transform: {},
-  testMatch: ["<rootDir>/src/tests/assessment.test.js"],
+  moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
 };
+

@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import Modal from "react-modal";
 import useMentorManagement from "../hooks/useMentorManagement";
 import MentorTable from "../components/MentorTable";
-
+Modal.setAppElement("#root");
 export default function MentorManagement() {
   const { darkMode } = useOutletContext();
 
@@ -42,7 +42,13 @@ export default function MentorManagement() {
   });
 
   const handleAddMentorClick = () => {
-    setFormData({ name: "", email: "", expertise: [], rating: 0, activeBatches: 0 });
+    setFormData({
+      name: "",
+      email: "",
+      expertise: [],
+      rating: 0,
+      activeBatches: 0,
+    });
     setIsAddModalOpen(true);
   };
 
@@ -61,7 +67,13 @@ export default function MentorManagement() {
     });
 
     setIsAddModalOpen(false);
-    setFormData({ name: "", email: "", expertise: [], rating: 0, activeBatches: 0 });
+    setFormData({
+      name: "",
+      email: "",
+      expertise: [],
+      rating: 0,
+      activeBatches: 0,
+    });
   };
 
   const handleExpertiseChange = (value) => {
@@ -92,18 +104,18 @@ export default function MentorManagement() {
   };
 
   return (
-   <div
-  className={`min-h-screen w-full px-6 py-6 ${
-    darkMode
-      ? "bg-slate-900 text-white"
-      : "bg-slate-100 text-slate-900"
-  }`}
->
+    <div
+      className={`min-h-screen w-full px-6 py-6 ${
+        darkMode ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-900"
+      }`}
+    >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div className="min-w-0">
             <h1 className="text-3xl font-bold truncate">Mentor Management</h1>
-            <p className={`mt-1 text-sm ${darkMode ? "text-slate-400" : "text-slate-600"}`}>
+            <p
+              className={`mt-1 text-sm ${darkMode ? "text-slate-400" : "text-slate-600"}`}
+            >
               Manage mentors and monitor performance.
             </p>
           </div>
@@ -118,7 +130,9 @@ export default function MentorManagement() {
 
         <div
           className={`p-4 rounded-lg shadow ${
-            darkMode ? "bg-slate-950 border border-slate-700" : "bg-white border border-slate-200"
+            darkMode
+              ? "bg-slate-950 border border-slate-700"
+              : "bg-white border border-slate-200"
           } flex flex-col gap-4 md:flex-row md:items-center`}
         >
           <input
@@ -127,7 +141,9 @@ export default function MentorManagement() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={`w-full min-w-0 border rounded px-3 py-2 ${
-              darkMode ? "bg-slate-900 border-slate-700 text-white" : "bg-slate-100 border-slate-300 text-slate-900"
+              darkMode
+                ? "bg-slate-900 border-slate-700 text-white"
+                : "bg-slate-100 border-slate-300 text-slate-900"
             }`}
           />
 
@@ -135,48 +151,54 @@ export default function MentorManagement() {
             value={expertise}
             onChange={(e) => setExpertise(e.target.value)}
             className={`w-full sm:w-auto border rounded px-3 py-2 ${
-              darkMode ? "bg-slate-900 border-slate-700 text-white" : "bg-slate-100 border-slate-300 text-slate-900"
+              darkMode
+                ? "bg-slate-900 border-slate-700 text-white"
+                : "bg-slate-100 border-slate-300 text-slate-900"
             }`}
           >
-          <option value="all">All Expertise</option>
-          <option value="MERN">MERN</option>
-          <option value="React">React</option>
-          <option value="Node.js">Node.js</option>
-          <option value="AI/ML">AI/ML</option>
-          <option value="Python">Python</option>
-          <option value="Java">Java</option>
-        </select>
+            <option value="all">All Expertise</option>
+            <option value="MERN">MERN</option>
+            <option value="React">React</option>
+            <option value="Node.js">Node.js</option>
+            <option value="AI/ML">AI/ML</option>
+            <option value="Python">Python</option>
+            <option value="Java">Java</option>
+          </select>
 
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className={`w-full sm:w-auto border rounded px-3 py-2 ${
-            darkMode ? "bg-slate-900 border-slate-700 text-white" : "bg-slate-100 border-slate-300 text-slate-900"
-          }`}
-        >
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-      </div>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className={`w-full sm:w-auto border rounded px-3 py-2 ${
+              darkMode
+                ? "bg-slate-900 border-slate-700 text-white"
+                : "bg-slate-100 border-slate-300 text-slate-900"
+            }`}
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
 
-      <div>
-        <h2 className="font-semibold">Showing {filteredMentors.length} mentors</h2>
-      </div>
+        <div>
+          <h2 className="font-semibold">
+            Showing {filteredMentors.length} mentors
+          </h2>
+        </div>
 
-      {loading ? (
-        <div className="text-sm">Loading...</div>
-      ) : (
-        <MentorTable
-          key={`${search}-${expertise}-${status}-${filteredMentors.length}`}
-          mentors={currentMentors}
-          darkMode={darkMode}
-          onMentorRemove={handleMentorRemove}
-          onMentorAssign={handleMentorAssign}
-          onMentorReplace={handleMentorReplace}
-          onStatusToggle={toggleMentorStatus}
-        />
-      )}
+        {loading ? (
+          <div className="text-sm">Loading...</div>
+        ) : (
+          <MentorTable
+            key={`${search}-${expertise}-${status}-${filteredMentors.length}`}
+            mentors={currentMentors}
+            darkMode={darkMode}
+            onMentorRemove={handleMentorRemove}
+            onMentorAssign={handleMentorAssign}
+            onMentorReplace={handleMentorReplace}
+            onStatusToggle={toggleMentorStatus}
+          />
+        )}
       </div>
 
       {/* Pagination */}
@@ -184,9 +206,7 @@ export default function MentorManagement() {
       <div className="flex justify-center items-center gap-4">
         <button
           disabled={currentPage === 1}
-          onClick={() =>
-            setCurrentPage((prev) => prev - 1)
-          }
+          onClick={() => setCurrentPage((prev) => prev - 1)}
           className="border px-4 py-2 rounded"
         >
           Prev
@@ -198,9 +218,7 @@ export default function MentorManagement() {
 
         <button
           disabled={currentPage === totalPages}
-          onClick={() =>
-            setCurrentPage((prev) => prev + 1)
-          }
+          onClick={() => setCurrentPage((prev) => prev + 1)}
           className="border px-4 py-2 rounded"
         >
           Next
@@ -212,18 +230,39 @@ export default function MentorManagement() {
         isOpen={isAddModalOpen}
         onRequestClose={() => setIsAddModalOpen(false)}
         ariaHideApp={false}
-        className={`rounded-lg p-6 w-125 mx-auto mt-20 outline-none ${
-          darkMode ? "bg-slate-950 border border-slate-700" : "bg-white"
-        }`}
-        overlayClassName="fixed inset-0 bg-black/50 flex justify-center items-start"
+        className={`
+  w-full
+  max-w-2xl
+  rounded-xl
+  p-6
+  mx-auto
+  mt-10
+  outline-none
+  max-h-[90vh]
+  overflow-y-auto
+  ${darkMode ? "bg-slate-950 border border-slate-700" : "bg-white"}
+`}
+        overlayClassName="
+  fixed
+  inset-0
+  z-50
+  bg-black/50
+  flex
+  justify-center
+  items-start
+  p-4
+  overflow-y-auto
+"
       >
         <h2 className="text-xl font-bold mb-4">Add New Mentor</h2>
 
         <div className="space-y-4">
           <div>
-            <label className={`block text-sm font-medium mb-1 ${
-              darkMode ? "text-slate-300" : "text-slate-900"
-            }`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                darkMode ? "text-slate-300" : "text-slate-900"
+              }`}
+            >
               Name
             </label>
             <input
@@ -242,9 +281,11 @@ export default function MentorManagement() {
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-1 ${
-              darkMode ? "text-slate-300" : "text-slate-900"
-            }`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                darkMode ? "text-slate-300" : "text-slate-900"
+              }`}
+            >
               Email
             </label>
             <input
@@ -263,9 +304,11 @@ export default function MentorManagement() {
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-2 ${
-              darkMode ? "text-slate-300" : "text-slate-900"
-            }`}>
+            <label
+              className={`block text-sm font-medium mb-2 ${
+                darkMode ? "text-slate-300" : "text-slate-900"
+              }`}
+            >
               Expertise
             </label>
             <div className="flex flex-wrap gap-2">
@@ -278,21 +321,23 @@ export default function MentorManagement() {
                       formData.expertise.includes(exp)
                         ? "bg-blue-600 text-white"
                         : darkMode
-                        ? "bg-slate-800 border border-slate-700 text-slate-300"
-                        : "bg-gray-200 text-slate-900"
+                          ? "bg-slate-800 border border-slate-700 text-slate-300"
+                          : "bg-gray-200 text-slate-900"
                     }`}
                   >
                     {exp}
                   </button>
-                )
+                ),
               )}
             </div>
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-1 ${
-              darkMode ? "text-slate-300" : "text-slate-900"
-            }`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                darkMode ? "text-slate-300" : "text-slate-900"
+              }`}
+            >
               Rating
             </label>
             <input
@@ -314,9 +359,11 @@ export default function MentorManagement() {
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-1 ${
-              darkMode ? "text-slate-300" : "text-slate-900"
-            }`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                darkMode ? "text-slate-300" : "text-slate-900"
+              }`}
+            >
               Active Batches
             </label>
             <input
@@ -336,10 +383,10 @@ export default function MentorManagement() {
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 mt-6">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6">
           <button
             onClick={() => setIsAddModalOpen(false)}
-            className={`px-4 py-2 border rounded ${
+            className={`w-full sm:w-auto px-4 py-2 border rounded ${
               darkMode
                 ? "border-slate-600 text-slate-300 hover:bg-slate-800"
                 : "border-slate-300 text-slate-900 hover:bg-gray-100"
@@ -350,7 +397,7 @@ export default function MentorManagement() {
 
           <button
             onClick={handleAddMentorSubmit}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
           >
             Save
           </button>

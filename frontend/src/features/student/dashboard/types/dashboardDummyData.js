@@ -1,3 +1,6 @@
+// src/features/student/dashboard/types/dashboardDummyData.js
+
+// Existing team data structures
 export const quickStatsData = [
   { title: "Applications", value: "12" },
   { title: "Interviews", value: "4" },
@@ -21,55 +24,45 @@ export const skillsBreakdownData = [
   { label: "DSA", value: "40%" },
   { label: "Projects", value: "30%" },
   { label: "Resume", value: "20%" },
-  { label: "Aptitude", value: "10%" },
 ];
 
-export const upcomingSessionsData = [
-  {
+// Required Ticket Data Structures (MOD-3)
+export const dashboardData = {
+  student: {
     id: 1,
-    title: "Mock Interview - HR Round",
-    date: "2026-06-20",
-    time: "10:00 AM",
-    mentor: "Mr. Sharma",
+    name: "John Doe",
+    profileImage: "",
+    department: "Information Technology"
   },
-];
-
-export const pendingTasksData = [
-  {
-    id: 1,
-    title: "Complete profile details",
-    dueDate: "2026-06-18",
-    done: false,
+  statistics: {
+    completedCourses: 8,
+    activeCourses: 3,
+    attendance: 92,
+    xp: 1450
   },
-];
-
-export const recentNotificationsData = [
-  {
-    id: 1,
-    message: "New job posting from Infosys",
-    time: "2 hours ago",
-    read: false,
+  progress: {
+    overallProgress: 76
   },
-];
-
-export const leaderboardData = [
-  {
-    rank: 1,
-    name: "Aditi Rao",
-    score: 980,
-    department: "Computer Engineering",
-  },
-];
+  upcomingActivities: [
+    { id: 1, title: "React Core Concepts Quiz", type: "Quiz", deadline: "Today, 11:59 PM", status: "Pending" },
+    { id: 2, title: "Tailwind UI Integration", type: "Assignment", deadline: "Tomorrow, 6:00 PM", status: "In Progress" },
+    { id: 3, title: "Mentor Sync Call", type: "Session", deadline: "July 8, 2:00 PM", status: "Scheduled" }
+  ],
+  notifications: [
+    { id: 1, title: "New Assignment Posted", description: "Module 3 - Context API challenge is live.", type: "Notification", time: "10 mins ago" },
+    { id: 2, title: "System Maintenance", description: "Platform offline tonight from 2 AM to 4 AM.", type: "Announcement", time: "2 hours ago" }
+  ],
+  achievements: {
+    badges: [
+      { id: 1, title: "Fast Learner", icon: "⚡", description: "Completed 5 lessons in one day" },
+      { id: 2, title: "Perfect Presence", icon: "📅", description: "Maintained >90% attendance" }
+    ],
+    xpMilestones: ["Level 4 Achieved", "1000 XP Club"],
+    leaderboardPosition: 14
+  }
+};
 
 export const dashboardApiResponse = {
   success: true,
-  data: {
-    activeDrive: activeDriveData,
-    quickStats: quickStatsData,
-    progressRing: progressRingData,
-    upcomingSessions: upcomingSessionsData,
-    pendingTasks: pendingTasksData,
-    leaderboard: leaderboardData,
-    recentNotifications: recentNotificationsData,
-  },
+  data: dashboardData
 };

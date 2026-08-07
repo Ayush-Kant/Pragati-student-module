@@ -172,4 +172,36 @@ export const register = async (req, res) => {
     });
   }
 };
+
+export const promoteAdmin = async (req, res) => {
+  try {
+    const secretHeader = req.headers['x-admin-secret'] || req.body?.secret;
+
+    if (!process.env.ADMIN_PROMOTE_SECRET) {
+      return res.status(500).json({ success: false, message: 'Server misconfigured: ADMIN_PROMOTE_SECRET not set' });
+    }
+
+    if (!secretHeader || secretHeader !== process.env.ADMIN_PROMOTE_SECRET) {
+      return res.status(403).json({ success: false, message: 'Forbidden: invalid admin secret' });
+    }
+
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+
+    const existing = await pool.query(`SELECT id FROM auth_users WHERE email = $1`, [email]);
+    if (!existing.rows.length) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    await pool.query(`UPDATE auth_users SET role = $1 WHERE email = $2`, ['admin', email]);
+    await pool.query(`UPDATE users SET role = $1 WHERE email = $2`, ['admin', email]);
+
+    return res.status(200).json({ success: true, message: 'User promoted to admin' });
+  } catch (error) {
+    console.error('promoteAdmin error', error);
+    return res.status(500).json({ success: false, message: 'Promotion failed' });
+  }
+};
 // reload backend server
