@@ -40,16 +40,27 @@ export const submitAssessment = async (id, answers) => {
     percentage,
     status: score >= assessment.passingMarks ? "passed" : "failed",
     submittedAt: new Date().toISOString(),
+    timeSpentMinutes: assessment.durationMinutes || 15,
     answers,
     questions: assessment.questions
   };
 
+  dummyHistory.unshift(result);
   return result;
 };
 
 export const getAssessmentResult = async (attemptId) => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(dummyHistory[0]), 300);
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const found = dummyHistory.find((item) => item.attemptId === attemptId);
+      if (found) {
+        resolve(found);
+      } else if (dummyHistory.length > 0) {
+        resolve(dummyHistory[0]);
+      } else {
+        reject(new Error("Result not found"));
+      }
+    }, 300);
   });
 };
 

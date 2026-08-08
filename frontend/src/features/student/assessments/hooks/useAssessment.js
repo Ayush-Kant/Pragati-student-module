@@ -7,11 +7,29 @@ export const useAssessment = (id) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!id) return;
+    let isMounted = true;
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
     getAssessmentById(id)
-      .then((data) => setAssessment(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (isMounted) setAssessment(data);
+      })
+      .catch((err) => {
+        if (isMounted) setError(err.message);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
   return { assessment, loading, error };

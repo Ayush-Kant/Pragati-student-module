@@ -3,32 +3,34 @@ import { useState, useEffect, useRef, useCallback } from "react";
 export const useAssessmentAttempt = (assessment, onSubmit) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(
-    assessment?.durationMinutes ? assessment.durationMinutes * 60 : 0
-  );
+  const [timeLeft, setTimeLeft] = useState(0);
 
-  // Use refs to store the latest values of answers and onSubmit.
-  // This prevents submitTest from changing on every state update,
-  // which keeps the useEffect timer interval completely stable.
   const answersRef = useRef(answers);
   answersRef.current = answers;
 
   const onSubmitRef = useRef(onSubmit);
   onSubmitRef.current = onSubmit;
 
+  // Synchronize timeLeft when assessment loads asynchronously
+  useEffect(() => {
+    if (assessment?.durationMinutes) {
+      setTimeLeft(assessment.durationMinutes * 60);
+    }
+  }, [assessment?.durationMinutes]);
+
   const handleSelectAnswer = (optionIndex) => {
     setAnswers((prev) => ({ ...prev, [currentIndex]: optionIndex }));
   };
 
-  // Memoized submit callback referencing current refs
   const submitTest = useCallback(() => {
     if (typeof onSubmitRef.current === "function") {
       onSubmitRef.current(answersRef.current);
     }
   }, []);
 
+  // Stable timer effect without recreating interval on every second update
   useEffect(() => {
-    if (!timeLeft || timeLeft <= 0) return;
+    if (timeLeft <= 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -42,7 +44,7 @@ export const useAssessmentAttempt = (assessment, onSubmit) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, submitTest]);
+  }, [assessment?.id, submitTest]); // Runs on component setup or assessment change
 
   return {
     currentIndex,

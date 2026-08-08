@@ -1,32 +1,26 @@
 import React from "react";
-import { useAssessment } from "../hooks/useAssessment";
+import AssessmentHeader from "../components/assessment/AssessmentHeader";
+import AssessmentInstructions from "../components/assessment/AssessmentInstructions";
+import AssessmentOverview from "../components/assessment/AssessmentOverview";
 import LoadingSpinner from "../components/common/LoadingSpinner";
+import ErrorState from "../components/common/ErrorState";
+import { useAssessment } from "../hooks/useAssessment";
 
 export default function AssessmentDetailsPage({ assessmentId, onStart }) {
   const { assessment, loading, error } = useAssessment(assessmentId);
 
   if (loading) return <LoadingSpinner message="Fetching assessment details..." />;
-  if (error || !assessment) return <div className="p-6 text-red-500">Failed to load assessment.</div>;
+  if (error || !assessment) return <ErrorState message={error || "Assessment not found"} />;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white rounded-xl border p-8 shadow-sm">
-      <h1 className="text-2xl font-bold text-gray-900">{assessment.title}</h1>
-      <p className="text-gray-600 mt-2">{assessment.description}</p>
+    <div className="p-6 max-w-4xl mx-auto bg-white rounded-xl border p-8 shadow-sm space-y-6">
+      <AssessmentHeader title={assessment.title} category={assessment.category} />
+      
+      <p className="text-gray-600">{assessment.description}</p>
 
-      <div className="grid grid-cols-3 gap-4 my-6 p-4 bg-gray-50 rounded-lg text-center">
-        <div><p className="text-xs text-gray-500">Duration</p><p className="font-bold">{assessment.durationMinutes} mins</p></div>
-        <div><p className="text-xs text-gray-500">Total Marks</p><p className="font-bold">{assessment.totalMarks}</p></div>
-        <div><p className="text-xs text-gray-500">Passing Marks</p><p className="font-bold">{assessment.passingMarks}</p></div>
-      </div>
+      <AssessmentOverview data={assessment} />
 
-      <div className="mb-6">
-        <h3 className="font-semibold text-gray-800 mb-2">Instructions:</h3>
-        <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
-          {assessment.instructions?.map((inst, idx) => (
-            <li key={idx}>{inst}</li>
-          ))}
-        </ul>
-      </div>
+      <AssessmentInstructions instructions={assessment.instructions} />
 
       <button
         onClick={() => onStart(assessment)}

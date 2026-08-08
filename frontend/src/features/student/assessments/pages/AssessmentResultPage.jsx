@@ -1,26 +1,39 @@
 import React from "react";
+import ScoreCard from "../components/result/ScoreCard";
+import ResultSummary from "../components/result/ResultSummary";
+import PerformanceChart from "../components/result/PerformanceChart";
+import AnswerReview from "../components/result/AnswerReview";
+import AttemptStatistics from "../components/result/AttemptStatistics";
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import ErrorState from "../components/common/ErrorState";
+import { useAssessmentResult } from "../hooks/useAssessmentResult";
 
-export default function AssessmentResultPage({ result, onBack }) {
-  if (!result) return <div className="p-6 text-center text-gray-500">No result available.</div>;
+export default function AssessmentResultPage({ attemptId, onBack }) {
+  const { result, loading, error } = useAssessmentResult(attemptId);
+
+  if (loading) return <LoadingSpinner message="Calculating assessment results..." />;
+  if (error || !result) return <ErrorState message={error || "Result unavailable"} />;
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-white rounded-xl border p-8 shadow-sm text-center">
-      <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase ${
-        result.status === "passed" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-      }`}>
-        {result.status}
-      </span>
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <ScoreCard
+        score={result.score}
+        totalMarks={result.totalMarks}
+        percentage={result.percentage}
+      />
 
-      <h1 className="text-2xl font-bold text-gray-900 mt-3">{result.title}</h1>
-      
-      <div className="my-8">
-        <p className="text-5xl font-extrabold text-blue-600">{result.percentage}%</p>
-        <p className="text-sm text-gray-500 mt-2">Score: {result.score} / {result.totalMarks}</p>
+      <div className="grid md:grid-cols-2 gap-6">
+        <ResultSummary result={result} />
+        <PerformanceChart percentage={result.percentage} />
       </div>
+
+      <AttemptStatistics result={result} />
+
+      <AnswerReview questions={result.questions} userAnswers={result.answers} />
 
       <button
         onClick={onBack}
-        className="bg-gray-800 text-white px-6 py-2.5 rounded-lg hover:bg-gray-900 transition"
+        className="w-full bg-gray-900 text-white font-bold py-3 rounded-lg hover:bg-gray-800 transition"
       >
         Back to Assessments
       </button>
