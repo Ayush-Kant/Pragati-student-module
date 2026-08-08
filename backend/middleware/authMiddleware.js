@@ -1,18 +1,29 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { pool } from "../config/db.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envCandidates = [
+  path.resolve(__dirname, "..", "..", ".env"),
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(process.cwd(), "..", ".env"),
+];
 
-if (!process.env.JWT_SECRET) {
-  throw new Error(
-    "FATAL: JWT_SECRET environment variable is not set. " +
-    "The server cannot start without it."
-  );
+for (const envPath of envCandidates) {
+  dotenv.config({ path: envPath });
 }
 
 const authMiddleware = async (req, res, next) => {
   try {
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "JWT secret is not configured",
+      });
+    }
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

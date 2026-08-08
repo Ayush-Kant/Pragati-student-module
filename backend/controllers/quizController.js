@@ -26,10 +26,16 @@ export const getQuizDetails = async (req, res, next) => {
 
 export const getQuizHistory = async (req, res, next) => {
   try {
-    const studentId = req.user?.id || req.user?.uid || req.user?.userId;
-    const history = await quizService.getQuizHistory(studentId);
+    const studentId = req.user?.id ?? req.user?.uid ?? req.user?.userId;
+    if (!studentId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: student id missing from token' });
+    }
+
+    const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
+    const history = await quizService.getQuizHistory(normalizedStudentId);
     return res.status(200).json({ success: true, data: history });
   } catch (error) {
+    console.error('Quiz history error:', error);
     next(error);
   }
 };
@@ -46,11 +52,17 @@ export const submitQuiz = async (req, res, next) => {
       return res.status(400).json({ success: false, message: validation.error.message });
     }
 
-    const studentId = req.user?.id || req.user?.uid || req.user?.userId;
-    const result = await quizService.submitQuiz(Number(req.params.quizId), studentId, validation.value.answers);
+    const studentId = req.user?.id ?? req.user?.uid ?? req.user?.userId;
+    if (!studentId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: student id missing from token' });
+    }
+
+    const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
+    const result = await quizService.submitQuiz(Number(req.params.quizId), normalizedStudentId, validation.value.answers);
 
     return res.status(201).json({ success: true, data: result });
   } catch (error) {
+    console.error('Submit quiz error:', error);
     next(error);
   }
 };

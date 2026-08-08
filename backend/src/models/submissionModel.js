@@ -38,18 +38,24 @@ export const updateSubmission = async (assignmentId, studentId, payload) => {
   const values = [assignmentId, studentId];
   let index = 3;
 
+  const createPlaceholder = () => {
+    const currentIndex = index;
+    index += 1;
+    return currentIndex;
+  };
+
   if (payload.content !== undefined) {
-    fields.push(`content = $${index++}`);
+    fields.push(`content = $${createPlaceholder()}`);
     values.push(payload.content ?? null);
   }
 
   if (payload.fileUrl !== undefined) {
-    fields.push(`file_url = $${index++}`);
+    fields.push(`file_url = $${createPlaceholder()}`);
     values.push(payload.fileUrl ?? null);
   }
 
   if (payload.status !== undefined) {
-    fields.push(`status = $${index++}`);
+    fields.push(`status = $${createPlaceholder()}`);
     values.push(payload.status ?? "Submitted");
   }
 

@@ -6,24 +6,26 @@ import VerificationPage from "../pages/public/VerificationPage";
 import LoginPage from "../../auth/LoginPage";
 import RegisterPage from "../../auth/RegisterPage";
 
-import OnboardingWizard from "../pages/onboarding/OnboardingWizard";
-import DashboardPage from "../pages/dashboard/DashboardPage";
-import StudentProfilePage from "../profile/pages/StudentProfilePage";
-import CoursesPage from "../pages/training/CoursesPage";
-import CourseDetailPage from "../pages/training/CourseDetailPage";
-import LiveSessionsPage from "../live-sessions/pages/LiveSessionsPage";
-import SessionsPage from "../pages/sessions/SessionsPage";
-import AssignmentsPage from "../assignments/pages/AssignmentsPage";
-import AssignmentDetail from "../pages/assignments/AssignmentDetail";
-import QuizzesPage from "../pages/quizzes/QuizzesPage";
-import CodingChallengePage from "../pages/coding/CodingChallengePage";
-import ProjectsPage from "../pages/projects/ProjectsPage";
-import ProjectDetailPage from "../pages/projects/ProjectDetailPage";
-import PerformancePage from "../pages/performance/PerformancePage";
-import InterviewsPage from "../pages/interviews/InterviewsPage";
-import NotificationsPage from "../pages/notifications/NotificationsPage";
-import NotificationPreferences from "../pages/settings/NotificationPreferences";
-import CertificatesPage from "../pages/public/CertificatesPage";
+import OnboardingWizard from '../pages/onboarding/OnboardingWizard';
+import DashboardPage from '../pages/dashboard/DashboardPage';
+import StudentProfilePage from '../profile/pages/StudentProfilePage';
+import CoursesPage from '../pages/training/CoursesPage';
+import CourseDetailPage from '../pages/training/CourseDetailPage';
+import SessionsPage from '../pages/sessions/SessionsPage';
+import AssignmentsPage from '../pages/assignments/AssignmentsPage';
+import AssignmentDetail from '../pages/assignments/AssignmentDetail';
+import QuizzesPage from '../pages/quizzes/QuizzesPage';
+import CodingChallengePage from '../pages/coding/CodingChallengePage';
+import CodingChallengesPage from '../coding-challenges/pages/CodingChallengesPage';
+import SubmissionHistoryPage from '../coding-challenges/pages/SubmissionHistoryPage';
+import LeaderboardPage from '../coding-challenges/pages/LeaderboardPage';
+import ProjectsPage from '../pages/projects/ProjectsPage';
+import ProjectDetailPage from '../pages/projects/ProjectDetailPage';
+import PerformancePage from '../pages/performance/PerformancePage';
+import InterviewsPage from '../pages/interviews/InterviewsPage';
+import NotificationsPage from '../pages/notifications/NotificationsPage';
+import NotificationPreferences from '../pages/settings/NotificationPreferences';
+import CertificatesPage from '../pages/public/CertificatesPage';
 
 // ✅ IMPORT YOUR LEARNING MODULES PAGE
 import LearningModulesPage from '../learning-modules/pages/LearningModulesPage';
@@ -53,6 +55,10 @@ const studentRoute = (
           <Route path="assignments" element={<AssignmentsPage />} />
           <Route path="assignments/:id" element={<AssignmentDetail />} />
           <Route path="quizzes" element={<QuizzesPage />} />
+          {/* Coding Challenges */}
+          <Route path="coding-challenges" element={<CodingChallengesPage />} />
+          <Route path="coding-challenges/:challengeId/submissions" element={<SubmissionHistoryPage />} />
+          <Route path="coding-challenges/:challengeId/leaderboard" element={<LeaderboardPage />} />
           <Route path="coding/:challengeId" element={<CodingChallengePage />} />
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="projects/:projectId" element={<ProjectDetailPage />} />

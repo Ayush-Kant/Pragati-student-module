@@ -32,7 +32,6 @@ import {
     resolveStudentId,
     calculateProfileCompleteness,
     successResponse,
-    errorResponse,
 } from '../utils/studentProfileHelpers.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

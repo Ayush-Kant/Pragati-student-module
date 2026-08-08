@@ -1,16 +1,31 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import pg from "pg";
 import dotenv from "dotenv";
 import { setDefaultResultOrder } from "node:dns";
+import { normalizeDatabaseConnectionString } from "./connectionString.js";
 
 setDefaultResultOrder("ipv4first");
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envCandidates = [
+  path.resolve(__dirname, "..", "..", ".env"),
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(process.cwd(), "..", ".env"),
+];
+
+for (const envPath of envCandidates) {
+  dotenv.config({ path: envPath });
+}
 
 const { Pool } = pg;
-const connectionString = process.env.POSTGRESQL_URI;
+const connectionString = normalizeDatabaseConnectionString(
+  process.env.POSTGRESQL_URI || process.env.DATABASE_URL,
+);
 
 if (!connectionString) {
-  throw new Error("❌ POSTGRESQL_URI is missing in .env file");
+  throw new Error("❌ No database connection string found in .env file");
 }
 
 export const pool = new Pool({

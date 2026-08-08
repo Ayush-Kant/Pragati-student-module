@@ -72,7 +72,7 @@ export const getCourses = async () => {
     return result.rows.map(toCourse);
   } catch (error) {
     console.error("Error in getCourses:", error);
-    throw new Error("Failed to retrieve courses");
+    throw new Error("Failed to retrieve courses", { cause: error });
   }
 };
 
@@ -130,7 +130,7 @@ export const getCourseById = async (courseId) => {
     return course;
   } catch (error) {
     console.error("Error in getCourseById:", error);
-    throw new Error("Failed to retrieve course by ID");
+    throw new Error("Failed to retrieve course by ID", { cause: error });
   }
 };
 
@@ -166,7 +166,7 @@ export const getModules = async (courseId) => {
     }));
   } catch (error) {
     console.error("Error in getModules:", error);
-    throw new Error("Failed to retrieve modules");
+    throw new Error("Failed to retrieve modules", { cause: error });
   }
 };
 
@@ -206,7 +206,7 @@ export const getLessons = async (moduleId) => {
     }));
   } catch (error) {
     console.error("Error in getLessons:", error);
-    throw new Error("Failed to retrieve lessons");
+    throw new Error("Failed to retrieve lessons", { cause: error });
   }
 };
 
@@ -238,7 +238,7 @@ export const getLessonResources = async (lessonId) => {
     }));
   } catch (error) {
     console.error("Error in getLessonResources:", error);
-    throw new Error("Failed to retrieve lesson resources");
+    throw new Error("Failed to retrieve lesson resources", { cause: error });
   }
 };
 
@@ -272,7 +272,7 @@ export const getLessonProgress = async ({ studentId, lessonId = null }) => {
     return result.rows.map(toLessonProgress);
   } catch (error) {
     console.error("Error in getLessonProgress:", error);
-    throw new Error("Failed to retrieve lesson progress");
+    throw new Error("Failed to retrieve lesson progress", { cause: error });
   }
 };
 
@@ -282,7 +282,7 @@ export const getLessonProgressByIds = async ({ studentId, lessonId }) => {
     return progress[0] ?? null;
   } catch (error) {
     console.error("Error in getLessonProgressByIds:", error);
-    throw new Error("Failed to retrieve lesson progress by IDs");
+    throw new Error("Failed to retrieve lesson progress by IDs", { cause: error });
   }
 };
 
@@ -328,7 +328,7 @@ export const updateLessonProgress = async ({ studentId, lessonId, progressPct, c
     return await getLessonProgressByIds({ studentId, lessonId });
   } catch (error) {
     console.error("Error in updateLessonProgress:", error);
-    throw new Error("Failed to update lesson progress");
+    throw new Error("Failed to update lesson progress", { cause: error });
   }
 };
 
@@ -360,7 +360,7 @@ export const getStudentNotes = async ({ studentId, lessonId = null }) => {
     return result.rows.map(toStudentNote);
   } catch (error) {
     console.error("Error in getStudentNotes:", error);
-    throw new Error("Failed to retrieve student notes");
+    throw new Error("Failed to retrieve student notes", { cause: error });
   }
 };
 
@@ -390,7 +390,7 @@ const getStudentNoteById = async (noteId) => {
     return result.rows[0] ? toStudentNote(result.rows[0]) : null;
   } catch (error) {
     console.error("Error in getStudentNoteById:", error);
-    throw new Error("Failed to retrieve student note by ID");
+    throw new Error("Failed to retrieve student note by ID", { cause: error });
   }
 };
 
@@ -442,7 +442,7 @@ export const saveStudentNote = async ({ studentId, lessonId, content, noteId = n
     return await getStudentNoteById(insertResult.rows[0].note_id);
   } catch (error) {
     console.error("Error in saveStudentNote:", error);
-    throw new Error("Failed to save student note");
+    throw new Error("Failed to save student note", { cause: error });
   }
 };
 
@@ -474,7 +474,7 @@ export const getLessonBookmarks = async ({ studentId, lessonId = null }) => {
     return result.rows.map(toLessonBookmark);
   } catch (error) {
     console.error("Error in getLessonBookmarks:", error);
-    throw new Error("Failed to retrieve lesson bookmarks");
+    throw new Error("Failed to retrieve lesson bookmarks", { cause: error });
   }
 };
 
@@ -487,7 +487,7 @@ export const getLessonBookmark = async ({ studentId, lessonId }) => {
     return await getLessonBookmarkByIds({ studentId, lessonId });
   } catch (error) {
     console.error("Error in getLessonBookmark:", error);
-    throw new Error("Failed to retrieve lesson bookmark");
+    throw new Error("Failed to retrieve lesson bookmark", { cause: error });
   }
 };
 
@@ -518,7 +518,7 @@ const getLessonBookmarkByIds = async ({ studentId, lessonId }) => {
     return result.rows[0] ? toLessonBookmark(result.rows[0]) : null;
   } catch (error) {
     console.error("Error in getLessonBookmarkByIds:", error);
-    throw new Error("Failed to retrieve lesson bookmark by IDs");
+    throw new Error("Failed to retrieve lesson bookmark by IDs", { cause: error });
   }
 };
 
@@ -552,7 +552,7 @@ export const saveLessonBookmark = async ({ studentId, lessonId, bookmarkTimeSeco
     return await getLessonBookmarkByIds({ studentId, lessonId });
   } catch (error) {
     console.error("Error in saveLessonBookmark:", error);
-    throw new Error("Failed to save lesson bookmark");
+    throw new Error("Failed to save lesson bookmark", { cause: error });
   }
 };
 
@@ -575,6 +575,6 @@ export const deleteLessonBookmark = async ({ studentId, lessonId }) => {
     return result.rows.length > 0;
   } catch (error) {
     console.error("Error in deleteLessonBookmark:", error);
-    throw new Error("Failed to delete lesson bookmark");
+    throw new Error("Failed to delete lesson bookmark", { cause: error });
   }
 };
