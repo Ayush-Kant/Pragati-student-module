@@ -1,52 +1,40 @@
-import { useCallback, useEffect, useState } from "react";
-import { getRecordings, downloadRecording } from "../services/liveSessionService";
+// useRecordings.js
+// Fetches recording availability/URL for a specific session
 
-/**
- * Fetches recordings and exposes a download action.
- * Responsibilities: fetch recordings, download recording, loading/error state.
- */
-export function useRecordings() {
-  const [recordings, setRecordings] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+import { useState, useEffect, useCallback } from "react";
+import { getRecordings } from "../services/liveSessionsService";
+import { LOADING_STATES } from "../constants/liveSessionsConstants";
+
+const useRecordings = (sessionId) => {
+  const [recording, setRecording] = useState(null);
+  const [loadingState, setLoadingState] = useState(LOADING_STATES.IDLE);
   const [error, setError] = useState(null);
-  const [downloadingId, setDownloadingId] = useState(null);
 
-  const fetchRecordings = useCallback(async () => {
-    setIsLoading(true);
+  const fetchRecording = useCallback(async () => {
+    if (!sessionId) return;
+    setLoadingState(LOADING_STATES.LOADING);
     setError(null);
-    const result = await getRecordings();
-    if (result.success) {
-      setRecordings(result.data);
-    } else {
-      setError(result.error);
+    try {
+      const data = await getRecordings(sessionId);
+      setRecording(data);
+      setLoadingState(LOADING_STATES.SUCCESS);
+    } catch (err) {
+      setError(err.message || "Failed to load recording");
+      setLoadingState(LOADING_STATES.ERROR);
     }
-    setIsLoading(false);
-  }, []);
+  }, [sessionId]);
 
   useEffect(() => {
-    fetchRecordings();
-  }, [fetchRecordings]);
-
-  const download = useCallback(async (sessionId) => {
-    setDownloadingId(sessionId);
-    const result = await downloadRecording(sessionId);
-    if (result.success && typeof window !== "undefined") {
-      const link = document.createElement("a");
-      link.href = result.data.url;
-      link.download = result.data.filename || "recording.mp4";
-      link.rel = "noopener noreferrer";
-      link.click();
-    }
-    setDownloadingId(null);
-    return result;
-  }, []);
+    fetchRecording();
+  }, [fetchRecording]);
 
   return {
-    recordings,
-    isLoading,
+    recording,
+    loading: loadingState === LOADING_STATES.LOADING,
+    loadingState,
     error,
-    refetch: fetchRecordings,
-    download,
-    isDownloading: (id) => downloadingId === id,
+    refetch: fetchRecording,
   };
-}
+};
+
+export default useRecordings;

@@ -1,68 +1,65 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  getLiveSessions,
-  joinSession as joinSessionApi,
-  leaveSession as leaveSessionApi,
-} from "../services/liveSessionService";
-import { splitUpcomingAndPast } from "../utils/liveSessionHelpers";
+// useLiveSessions.js
+// Fetches live sessions and exposes filter/sort state for the listing UI
 
-/**
- * Fetches and manages the list of live sessions.
- * Responsibilities: fetch session data, join, leave, loading/error state.
- */
-export function useLiveSessions() {
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { getLiveSessions } from "../services/liveSessionsService";
+import { LOADING_STATES } from "../constants/liveSessionsConstants";
+import { filterSessionsByStatus, sortSessionsByStartTime } from "../utils/liveSessionsHelpers";
+import { validateSession } from "../validations/liveSessionsValidation";
+
+const useLiveSessions = () => {
   const [sessions, setSessions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loadingState, setLoadingState] = useState(LOADING_STATES.IDLE);
   const [error, setError] = useState(null);
-  const [actionState, setActionState] = useState({ id: null, type: null });
+  const [statusFilter, setStatusFilter] = useState("All");
 
   const fetchSessions = useCallback(async () => {
-    setIsLoading(true);
+    setLoadingState(LOADING_STATES.LOADING);
     setError(null);
-    const result = await getLiveSessions();
-    if (result.success) {
-      setSessions(result.data);
-    } else {
-      setError(result.error);
+    try {
+      const data = await getLiveSessions();
+
+      const validSessions = data.filter((session) => {
+        const { valid, errors } = validateSession(session);
+        if (!valid) {
+          console.warn(`Invalid session data (id: ${session?.id ?? "unknown"}):`, errors);
+        }
+        return valid;
+      });
+
+      setSessions(validSessions);
+      setLoadingState(LOADING_STATES.SUCCESS);
+    } catch (err) {
+      setError(err.message || "Failed to load live sessions");
+      setLoadingState(LOADING_STATES.ERROR);
     }
-    setIsLoading(false);
   }, []);
 
   useEffect(() => {
     fetchSessions();
   }, [fetchSessions]);
 
-  const joinSession = useCallback(async (sessionId) => {
-    setActionState({ id: sessionId, type: "join" });
-    const result = await joinSessionApi(sessionId);
-    if (result.success) {
-      setSessions((prev) =>
-        prev.map((s) => (s.id === sessionId ? { ...s, status: "Ongoing" } : s))
-      );
-    }
-    setActionState({ id: null, type: null });
-    return result;
-  }, []);
+  const filteredSessions = useMemo(
+    () => sortSessionsByStartTime(filterSessionsByStatus(sessions, statusFilter)),
+    [sessions, statusFilter]
+  );
 
-  const leaveSession = useCallback(async (sessionId) => {
-    setActionState({ id: sessionId, type: "leave" });
-    const result = await leaveSessionApi(sessionId);
-    setActionState({ id: null, type: null });
-    return result;
-  }, []);
-
-  const { upcoming, past } = splitUpcomingAndPast(sessions);
+  const upcomingSessions = useMemo(
+    () => sortSessionsByStartTime(sessions.filter((s) => s.status === "Upcoming" || s.status === "Live")),
+    [sessions]
+  );
 
   return {
-    sessions,
-    upcomingSessions: upcoming,
-    pastSessions: past,
-    isLoading,
+    sessions: filteredSessions,
+    allSessions: sessions,
+    upcomingSessions,
+    statusFilter,
+    setStatusFilter,
+    loading: loadingState === LOADING_STATES.LOADING,
+    loadingState,
     error,
     refetch: fetchSessions,
-    joinSession,
-    leaveSession,
-    isJoining: (id) => actionState.id === id && actionState.type === "join",
-    isLeaving: (id) => actionState.id === id && actionState.type === "leave",
   };
-}
+};
+
+export default useLiveSessions;

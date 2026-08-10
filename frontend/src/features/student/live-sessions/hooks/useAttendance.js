@@ -1,74 +1,47 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { getAttendance, updateAttendance } from "../services/liveSessionService";
-import { calculateAttendanceProgress } from "../utils/liveSessionHelpers";
+// useAttendance.js
+// Fetches attendance status for a specific session
 
-/**
- * Tracks attendance status/history for a set of sessions.
- * Responsibilities: fetch attendance, mark attendance, compute progress.
- */
-export function useAttendance(sessions = []) {
-  const [attendanceMap, setAttendanceMap] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+import { useState, useEffect, useCallback } from "react";
+import { getAttendance } from "../services/liveSessionsService";
+import { LOADING_STATES } from "../constants/liveSessionsConstants";
+import { validateAttendanceStatus } from "../validations/liveSessionsValidation";
+
+const useAttendance = (sessionId) => {
+  const [attendance, setAttendance] = useState(null);
+  const [loadingState, setLoadingState] = useState(LOADING_STATES.IDLE);
   const [error, setError] = useState(null);
 
+  const fetchAttendance = useCallback(async () => {
+    if (!sessionId) return;
+    setLoadingState(LOADING_STATES.LOADING);
+    setError(null);
+    try {
+      const data = await getAttendance(sessionId);
+
+      const { valid, errors } = validateAttendanceStatus(data?.status);
+      if (!valid) {
+        console.warn(`Invalid attendance status (sessionId: ${sessionId}):`, errors);
+      }
+
+      setAttendance(data);
+      setLoadingState(LOADING_STATES.SUCCESS);
+    } catch (err) {
+      setError(err.message || "Failed to load attendance");
+      setLoadingState(LOADING_STATES.ERROR);
+    }
+  }, [sessionId]);
+
   useEffect(() => {
-    if (!sessions.length) return;
-    let cancelled = false;
+    fetchAttendance();
+  }, [fetchAttendance]);
 
-    async function loadAll() {
-      setIsLoading(true);
-      setError(null);
-      const results = await Promise.all(
-        sessions.map((s) => getAttendance(s.id))
-      );
-      if (cancelled) return;
+  return {
+    attendance,
+    loading: loadingState === LOADING_STATES.LOADING,
+    loadingState,
+    error,
+    refetch: fetchAttendance,
+  };
+};
 
-      const nextMap = {};
-      let firstError = null;
-      results.forEach((res, i) => {
-        if (res.success) {
-          nextMap[sessions[i].id] = res.data.attendance;
-        } else {
-          firstError = firstError || res.error;
-        }
-      });
-      setAttendanceMap(nextMap);
-      setError(firstError);
-      setIsLoading(false);
-    }
-
-    loadAll();
-    return () => {
-      cancelled = true;
-    };
-  }, [sessions]);
-
-  const markAttendance = useCallback(async (sessionId, value) => {
-    const result = await updateAttendance(sessionId, value);
-    if (result.success) {
-      setAttendanceMap((prev) => ({ ...prev, [sessionId]: value }));
-    }
-    return result;
-  }, []);
-
-  const attendanceHistory = useMemo(
-    () =>
-      sessions.map((s) => ({
-        sessionId: s.id,
-        title: s.title,
-        date: s.date,
-        status: attendanceMap[s.id] ?? s.attendance,
-      })),
-    [sessions, attendanceMap]
-  );
-
-  const progress = useMemo(
-    () =>
-      calculateAttendanceProgress(
-        sessions.map((s) => ({ ...s, attendance: attendanceMap[s.id] ?? s.attendance }))
-      ),
-    [sessions, attendanceMap]
-  );
-
-  return { attendanceMap, attendanceHistory, progress, isLoading, error, markAttendance };
-}
+export default useAttendance;
