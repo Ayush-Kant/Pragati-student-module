@@ -15,6 +15,9 @@ import AssignmentsPage from "../pages/assignments/AssignmentsPage";
 import AssignmentDetail from "../pages/assignments/AssignmentDetail";
 import QuizzesPage from "../pages/quizzes/QuizzesPage";
 import CodingChallengePage from "../pages/coding/CodingChallengePage";
+import CodingChallengesPage from "../coding-challenges/pages/CodingChallengesPage";
+import SubmissionHistoryPage from "../coding-challenges/pages/SubmissionHistoryPage";
+import LeaderboardPage from "../coding-challenges/pages/LeaderboardPage";
 import ProjectsPage from "../pages/projects/ProjectsPage";
 import ProjectDetailPage from "../pages/projects/ProjectDetailPage";
 import PerformancePage from "../pages/performance/PerformancePage";
@@ -99,6 +102,24 @@ const studentRoute = (
         <Route
           path="quizzes"
           element={<QuizzesPage />}
+        />
+
+
+        <Route
+          path="coding-challenges"
+          element={<CodingChallengesPage />}
+        />
+
+
+        <Route
+          path="coding-challenges/:challengeId/submissions"
+          element={<SubmissionHistoryPage />}
+        />
+
+
+        <Route
+          path="coding-challenges/:challengeId/leaderboard"
+          element={<LeaderboardPage />}
         />
 
 

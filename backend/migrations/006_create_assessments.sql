@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS assessments (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   type VARCHAR(20) NOT NULL
-    CHECK(type IN ('MCQ', 'Coding')),
+    CHECK(type IN ('Technical', 'Behavioural', 'Aptitude', 'Design')),
   difficulty VARCHAR(20) NOT NULL
     CHECK(difficulty IN ('Easy', 'Medium', 'Hard')),
   time_limit_minutes INTEGER NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS assessment_questions (
     REFERENCES assessments(id)
     ON DELETE CASCADE,
   type VARCHAR(20) NOT NULL
-    CHECK(type IN ('MCQ', 'Coding')),
+    CHECK(type IN ('Technical', 'Behavioural', 'Aptitude', 'Design')),
   question_text TEXT,
   options JSONB,
   correct_option INTEGER,

@@ -43,12 +43,16 @@ const createInterview = async ({
         INSERT INTO interviews
         (
             application_id,
+            student_id,
+            drive_id,
             scheduled_at,
-            interview_type,
+            title,
             interviewer_id,
             meeting_link
         )
-        VALUES ($1, $2, $3, $4, $5)
+        SELECT id, student_id, drive_id, $2, $3, $4, $5
+        FROM applications
+        WHERE id = $1
         RETURNING *
         `,
         [
@@ -66,9 +70,9 @@ const createInterview = async ({
     try {
         const candidateDetails = await pool.query(
             `
-            SELECT u.email, u.full_name
+            SELECT s.email, s.name AS full_name
             FROM applications a
-            JOIN users u ON a.student_id = u.id
+            JOIN students s ON a.student_id = s.id
             WHERE a.id = $1
             `,
             [applicationId]
@@ -98,7 +102,8 @@ const submitFeedback = async (id, feedback) => {
     const result = await pool.query(
         `
         UPDATE interviews
-        SET feedback = $2
+        SET feedback = $2,
+            updated_at = NOW()
         WHERE id = $1
         RETURNING *
         `,
@@ -125,7 +130,8 @@ const updateResult = async (id, resultStatus, attendanceStatus) => {
         UPDATE interviews
         SET result = $2,
             status = $3,
-            attendance = $4
+            attendance = $4,
+            updated_at = NOW()
         WHERE id = $1
         RETURNING *
         `,
@@ -139,10 +145,10 @@ const updateResult = async (id, resultStatus, attendanceStatus) => {
         try {
             const candidateDetails = await pool.query(
                 `
-                SELECT u.email, u.full_name
+                SELECT s.email, s.name AS full_name
                 FROM interviews i
                 JOIN applications a ON i.application_id = a.id
-                JOIN users u ON a.student_id = u.id
+                JOIN students s ON a.student_id = s.id
                 WHERE i.id = $1
                 `,
                 [id]
@@ -153,7 +159,7 @@ const updateResult = async (id, resultStatus, attendanceStatus) => {
                 await sendInterviewResultEmail(
                     email,
                     full_name,
-                    interview.interview_type,
+                    interview.title,
                     resultStatus
                 );
             }
@@ -171,4 +177,4 @@ export {
     createInterview,
     submitFeedback,
     updateResult,
-};
+};

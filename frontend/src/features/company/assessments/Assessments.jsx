@@ -255,7 +255,7 @@ const Assessments = () => {
 
   if (loadingAssessments) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin inline-block"></div>
           <p className="text-gray-600 mt-4 font-semibold">Loading assessments...</p>
@@ -520,11 +520,12 @@ const Assessments = () => {
               ))}
             </div>
 
-            <div className="assign-drive-box">
+            <div className="assign-drive-box mx-7">
               <h3>Assign Assessment To Drive</h3>
               <select
                 value={selectedDriveId}
                 onChange={(e) => setSelectedDriveId(e.target.value)}
+                className="border border-gray-300 rounded-lg mt-1"
               >
                 <option value="">Select Drive</option>
                 {drives.map(d => (
@@ -533,7 +534,7 @@ const Assessments = () => {
               </select>
               <button
                 type="button"
-                className="assign-btn"
+                className="assign-btn ml-3"
                 onClick={() => {
                   if (!selectedDriveId) {
                     toast.error('Please select a drive first');
@@ -587,8 +588,9 @@ const Assessments = () => {
           <div className="assessment-modal">
             <div className="assessment-modal-content">
               <h2 className="edit-title"> Edit Assessment </h2>
-              <form onSubmit={handleSaveAssessment}>
+              <form onSubmit={handleSaveAssessment} className="space-y-2">
                 <input
+                  className="border rounded-lg p-2 outline-none"
                   type="text"
                   value={editForm.title}
                   onChange={(e) =>
@@ -601,6 +603,7 @@ const Assessments = () => {
                 />
 
                 <select
+                  className="border rounded-lg p-2 outline-none"
                   value={editForm.type}
                   onChange={(e) =>
                     setEditForm({
@@ -615,6 +618,7 @@ const Assessments = () => {
                 </select>
 
                 <select
+                  className="border rounded-lg p-2 outline-none"
                   value={editForm.difficulty}
                   onChange={(e) =>
                     setEditForm({
@@ -638,23 +642,26 @@ const Assessments = () => {
                     })
                   }
                   placeholder="Duration (mins)"
+                  className="border rounded-lg p-2 outline-none"
                   required
                 />
 
-                <button
-                  className="save-btn"
-                  type="submit"
-                >
-                  Save Changes
-                </button>
+                <div className="edit-assessment-btn">
+                  <button
+                    className="save-btn"
+                    type="submit"
+                  >
+                    Save Changes
+                  </button>
 
-                <button
-                  className="cancel-btn"
-                  type="button"
-                  onClick={closeAssessmentDialog}
-                >
-                  Cancel
-                </button>
+                  <button
+                    className="cancel-btn"
+                    type="button"
+                    onClick={closeAssessmentDialog}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </form>
             </div>
           </div>
