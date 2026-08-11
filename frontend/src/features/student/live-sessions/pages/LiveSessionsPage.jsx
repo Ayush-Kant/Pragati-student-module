@@ -1,143 +1,95 @@
 // LiveSessionsPage.jsx
-// ⚠️ RESERVED FILE — only the Team Lead (@bhavyachawda07) modifies this per project rules.
-// This is the single top-level page for the Live Sessions module. It wires
-// Pages → Components → Hooks → Services together and should stay thin:
-// data + orchestration only, no business logic (that belongs in hooks/services).
+// Entry page for the Live Sessions module (MOD-04 / issue #421-422)
+// Pages -> Components -> Hooks -> Services -> Backend APIs
 
 import { useState } from "react";
-import { useLiveSessions } from "../hooks/useLiveSessions";
-import { useAttendance } from "../hooks/useAttendance";
-import { useRecordings } from "../hooks/useRecordings";
-import { useSessionFilters } from "../hooks/useSessionFilters";
 
-import UpcomingSessions from "../components/sessions/UpcomingSessions";
-import PastSessions from "../components/sessions/PastSessions";
-import SessionDetails from "../components/sessions/SessionDetails";
-import RecordingList from "../components/recordings/RecordingList";
-import AttendanceHistory from "../components/attendance/AttendanceHistory";
-import AttendanceProgress from "../components/attendance/AttendanceProgress";
+import useLiveSessions from "../hooks/useLiveSessions";
+import useAttendance from "../hooks/useAttendance";
+import useRecordings from "../hooks/useRecordings";
 
-import SearchSession from "../components/filters/SearchSession";
-import StatusFilter from "../components/filters/StatusFilter";
-import DateFilter from "../components/filters/DateFilter";
-import TrainerFilter from "../components/filters/TrainerFilter";
+import SessionCard from "../components/SessionCard";
+import SessionDetails from "../components/SessionDetails";
+import SessionFilter from "../components/SessionFilter";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorState from "../components/ErrorState";
+import EmptyState from "../components/EmptyState";
 
-import LoadingSpinner from "../components/common/LoadingSpinner";
-import ErrorState from "../components/common/ErrorState";
-import ConfirmationModal from "../components/common/ConfirmationModal";
+import { EMPTY_MESSAGES } from "../constants/liveSessionsConstants";
 
-export default function LiveSessionsPage() {
+const LiveSessionsPage = () => {
   const {
     sessions,
-    isLoading,
+    statusFilter,
+    setStatusFilter,
+    loading,
     error,
     refetch,
-    joinSession,
-    leaveSession,
-    isJoining,
   } = useLiveSessions();
 
-  const {
-    search,
-    setSearch,
-    status,
-    setStatus,
-    dateRange,
-    setDateRange,
-    trainer,
-    setTrainer,
-    trainerOptions,
-    filteredSessions,
-  } = useSessionFilters(sessions);
+  const [selectedSessionId, setSelectedSessionId] = useState(null);
+  const selectedSession = sessions.find((s) => s.id === selectedSessionId) || null;
 
-  const { attendanceHistory, progress } = useAttendance(sessions);
-  const { recordings, download, isDownloading } = useRecordings();
+  const { attendance, loading: attendanceLoading } = useAttendance(
+    selectedSession?.status === "Completed" ? selectedSessionId : null
+  );
+  const { recording, loading: recordingLoading } = useRecordings(
+    selectedSession?.status === "Completed" ? selectedSessionId : null
+  );
 
-  const [selectedSession, setSelectedSession] = useState(null);
-  const [activeSession, setActiveSession] = useState(null); // session currently "joined"
-  const [leaveTarget, setLeaveTarget] = useState(null);
+  const handleSelectSession = (session) => setSelectedSessionId(session.id);
+  const handleBack = () => setSelectedSessionId(null);
 
-  const upcoming = filteredSessions.filter((s) => s.status === "Upcoming" || s.status === "Ongoing");
-  const past = filteredSessions.filter((s) => s.status === "Completed" || s.status === "Cancelled");
+  if (selectedSessionId) {
+    return (
+      <div className="p-4 md:p-6 max-w-3xl mx-auto">
+        <button
+          onClick={handleBack}
+          className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-1"
+        >
+          ← Back to Sessions
+        </button>
 
-  const handleJoin = async (sessionId) => {
-    const result = await joinSession(sessionId);
-    if (result.success) {
-      setActiveSession(sessions.find((s) => s.id === sessionId) || null);
-      setSelectedSession(null);
-    }
-  };
-
-  const confirmLeave = async () => {
-    if (leaveTarget) {
-      await leaveSession(leaveTarget.id);
-    }
-    setActiveSession(null);
-    setLeaveTarget(null);
-  };
-
-  if (isLoading) {
-    return <LoadingSpinner label="Loading live sessions…" />;
-  }
-
-  if (error) {
-    return <ErrorState message={error} onRetry={refetch} />;
+        <SessionDetails
+          session={selectedSession}
+          loading={loading}
+          error={error}
+          onRetry={refetch}
+          attendance={attendance}
+          attendanceLoading={attendanceLoading}
+          recording={recording}
+          recordingLoading={recordingLoading}
+        />
+      </div>
+    );
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-10 px-4 py-8">
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900">Live Sessions</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Join live classes, catch up on recordings, and track your attendance.
+    <div className="p-4 md:p-6 max-w-6xl mx-auto flex flex-col gap-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800">Live Sessions</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Join upcoming sessions, check attendance, and watch past recordings.
         </p>
-      </header>
-
-      <AttendanceProgress progress={progress} />
-
-      <div className="flex flex-wrap items-center gap-3">
-        <SearchSession value={search} onChange={setSearch} />
-        <StatusFilter value={status} onChange={setStatus} />
-        <DateFilter value={dateRange} onChange={setDateRange} />
-        <TrainerFilter value={trainer} onChange={setTrainer} options={trainerOptions} />
       </div>
 
-      <UpcomingSessions
-        sessions={upcoming}
-        onViewDetails={setSelectedSession}
-        onJoin={handleJoin}
-        isJoining={isJoining}
-      />
+      <SessionFilter value={statusFilter} onChange={setStatusFilter} />
 
-      <PastSessions sessions={past} onViewDetails={setSelectedSession} />
-
-      <RecordingList
-        recordings={recordings}
-        onPlay={setSelectedSession}
-        onDownload={download}
-        isDownloading={isDownloading}
-      />
-
-      <AttendanceHistory history={attendanceHistory} />
-
-      {selectedSession && (
-        <SessionDetails
-          session={selectedSession}
-          onClose={() => setSelectedSession(null)}
-          onJoin={handleJoin}
-          isJoining={isJoining(selectedSession.id)}
-        />
+      {loading ? (
+        <LoadingSpinner label="Loading live sessions..." />
+      ) : error ? (
+        <ErrorState message={error} onRetry={refetch} />
+      ) : !sessions.length ? (
+        <EmptyState title="No sessions found" message={EMPTY_MESSAGES.SESSIONS} icon="📅" />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sessions.map((session) => (
+            <SessionCard key={session.id} session={session} onView={handleSelectSession} />
+          ))}
+        </div>
       )}
-
-      <ConfirmationModal
-        isOpen={!!leaveTarget}
-        title="Leave this session?"
-        message="You can rejoin anytime before it ends."
-        confirmLabel="Leave"
-        tone="danger"
-        onConfirm={confirmLeave}
-        onCancel={() => setLeaveTarget(null)}
-      />
     </div>
   );
-}
+};
+
+export default LiveSessionsPage;
