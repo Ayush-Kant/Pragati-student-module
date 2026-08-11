@@ -1,21 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getProjects } from '../services/projectService';
+import { useState, useEffect, useCallback } from "react";
+import { projectService } from "../services/projectService";
 
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchProjects = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
     try {
-      const data = await getProjects();
+      setLoading(true);
+      setError(null);
+      const data = await projectService.getProjects();
       setProjects(data);
     } catch (err) {
-      setError(err.message || 'Failed to load projects list.');
+      setError(err.message || "Failed to fetch projects.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }, []);
 
@@ -25,7 +25,7 @@ export const useProjects = () => {
 
   return {
     projects,
-    isLoading,
+    loading,
     error,
     refetch: fetchProjects,
   };

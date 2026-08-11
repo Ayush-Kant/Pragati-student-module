@@ -1,143 +1,193 @@
-import React, { useState } from 'react';
-import { Send, Github, FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
-import ProjectFiles from './ProjectFiles';
-import { validateSubmissionForm } from '../../validations/projectValidation';
+import React, { useState } from "react";
+import { Send, Github, CheckCircle, Loader2 } from "lucide-react";
+import FileUpload from "./FileUpload";
+import UploadedFiles from "./UploadedFiles";
+import GitHubRepository from "./GitHubRepository";
 
-export const SubmissionForm = ({ onSubmit, defaultGithubRepoUrl = '', isSubmitting = false }) => {
+export const SubmissionForm = ({
+  project,
+  onSubmit,
+  submitting,
+  uploading,
+  validationErrors = {},
+  submittedSuccess,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    notes: '',
-    githubRepoUrl: defaultGithubRepoUrl || '',
-    files: [],
+    title: "",
+    notes: "",
+    githubRepoUrl: project?.githubRepo?.url || "",
+    githubBranch: project?.githubRepo?.branch || "main",
+    commitHash: "",
   });
 
-  const [errors, setErrors] = useState({});
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
-  const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: null }));
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleRemoveFile = (index) => {
+    setSelectedFiles((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const validation = validateSubmissionForm(formData);
-
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      return;
-    }
-
-    try {
-      if (onSubmit) {
-        await onSubmit(formData);
-        setIsSuccess(true);
-        setFormData({
-          title: '',
-          notes: '',
-          githubRepoUrl: defaultGithubRepoUrl || '',
-          files: [],
-        });
-        setTimeout(() => setIsSuccess(false), 5000);
-      }
-    } catch (err) {
-      setErrors({ form: err.message || 'Submission failed. Please try again.' });
-    }
+    onSubmit(formData, selectedFiles);
   };
+
+  if (submittedSuccess) {
+    return (
+      <div className="bg-white dark:bg-surface-800 rounded-2xl border border-emerald-200 dark:border-emerald-800 p-8 text-center shadow-lg my-6">
+        <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <CheckCircle className="w-10 h-10" />
+        </div>
+        <h3 className="text-xl font-extrabold text-surface-900 dark:text-white mb-2">
+          Submission Received Successfully!
+        </h3>
+        <p className="text-sm text-surface-600 dark:text-surface-300 max-w-md mx-auto mb-6">
+          Your project work and uploaded files have been submitted. Your assigned mentor has been notified for evaluation.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-xl transition-all shadow-md"
+        >
+          Submit Another Artifact
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-5">
-      <div className="flex items-center justify-between pb-4 border-b border-slate-700/60">
-        <div>
-          <h3 className="text-base font-bold text-slate-100">Submit Project Deliverable</h3>
-          <p className="text-xs text-slate-400">Upload code repository link, artifacts, and summary for faculty evaluation.</p>
-        </div>
-      </div>
+    <form onSubmit={handleSubmit} className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 md:p-8 shadow-sm">
+      <h3 className="text-lg font-extrabold text-surface-900 dark:text-white mb-6">
+        Submit Project Milestone / Deliverables
+      </h3>
 
-      {isSuccess && (
-        <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl text-emerald-300 text-xs font-semibold flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 shrink-0" /> Deliverable submitted successfully! Your mentor has been notified.
-        </div>
-      )}
-
-      {errors.form && (
-        <div className="bg-rose-500/10 border border-rose-500/30 p-4 rounded-xl text-rose-300 text-xs font-semibold flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 shrink-0" /> {errors.form}
-        </div>
-      )}
-
-      {/* Title */}
-      <div>
-        <label className="text-xs font-bold text-slate-200 block mb-1">
-          Deliverable Title / Release Name <span className="text-rose-400">*</span>
+      {/* Submission Title */}
+      <div className="mb-5">
+        <label className="block text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider mb-2">
+          Submission Title *
         </label>
         <input
           type="text"
-          placeholder="e.g. Milestone 2 Deliverable — React Frontend Implementation"
+          name="title"
           value={formData.title}
-          onChange={(e) => handleChange('title', e.target.value)}
-          className={`w-full bg-slate-900 border text-slate-100 placeholder-slate-400 text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 transition-colors ${
-            errors.title ? 'border-rose-500' : 'border-slate-700'
-          }`}
+          onChange={handleChange}
+          placeholder="e.g. Mid-Term Sprint Milestone Submission"
+          className={`w-full px-4 py-3 bg-surface-50 dark:bg-surface-900/60 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${
+            validationErrors.title
+              ? "border-rose-400 focus:ring-rose-400"
+              : "border-surface-300 dark:border-surface-600 focus:ring-brand-500"
+          } dark:text-white`}
         />
-        {errors.title && <p className="text-rose-400 text-[11px] mt-1 font-medium">{errors.title}</p>}
+        {validationErrors.title && (
+          <p className="text-xs text-rose-500 mt-1">{validationErrors.title}</p>
+        )}
       </div>
 
       {/* GitHub Repository Link */}
-      <div>
-        <label className="text-xs font-bold text-slate-200 block mb-1">
-          GitHub Repository URL <span className="text-rose-400">*</span>
+      <div className="mb-5">
+        <label className="block text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
+          <Github className="w-4 h-4 text-surface-500" />
+          <span>GitHub Repository URL *</span>
         </label>
-        <div className="relative">
-          <Github className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <input
+          type="url"
+          name="githubRepoUrl"
+          value={formData.githubRepoUrl}
+          onChange={handleChange}
+          placeholder="https://github.com/organization/repository"
+          className={`w-full px-4 py-3 bg-surface-50 dark:bg-surface-900/60 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${
+            validationErrors.githubRepoUrl
+              ? "border-rose-400 focus:ring-rose-400"
+              : "border-surface-300 dark:border-surface-600 focus:ring-brand-500"
+          } dark:text-white`}
+        />
+        {validationErrors.githubRepoUrl && (
+          <p className="text-xs text-rose-500 mt-1">{validationErrors.githubRepoUrl}</p>
+        )}
+      </div>
+
+      {/* Branch & Commit Optional Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+        <div>
+          <label className="block text-xs font-semibold text-surface-600 dark:text-surface-400 mb-1">
+            Target Branch
+          </label>
           <input
-            type="url"
-            placeholder="https://github.com/uptoskills-students/your-repo-name"
-            value={formData.githubRepoUrl}
-            onChange={(e) => handleChange('githubRepoUrl', e.target.value)}
-            className={`w-full bg-slate-900 border text-slate-100 placeholder-slate-400 text-xs rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-indigo-500 transition-colors ${
-              errors.githubRepoUrl ? 'border-rose-500' : 'border-slate-700'
-            }`}
+            type="text"
+            name="githubBranch"
+            value={formData.githubBranch}
+            onChange={handleChange}
+            placeholder="main"
+            className="w-full px-3.5 py-2.5 bg-surface-50 dark:bg-surface-900/60 border border-surface-300 dark:border-surface-600 rounded-xl text-sm dark:text-white"
           />
         </div>
-        {errors.githubRepoUrl && <p className="text-rose-400 text-[11px] mt-1 font-medium">{errors.githubRepoUrl}</p>}
+        <div>
+          <label className="block text-xs font-semibold text-surface-600 dark:text-surface-400 mb-1">
+            Commit SHA (Optional)
+          </label>
+          <input
+            type="text"
+            name="commitHash"
+            value={formData.commitHash}
+            onChange={handleChange}
+            placeholder="e.g. fa8291c"
+            className="w-full px-3.5 py-2.5 bg-surface-50 dark:bg-surface-900/60 border border-surface-300 dark:border-surface-600 rounded-xl text-sm dark:text-white"
+          />
+        </div>
       </div>
 
       {/* Notes / Description */}
-      <div>
-        <label className="text-xs font-bold text-slate-200 block mb-1">
-          Submission Summary / Technical Notes <span className="text-rose-400">*</span>
+      <div className="mb-6">
+        <label className="block text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider mb-2">
+          Submission Notes & Summary *
         </label>
         <textarea
+          name="notes"
           rows={4}
-          placeholder="Describe completed features, architecture highlights, setup steps, or any known limitations for the evaluator..."
           value={formData.notes}
-          onChange={(e) => handleChange('notes', e.target.value)}
-          className={`w-full bg-slate-900 border text-slate-100 placeholder-slate-400 text-xs rounded-xl p-3 focus:outline-none focus:border-indigo-500 transition-colors ${
-            errors.notes ? 'border-rose-500' : 'border-slate-700'
-          }`}
+          onChange={handleChange}
+          placeholder="Describe what was accomplished in this milestone, testing instructions, and key highlights..."
+          className={`w-full px-4 py-3 bg-surface-50 dark:bg-surface-900/60 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${
+            validationErrors.notes
+              ? "border-rose-400 focus:ring-rose-400"
+              : "border-surface-300 dark:border-surface-600 focus:ring-brand-500"
+          } dark:text-white`}
         />
-        {errors.notes && <p className="text-rose-400 text-[11px] mt-1 font-medium">{errors.notes}</p>}
+        {validationErrors.notes && (
+          <p className="text-xs text-rose-500 mt-1">{validationErrors.notes}</p>
+        )}
       </div>
 
-      {/* File Upload Dropzone */}
-      <ProjectFiles
-        files={formData.files}
-        onFilesChange={(files) => handleChange('files', files)}
+      {/* File Upload Section */}
+      <FileUpload
+        selectedFiles={selectedFiles}
+        onFilesChange={setSelectedFiles}
+        error={validationErrors.files}
       />
-      {errors.files && <p className="text-rose-400 text-[11px] font-medium">{errors.files}</p>}
+
+      <UploadedFiles files={selectedFiles} onRemoveFile={handleRemoveFile} />
 
       {/* Submit Button */}
-      <div className="pt-2">
+      <div className="pt-4 border-t border-surface-100 dark:border-surface-700 flex justify-end">
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/25 transition-all inline-flex items-center justify-center gap-2"
+          disabled={submitting || uploading}
+          className="inline-flex items-center space-x-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-brand-500/25 active:scale-95"
         >
-          <Send className="w-4 h-4" />
-          {isSubmitting ? 'Submitting Deliverable...' : 'Submit Deliverable for Review'}
+          {submitting || uploading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>{uploading ? "Uploading files..." : "Submitting..."}</span>
+            </>
+          ) : (
+            <>
+              <Send className="w-4 h-4" />
+              <span>Confirm & Submit Work</span>
+            </>
+          )}
         </button>
       </div>
     </form>

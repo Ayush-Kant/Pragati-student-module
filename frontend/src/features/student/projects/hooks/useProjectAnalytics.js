@@ -1,22 +1,22 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getProjectAnalytics } from '../services/projectService';
+import { useState, useEffect, useCallback } from "react";
+import { projectService } from "../services/projectService";
 
 export const useProjectAnalytics = (projectId) => {
   const [analytics, setAnalytics] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchAnalytics = useCallback(async () => {
     if (!projectId) return;
-    setIsLoading(true);
-    setError(null);
     try {
-      const data = await getProjectAnalytics(projectId);
+      setLoading(true);
+      setError(null);
+      const data = await projectService.getProjectAnalytics(projectId);
       setAnalytics(data);
     } catch (err) {
-      setError(err.message || 'Failed to fetch project analytics.');
+      setError(err.message || "Failed to fetch project analytics.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }, [projectId]);
 
@@ -26,7 +26,7 @@ export const useProjectAnalytics = (projectId) => {
 
   return {
     analytics,
-    isLoading,
+    loading,
     error,
     refetch: fetchAnalytics,
   };

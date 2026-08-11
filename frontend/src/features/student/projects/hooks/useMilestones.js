@@ -1,23 +1,22 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getMilestones } from '../services/projectService';
-import { calculateCompletionPercentage } from '../utils/projectHelpers';
+import { useState, useEffect, useCallback } from "react";
+import { projectService } from "../services/projectService";
 
 export const useMilestones = (projectId) => {
   const [milestones, setMilestones] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchMilestones = useCallback(async () => {
     if (!projectId) return;
-    setIsLoading(true);
-    setError(null);
     try {
-      const data = await getMilestones(projectId);
+      setLoading(true);
+      setError(null);
+      const data = await projectService.getProjectMilestones(projectId);
       setMilestones(data);
     } catch (err) {
-      setError(err.message || 'Failed to fetch project milestones.');
+      setError(err.message || "Failed to fetch milestones.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }, [projectId]);
 
@@ -25,29 +24,34 @@ export const useMilestones = (projectId) => {
     fetchMilestones();
   }, [fetchMilestones]);
 
-  const updateTaskProgress = (taskId, newStatus) => {
+  const toggleTaskChecklist = (milestoneId, taskId, checklistId) => {
     setMilestones((prevMilestones) =>
-      prevMilestones.map((ms) => {
-        let hasTask = false;
-        const updatedTasks = ms.tasks.map((t) => {
-          if (t.id === taskId) {
-            hasTask = true;
-            return { ...t, status: newStatus };
-          }
-          return t;
+      prevMilestones.map((m) => {
+        if (m.id !== milestoneId) return m;
+        const updatedTasks = m.tasks.map((t) => {
+          if (t.id !== taskId) return t;
+          const updatedChecklist = t.checklist.map((c) =>
+            c.id === checklistId ? { ...c, completed: !c.completed } : c
+          );
+          const allCompleted = updatedChecklist.every((c) => c.completed);
+          return {
+            ...t,
+            checklist: updatedChecklist,
+            status: allCompleted ? "COMPLETED" : "IN_PROGRESS",
+          };
         });
 
-        if (!hasTask) return ms;
-
-        const newPercentage = calculateCompletionPercentage(updatedTasks);
-        const allDone = updatedTasks.every((t) => t.status === 'done');
-        const msStatus = allDone ? 'completed' : newPercentage > 0 ? 'in-progress' : 'todo';
+        // Recalculate milestone progress
+        const totalTasks = updatedTasks.length;
+        const completedTasks = updatedTasks.filter((t) => t.status === "COMPLETED").length;
+        const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        const status = progressPercent === 100 ? "COMPLETED" : progressPercent > 0 ? "IN_PROGRESS" : "NOT_STARTED";
 
         return {
-          ...ms,
+          ...m,
           tasks: updatedTasks,
-          completionPercentage: newPercentage,
-          status: msStatus,
+          progressPercent,
+          status,
         };
       })
     );
@@ -55,9 +59,9 @@ export const useMilestones = (projectId) => {
 
   return {
     milestones,
-    isLoading,
+    loading,
     error,
-    updateTaskProgress,
     refetch: fetchMilestones,
+    toggleTaskChecklist,
   };
 };

@@ -1,64 +1,101 @@
-import React, { useState } from 'react';
-import { MessageSquare, Send, User } from 'lucide-react';
-import { formatDateTime } from '../../utils/projectHelpers';
+import React, { useState } from "react";
+import { MessageSquare, Send, CornerDownRight } from "lucide-react";
+import { formatDate } from "../../utils/projectHelpers";
 
-export const ReviewComments = ({ comments = [], onAddComment }) => {
-  const [newCommentText, setNewCommentText] = useState('');
+export const ReviewComments = ({ comments = [], onAddReply }) => {
+  const [replyText, setReplyText] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleReplySubmit = (e) => {
     e.preventDefault();
-    if (!newCommentText.trim()) return;
-    if (onAddComment) {
-      onAddComment(newCommentText);
-    }
-    setNewCommentText('');
+    if (!replyText.trim()) return;
+    onAddReply(replyText);
+    setReplyText("");
   };
 
   return (
-    <div className="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 shadow-md">
-      <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center gap-2">
-        <MessageSquare className="w-4 h-4 text-indigo-400" /> Mentor & Student Discussion Thread
-      </h3>
-
-      <div className="space-y-4 mb-6">
-        {comments.length === 0 ? (
-          <p className="text-xs text-slate-400 italic">No feedback comments recorded yet.</p>
-        ) : (
-          comments.map((comment) => (
-            <div key={comment.id} className="bg-slate-900/70 p-4 rounded-xl border border-slate-700/40 flex items-start gap-3.5">
-              <img
-                src={comment.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-                alt={comment.author}
-                className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/30 shrink-0"
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <h4 className="text-xs font-bold text-slate-100">{comment.author}</h4>
-                  <span className="text-[10px] text-slate-400 font-medium">{formatDateTime(comment.timestamp)}</span>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">{comment.text}</p>
-              </div>
-            </div>
-          ))
-        )}
+    <div className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 shadow-sm mb-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-base font-bold text-surface-900 dark:text-white flex items-center space-x-2">
+          <MessageSquare className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+          <span>Mentor Feedback & Conversation</span>
+        </h3>
+        <span className="text-xs text-surface-500">{comments.length} Comments</span>
       </div>
 
-      {/* Add Reply Input Form */}
-      <form onSubmit={handleSubmit} className="flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Reply to faculty mentor feedback..."
-          value={newCommentText}
-          onChange={(e) => setNewCommentText(e.target.value)}
-          className="flex-1 bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-400 text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 transition-colors"
-        />
-        <button
-          type="submit"
-          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/20 transition-all inline-flex items-center gap-1.5 shrink-0"
-        >
-          <Send className="w-3.5 h-3.5" /> Reply
-        </button>
-      </form>
+      {/* List of comments */}
+      <div className="space-y-4 mb-6">
+        {comments.map((comment) => {
+          const isStudent = comment.type === "STUDENT_REPLY";
+
+          return (
+            <div
+              key={comment.id}
+              className={`p-4 rounded-xl border transition-all ${
+                isStudent
+                  ? "bg-brand-50/50 dark:bg-brand-950/30 border-brand-200 dark:border-brand-800/60 ml-4 sm:ml-8"
+                  : "bg-surface-50 dark:bg-surface-900/50 border-surface-200 dark:border-surface-700"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={comment.author.avatar}
+                    alt={comment.author.name}
+                    className="w-8 h-8 rounded-full object-cover ring-1 ring-surface-300 dark:ring-surface-600"
+                  />
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-bold text-surface-900 dark:text-white">
+                        {comment.author.name}
+                      </span>
+                      <span
+                        className={`px-1.5 py-0.2 text-[10px] font-semibold rounded ${
+                          isStudent
+                            ? "bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300"
+                            : "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                        }`}
+                      >
+                        {comment.author.role}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-surface-400 dark:text-surface-500">
+                      {formatDate(comment.timestamp, true)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-xs text-surface-700 dark:text-surface-300 leading-relaxed pl-11">
+                {comment.content}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Reply Input */}
+      {onAddReply && (
+        <form onSubmit={handleReplySubmit} className="pt-4 border-t border-surface-100 dark:border-surface-700">
+          <label className="block text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider mb-2">
+            Reply to Mentor
+          </label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder="Ask a clarifying question or respond to feedback..."
+              className="flex-1 px-4 py-2.5 bg-surface-50 dark:bg-surface-900/60 border border-surface-300 dark:border-surface-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-xl transition-all shadow"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 };
