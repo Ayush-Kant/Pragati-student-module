@@ -1,12 +1,12 @@
-import {
-  assignments,
-  assignmentApiResponse,
-} from "../types/assignmentDummyData";
+import { assignments } from "../data/assignmentDummyData";
+import assignmentApiResponse from "../data/assignmentApiResponse";
 
 export const getAssignments = async () => {
-  return assignmentApiResponse;
+  return {
+    success: assignmentApiResponse.success,
+    data: assignmentApiResponse.data.assignments,
+  };
 };
-
 export const getAssignmentById = async (id) => {
   const assignment = assignments.find(
     (assignment) => assignment.id === Number(id)

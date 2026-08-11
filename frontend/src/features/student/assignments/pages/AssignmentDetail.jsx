@@ -3,20 +3,22 @@
 
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import useAssignments from "../../assignments/hooks/useAssignments";
-import useSubmission from "../../assignments/hooks/useSubmission";
-import useFeedback from "../../assignments/hooks/useFeedback";
-import useDarkMode from "../../assignments/hooks/useDarkMode";
-import AssignmentDetails from "../../assignments/components/assignments/AssignmentDetails";
-import AssignmentSubmissionForm from "../../assignments/components/submission/AssignmentSubmissionForm";
-import SubmissionHistory from "../../assignments/components/submission/SubmissionHistory";
-import GradeCard from "../../assignments/components/feedback/GradeCard";
-import FeedbackCard from "../../assignments/components/feedback/FeedbackCard";
-import EvaluationSummary from "../../assignments/components/feedback/EvaluationSummary";
-import InstructorRemarks from "../../assignments/components/feedback/InstructorRemarks";
-import DeadlineTracker from "../../assignments/components/progress/DeadlineTracker";
-import ErrorState from "../../assignments/components/common/ErrorState";
-import { SkeletonLine } from "../../assignments/components/common/LoadingSpinner";
+
+import useAssignments from "../hooks/useAssignments";
+import useSubmission from "../hooks/useSubmission";
+import useFeedback from "../hooks/useFeedback";
+import useDarkMode from "../hooks/useDarkMode";
+
+import AssignmentDetails from "../components/assignments/AssignmentDetails";
+import AssignmentSubmissionForm from "../components/submission/AssignmentSubmissionForm";
+import SubmissionHistory from "../components/submission/SubmissionHistory";
+import GradeCard from "../components/feedback/GradeCard";
+import FeedbackCard from "../components/feedback/FeedbackCard";
+import EvaluationSummary from "../components/feedback/EvaluationSummary";
+import InstructorRemarks from "../components/feedback/InstructorRemarks";
+import DeadlineTracker from "../components/progress/DeadlineTracker";
+import ErrorState from "../components/common/ErrorState";
+import { SkeletonLine } from "../components/common/LoadingSpinner";
 import { ArrowLeft, ClipboardList, FileSearch, Moon, Sun } from "lucide-react";
 
 /* ── Skeleton ── */

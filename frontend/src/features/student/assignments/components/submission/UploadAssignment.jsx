@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { validateUpload } from "../../validations/assignmentValidation";
+import { validateSubmission } from "../../utils/assignmentValidation";
 import { Upload, FileText, X } from "lucide-react";
 
 const ACCEPTED_EXTENSIONS = ".pdf,.doc,.docx,.zip";

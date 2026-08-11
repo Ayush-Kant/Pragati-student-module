@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { validateSubmission } from "../../validations/assignmentValidation";
+import { validateSubmission } from "../../utils/assignmentValidation";
 import UploadAssignment from "./UploadAssignment";
 import ErrorState from "../common/ErrorState";
 import { CheckCircle2, Upload, Loader2 } from "lucide-react";

@@ -13,6 +13,7 @@ import AssignmentCard from "../../assignments/components/assignments/AssignmentC
 import SearchAssignment from "../../assignments/components/filters/SearchAssignment";
 import StatusFilter from "../../assignments/components/filters/StatusFilter";
 import SubjectFilter from "../../assignments/components/filters/SubjectFilter";
+import DeadlineFilter from "../../assignments/components/filters/DeadlineFilter";
 import ErrorState from "../../assignments/components/common/ErrorState";
 import { SkeletonAssignmentPage } from "../../assignments/components/common/LoadingSpinner";
 import {
@@ -31,10 +32,12 @@ const AssignmentsPage = () => {
     searchTerm,
     status,
     subject,
+    deadline,
     filteredAssignments,
     setSearchTerm,
     setStatus,
     setSubject,
+    setDeadline,
   } = useAssignmentFilters(assignments);
 
   const { darkMode, toggleDarkMode } = useDarkMode();
@@ -145,7 +148,7 @@ const AssignmentsPage = () => {
                       <SearchAssignment value={searchTerm} onChange={setSearchTerm} darkMode={darkMode} />
                       <StatusFilter value={status} onChange={setStatus} darkMode={darkMode} />
                       <SubjectFilter value={subject} onChange={setSubject} subjects={subjects} darkMode={darkMode} />
-
+                      <DeadlineFilter value={deadline}  onChange={setDeadline} darkMode={darkMode}/>
                       {/* View toggle */}
                       <div className={`ml-auto flex items-center gap-1 p-1 rounded-xl shrink-0 ${darkMode ? "bg-slate-700" : "bg-gray-100"}`}>
                         <button
