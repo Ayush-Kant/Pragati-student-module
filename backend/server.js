@@ -68,6 +68,7 @@ import projectRoutes from "./src/routes/projectRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
 import { initializeQuizModule } from "./models/quizModel.js";
 import discussionRoutes from "./src/routes/discussionRoutes.js";
+import certificateRoutes from "./src/routes/certificateRoutes.js";
 
 // Student profile routes
 import studentProfileRouter from "./src/routes/index.js";
@@ -184,6 +185,7 @@ app.use("/api/student/assignments", gradeRoutes);
 app.use("/api/student/assignments", deadlineRoutes);
 app.use("/api/student/projects", projectRoutes);
 app.use("/api/student", quizRoutes);
+app.use("/api/student", certificateRoutes);
 app.use("/api/student", discussionRoutes);
 
 app.use(studentProfileRouter);
