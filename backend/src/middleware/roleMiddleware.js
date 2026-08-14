@@ -148,8 +148,10 @@ export const authorizeProjectLeader = async (req, res, next) => {
   }
 };
 
-export default {
-  requireRole,
-  authorizeProjectMember,
-  authorizeProjectLeader,
-};
+const roleMiddleware = requireRole;
+roleMiddleware.requireRole = requireRole;
+roleMiddleware.authorizeProjectMember = authorizeProjectMember;
+roleMiddleware.authorizeProjectLeader = authorizeProjectLeader;
+
+export default roleMiddleware;
+
