@@ -13,7 +13,7 @@ ProjectMember.init(
     },
     projectId: {
       type: DataTypes.INTEGER,
-      field: "project_id",
+      columnName: "project_id",
       allowNull: false,
       references: {
         model: Project,
@@ -22,7 +22,7 @@ ProjectMember.init(
     },
     studentId: {
       type: DataTypes.INTEGER,
-      field: "student_id",
+      columnName: "student_id",
       allowNull: false,
     },
     role: {

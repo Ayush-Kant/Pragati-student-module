@@ -19,6 +19,22 @@ const storage = multer.diskStorage({
   },
 });
 
+const allowedMimeTypes = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/zip",
+  "application/x-zip-compressed",
+  "application/x-rar-compressed",
+  "application/vnd.rar",
+  "application/octet-stream",
+  "image/png",
+  "image/jpeg",
+  "text/plain",
+  "text/markdown",
+  "text/x-markdown",
+];
+
 const fileFilter = (req, file, cb) => {
   const allowedExtensions = [
     ".pdf",
@@ -33,10 +49,12 @@ const fileFilter = (req, file, cb) => {
     ".md",
   ];
   const ext = path.extname(file.originalname).toLowerCase();
-  if (allowedExtensions.includes(ext)) {
+  const mimeType = (file.mimetype || "").toLowerCase();
+
+  if (allowedExtensions.includes(ext) && (allowedMimeTypes.includes(mimeType) || mimeType === "")) {
     cb(null, true);
   } else {
-    cb(new Error(`File type ${ext} is not allowed`), false);
+    cb(new Error(`File type ${ext} or MIME type ${mimeType} is not allowed`), false);
   }
 };
 

@@ -13,7 +13,7 @@ ProjectSubmission.init(
     },
     projectId: {
       type: DataTypes.INTEGER,
-      field: "project_id",
+      columnName: "project_id",
       allowNull: false,
       references: {
         model: Project,
@@ -22,28 +22,28 @@ ProjectSubmission.init(
     },
     submittedBy: {
       type: DataTypes.INTEGER,
-      field: "submitted_by",
+      columnName: "submitted_by",
       allowNull: false,
     },
     repositoryUrl: {
       type: DataTypes.STRING,
-      field: "repository_url",
+      columnName: "repository_url",
       allowNull: false,
     },
     branchName: {
       type: DataTypes.STRING,
-      field: "branch_name",
+      columnName: "branch_name",
       allowNull: false,
       defaultValue: "main",
     },
     submissionNotes: {
       type: DataTypes.TEXT,
-      field: "submission_notes",
+      columnName: "submission_notes",
       allowNull: true,
     },
     demoUrl: {
       type: DataTypes.STRING,
-      field: "demo_url",
+      columnName: "demo_url",
       allowNull: true,
     },
     status: {

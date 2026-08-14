@@ -1,5 +1,4 @@
 ﻿import express from "express";
-import rateLimit from "express-rate-limit";
 import * as assessmentController from "../controllers/assessmentController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import roleMiddleware from "../middleware/roleMiddleware.js";
@@ -10,15 +9,9 @@ import {
 } from "../validations/assessmentValidation.js";
 
 const router = express.Router();
-const assessmentLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 120,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
 // All assessment routes require a valid student JWT.
-router.use(assessmentLimiter, authMiddleware, roleMiddleware("student"));
+router.use(authMiddleware, roleMiddleware("student"));
 
 router.get("/history", validateHistoryQuery, assessmentController.getAssessmentHistory);
 

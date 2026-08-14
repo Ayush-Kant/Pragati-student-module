@@ -87,6 +87,38 @@ export const generateProjectInsights = (projectData) => {
   };
 };
 
+/**
+ * Calculates team statistics including member counts by role and task assignments per member.
+ * @param {Array} members 
+ * @param {Array} tasks 
+ * @returns {Object}
+ */
+export const calculateTeamStats = (members = [], tasks = []) => {
+  const totalMembers = members.length;
+  const roleCounts = members.reduce((acc, m) => {
+    const r = m.role || "MEMBER";
+    acc[r] = (acc[r] || 0) + 1;
+    return acc;
+  }, {});
+
+  const memberTaskStats = members.map((m) => {
+    const memberTasks = tasks.filter((t) => Number(t.assignedTo) === Number(m.studentId));
+    const completed = memberTasks.filter((t) => t.status === "COMPLETED").length;
+    return {
+      studentId: m.studentId,
+      role: m.role,
+      assignedTasksCount: memberTasks.length,
+      completedTasksCount: completed,
+    };
+  });
+
+  return {
+    totalMembers,
+    roleCounts,
+    memberTaskStats,
+  };
+};
+
 export class ApiError extends Error {
   constructor(statusCode = 400, message = "Error") {
     super(message);
