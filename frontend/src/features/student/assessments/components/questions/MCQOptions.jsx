@@ -5,8 +5,9 @@ export default function MCQOptions({ options = [], selectedOption, onSelect }) {
     <div className="space-y-2 mt-4">
       {options.map((option, idx) => (
         <button
-          key={idx}
-          onClick={() => onSelect(idx)}
+          key={`${option}-${idx}`}
+          type="button"
+          onClick={() => onSelect?.(idx)}
           className={`w-full text-left p-3 rounded-lg border transition ${
             selectedOption === idx
               ? "border-blue-600 bg-blue-50 text-blue-900 font-medium"

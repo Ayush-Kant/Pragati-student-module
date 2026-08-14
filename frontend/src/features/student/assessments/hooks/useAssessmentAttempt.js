@@ -28,7 +28,7 @@ export const useAssessmentAttempt = (assessment, onSubmit) => {
     }
   }, []);
 
-  // Stable timer effect without recreating interval on every second update
+  // Timer effect starts correctly when timeLeft becomes > 0
   useEffect(() => {
     if (timeLeft <= 0) return;
 
@@ -44,7 +44,7 @@ export const useAssessmentAttempt = (assessment, onSubmit) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [assessment?.id, submitTest]); // Runs on component setup or assessment change
+  }, [timeLeft > 0, submitTest]);
 
   return {
     currentIndex,

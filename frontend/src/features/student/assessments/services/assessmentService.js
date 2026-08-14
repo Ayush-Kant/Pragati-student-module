@@ -9,7 +9,8 @@ export const getAssessments = async () => {
 export const getAssessmentById = async (id) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const found = dummyAssessments.find((a) => a.id === id);
+      // Safe stringified ID comparison
+      const found = dummyAssessments.find((a) => String(a.id) === String(id));
       if (found) resolve(found);
       else reject(new Error("Assessment not found"));
     }, 300);
@@ -24,13 +25,21 @@ export const submitAssessment = async (id, answers) => {
   const assessment = await getAssessmentById(id);
   let score = 0;
 
-  assessment.questions.forEach((q, idx) => {
+  const defaultWeight =
+    assessment.questions?.length > 0
+      ? assessment.totalMarks / assessment.questions.length
+      : 0;
+
+  assessment.questions?.forEach((q, idx) => {
     if (answers[idx] === q.correctOption) {
-      score += 10;
+      score += q.marks || defaultWeight;
     }
   });
 
-  const percentage = Math.round((score / assessment.totalMarks) * 100);
+  const percentage = assessment.totalMarks
+    ? Math.round((score / assessment.totalMarks) * 100)
+    : 0;
+
   const result = {
     attemptId: `att-${Date.now()}`,
     assessmentId: id,
@@ -52,12 +61,13 @@ export const submitAssessment = async (id, answers) => {
 export const getAssessmentResult = async (attemptId) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const found = dummyHistory.find((item) => item.attemptId === attemptId);
+      const found = dummyHistory.find(
+        (item) => String(item.attemptId) === String(attemptId)
+      );
       if (found) {
         resolve(found);
-      } else if (dummyHistory.length > 0) {
-        resolve(dummyHistory[0]);
       } else {
+        // Explicitly throw error when attemptId is not found
         reject(new Error("Result not found"));
       }
     }, 300);
