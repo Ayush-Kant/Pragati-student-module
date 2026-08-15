@@ -1,4 +1,5 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import {
   generateUniqueCertificateId,
@@ -19,63 +20,63 @@ import {
 describe('certificate helpers', () => {
   it('creates certificate identifiers with the expected prefix', () => {
     const certificateId = generateUniqueCertificateId();
-    expect(certificateId).toMatch(/^CERT-/);
+    assert.match(certificateId, /^CERT-/);
   });
 
   it('creates verification codes with the expected prefix', () => {
     const verificationCode = generateVerificationCode();
-    expect(verificationCode).toMatch(/^VER-/);
+    assert.match(verificationCode, /^VER-/);
   });
 
   it('returns a standardized API response payload', () => {
     const response = formatApiResponse(true, 'Certificate generated successfully', { id: 1 }, 201);
-    expect(response.success).toBe(true);
-    expect(response.message).toBe('Certificate generated successfully');
-    expect(response.data.id).toBe(1);
-    expect(response.statusCode).toBe(201);
+    assert.strictEqual(response.success, true);
+    assert.strictEqual(response.message, 'Certificate generated successfully');
+    assert.strictEqual(response.data.id, 1);
+    assert.strictEqual(response.statusCode, 201);
   });
 
   it('formats dates into a readable string', () => {
     const formatted = formatDate('2026-08-01T10:00:00.000Z');
-    expect(typeof formatted).toBe('string');
-    expect(formatted.length).toBeGreaterThan(0);
+    assert.strictEqual(typeof formatted, 'string');
+    assert.ok(formatted.length > 0);
   });
 
   it('treats earned achievements as eligible without trusting client flags', () => {
     const eligible = checkEligibility({ achievements: [{ status: 'earned' }], isEligible: true });
-    expect(eligible).toBe(true);
+    assert.strictEqual(eligible, true);
   });
 
   it('does not trust a client-provided eligibility flag when it is the only signal', () => {
     const eligible = checkEligibility({ achievements: [], isEligible: true });
-    expect(eligible).toBe(false);
+    assert.strictEqual(eligible, false);
   });
 
   it('parses numeric student ids from string values safely', () => {
-    expect(resolveStudentId({ studentId: '42' })).toBe(42);
-    expect(resolveStudentId({ id: '7' })).toBe(7);
-    expect(resolveStudentId({ userId: '0' })).toBeNull();
+    assert.strictEqual(resolveStudentId({ studentId: '42' }), 42);
+    assert.strictEqual(resolveStudentId({ id: '7' }), 7);
+    assert.strictEqual(resolveStudentId({ userId: '0' }), null);
   });
 });
 
 describe('certificate validation', () => {
   it('rejects invalid certificate ids', () => {
     const result = validateCertificateId('   ');
-    expect(result.success).toBe(false);
+    assert.strictEqual(result.success, false);
   });
 
   it('requires certificate verification payload fields', () => {
     const result = validateVerificationRequest({});
-    expect(result.success).toBe(false);
+    assert.strictEqual(result.success, false);
   });
 
   it('accepts earned achievement status', () => {
     const result = validateAchievementStatus('earned');
-    expect(result.success).toBe(true);
+    assert.strictEqual(result.success, true);
   });
 
   it('rejects missing student context for eligibility validation', () => {
     const result = validateStudentEligibility({});
-    expect(result.success).toBe(false);
+    assert.strictEqual(result.success, false);
   });
 });

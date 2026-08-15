@@ -1,5 +1,10 @@
 import * as quizService from '../services/quizService.js';
-import { validateQuizId, validateQuizSubmission } from '../validations/quizValidation.js';
+import {
+  validateQuizId,
+  validateQuizSubmission,
+  validateAttemptId,
+  validateAnswerPayload,
+} from '../validations/quizValidation.js';
 
 export const getAvailableQuizzes = async (req, res, next) => {
   try {
@@ -64,5 +69,101 @@ export const submitQuiz = async (req, res, next) => {
   } catch (error) {
     console.error('Submit quiz error:', error);
     next(error);
+  }
+};
+
+export const startQuiz = async (req, res, next) => {
+  try {
+    const { error } = validateQuizId(req.params.quizId);
+    if (error) return res.status(400).json({ success: false, message: error.message });
+
+    const studentId = req.user?.id ?? req.user?.uid ?? req.user?.userId;
+    if (!studentId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
+
+    const attempt = await quizService.startQuizAttempt(Number(req.params.quizId), normalizedStudentId);
+    return res.status(201).json({ success: true, data: attempt });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getAttempt = async (req, res, next) => {
+  try {
+    const { error } = validateAttemptId(req.params.attemptId);
+    if (error) return res.status(400).json({ success: false, message: error.message });
+
+    const studentId = req.user?.id ?? req.user?.uid ?? req.user?.userId;
+    if (!studentId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
+
+    const result = await quizService.getAttemptById(Number(req.params.attemptId), normalizedStudentId);
+    return res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const saveAnswer = async (req, res, next) => {
+  try {
+    const { error } = validateAttemptId(req.params.attemptId);
+    if (error) return res.status(400).json({ success: false, message: error.message });
+
+    const payloadValidation = validateAnswerPayload(req.body);
+    if (payloadValidation.error) return res.status(400).json({ success: false, message: payloadValidation.error.message });
+
+    const studentId = req.user?.id ?? req.user?.uid ?? req.user?.userId;
+    if (!studentId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
+
+    const { questionId, selectedOptionId } = payloadValidation.value;
+    const saved = await quizService.saveQuizAnswer(Number(req.params.attemptId), normalizedStudentId, questionId, selectedOptionId === null ? null : Number(selectedOptionId));
+    return res.status(200).json({ success: true, data: saved });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const submitAttempt = async (req, res, next) => {
+  try {
+    const { error } = validateAttemptId(req.params.attemptId);
+    if (error) return res.status(400).json({ success: false, message: error.message });
+
+    const studentId = req.user?.id ?? req.user?.uid ?? req.user?.userId;
+    if (!studentId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
+
+    const result = await quizService.submitQuizAttempt(Number(req.params.attemptId), normalizedStudentId);
+    return res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getResult = async (req, res, next) => {
+  try {
+    const { error } = validateAttemptId(req.params.attemptId);
+    if (error) return res.status(400).json({ success: false, message: error.message });
+
+    const studentId = req.user?.id ?? req.user?.uid ?? req.user?.userId;
+    if (!studentId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
+
+    const result = await quizService.getAttemptResult(Number(req.params.attemptId), normalizedStudentId);
+    return res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getPerformance = async (req, res, next) => {
+  try {
+    const studentId = req.user?.id ?? req.user?.uid ?? req.user?.userId;
+    if (!studentId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
+    const result = await quizService.getPerformanceSummary(normalizedStudentId);
+    return res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    next(err);
   }
 };

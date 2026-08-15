@@ -105,7 +105,7 @@ export const QuizAttempt = sequelize.define('QuizAttempt', {
   },
   status: {
     type: DataTypes.STRING,
-    defaultValue: 'submitted',
+    defaultValue: 'in_progress',
   },
   score: {
     type: DataTypes.INTEGER,
@@ -125,7 +125,11 @@ export const QuizAttempt = sequelize.define('QuizAttempt', {
   },
   submittedAt: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
+  },
+  startedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
 }, {
   tableName: 'quiz_attempts',
