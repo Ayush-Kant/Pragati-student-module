@@ -13,7 +13,7 @@ Milestone.init(
     },
     projectId: {
       type: DataTypes.INTEGER,
-      field: "project_id",
+      columnName: "project_id",
       allowNull: false,
       references: {
         model: Project,
@@ -35,17 +35,17 @@ Milestone.init(
     },
     dueDate: {
       type: DataTypes.DATE,
-      field: "due_date",
+      columnName: "due_date",
       allowNull: true,
     },
     targetDate: {
       type: DataTypes.DATE,
-      field: "target_date",
+      columnName: "target_date",
       allowNull: true,
     },
     completedAt: {
       type: DataTypes.DATE,
-      field: "completed_at",
+      columnName: "completed_at",
       allowNull: true,
     },
   },

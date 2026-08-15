@@ -39,22 +39,22 @@ Project.init(
     },
     githubRepoUrl: {
       type: DataTypes.STRING,
-      field: "github_repo_url",
+      columnName: "github_repo_url",
       allowNull: true,
     },
     createdById: {
       type: DataTypes.INTEGER,
-      field: "created_by_id",
+      columnName: "created_by_id",
       allowNull: false,
     },
     startDate: {
       type: DataTypes.DATE,
-      field: "start_date",
+      columnName: "start_date",
       allowNull: true,
     },
     endDate: {
       type: DataTypes.DATE,
-      field: "end_date",
+      columnName: "end_date",
       allowNull: true,
     },
   },

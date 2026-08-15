@@ -65,6 +65,19 @@ export const updateProjectSchema = Joi.object({
   endDate: Joi.date().iso().allow(null),
 });
 
+export const addMemberSchema = Joi.object({
+  studentId: Joi.alternatives().try(Joi.number().integer(), Joi.string()).required(),
+  role: Joi.string()
+    .valid(...Object.values(PROJECT_ROLE))
+    .default(PROJECT_ROLE.MEMBER),
+});
+
+export const updateMemberRoleSchema = Joi.object({
+  role: Joi.string()
+    .valid(...Object.values(PROJECT_ROLE))
+    .required(),
+});
+
 export const createMilestoneSchema = Joi.object({
   title: Joi.string().trim().min(2).max(255).required(),
   description: Joi.string().trim().allow("", null),
@@ -109,11 +122,40 @@ export const submitProjectSchema = Joi.object({
   demoUrl: Joi.string().uri().allow("", null),
 });
 
-export const addMemberSchema = Joi.object({
-  studentId: Joi.alternatives().try(Joi.number().integer(), Joi.string()).required(),
-  role: Joi.string()
-    .valid(...Object.values(PROJECT_ROLE))
-    .default(PROJECT_ROLE.MEMBER),
+export const updateSubmissionSchema = Joi.object({
+  repositoryUrl: Joi.string().trim().regex(githubUrlPattern).messages({
+    "string.pattern.base": "Invalid GitHub repository URL format",
+  }),
+  branchName: Joi.string().trim(),
+  submissionNotes: Joi.string().trim().allow("", null),
+  demoUrl: Joi.string().uri().allow("", null),
+  status: Joi.string().valid(...Object.values(SUBMISSION_STATUS)),
+});
+
+export const updateRepositorySchema = Joi.object({
+  repoUrl: Joi.string().trim().regex(githubUrlPattern).required().messages({
+    "string.pattern.base": "Invalid GitHub repository URL format",
+  }),
+  repoName: Joi.string().trim().allow("", null),
+  branch: Joi.string().trim().default("main"),
+  owner: Joi.string().trim().allow("", null),
+  isPrivate: Joi.boolean().default(false),
+  openIssues: Joi.number().integer().min(0).default(0),
+  stars: Joi.number().integer().min(0).default(0),
+  forks: Joi.number().integer().min(0).default(0),
+});
+
+export const createMentorReviewSchema = Joi.object({
+  submissionId: Joi.alternatives().try(Joi.number().integer(), Joi.string()).allow(null),
+  feedback: Joi.string().trim().min(2).required(),
+  score: Joi.number().min(0).max(100).allow(null),
+  status: Joi.string().default("COMPLETED"),
+});
+
+export const updateMentorReviewSchema = Joi.object({
+  feedback: Joi.string().trim().min(2),
+  score: Joi.number().min(0).max(100).allow(null),
+  status: Joi.string(),
 });
 
 // ------------------------- Imperative validators ---------------------------

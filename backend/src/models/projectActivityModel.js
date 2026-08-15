@@ -13,7 +13,7 @@ ProjectActivity.init(
     },
     projectId: {
       type: DataTypes.INTEGER,
-      field: "project_id",
+      columnName: "project_id",
       allowNull: false,
       references: {
         model: Project,
@@ -22,12 +22,12 @@ ProjectActivity.init(
     },
     userId: {
       type: DataTypes.INTEGER,
-      field: "user_id",
+      columnName: "user_id",
       allowNull: false,
     },
     activityType: {
       type: DataTypes.STRING,
-      field: "activity_type",
+      columnName: "activity_type",
       allowNull: false,
     },
     description: {

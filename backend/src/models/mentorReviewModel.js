@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "@sequelize/core";
 import sequelize from "../../config/sequelize.js";
 import Project from "./projectModel.js";
-import ProjectSubmission from "./projectSubmissionModel.js";
+import { ProjectSubmission } from "./submissionModel.js";
 
 class MentorReview extends Model {}
 
@@ -14,7 +14,7 @@ MentorReview.init(
     },
     projectId: {
       type: DataTypes.INTEGER,
-      field: "project_id",
+      columnName: "project_id",
       allowNull: false,
       references: {
         model: Project,
@@ -23,7 +23,7 @@ MentorReview.init(
     },
     submissionId: {
       type: DataTypes.INTEGER,
-      field: "submission_id",
+      columnName: "submission_id",
       allowNull: true,
       references: {
         model: ProjectSubmission,
@@ -32,7 +32,7 @@ MentorReview.init(
     },
     mentorId: {
       type: DataTypes.INTEGER,
-      field: "mentor_id",
+      columnName: "mentor_id",
       allowNull: false,
     },
     feedback: {

@@ -14,7 +14,7 @@ Task.init(
     },
     projectId: {
       type: DataTypes.INTEGER,
-      field: "project_id",
+      columnName: "project_id",
       allowNull: false,
       references: {
         model: Project,
@@ -23,7 +23,7 @@ Task.init(
     },
     milestoneId: {
       type: DataTypes.INTEGER,
-      field: "milestone_id",
+      columnName: "milestone_id",
       allowNull: true,
       references: {
         model: Milestone,
@@ -40,7 +40,7 @@ Task.init(
     },
     assignedTo: {
       type: DataTypes.INTEGER,
-      field: "assigned_to",
+      columnName: "assigned_to",
       allowNull: true,
     },
     status: {
@@ -55,12 +55,12 @@ Task.init(
     },
     dueDate: {
       type: DataTypes.DATE,
-      field: "due_date",
+      columnName: "due_date",
       allowNull: true,
     },
     completedAt: {
       type: DataTypes.DATE,
-      field: "completed_at",
+      columnName: "completed_at",
       allowNull: true,
     },
   },

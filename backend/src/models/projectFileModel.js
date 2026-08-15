@@ -13,7 +13,7 @@ ProjectFile.init(
     },
     projectId: {
       type: DataTypes.INTEGER,
-      field: "project_id",
+      columnName: "project_id",
       allowNull: false,
       references: {
         model: Project,
@@ -22,32 +22,32 @@ ProjectFile.init(
     },
     uploadedBy: {
       type: DataTypes.INTEGER,
-      field: "uploaded_by",
+      columnName: "uploaded_by",
       allowNull: false,
     },
     fileName: {
       type: DataTypes.STRING,
-      field: "file_name",
+      columnName: "file_name",
       allowNull: false,
     },
     originalName: {
       type: DataTypes.STRING,
-      field: "original_name",
+      columnName: "original_name",
       allowNull: false,
     },
     filePath: {
       type: DataTypes.STRING,
-      field: "file_path",
+      columnName: "file_path",
       allowNull: false,
     },
     fileSize: {
       type: DataTypes.INTEGER,
-      field: "file_size",
+      columnName: "file_size",
       allowNull: true,
     },
     fileType: {
       type: DataTypes.STRING,
-      field: "file_type",
+      columnName: "file_type",
       allowNull: true,
     },
   },
