@@ -1,10 +1,10 @@
-import { Navigate, Route } from 'react-router-dom';
-import PrivateRoute from '../../../routes/PrivateRoute';
-import RoleRoute from '../../../routes/RoleRoute';
+import { Navigate, Route } from "react-router-dom";
+import PrivateRoute from "../../../routes/PrivateRoute";
+import RoleRoute from "../../../routes/RoleRoute";
 
-import VerificationPage from '../pages/public/VerificationPage';
-import LoginPage from '../../auth/LoginPage';
-import RegisterPage from '../../auth/RegisterPage';
+import VerificationPage from "../pages/public/VerificationPage";
+import LoginPage from "../../auth/LoginPage";
+import RegisterPage from "../../auth/RegisterPage";
 
 import OnboardingWizard from '../pages/onboarding/OnboardingWizard';
 import DashboardPage from '../pages/dashboard/DashboardPage';
@@ -12,8 +12,8 @@ import StudentProfilePage from '../profile/pages/StudentProfilePage';
 import CoursesPage from '../pages/training/CoursesPage';
 import CourseDetailPage from '../pages/training/CourseDetailPage';
 import SessionsPage from '../pages/sessions/SessionsPage';
-import AssignmentsPage from '../pages/assignments/AssignmentsPage';
-import AssignmentDetail from '../pages/assignments/AssignmentDetail';
+import AssignmentsPage from "../assignments/pages/AssignmentsPage";
+import AssignmentDetail from "../assignments/pages/AssignmentDetail";
 import QuizzesPage from '../pages/quizzes/QuizzesPage';
 import CodingChallengePage from '../pages/coding/CodingChallengePage';
 import CodingChallengesPage from '../coding-challenges/pages/CodingChallengesPage';
@@ -35,8 +35,7 @@ const studentRoute = (
     <Route path="login" element={<LoginPage />} />
     <Route path="register" element={<RegisterPage />} />
     <Route path="verify/:code" element={<VerificationPage />} />
-
-    <Route path="profile" element={<StudentProfilePage />} />
+      
 
     {/* ✅ AUTHENTICATION ENABLED - DO NOT COMMENT OUT */}
     <Route element={<PrivateRoute />}>
@@ -49,6 +48,7 @@ const studentRoute = (
           <Route path="learning-modules" element={<LearningModulesPage />} />
           
           <Route path="onboarding" element={<OnboardingWizard />} />
+          <Route path="profile" element={<StudentProfilePage />} />
           <Route path="courses" element={<CoursesPage />} />
           <Route path="courses/:courseId" element={<CourseDetailPage />} />
           <Route path="sessions" element={<SessionsPage />} />
