@@ -1,4 +1,4 @@
-import { calculateScore, evaluateAnswers } from '../../utils/quizHelpers.js';
+import { calculateScore, evaluateAnswers } from '../utils/quizScoring.js';
 
 test('calculateScore counts correct answers and percentage', () => {
   const questions = [

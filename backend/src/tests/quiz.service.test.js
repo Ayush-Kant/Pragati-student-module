@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 
 // Mock models and sequelize
-jest.unstable_mockModule('../../models/quizModel.js', () => ({
+jest.unstable_mockModule('../models/quizModel.js', () => ({
   Quiz: {
     findOne: jest.fn(),
     findAll: jest.fn(),
@@ -31,15 +31,38 @@ jest.unstable_mockModule('../../models/quizModel.js', () => ({
 }));
 
 jest.unstable_mockModule('../../config/sequelize.js', () => ({
+  __esModule: true,
+  default: {
+    define: jest.fn(() => ({
+      findOne: jest.fn(),
+      findAll: jest.fn(),
+      create: jest.fn(),
+      count: jest.fn(),
+      save: jest.fn(),
+      destroy: jest.fn(),
+      update: jest.fn(),
+    })),
+    transaction: jest.fn(),
+    sync: jest.fn(),
+  },
   sequelize: {
     transaction: jest.fn(),
+    define: jest.fn(() => ({
+      findOne: jest.fn(),
+      findAll: jest.fn(),
+      create: jest.fn(),
+      count: jest.fn(),
+      save: jest.fn(),
+      destroy: jest.fn(),
+      update: jest.fn(),
+    })),
+    sync: jest.fn(),
   },
-  default: { sequelize: {} },
 }));
 
-const { Quiz, QuizQuestion, QuizOption, QuizAttempt, QuizAnswer } = await import('../../models/quizModel.js');
-const { sequelize } = await import('../../config/sequelize.js');
-const quizService = await import('../../services/quizService.js');
+const { Quiz, QuizQuestion, QuizOption, QuizAttempt, QuizAnswer } = await import('../models/quizModel.js');
+const { sequelize } = await import('../config/sequelize.js');
+const quizService = await import('../services/quizService.js');
 
 describe('quizService (unit)', () => {
   beforeEach(() => {

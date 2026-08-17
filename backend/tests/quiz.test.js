@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { calculateScore, buildPerformanceSummary } from '../utils/quizHelpers.js';
+import { calculateScore, buildPerformanceSummary } from '../src/utils/quizScoring.js';
 import { validateQuizSubmission } from '../validations/quizValidation.js';
 
 test('calculateScore returns the correct score and percentage', () => {

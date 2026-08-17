@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { jest } from '@jest/globals';
 
 // Mock the quizService used by controllers
-jest.unstable_mockModule('../../services/quizService.js', () => ({
+jest.unstable_mockModule('../services/quizService.js', () => ({
   getAvailableQuizzes: jest.fn(),
   getQuizDetails: jest.fn(),
   startQuizAttempt: jest.fn(),
@@ -15,8 +15,8 @@ jest.unstable_mockModule('../../services/quizService.js', () => ({
   getPerformanceSummary: jest.fn(),
 }));
 
-const quizService = await import('../../services/quizService.js');
-const quizRoutes = (await import('../../routes/quizRoutes.js')).default;
+const quizService = await import('../services/quizService.js');
+const quizRoutes = (await import('../routes/quizRoutes.js')).default;
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
 const app = express();

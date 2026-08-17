@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
+import quizAttemptMiddleware from '../middleware/quizAttemptMiddleware.js';
 import {
   getAvailableQuizzes,
   getQuizDetails,
@@ -24,9 +25,8 @@ router.get('/quizzes/:quizId', getQuizDetails);
 router.post('/quizzes/:quizId/submit', submitQuiz);
 router.post('/quizzes/:quizId/start', startQuiz);
 router.get('/quizzes/attempts/:attemptId', getAttempt);
-router.put('/quizzes/attempts/:attemptId/answers', saveAnswer);
-router.post('/quizzes/attempts/:attemptId/submit', submitAttempt);
-router.get('/quizzes/attempts/:attemptId/result', getResult);
-
+router.put('/quizzes/attempts/:attemptId/answers', quizAttemptMiddleware, saveAnswer);
+router.post('/quizzes/attempts/:attemptId/submit', quizAttemptMiddleware, submitAttempt);
+router.get('/quizzes/attempts/:attemptId/result', quizAttemptMiddleware, getResult);
 
 export default router;

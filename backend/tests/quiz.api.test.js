@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import express from 'express';
-import quizRoutes from '../routes/quizRoutes.js';
+import quizRoutes from '../src/routes/quizRoutes.js';
 
 const app = express();
 app.use(express.json());
