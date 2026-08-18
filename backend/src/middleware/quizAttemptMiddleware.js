@@ -1,3 +1,5 @@
+import { QuizAttempt } from '../models/quizAttemptModel.js';
+
 export const quizAttemptMiddleware = async (req, res, next) => {
   try {
     const attemptId = Number(req.params.attemptId || req.params.id);
@@ -20,7 +22,6 @@ export const quizAttemptMiddleware = async (req, res, next) => {
       return next();
     }
 
-    const { QuizAttempt } = await import('../models/quizAttemptModel.js');
     const attempt = await QuizAttempt.findOne({ where: { id: attemptId } });
 
     if (!attempt) {

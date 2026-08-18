@@ -17,7 +17,7 @@ export const QuizAnswer = sequelize.define('QuizAnswer', {
   },
   selectedOptionId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
   isCorrect: {
     type: DataTypes.BOOLEAN,

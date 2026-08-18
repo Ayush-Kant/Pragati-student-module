@@ -115,7 +115,7 @@ export const saveAnswer = async (req, res, next) => {
     const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
 
     const { questionId, selectedOptionId } = payloadValidation.value;
-    const saved = await quizService.saveQuizAnswer(Number(req.params.attemptId), normalizedStudentId, questionId, selectedOptionId === null ? null : Number(selectedOptionId));
+    const saved = await quizService.saveQuizAnswer(Number(req.params.attemptId), normalizedStudentId, questionId, selectedOptionId == null ? null : Number(selectedOptionId));
     return res.status(200).json({ success: true, data: saved });
   } catch (error) {
     next(error);

@@ -1,4 +1,4 @@
-import { Quiz, QuizQuestion, QuizOption, QuizAttempt, QuizAnswer } from '../models/quizModel.js';
+import { Quiz, QuizQuestion, QuizOption, QuizAttempt, QuizAnswer, QuizResult } from '../models/quizModel.js';
 import { sequelize } from '../config/sequelize.js';
 import { evaluateAnswers } from '../utils/quizScoring.js';
 import { DEFAULT_PASSING_SCORE } from '../constants/quizConstants.js';
@@ -209,6 +209,16 @@ export const submitQuizAttempt = async (attemptId, studentId) => {
     attempt.submittedAt = new Date();
     await attempt.save({ transaction });
 
+    // Create QuizResult record
+    const result = await QuizResult.create({
+      quizAttemptId: attempt.id,
+      studentId: attempt.studentId,
+      quizId: attempt.quizId,
+      score: attempt.score,
+      percentage: attempt.percentage,
+      passed: attempt.passed,
+    }, { transaction });
+
     await transaction.commit();
 
     return {
@@ -223,6 +233,7 @@ export const submitQuizAttempt = async (attemptId, studentId) => {
         submittedAt: attempt.submittedAt,
       },
       result: evaluation,
+      resultId: result.id,
     };
   } catch (error) {
     await transaction.rollback();
@@ -231,44 +242,97 @@ export const submitQuizAttempt = async (attemptId, studentId) => {
 };
 
 export const submitQuiz = async (quizId, studentId, answers) => {
-  const quiz = await Quiz.findOne({ where: { id: quizId, isActive: true }, attributes: ['id', 'passingScore', 'title'] });
-  if (!quiz) {
-    const error = new Error('Quiz not found');
-    error.status = 404;
-    throw error;
-  }
+  const transaction = await sequelize.transaction();
+  try {
+    const quiz = await Quiz.findOne({ where: { id: quizId, isActive: true }, attributes: ['id', 'passingScore', 'title'], transaction });
+    if (!quiz) {
+      const error = new Error('Quiz not found');
+      error.status = 404;
+      throw error;
+    }
 
-  const attempt = await QuizAttempt.findOne({ where: { quizId, studentId, status: 'in_progress' } });
-  if (!attempt) {
-    const error = new Error('No active attempt found');
-    error.status = 404;
-    throw error;
-  }
+    const attempt = await QuizAttempt.findOne({ where: { quizId, studentId, status: 'in_progress' }, transaction });
+    if (!attempt) {
+      const error = new Error('No active attempt found');
+      error.status = 404;
+      throw error;
+    }
 
-  const questions = await QuizQuestion.findAll({ where: { quizId }, attributes: ['id', 'correctOptionId'] });
-  const evaluation = evaluateAnswers(questions.map((question) => question.toJSON()), answers);
-  const passingScore = quiz.passingScore || DEFAULT_PASSING_SCORE;
+    // Save all provided answers
+    for (const answer of answers) {
+      const { questionId, selectedOptionId } = answer;
+      const question = await QuizQuestion.findOne({ where: { id: questionId, quizId }, transaction });
+      if (!question) continue;
 
-  attempt.score = evaluation.score;
-  attempt.percentage = evaluation.percentage;
-  attempt.passed = evaluation.percentage >= passingScore;
-  attempt.status = 'submitted';
-  attempt.submittedAt = new Date();
-  await attempt.save();
+      const existing = await QuizAnswer.findOne({ 
+        where: { quizAttemptId: attempt.id, questionId }, 
+        transaction 
+      });
 
-  return {
-    attempt: {
-      id: attempt.id,
-      quizId: attempt.quizId,
+      const isCorrect = selectedOptionId !== null && Number(question.correctOptionId) === Number(selectedOptionId);
+
+      if (existing) {
+        existing.selectedOptionId = selectedOptionId;
+        existing.isCorrect = isCorrect;
+        await existing.save({ transaction });
+      } else if (selectedOptionId !== null) {
+        await QuizAnswer.create({
+          quizAttemptId: attempt.id,
+          questionId,
+          selectedOptionId,
+          isCorrect,
+        }, { transaction });
+      }
+    }
+
+    const questions = await QuizQuestion.findAll({ where: { quizId }, attributes: ['id', 'correctOptionId'], transaction });
+    const storedAnswers = await QuizAnswer.findAll({ where: { quizAttemptId: attempt.id }, transaction });
+    
+    const evaluation = evaluateAnswers(
+      questions.map((question) => question.toJSON()), 
+      storedAnswers.map((answer) => answer.toJSON())
+    );
+
+    const passingScore = quiz.passingScore || DEFAULT_PASSING_SCORE;
+
+    attempt.score = evaluation.score;
+    attempt.totalQuestions = evaluation.totalQuestions;
+    attempt.percentage = evaluation.percentage;
+    attempt.passed = evaluation.percentage >= passingScore;
+    attempt.status = 'submitted';
+    attempt.submittedAt = new Date();
+    await attempt.save({ transaction });
+
+    // Create QuizResult record
+    const result = await QuizResult.create({
+      quizAttemptId: attempt.id,
       studentId: attempt.studentId,
-      status: attempt.status,
+      quizId: attempt.quizId,
       score: attempt.score,
       percentage: attempt.percentage,
       passed: attempt.passed,
-      submittedAt: attempt.submittedAt,
-    },
-    ...evaluation,
-  };
+    }, { transaction });
+
+    await transaction.commit();
+
+    return {
+      attempt: {
+        id: attempt.id,
+        quizId: attempt.quizId,
+        studentId: attempt.studentId,
+        score: attempt.score,
+        totalQuestions: attempt.totalQuestions,
+        percentage: attempt.percentage,
+        passed: attempt.passed,
+        submittedAt: attempt.submittedAt,
+      },
+      result: evaluation,
+      resultId: result.id,
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
 };
 
 export default {
