@@ -2,6 +2,7 @@ export const quizAttemptMiddleware = async (req, res, next) => {
   try {
     const attemptId = Number(req.params.attemptId || req.params.id);
     const studentId = req.user?.id ?? req.user?.uid ?? req.user?.userId;
+    const isResultRequest = req.originalUrl?.includes('/result') || req.path?.endsWith('/result');
 
     if (!attemptId || Number.isNaN(attemptId)) {
       return res.status(400).json({ success: false, message: 'Invalid attempt id' });
@@ -14,7 +15,8 @@ export const quizAttemptMiddleware = async (req, res, next) => {
     const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
 
     if (process.env.NODE_ENV === 'test') {
-      req.quizAttempt = { id: attemptId, studentId: normalizedStudentId, status: 'in_progress' };
+      const status = isResultRequest ? 'submitted' : 'in_progress';
+      req.quizAttempt = { id: attemptId, studentId: normalizedStudentId, status };
       return next();
     }
 
@@ -29,7 +31,9 @@ export const quizAttemptMiddleware = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Unauthorized access to attempt' });
     }
 
-    if (attempt.status !== 'in_progress') {
+    const isAllowedStatus = isResultRequest ? attempt.status === 'submitted' : attempt.status === 'in_progress';
+
+    if (!isAllowedStatus) {
       return res.status(409).json({ success: false, message: 'Attempt is not active' });
     }
 

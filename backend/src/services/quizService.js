@@ -27,7 +27,18 @@ export const getQuizDetails = async (quizId) => {
   const quiz = await Quiz.findOne({
     where: { id: quizId, isActive: true },
     attributes: ['id', 'title', 'description', 'durationMinutes', 'passingScore', 'isActive'],
-    include: [{ model: QuizQuestion, as: 'questions', order: [['displayOrder', 'ASC']], include: [{ model: QuizOption, as: 'options', order: [['displayOrder', 'ASC']] }] }],
+    include: [{
+      model: QuizQuestion,
+      as: 'questions',
+      attributes: ['id', 'questionText', 'displayOrder'],
+      order: [['displayOrder', 'ASC']],
+      include: [{
+        model: QuizOption,
+        as: 'options',
+        attributes: ['id', 'optionText', 'displayOrder'],
+        order: [['displayOrder', 'ASC']],
+      }],
+    }],
   });
 
   if (!quiz) {
