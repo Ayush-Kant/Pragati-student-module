@@ -20,6 +20,8 @@ import SubmissionHistoryPage from "../coding-challenges/pages/SubmissionHistoryP
 import LeaderboardPage from "../coding-challenges/pages/LeaderboardPage";
 import ProjectsPage from "../pages/projects/ProjectsPage";
 import ProjectDetailPage from "../pages/projects/ProjectDetailPage";
+import ProjectWorkspacePage from "../projects/pages/ProjectWorkspacePage";
+import ProjectEvaluationPage from "../projects/pages/ProjectEvaluationPage";
 import PerformancePage from "../pages/performance/PerformancePage";
 import InterviewsPage from "../pages/interviews/InterviewsPage";
 import NotificationsPage from "../pages/notifications/NotificationsPage";
@@ -138,6 +140,18 @@ const studentRoute = (
         <Route
           path="projects/:projectId"
           element={<ProjectDetailPage />}
+        />
+
+
+        <Route
+          path="projects/:projectId/workspace"
+          element={<ProjectWorkspacePage />}
+        />
+
+
+        <Route
+          path="projects/:projectId/evaluation"
+          element={<ProjectEvaluationPage />}
         />
 
 
