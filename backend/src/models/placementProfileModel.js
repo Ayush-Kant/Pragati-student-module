@@ -3,11 +3,11 @@ import connectDB from "../../config/db.js";
 
 const sequelizeInstance = connectDB.sequelize || connectDB;
 
-export class Application extends Model {}
+export class PlacementProfile extends Model {}
 
 try {
   if (sequelizeInstance && typeof sequelizeInstance.define === "function") {
-    Application.init(
+    PlacementProfile.init(
       {
         id: {
           type: DataTypes.INTEGER,
@@ -19,46 +19,53 @@ try {
           allowNull: false,
           field: "student_id",
         },
-        companyName: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          field: "company_name",
-        },
-        jobTitle: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          field: "job_title",
-        },
-        jobId: {
+        resumeUrl: {
           type: DataTypes.STRING,
           allowNull: true,
-          field: "job_id",
+          field: "resume_url",
         },
-        status: {
+        portfolioUrl: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          field: "portfolio_url",
+        },
+        linkedinUrl: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          field: "linkedin_url",
+        },
+        githubUrl: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          field: "github_url",
+        },
+        readinessScore: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+          field: "readiness_score",
+        },
+        placementStatus: {
           type: DataTypes.STRING,
           allowNull: false,
-          defaultValue: "APPLIED",
+          defaultValue: "NOT_PLACED",
+          field: "placement_status",
         },
-        appliedDate: {
-          type: DataTypes.DATE,
-          allowNull: false,
-          defaultValue: DataTypes.NOW,
-          field: "applied_date",
-        },
-        notes: {
-          type: DataTypes.TEXT,
+        preferredRole: {
+          type: DataTypes.STRING,
           allowNull: true,
+          field: "preferred_role",
         },
-        history: {
-          type: DataTypes.JSON,
+        targetSalary: {
+          type: DataTypes.DECIMAL,
           allowNull: true,
-          defaultValue: [],
+          field: "target_salary",
         },
       },
       {
         sequelize: sequelizeInstance,
-        modelName: "Application",
-        tableName: "job_applications",
+        modelName: "PlacementProfile",
+        tableName: "placement_profiles",
         underscored: true,
         timestamps: true,
       }
@@ -68,4 +75,4 @@ try {
   // Fallback
 }
 
-export default Application;
+export default PlacementProfile;

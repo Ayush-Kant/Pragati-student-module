@@ -1,52 +1,53 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "@jest/globals";
 
 import placementService from "../services/placementService.js";
 import placementRoutes from "../routes/placementRoutes.js";
 import { formatSuccessResponse, formatErrorResponse } from "../utils/placementHelpers.js";
 
-test("getPlacementDashboard aggregates readiness score, application stats, and recommendations", async () => {
-  const studentId = 101;
-  const dashboard = await placementService.getPlacementDashboard(studentId);
+describe("Placement Service & Routes", () => {
+  it("getPlacementDashboard aggregates readiness score, application stats, and recommendations", async () => {
+    const studentId = 101;
+    const dashboard = await placementService.getPlacementDashboard(studentId);
 
-  assert.equal(dashboard.studentId, 101);
-  assert.ok(typeof dashboard.readinessScore === "number");
-  assert.ok(typeof dashboard.applicationsCount === "number");
-  assert.ok(typeof dashboard.interviewsCount === "number");
-  assert.ok(Array.isArray(dashboard.skillReadiness));
-  assert.ok(Array.isArray(dashboard.careerRecommendations));
-  assert.ok(dashboard.applicationStatistics);
-  assert.ok(dashboard.interviewStatistics);
-});
+    expect(dashboard.studentId).toBe(101);
+    expect(typeof dashboard.readinessScore).toBe("number");
+    expect(typeof dashboard.applicationsCount).toBe("number");
+    expect(typeof dashboard.interviewsCount).toBe("number");
+    expect(Array.isArray(dashboard.skillReadiness)).toBe(true);
+    expect(Array.isArray(dashboard.careerRecommendations)).toBe(true);
+    expect(dashboard.applicationStatistics).toBeDefined();
+    expect(dashboard.interviewStatistics).toBeDefined();
+  });
 
-test("formatSuccessResponse formats API payload cleanly", () => {
-  const response = formatSuccessResponse({ score: 90 }, "Data fetched");
-  assert.equal(response.success, true);
-  assert.equal(response.message, "Data fetched");
-  assert.equal(response.data.score, 90);
-});
+  it("formatSuccessResponse formats API payload cleanly", () => {
+    const response = formatSuccessResponse({ score: 90 }, "Data fetched");
+    expect(response.success).toBe(true);
+    expect(response.message).toBe("Data fetched");
+    expect(response.data.score).toBe(90);
+  });
 
-test("formatErrorResponse formats structured error output", () => {
-  const response = formatErrorResponse("Invalid payload", "VALIDATION_ERROR");
-  assert.equal(response.success, false);
-  assert.equal(response.message, "Invalid payload");
-  assert.equal(response.code, "VALIDATION_ERROR");
-});
+  it("formatErrorResponse formats structured error output", () => {
+    const response = formatErrorResponse("Invalid payload", "VALIDATION_ERROR");
+    expect(response.success).toBe(false);
+    expect(response.message).toBe("Invalid payload");
+    expect(response.code).toBe("VALIDATION_ERROR");
+  });
 
-test("placementRoutes exposes all required API endpoint paths", () => {
-  const registeredPaths = placementRoutes.stack
-    .filter((layer) => layer.route)
-    .map((layer) => layer.route.path);
+  it("placementRoutes exposes all required API endpoint paths", () => {
+    const registeredPaths = placementRoutes.stack
+      .filter((layer) => layer.route)
+      .map((layer) => layer.route.path);
 
-  assert.ok(registeredPaths.includes("/dashboard"));
-  assert.ok(registeredPaths.includes("/applications"));
-  assert.ok(registeredPaths.includes("/applications/:applicationId"));
-  assert.ok(registeredPaths.includes("/applications/:applicationId/status"));
-  assert.ok(registeredPaths.includes("/interviews"));
-  assert.ok(registeredPaths.includes("/interviews/:interviewId"));
-  assert.ok(registeredPaths.includes("/skills"));
-  assert.ok(registeredPaths.includes("/skills/gaps"));
-  assert.ok(registeredPaths.includes("/readiness"));
-  assert.ok(registeredPaths.includes("/analytics"));
-  assert.ok(registeredPaths.includes("/recommendations"));
+    expect(registeredPaths).toContain("/dashboard");
+    expect(registeredPaths).toContain("/applications");
+    expect(registeredPaths).toContain("/applications/:applicationId");
+    expect(registeredPaths).toContain("/applications/:applicationId/status");
+    expect(registeredPaths).toContain("/interviews");
+    expect(registeredPaths).toContain("/interviews/:interviewId");
+    expect(registeredPaths).toContain("/skills");
+    expect(registeredPaths).toContain("/skills/gaps");
+    expect(registeredPaths).toContain("/readiness");
+    expect(registeredPaths).toContain("/analytics");
+    expect(registeredPaths).toContain("/recommendations");
+  });
 });

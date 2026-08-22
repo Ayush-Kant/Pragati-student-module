@@ -5,7 +5,7 @@ export const extractStudentId = (req, res, next) => {
     return res.status(401).json(formatErrorResponse("Unauthorized: User identity not found", "UNAUTHORIZED_ACCESS"));
   }
 
-  const studentId = req.user.id || req.user.studentId || req.user.uid;
+  const studentId = req.user?.id || req.user?.studentId || req.user?.uid;
   if (!studentId) {
     return res.status(403).json(formatErrorResponse("Forbidden: Student identity missing from token", "UNAUTHORIZED_ACCESS"));
   }

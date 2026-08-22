@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from "@sequelize/core";
 import connectDB from "../../config/db.js";
 
 const sequelizeInstance = connectDB.sequelize || connectDB;
