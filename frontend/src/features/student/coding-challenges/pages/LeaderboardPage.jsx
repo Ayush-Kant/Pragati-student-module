@@ -9,6 +9,7 @@ import SectionHeader from '../components/common/SectionHeader';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorState from '../components/common/ErrorState';
 import EmptyState from '../components/common/EmptyState';
+import CodingChallengeErrorBoundary from '../components/common/CodingChallengeErrorBoundary';
 
 /**
  * Leaderboard page for a specific challenge or global ranking.
@@ -25,63 +26,76 @@ const LeaderboardPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#050505] text-gray-100 px-4 py-6 max-w-5xl mx-auto">
-      {/* Back link */}
-      {challengeId && (
-        <button
-          type="button"
-          onClick={() => navigate(`/student/coding/${challengeId}`)}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-orange-400 transition-colors mb-6"
-        >
-          <ArrowLeft size={16} aria-hidden="true" />
-          Back to Challenge
-        </button>
-      )}
+    <CodingChallengeErrorBoundary>
+      <div className="min-h-screen bg-[#050505] text-gray-100 px-4 py-6 max-w-5xl mx-auto">
+        {/* Back link */}
+        {challengeId && (
+          <button
+            type="button"
+            onClick={() => navigate(`/student/coding-challenges/${challengeId}`)}
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-orange-400 transition-colors mb-6"
+          >
+            <ArrowLeft size={16} aria-hidden="true" />
+            Back to Challenge
+          </button>
+        )}
 
-      {/* Page header */}
-      <div className="flex items-center gap-3 mb-8 animate-fade-in">
-        <Trophy size={28} className="text-orange-500" aria-hidden="true" />
-        <h1 className="text-4xl font-extrabold text-orange-400 drop-shadow-[0_0_12px_rgba(251,146,60,0.5)]">
-          Leaderboard
-        </h1>
-      </div>
+        {!challengeId && (
+          <button
+            type="button"
+            onClick={() => navigate('/student/coding-challenges')}
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-orange-400 transition-colors mb-6"
+          >
+            <ArrowLeft size={16} aria-hidden="true" />
+            All Challenges
+          </button>
+        )}
 
-      {isLoading && <LoadingSpinner size="lg" label="Loading leaderboard…" />}
-
-      {!isLoading && error && (
-        <ErrorState error={error} onRetry={refetch} />
-      )}
-
-      {!isLoading && !error && leaderboard.length === 0 && (
-        <EmptyState
-          title="No rankings yet"
-          description="Be the first to solve this challenge and claim the top spot!"
-          icon="🏆"
-        />
-      )}
-
-      {!isLoading && !error && leaderboard.length > 0 && (
-        <div className="space-y-8 animate-slide-up">
-          {/* Your standing */}
-          {currentUserEntry && <ScoreSummary entry={currentUserEntry} />}
-
-          {/* Podium — aria-label provides the accessible name directly */}
-          <section aria-label="Top Performers">
-            <SectionHeader title="Top Performers" />
-            <TopCoders leaderboard={leaderboard} />
-          </section>
-
-          {/* Full table */}
-          <section aria-label="All Rankings">
-            <SectionHeader
-              title="All Rankings"
-              subtitle={`${leaderboard.length} participants`}
-            />
-            <LeaderboardTable leaderboard={leaderboard} />
-          </section>
+        {/* Page header */}
+        <div className="flex items-center gap-3 mb-8 animate-fade-in">
+          <Trophy size={28} className="text-orange-500" aria-hidden="true" />
+          <h1 className="text-4xl font-extrabold text-orange-400 drop-shadow-[0_0_12px_rgba(251,146,60,0.5)]">
+            {challengeId ? 'Challenge Leaderboard' : 'Global Leaderboard'}
+          </h1>
         </div>
-      )}
-    </div>
+
+        {isLoading && <LoadingSpinner size="lg" label="Loading leaderboard…" />}
+
+        {!isLoading && error && (
+          <ErrorState error={error} onRetry={refetch} />
+        )}
+
+        {!isLoading && !error && leaderboard.length === 0 && (
+          <EmptyState
+            title="No rankings yet"
+            description="Be the first to solve this challenge and claim the top spot!"
+            icon="🏆"
+          />
+        )}
+
+        {!isLoading && !error && leaderboard.length > 0 && (
+          <div className="space-y-8 animate-slide-up">
+            {/* Your standing */}
+            {currentUserEntry && <ScoreSummary entry={currentUserEntry} />}
+
+            {/* Podium — aria-label provides the accessible name directly */}
+            <section aria-label="Top Performers">
+              <SectionHeader title="Top Performers" />
+              <TopCoders leaderboard={leaderboard} />
+            </section>
+
+            {/* Full table */}
+            <section aria-label="All Rankings">
+              <SectionHeader
+                title="All Rankings"
+                subtitle={`${leaderboard.length} participants`}
+              />
+              <LeaderboardTable leaderboard={leaderboard} />
+            </section>
+          </div>
+        )}
+      </div>
+    </CodingChallengeErrorBoundary>
   );
 };
 

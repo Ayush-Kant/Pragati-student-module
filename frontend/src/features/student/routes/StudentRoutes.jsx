@@ -16,6 +16,7 @@ import AssignmentDetail from "../pages/assignments/AssignmentDetail";
 import QuizzesPage from "../pages/quizzes/QuizzesPage";
 import CodingChallengePage from "../pages/coding/CodingChallengePage";
 import CodingChallengesPage from "../coding-challenges/pages/CodingChallengesPage";
+import ChallengeDetailsPage from "../coding-challenges/pages/ChallengeDetailsPage";
 import SubmissionHistoryPage from "../coding-challenges/pages/SubmissionHistoryPage";
 import LeaderboardPage from "../coding-challenges/pages/LeaderboardPage";
 import ProjectsPage from "../pages/projects/ProjectsPage";
@@ -113,6 +114,13 @@ const studentRoute = (
         />
 
 
+        {/* Challenge detail — canonical URL */}
+        <Route
+          path="coding-challenges/:challengeId"
+          element={<ChallengeDetailsPage />}
+        />
+
+
         <Route
           path="coding-challenges/:challengeId/submissions"
           element={<SubmissionHistoryPage />}
@@ -125,6 +133,14 @@ const studentRoute = (
         />
 
 
+        {/* Global leaderboard (no challenge scope) */}
+        <Route
+          path="leaderboard"
+          element={<LeaderboardPage />}
+        />
+
+
+        {/* Legacy route kept for backwards-compatibility */}
         <Route
           path="coding/:challengeId"
           element={<CodingChallengePage />}

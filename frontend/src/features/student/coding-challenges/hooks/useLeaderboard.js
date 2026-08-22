@@ -1,53 +1,72 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getLeaderboard } from '../services/codingChallengeService';
 
 /**
- * Fetches and manages leaderboard data.
+ * Fetches and manages leaderboard data for a specific challenge or global.
+ *
+ * Safety: Uses AbortController to cancel in-flight requests on unmount,
+ * and a fetchId counter to discard stale responses from concurrent requests.
+ * Lint-safe: useEffect body only kicks off the request and returns cleanup;
+ * all setState calls are inside .then()/.catch() callbacks.
  *
  * @param {string | null} [challengeId]
- * @returns {{
- *   leaderboard: object[],
- *   isLoading: boolean,
- *   error: string | null,
- *   refetch: Function,
- * }}
  */
 export function useLeaderboard(challengeId = null) {
   const [leaderboard, setLeaderboard] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchLeaderboard = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const result = await getLeaderboard(challengeId);
-      if (result.success) {
-        setLeaderboard(result.data);
-      } else {
-        setError(result.error);
-      }
-    } catch {
-      setError('Failed to load leaderboard. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [challengeId]);
+  const fetchIdRef = useRef(0);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (cancelled) return;
-      await fetchLeaderboard();
-    })();
-    return () => { cancelled = true; };
-  }, [fetchLeaderboard]);
+    const abortController = new AbortController();
+    const fetchId = ++fetchIdRef.current;
 
-  return {
-    leaderboard,
-    isLoading,
-    error,
-    refetch: fetchLeaderboard,
-  };
+    getLeaderboard(challengeId, abortController.signal)
+      .then((result) => {
+        if (fetchId !== fetchIdRef.current || abortController.signal.aborted) return;
+        if (result.success) {
+          setLeaderboard(result.data);
+          setError(null);
+        } else {
+          setError(result.error);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        if (err?.name === 'AbortError' || fetchId !== fetchIdRef.current) return;
+        setError('Failed to load leaderboard. Please try again.');
+        setIsLoading(false);
+      });
+
+    return () => abortController.abort();
+  }, [challengeId]);
+
+  const refetch = useCallback(() => {
+    setIsLoading(true);
+    setError(null);
+    const abortController = new AbortController();
+    const fetchId = ++fetchIdRef.current;
+
+    getLeaderboard(challengeId, abortController.signal)
+      .then((result) => {
+        if (fetchId !== fetchIdRef.current || abortController.signal.aborted) return;
+        if (result.success) {
+          setLeaderboard(result.data);
+          setError(null);
+        } else {
+          setError(result.error);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        if (err?.name === 'AbortError' || fetchId !== fetchIdRef.current) return;
+        setError('Failed to load leaderboard. Please try again.');
+        setIsLoading(false);
+      });
+
+    return () => abortController.abort();
+  }, [challengeId]);
+
+  return { leaderboard, isLoading, error, refetch };
 }

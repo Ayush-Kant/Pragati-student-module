@@ -13,6 +13,11 @@ import {
  * Manages the code editor state, language switching, code execution,
  * and solution submission for a single challenge.
  *
+ * Safety features:
+ * - `isExecuting` / `isSubmitting` flags prevent duplicate concurrent requests.
+ * - In-flight ref guards against simultaneous clicks even before state updates.
+ * - Execution and submission use independent loading flags so they can't overlap.
+ *
  * @param {string} challengeId
  * @param {object | null} challengeStarterCode - Map of language → starter code from challenge data.
  * @returns {{
@@ -24,6 +29,7 @@ import {
  *   isSubmitting: boolean,
  *   executionError: string | null,
  *   submissionError: string | null,
+ *   isDirty: boolean,
  *   setLanguage: Function,
  *   setCode: Function,
  *   handleRunCode: Function,
@@ -40,6 +46,11 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [executionError, setExecutionError] = useState(null);
   const [submissionError, setSubmissionError] = useState(null);
+  const [isDirty, setIsDirty] = useState(false);
+
+  // In-flight guards — prevent duplicate requests without waiting for React re-render.
+  const executingRef = useRef(false);
+  const submittingRef = useRef(false);
 
   /**
    * Per-language code storage — preserves user code across language switches.
@@ -86,6 +97,7 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
     (newCode) => {
       codeByLanguage.current[language] = newCode;
       setCodeState(newCode);
+      setIsDirty(true);
     },
     [language]
   );
@@ -114,10 +126,14 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
     setCodeState(starter);
     setExecutionResult(null);
     setExecutionError(null);
+    setIsDirty(false);
   }, [language, challengeStarterCode]);
 
-  /** Run code against sample test cases. */
+  /** Run code against sample test cases. Duplicate-click safe. */
   const handleRunCode = useCallback(async () => {
+    // Duplicate request guard — check ref (instant) before state check.
+    if (executingRef.current || submittingRef.current) return;
+
     const payload = { challengeId, language, code };
     const validation = validateExecutionRequest(payload);
 
@@ -126,6 +142,7 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
       return;
     }
 
+    executingRef.current = true;
     setIsExecuting(true);
     setExecutionError(null);
     setExecutionResult(null);
@@ -140,12 +157,16 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
     } catch {
       setExecutionError('Code execution failed. Please try again.');
     } finally {
+      executingRef.current = false;
       setIsExecuting(false);
     }
   }, [challengeId, language, code]);
 
-  /** Submit solution for final evaluation. */
+  /** Submit solution for final evaluation. Duplicate-click safe. */
   const handleSubmit = useCallback(async () => {
+    // Duplicate request guard — check ref (instant) before state check.
+    if (submittingRef.current || executingRef.current) return;
+
     const payload = { challengeId, language, code };
     const validation = validateSubmissionRequest(payload);
 
@@ -154,6 +175,7 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
       return;
     }
 
+    submittingRef.current = true;
     setIsSubmitting(true);
     setSubmissionError(null);
     setSubmissionResult(null);
@@ -162,12 +184,15 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
       const result = await submitSolution(payload);
       if (result.success) {
         setSubmissionResult(result.data);
+        // After a successful submission, mark as no longer dirty.
+        setIsDirty(false);
       } else {
         setSubmissionError(result.error);
       }
     } catch {
       setSubmissionError('Submission failed. Please try again.');
     } finally {
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   }, [challengeId, language, code]);
@@ -186,6 +211,7 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
     isSubmitting,
     executionError,
     submissionError,
+    isDirty,
     setLanguage,
     setCode,
     handleRunCode,
