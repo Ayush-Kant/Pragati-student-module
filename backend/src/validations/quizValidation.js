@@ -6,7 +6,7 @@ const answerSchema = Joi.object({
 });
 
 export const quizSubmissionSchema = Joi.object({
-  answers: Joi.array().items(answerSchema).min(1).required(),
+  answers: Joi.array().items(answerSchema).min(1).max(100).required(),
 });
 
 export const validateQuizSubmission = (payload) => quizSubmissionSchema.validate(payload, { abortEarly: false });

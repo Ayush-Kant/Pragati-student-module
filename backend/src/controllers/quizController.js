@@ -40,7 +40,6 @@ export const getQuizHistory = async (req, res, next) => {
     const history = await quizService.getQuizHistory(normalizedStudentId);
     return res.status(200).json({ success: true, data: history });
   } catch (error) {
-    console.error('Quiz history error:', error);
     next(error);
   }
 };
@@ -67,7 +66,6 @@ export const submitQuiz = async (req, res, next) => {
 
     return res.status(201).json({ success: true, data: result });
   } catch (error) {
-    console.error('Submit quiz error:', error);
     next(error);
   }
 };
@@ -83,8 +81,8 @@ export const startQuiz = async (req, res, next) => {
 
     const attempt = await quizService.startQuizAttempt(Number(req.params.quizId), normalizedStudentId);
     return res.status(201).json({ success: true, data: attempt });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -99,8 +97,8 @@ export const getAttempt = async (req, res, next) => {
 
     const result = await quizService.getAttemptById(Number(req.params.attemptId), normalizedStudentId);
     return res.status(200).json({ success: true, data: result });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -117,10 +115,10 @@ export const saveAnswer = async (req, res, next) => {
     const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
 
     const { questionId, selectedOptionId } = payloadValidation.value;
-    const saved = await quizService.saveQuizAnswer(Number(req.params.attemptId), normalizedStudentId, questionId, selectedOptionId === null ? null : Number(selectedOptionId));
+    const saved = await quizService.saveQuizAnswer(Number(req.params.attemptId), normalizedStudentId, questionId, selectedOptionId == null ? null : Number(selectedOptionId));
     return res.status(200).json({ success: true, data: saved });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -135,8 +133,8 @@ export const submitAttempt = async (req, res, next) => {
 
     const result = await quizService.submitQuizAttempt(Number(req.params.attemptId), normalizedStudentId);
     return res.status(200).json({ success: true, data: result });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -151,8 +149,8 @@ export const getResult = async (req, res, next) => {
 
     const result = await quizService.getAttemptResult(Number(req.params.attemptId), normalizedStudentId);
     return res.status(200).json({ success: true, data: result });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -163,7 +161,20 @@ export const getPerformance = async (req, res, next) => {
     const normalizedStudentId = Number.isNaN(Number(studentId)) ? studentId : Number(studentId);
     const result = await quizService.getPerformanceSummary(normalizedStudentId);
     return res.status(200).json({ success: true, data: result });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
+};
+
+export default {
+  getAvailableQuizzes,
+  getQuizDetails,
+  getQuizHistory,
+  submitQuiz,
+  startQuiz,
+  getAttempt,
+  saveAnswer,
+  submitAttempt,
+  getResult,
+  getPerformance,
 };

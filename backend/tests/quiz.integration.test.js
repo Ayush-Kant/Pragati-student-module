@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import jwt from 'jsonwebtoken';
-import { Quiz, QuizQuestion, QuizOption, QuizAttempt, QuizAnswer } from '../models/quizModel.js';
-import { calculateScore, buildPerformanceSummary } from '../utils/quizHelpers.js';
+import { Quiz, QuizQuestion, QuizOption, QuizAttempt, QuizAnswer } from '../src/models/quizModel.js';
+import { calculateScore, buildPerformanceSummary } from '../src/utils/quizScoring.js';
 import { validateQuizSubmission, validateQuizId } from '../validations/quizValidation.js';
 
 const sampleQuiz = {

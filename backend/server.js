@@ -65,8 +65,8 @@ import feedbackRoutes from "./src/routes/feedbackRoutes.js";
 import gradeRoutes from "./src/routes/gradeRoutes.js";
 import deadlineRoutes from "./src/routes/deadlineRoutes.js";
 import projectRoutes from "./src/routes/projectRoutes.js";
-import quizRoutes from "./routes/quizRoutes.js";
-import { initializeQuizModule } from "./models/quizModel.js";
+import quizRoutes from "./src/routes/quizRoutes.js";
+import { initializeQuizModule } from "./src/models/quizModel.js";
 import discussionRoutes from "./src/routes/discussionRoutes.js";
 import certificateRoutes from "./src/routes/certificateRoutes.js";
 
