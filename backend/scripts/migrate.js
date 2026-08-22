@@ -23,6 +23,7 @@ const migrationFiles = [
   "003_create_admin_dashboard.sql",
   "004_create_notifications.sql",
   "006_create_assessments.sql",
+  "006_create_assessments_minimal.sql",
   "006_create_college_profiles.sql",
   "006_create_dashboard_support.sql",
   "006_create_training_coordination.sql",
@@ -40,11 +41,20 @@ const migrationFiles = [
   "009_create_reports_analytics_tables.sql",
   "011_create_job_posting_tables.sql",
   "012_create_jobs_table.sql",
+  "013_create_reports_management_tables.sql",
+  "013_create_placement_drives.sql",
+  "014_create_college_communication_announcements.sql",
   "019_create_notifications.sql",
   "college.department.course.seeddata.sql",
+  "collegeStudentNominations.sql",
+  "collegeAnalyticsDashboard.sql",
   "student_module.sql",
+  "020_drive_student_nominations.sql",
   "020_update_student_drive_progress.sql",
+  "021_fix_drive_data_redundancy.sql",
   "021_update_interviews_table.sql",
+  "022_seed_college_modules.sql",
+  "015_upgrade_announcements_saas_fields.sql"
 ];
 
 async function runMigrationsFresh() {
@@ -249,7 +259,6 @@ async function runMigrations() {
     console.error(error);
 
     throw error;
-
   } finally {
     client.release();
   }

@@ -193,11 +193,11 @@ const AssessmentManagement = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       {/* Header */}
 
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl md:text-3xl font-bold">
           Assessment Control
         </h1>
 
@@ -205,7 +205,7 @@ const AssessmentManagement = () => {
           onClick={() =>
             setOpenCreateModal(true)
           }
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="rounded-lg bg-blue-600 px-3 py-2 text-sm text-white transition hover:bg-blue-700 md:px-4 md:text-base"
         >
           + Create Test
         </button>
@@ -228,7 +228,7 @@ const AssessmentManagement = () => {
           onChange={(e) =>
             setSearch(e.target.value)
           }
-          className="border rounded-lg p-2"
+          className="rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
         />
 
         <select
@@ -236,7 +236,7 @@ const AssessmentManagement = () => {
           onChange={(e) =>
             setType(e.target.value)
           }
-          className="border rounded-lg p-2"
+          className="rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
         >
           <option>All</option>
           <option>MCQ</option>
@@ -248,7 +248,7 @@ const AssessmentManagement = () => {
           onChange={(e) =>
             setDifficulty(e.target.value)
           }
-          className="border rounded-lg p-2"
+          className="rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
         >
           <option>All</option>
           <option>Easy</option>
@@ -261,7 +261,7 @@ const AssessmentManagement = () => {
           onChange={(e) =>
             setStatus(e.target.value)
           }
-          className="border rounded-lg p-2"
+          className="rounded-lg border px-3 py-2 text-sm md:p-3 md:text-base"
         >
           <option>All</option>
           <option>Active</option>
@@ -272,7 +272,7 @@ const AssessmentManagement = () => {
 
       {/* Count */}
 
-      <p className="mb-4 font-medium">
+      <p className="mb-4 text-sm font-medium md:text-base">
         Showing {filteredAssessments.length} of{" "}
         {assessments.length} assessments
       </p>

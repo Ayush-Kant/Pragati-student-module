@@ -10,10 +10,8 @@ const getAllCompanies = async () => {
         SELECT
             id,
             name,
-            email,
-            industry,
             location,
-            package_offered AS "packageOffered",
+            package,
             status,
             created_at AS "createdAt"
         FROM companies
@@ -30,10 +28,8 @@ const getCompanyById = async (id) => {
         SELECT
             id,
             name,
-            email,
-            industry,
             location,
-            package_offered AS "packageOffered",
+            package,
             status,
             created_at AS "createdAt"
         FROM companies
@@ -45,12 +41,24 @@ const getCompanyById = async (id) => {
     return result.rows[0];
 };
 
+const getCompanyByName = async (name) => {
+
+    const result = await pool.query(
+        `
+        SELECT id, name
+        FROM companies
+        WHERE name = $1
+        `,
+        [name]
+    );
+
+    return result.rows[0];
+};
+
 const createCompany = async ({
     name,
-    email,
-    industry,
     location,
-    packageOffered,
+    package: packageValue
 }) => {
 
     const result = await pool.query(
@@ -58,38 +66,30 @@ const createCompany = async ({
         INSERT INTO companies
         (
             name,
-            email,
-            industry,
             location,
-            package_offered
+            package
         )
         VALUES
         (
-            $1,$2,$3,$4,$5
+            $1,$2,$3
         )
         RETURNING *
         `,
         [
             name,
-            email,
-            industry,
             location,
-            packageOffered,
+            packageValue
         ]
     );
 
     return result.rows[0];
 };
-
 const updateCompany = async (
     id,
     {
         name,
-        email,
-        industry,
         location,
-        packageOffered,
-        status,
+        package: packageValue
     }
 ) => {
 
@@ -98,23 +98,17 @@ const updateCompany = async (
         UPDATE companies
         SET
             name=$1,
-            email=$2,
-            industry=$3,
-            location=$4,
-            package_offered=$5,
-            status=$6,
+            location=$2,
+            package=$3,
             updated_at=NOW()
-        WHERE id=$7
+        WHERE id=$4
         RETURNING *
         `,
         [
             name,
-            email,
-            industry,
             location,
-            packageOffered,
-            status,
-            id,
+            packageValue,
+            id
         ]
     );
 
@@ -142,8 +136,8 @@ const searchCompanies = async (keyword) => {
         FROM companies
         WHERE
             name ILIKE $1
-            OR industry ILIKE $1
             OR location ILIKE $1
+            OR package ILIKE $1
         `,
         [`%${keyword}%`]
     );
@@ -157,22 +151,52 @@ const searchCompanies = async (keyword) => {
 
 const getAllJobPostings = async () => {
 
-    const result = await pool.query(`
-        SELECT *
-        FROM job_postings
-        ORDER BY id DESC
-    `);
+    const result = await pool.query(
+        `
+        SELECT
+            jp.id,
+            jp.company_id,
+
+            c.name AS company,
+
+            jp.role,
+            jp.department,
+            jp.location,
+            jp.package,
+
+            jp.cgpa_limit AS cgpa,
+
+            jp.batch,
+
+            jp.application_deadline AS deadline,
+
+            jp.job_description AS "jobDescription",
+
+            jp.hiring_process AS "hiringProcess",
+
+            jp.status,
+
+            jp.created_at
+
+        FROM job_postings jp
+
+        LEFT JOIN companies c
+        ON jp.company_id = c.id
+
+        ORDER BY jp.id DESC
+        `
+    );
+
 
     return result.rows;
 };
 
 const getJobPostingById = async (id) => {
-
     const result = await pool.query(
         `
         SELECT *
         FROM job_postings
-        WHERE id=$1
+        WHERE id = $1
         `,
         [id]
     );
@@ -188,66 +212,130 @@ const createJobPosting = async (job) => {
         (
             company_id,
             title,
-            description,
-            job_type,
+            role,
+            department,
             location,
-            salary_min,
-            salary_max,
-            experience_required,
-            status,
-            posted_at
+            package,
+            cgpa_limit,
+            batch,
+            application_deadline,
+            job_description,
+            hiring_process,
+            status
         )
         VALUES
         (
-            $1,$2,$3,$4,$5,$6,$7,$8,$9,NOW()
+            $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12
         )
         RETURNING *
         `,
         [
             job.company_id,
-            job.title,
-            job.description,
-            job.job_type,
+            job.role,          // mirror role → title to satisfy NOT NULL
+            job.role,
+            job.department,
             job.location,
-            job.salary_min,
-            job.salary_max,
-            job.experience_required,
-            job.status || "Open",
+            job.package,
+            job.cgpa_limit,
+            job.batch,
+            job.application_deadline,
+            job.job_description,
+            job.hiring_process,
+            job.status || "Open"
         ]
     );
 
     return result.rows[0];
 };
-
 const updateJobPosting = async (id, job) => {
 
-    const result = await pool.query(
+    console.log("MODEL RECEIVED UPDATE JOB:", job);
+    console.log("MODEL UPDATE ARRAY:", [
+        job.company_id,
+        job.role,
+        job.department,
+        job.location,
+        job.package,
+        job.cgpa_limit,
+        job.batch,
+        job.application_deadline,
+        job.job_description,
+        job.hiring_process,
+        job.status || "Open",
+        id
+    ]);
+
+    await pool.query(
         `
         UPDATE job_postings
         SET
-            title=$1,
-            description=$2,
-            job_type=$3,
-            location=$4,
-            salary_min=$5,
-            salary_max=$6,
-            experience_required=$7,
-            status=$8
-        WHERE id=$9
-        RETURNING *
+            company_id = $1,
+            role = $2,
+            department = $3,
+            location = $4,
+            package = $5,
+            cgpa_limit = $6,
+            batch = $7,
+            application_deadline = $8,
+            job_description = $9,
+            hiring_process = $10,
+            status = $11,
+            updated_at = NOW()
+
+        WHERE id = $12
         `,
         [
-            job.title,
-            job.description,
-            job.job_type,
+            job.company_id,
+            job.role,
+            job.department,
             job.location,
-            job.salary_min,
-            job.salary_max,
-            job.experience_required,
-            job.status,
-            id,
+            job.package,
+            job.cgpa_limit,
+            job.batch,
+            job.application_deadline,
+            job.job_description,
+            job.hiring_process,
+            job.status || "Open",
+            id
         ]
     );
+
+
+    const result = await pool.query(
+        `
+        SELECT
+            jp.id,
+            jp.company_id,
+            c.name AS company,
+
+            jp.role,
+            jp.department,
+            jp.location,
+            jp.package,
+
+            jp.cgpa_limit AS cgpa,
+
+            jp.batch,
+
+            jp.application_deadline AS deadline,
+
+            jp.job_description AS "jobDescription",
+
+            jp.hiring_process AS "hiringProcess",
+
+            jp.status,
+            jp.created_at
+
+        FROM job_postings jp
+
+        LEFT JOIN companies c
+        ON jp.company_id = c.id
+
+        WHERE jp.id = $1
+        `,
+        [id]
+    );
+
 
     return result.rows[0];
 };
@@ -381,6 +469,7 @@ export {
     // Company
     getAllCompanies,
     getCompanyById,
+    getCompanyByName,
     createCompany,
     updateCompany,
     deleteCompany,

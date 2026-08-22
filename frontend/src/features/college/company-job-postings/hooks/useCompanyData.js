@@ -13,19 +13,29 @@ const useCompanyData = () => {
   const [error, setError] = useState("");
 
   const fetchCompanies = useCallback(async (showLoading = true) => {
-    try {
-      if (showLoading) {
-        setLoading(true);
-      }
-
-      const data = await getCompanies();
-      setCompanies([...data]);
-    } catch {
-      setError("Unable to fetch companies.");
-    } finally {
-      setLoading(false);
+  try {
+    if (showLoading) {
+      setLoading(true);
     }
-  }, []);
+
+   const data = await getCompanies();
+
+console.log("Companies API Response:");
+console.table(data);
+setCompanies(data);
+  } catch (error) {
+    console.error("Fetch Companies Error:", error);
+    console.error("Response:", error.response);
+
+    setError(
+      error.response?.data?.message ||
+      error.message ||
+      "Unable to fetch companies."
+    );
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   useEffect(() => {
     // call async function inside effect to avoid setting state synchronously
@@ -37,13 +47,36 @@ const useCompanyData = () => {
   }, [fetchCompanies]);
 
   const addCompany = async (company) => {
-    try {
-      const newCompany = await createCompany(company);
-      setCompanies((prev) => [...prev, newCompany]);
-    } catch {
-      setError("Unable to add company.");
-    }
-  };
+
+  try {
+
+    const payload = {
+  name: company.name,
+  location: company.location,
+  package: company.package
+};
+
+
+    await createCompany(payload);
+
+    await fetchCompanies(false);
+
+
+  } catch(error) {
+
+    console.error(
+      "Add Company Error:",
+      error
+    );
+
+    setError(
+      error.response?.data?.message ||
+      "Unable to add company."
+    );
+
+  }
+
+};
 
   const editCompany = async (id, company) => {
     try {

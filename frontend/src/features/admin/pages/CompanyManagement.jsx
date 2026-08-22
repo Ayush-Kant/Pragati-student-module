@@ -57,6 +57,8 @@ export default function CompanyManagement() {
             setActionLoading(false);
         }
     };
+    console.log("filteredCompanies:", filteredCompanies);
+console.log("currentCompanies:", currentCompanies);
 
     return (
         <div className={`p-4 transition ${darkMode ? "text-white" : "text-slate-900"}`}>

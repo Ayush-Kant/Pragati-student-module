@@ -34,17 +34,16 @@ export default function DriveManagement() {
   } = useDriveManagement();
 
   return (
-    <div className="p-6">
-
+    <div className="p-4 sm:p-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold">
           Recruitment Drive Management
         </h1>
 
         <button
           onClick={() => setShowModal(true)}
-          className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
+          className="w-full sm:w-auto bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
         >
           + New Drive
         </button>
@@ -52,19 +51,18 @@ export default function DriveManagement() {
 
       {/* Filters */}
       <div className="bg-white p-4 rounded shadow flex gap-4 mb-6 flex-wrap">
-
         <input
           type="text"
           placeholder="Search Drive..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border px-3 py-2 rounded"
+          className="w-full sm:flex-1 border px-3 py-2 rounded"
         />
 
         <select
           value={company}
           onChange={(e) => setCompany(e.target.value)}
-          className="border px-3 py-2 rounded"
+          className="w-full sm:flex-1 border px-3 py-2 rounded"
         >
           <option value="all">All Companies</option>
           <option value="TechCorp Ltd">TechCorp Ltd</option>
@@ -75,7 +73,7 @@ export default function DriveManagement() {
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="border px-3 py-2 rounded"
+          className="w-full sm:flex-1 border px-3 py-2 rounded"
         >
           <option value="all">All Status</option>
           <option value="active">Active</option>
@@ -86,28 +84,23 @@ export default function DriveManagement() {
         <select
           value={stage}
           onChange={(e) => setStage(e.target.value)}
-          className="border px-3 py-2 rounded"
+          className="w-full sm:flex-1 border px-3 py-2 rounded"
         >
           <option value="all">All Stages</option>
           <option value="screening">Screening</option>
           <option value="training">Training</option>
           <option value="shortlist">Shortlist</option>
         </select>
-
       </div>
 
       {/* Error */}
       {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
-          {error}
-        </div>
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
       )}
 
       {/* Loading */}
       {loading ? (
-        <div className="text-center text-gray-500">
-          Loading drives...
-        </div>
+        <div className="text-center text-gray-500">Loading drives...</div>
       ) : (
         <>
           {/* Count */}
@@ -117,21 +110,18 @@ export default function DriveManagement() {
 
           {/* Table */}
           <DriveTable
-  drives={currentDrives}
-  onDelete={(id) => {
-
-    if(window.confirm("Delete this drive?")){
-      deleteDrive(id);
-    }
-
-  }}
-  onFreeze={freezeDrive}
-  onUnfreeze={unfreezeDrive}
-/>
+            drives={currentDrives}
+            onDelete={(id) => {
+              if (window.confirm("Delete this drive?")) {
+                deleteDrive(id);
+              }
+            }}
+            onFreeze={freezeDrive}
+            onUnfreeze={unfreezeDrive}
+          />
 
           {/* Pagination */}
-          <div className="flex justify-center gap-4 mt-6 items-center">
-
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
@@ -151,7 +141,6 @@ export default function DriveManagement() {
             >
               Next
             </button>
-
           </div>
         </>
       )}

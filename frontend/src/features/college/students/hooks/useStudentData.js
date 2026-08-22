@@ -30,9 +30,19 @@ const useStudentData = () => {
   }, [fetchStudents])
 
   const addStudent = async (data) => {
-    const res = await createStudent(data)
-    if (res.success) setStudents((prev) => [...prev, res.data])
-    return res
+    try {
+      const res = await createStudent(data)
+      if (res.success) setStudents((prev) => [...prev, res.data])
+      return res
+    } catch (err) {
+      const serverErrors = err.response?.data?.errors
+      const serverMessage = err.response?.data?.message || err.message
+      if (serverErrors?.length) {
+        console.error("Student creation validation errors:", serverErrors)
+      }
+      console.error("Add student failed:", serverMessage)
+      return { success: false, message: serverMessage, errors: serverErrors }
+    }
   }
 
   const editStudent = async (id, data) => {

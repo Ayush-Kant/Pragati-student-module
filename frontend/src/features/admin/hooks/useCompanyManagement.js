@@ -13,30 +13,38 @@ export default function useCompanyManagement() {
   const itemsPerPage = 5;
 
   const filteredCompanies = companies.filter((company) => {
-    const matchesSearch = company.name.toLowerCase().includes(search.toLowerCase());
-    const matchesIndustry =
-      industry === ""
-        ? true
-        : company.industry
+  const matchesSearch =
+    (company.name || "")
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+  const matchesIndustry =
+    industry === ""
+      ? true
+      : (company.industry || "")
           .toLowerCase()
           .includes(industry.toLowerCase());
-    const matchesLocation =
-      location === ""
-        ? true
-        : company.location
+
+  const matchesLocation =
+    location === ""
+      ? true
+      : (company.location || "")
           .toLowerCase()
           .includes(location.toLowerCase());
-    const matchesStatus =
-      status === "all"
-        ? true
-        : company.status.toLowerCase() === status.toLocaleLowerCase();
-    return (
-      matchesSearch &&
-      matchesIndustry &&
-      matchesLocation &&
-      matchesStatus
-    );
-  });
+
+  const matchesStatus =
+    status === "all"
+      ? true
+      : (company.status || "")
+          .toLowerCase() === status.toLowerCase();
+
+  return (
+    matchesSearch &&
+    matchesIndustry &&
+    matchesLocation &&
+    matchesStatus
+  );
+});
 
   const totalPages = Math.ceil(
     filteredCompanies.length / itemsPerPage

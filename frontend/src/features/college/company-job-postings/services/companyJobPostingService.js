@@ -1,73 +1,107 @@
-import {
-  companies,
-  jobPostings,
-} from "../types/companyJobPostingDummyData";
 
-let companyData = [...companies];
-let jobData = [...jobPostings];
+import api from "../../../../services/api";
+
 
 // ---------------- Company ----------------
 
 export const getCompanies = async () => {
-  return [...companyData];
+  const res = await api.get("/college/companies");
+  return res.data.data;
 };
 
 export const getCompanyById = async (id) => {
-  return companyData.find((company) => company.id === id);
+  const res = await api.get(`/college/companies/${id}`);
+  return res.data.data;
 };
 
 export const createCompany = async (company) => {
-  const newCompany = {
-    ...company,
-    id: Date.now(),
-  };
-
-  companyData.push(newCompany);
-
-  return newCompany;
+  const res = await api.post("/college/companies", company);
+  return res.data.data;
 };
 
-export const updateCompany = async (id, updatedCompany) => {
-  companyData = companyData.map((company) =>
-    company.id === id ? { ...company, ...updatedCompany } : company
-  );
-
-  return companyData.find((company) => company.id === id);
+export const updateCompany = async (id, company) => {
+  const res = await api.put(`/college/companies/${id}`, company);
+  return res.data.data;
 };
 
 export const deleteCompany = async (id) => {
-  companyData = companyData.filter((company) => company.id !== id);
-
+  await api.delete(`/college/companies/${id}`);
   return true;
 };
 
-// ---------------- Job ----------------
+// ---------------- Job Postings ----------------
 
 export const getJobPostings = async () => {
-  return [...jobData];
+  const res = await api.get("/college/postings");
+  return res.data.data;
 };
+
 
 export const createJobPosting = async (job) => {
-  const newJob = {
-    ...job,
-    id: Date.now(),
+  const res = await api.post("/college/postings", job);
+  return res.data.data;
+};
+
+
+export const updateJobPosting = async (id, job) => {
+
+  const payload = {
+    role: job.role,
+    department: job.department,
+    location: job.location,
+    package: job.package,
+
+    cgpa_limit: Number(job.cgpa_limit ?? job.cgpa),
+
+    batch: job.batch,
+
+    application_deadline:
+      job.application_deadline ?? job.deadline,
+
+    job_description:
+      job.job_description ?? job.jobDescription,
+
+    hiring_process:
+      job.hiring_process ?? job.hiringProcess,
+
+    status: job.status
   };
 
-  jobData.push(newJob);
 
-  return newJob;
-};
-
-export const updateJobPosting = async (id, updatedJob) => {
-  jobData = jobData.map((job) =>
-    job.id === id ? { ...job, ...updatedJob } : job
+  const res = await api.put(
+    `/college/postings/${id}`,
+    payload
   );
 
-  return jobData.find((job) => job.id === id);
+  return res.data.data;
 };
 
-export const deleteJobPosting = async (id) => {
-  jobData = jobData.filter((job) => job.id !== id);
 
+export const deleteJobPosting = async (id) => {
+  await api.delete(`/college/postings/${id}`);
   return true;
+};
+
+
+// ---------------- Job Status Toggle ----------------
+
+export const toggleJobStatus = async (id, currentStatus) => {
+
+  let res;
+
+  if (currentStatus === "Open") {
+
+    res = await api.patch(
+      `/college/postings/${id}/close`
+    );
+
+  } else {
+
+    res = await api.patch(
+      `/college/postings/${id}/publish`
+    );
+
+  }
+
+  return res.data.data;
 };

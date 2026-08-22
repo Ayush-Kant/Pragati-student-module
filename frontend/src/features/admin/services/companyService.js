@@ -3,10 +3,13 @@ import { mockCompanies, mockActiveDrives, mockRankings } from "../adminCompanyMo
 
 const normalizeCompany = (company) => {
   if (!company) return null;
+
   return {
     ...company,
-    // id: Number(company.id),
     id: Number(company.id ?? company.companyId),
+    name: company.name ?? company.company ?? "",
+    location: company.location ?? "",
+    package: company.package ?? company.packageOffered ?? "",
     status: company.status || "Pending",
     activityLogs: company.activityLogs || [],
     activeDrives: company.activeDrives || [],
@@ -62,7 +65,13 @@ export const getCompanies = async (filters = {}) => {
       : "/v1/admin/company";
 
     const response = await api.get(url);
-    const companies = response.data?.companies ?? response.data ?? [];
+    const companies =
+  response.data?.data ??
+  response.data?.companies ??
+  response.data ??
+  [];
+  console.log("Admin API Response:", response.data);
+console.log("Companies:", companies);
     return normalizeCompanies(companies);
   } catch (error) {
     console.warn("Company API unavailable, using mock data", error?.message);
@@ -84,7 +93,7 @@ export const getCompanyById = async (id) => {
 
 export const updateCompanyStatus = async (companyId, payload) => {
   try {
-    const response = await api.patch(`/companies/${companyId}`, payload);
+    const response = await api.patch(`/v1/admin/company/${companyId}`, payload);
     const company = response.data?.company ?? response.data;
     return normalizeCompany(company) ?? applyMockStatusUpdate(companyId, payload);
   } catch (error) {

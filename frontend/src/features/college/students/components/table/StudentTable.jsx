@@ -3,14 +3,14 @@ import EmptyState from "../common/EmptyState"
 
 const HEADERS = ["Student", "Department", "Course", "Batch", "Semester", "CGPA", "Status", "Actions"]
 
-const StudentTable = ({ students = [], onView, onEdit, onDelete }) => (
-  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+const StudentTable = ({ students = [], onView, onEdit, onDelete, darkMode }) => (
+  <div className={`rounded-2xl overflow-hidden ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white border border-gray-100'}`}>
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-gray-50 text-left">
+          <tr className={`text-left ${darkMode ? 'bg-[#1A1A1A]' : 'bg-gray-50'}`}>
             {HEADERS.map((h) => (
-              <th key={h} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <th key={h} className={`px-4 py-3 text-xs font-semibold uppercase tracking-wide ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 {h}
               </th>
             ))}
@@ -20,7 +20,7 @@ const StudentTable = ({ students = [], onView, onEdit, onDelete }) => (
           {students.length === 0 ? (
             <tr>
               <td colSpan={HEADERS.length}>
-                <EmptyState />
+                <EmptyState darkMode={darkMode} />
               </td>
             </tr>
           ) : (
@@ -31,6 +31,7 @@ const StudentTable = ({ students = [], onView, onEdit, onDelete }) => (
                 onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                darkMode={darkMode}
               />
             ))
           )}

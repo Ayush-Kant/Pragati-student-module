@@ -10,12 +10,12 @@ Training.init(
     trainingId: {
       type: DataTypes.STRING,
       primaryKey: true,
-      field: "training_id",
+      columnName: "training_id",
     },
     companyId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: "company_id",
+      columnName: "company_id",
       references: {
         model: Company,
         key: "id",
@@ -36,17 +36,17 @@ Training.init(
     startDate: {
       type: DataTypes.DATE,
       allowNull: false,
-      field: "start_date",
+      columnName: "start_date",
     },
     endDate: {
       type: DataTypes.DATE,
       allowNull: false,
-      field: "end_date",
+      columnName: "end_date",
     },
     mentorId: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      field: "mentor_id",
+      columnName: "mentor_id",
       references: {
         model: Mentor,
         key: "id",

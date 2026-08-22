@@ -10,7 +10,7 @@ import DashboardPage from "../pages/dashboard/DashboardPage";
 import ProfilePage from "../pages/profile/ProfilePage";
 import CoursesPage from "../pages/training/CoursesPage";
 import CourseDetailPage from "../pages/training/CourseDetailPage";
-import SessionsPage from "../pages/sessions/SessionsPage";
+import LiveSessionsPage from "../live-sessions/pages/LiveSessionsPage";
 import AssignmentsPage from "../pages/assignments/AssignmentsPage";
 import AssignmentDetail from "../pages/assignments/AssignmentDetail";
 import QuizzesPage from "../pages/quizzes/QuizzesPage";
@@ -86,7 +86,7 @@ const studentRoute = (
 
         <Route
           path="sessions"
-          element={<SessionsPage />}
+          element={<LiveSessionsPage />}
         />
 
 

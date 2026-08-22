@@ -10,7 +10,41 @@ const router = express.Router();
 
 router.use(
     authMiddleware,
-    roleMiddleware('admin')
+    roleMiddleware('college')
+);
+
+/* ===================================
+   Company APIs
+=================================== */
+
+// GET Companies
+router.get(
+    '/companies',
+    controller.getCompanies
+);
+
+// GET Company By ID
+router.get(
+    '/companies/:id',
+    controller.getCompanyById
+);
+
+// CREATE Company
+router.post(
+    '/companies',
+    controller.createCompany
+);
+
+// UPDATE Company
+router.put(
+    '/companies/:id',
+    controller.updateCompany
+);
+
+// DELETE Company
+router.delete(
+    '/companies/:id',
+    controller.deleteCompany
 );
 
 /* ===================================
@@ -63,7 +97,7 @@ router.put(
     '/postings/:id',
     validator.sanitizeInput,
     validator.validateRequestBody,
-    validator.validateJobPosting,
+    validator.validateUpdateJobPosting,
     controller.updateJobPosting
 );
 
@@ -123,6 +157,42 @@ router.delete(
     validator.validateJobId,
     controller.deleteEligibility
 );
+
+/* ===================================
+   Hiring Rounds APIs
+=================================== */
+
+// GET Hiring Rounds
+router.get(
+    '/postings/:id/rounds',
+    validator.validateJobId,
+    controller.getRounds
+);
+
+// CREATE Hiring Round
+router.post(
+    '/postings/:id/rounds',
+    validator.validateJobId,
+    controller.createRound
+);
+
+
+// UPDATE Hiring Round
+router.put(
+    '/postings/:id/rounds/:roundId',
+    validator.validateJobId,
+    controller.updateRound
+);
+
+
+// DELETE Hiring Round
+router.delete(
+    '/postings/:id/rounds/:roundId',
+    validator.validateJobId,
+    controller.deleteRound
+);
+
+
 
 /* ===================================
    Jobs APIs (Keep Dynamic Routes LAST)

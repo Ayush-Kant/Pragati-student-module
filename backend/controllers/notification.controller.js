@@ -1,7 +1,7 @@
 import {
   getNotificationsService,
-  markNotificationsAsReadService,
-  createBulkNotificationsService,
+  markNotificationReadService,
+  markAllNotificationsReadService,
 } from "../services/notification.service.js";
 
 // GET NOTIFICATIONS
@@ -28,10 +28,9 @@ export const markNotificationRead = async (req, res) => {
     const userId = req.user.userId;
     const { notificationId } = req.params;
 
-    await markNotificationsAsReadService(
+    await markNotificationReadService(
+      Number(notificationId),
       userId,
-      [Number(notificationId)],
-      false,
     );
 
     return res.status(200).json({
@@ -53,7 +52,7 @@ export const markAllNotificationsRead = async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    await markNotificationsAsReadService(userId, null, true);
+    await markAllNotificationsReadService(userId);
 
     return res.status(200).json({
       success: true,

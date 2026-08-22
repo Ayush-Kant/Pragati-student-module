@@ -16,53 +16,93 @@ const formatStatistics = (row) => ({
   updatedAt: row.updated_at,
 });
 
+// =====================================================
+// GET
+// =====================================================
+
 export const getStatistics = async (departmentId = null) => {
   if (departmentId) {
-    const department = await departmentModel.getDepartmentById(departmentId);
+    const department =
+      await departmentModel.getDepartmentById(departmentId);
+
     if (!department) {
-      const err = new Error(`Department with id ${departmentId} was not found.`);
+      const err = new Error(
+        `Department with id ${departmentId} was not found.`
+      );
       err.statusCode = 404;
       throw err;
     }
 
-    let stats = await statsModel.getDepartmentStatistics(departmentId);
+    let stats =
+      await statsModel.getDepartmentStatistics(departmentId);
+
     if (!stats) {
-      stats = await statsModel.recomputeDepartmentStatistics(departmentId);
-      stats.department_name = department.name;
-      stats.department_code = department.code;
+      stats =
+        await statsModel.recomputeDepartmentStatistics(
+          departmentId
+        );
     }
+
+    stats.department_name = department.name;
+    stats.department_code = department.code;
+
     return formatStatistics(stats);
   }
 
-  const rows = await statsModel.getDepartmentStatistics(null);
+  const rows =
+    await statsModel.getDepartmentStatistics();
+
   return rows.map(formatStatistics);
 };
 
-export const updateStatistics = async (payload) => {
-  const departmentId = Number(payload.departmentId ?? payload.department_id);
+// =====================================================
+// UPDATE
+// =====================================================
 
-  const department = await departmentModel.getDepartmentById(departmentId);
+export const updateStatistics = async (payload) => {
+
+  const departmentId = Number(
+    payload.departmentId ?? payload.department_id
+  );
+
+  const department =
+    await departmentModel.getDepartmentById(departmentId);
+
   if (!department) {
-    const err = new Error(`Department with id ${departmentId} was not found.`);
+    const err = new Error(
+      `Department with id ${departmentId} was not found.`
+    );
     err.statusCode = 404;
     throw err;
   }
 
-  const { totalStudents, totalFaculty, recompute } = payload;
+  const {
+    totalStudents,
+    totalFaculty,
+  } = payload;
 
-  let updated;
-  if (recompute) {
-    updated = await statsModel.recomputeDepartmentStatistics(departmentId);
-    if (totalStudents !== undefined || totalFaculty !== undefined) {
-      updated = await statsModel.updateDepartmentStatistics(departmentId, { totalStudents, totalFaculty });
-    }
-  } else {
-    updated = await statsModel.updateDepartmentStatistics(departmentId, { totalStudents, totalFaculty });
-  }
+  // Always recompute courses & average credits first
+  await statsModel.recomputeDepartmentStatistics(
+    departmentId
+  );
+
+  // Then update editable fields
+  const updated =
+    await statsModel.updateDepartmentStatistics(
+      departmentId,
+      {
+        totalStudents,
+        totalFaculty,
+      }
+    );
 
   updated.department_name = department.name;
   updated.department_code = department.code;
+
   return formatStatistics(updated);
 };
 
-export default { getStatistics, updateStatistics };
+export default {
+  getStatistics,
+  updateStatistics,
+};

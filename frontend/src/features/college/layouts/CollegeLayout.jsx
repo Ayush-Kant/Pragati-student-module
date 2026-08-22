@@ -12,7 +12,7 @@ const CollegeLayout = () => {
   const [openSidebar, setOpenSidebar] = useState(false);
 
   // Dark Mode
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,9 +25,9 @@ const CollegeLayout = () => {
       try {
         const result = await getProfile();
         // If the API returns success:true but data is null, or if it outright fails
-        if (!result || !result.data) {
-          navigate("/college/add-profile", { replace: true });
-        }
+        //if (!result || !result.data) {
+         // navigate("/college/add-profile", { replace: true });
+        //}
       } catch (err) {
         console.error("Failed to fetch profile during layout mount:", err);
       }
@@ -39,7 +39,7 @@ const CollegeLayout = () => {
   if (location.pathname === "/college/add-profile") {
     return (
       <div className={`min-h-screen transition-all duration-300 flex items-center justify-center ${
-        darkMode ? "bg-slate-900 text-white" : "bg-slate-100 text-black"
+        darkMode ? "bg-[#1A1A1A] text-white" : "bg-slate-100 text-black"
       }`}>
         <div className="w-full max-w-4xl p-6">
           <Outlet context={{ darkMode }} />
@@ -51,7 +51,7 @@ const CollegeLayout = () => {
   return (
     <div
       className={`min-h-screen transition-all duration-300 ${
-        darkMode ? "bg-slate-900 text-white" : "bg-slate-100 text-black"
+        darkMode ? "bg-[#1A1A1A] text-white" : "bg-slate-100 text-[#2D3436]"
       }`}
     >
       {/* Navbar */}
@@ -80,9 +80,9 @@ const CollegeLayout = () => {
         />
 
         {/* Main Section */}
-        <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
+        <div className="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden">
           {/* Page Content */}
-          <main className="flex-1 pt-20 p-6">
+          <main className="flex-1 pt-20 p-6 overflow-y-auto">
             <Outlet
               context={{
                 darkMode,

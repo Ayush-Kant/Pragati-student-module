@@ -12,7 +12,7 @@ User.init(
     },
     fullName: {
       type: DataTypes.STRING,
-      field: "full_name",
+      columnName: "full_name",
     },
     email: {
       type: DataTypes.STRING,

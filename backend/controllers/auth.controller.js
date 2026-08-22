@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "crypto";
 
-const ALLOWED_ROLES = ['student', 'mentor', 'admin', 'college', 'company'];
+const ALLOWED_ROLES = ["student", "mentor", "admin", "college", "company"];
 
 export const login = async (req, res) => {
   try {
@@ -16,12 +16,13 @@ export const login = async (req, res) => {
       });
     }
 
+    // Fetch user details spanning auth_users and users tables
     const result = await pool.query(
       `SELECT a.id AS auth_user_id, a.uuid_id, a.email, a.role, a.password_hash, u.id AS user_id
        FROM auth_users a
        LEFT JOIN users u ON u.auth_user_id = a.id
        WHERE a.email = $1`,
-      [email]
+      [email],
     );
 
     if (!result.rows.length) {
@@ -42,6 +43,7 @@ export const login = async (req, res) => {
       });
     }
 
+    // Comprehensive JWT Payload matching your present ecosystem
     const token = jwt.sign(
       {
         id: user.user_id,
@@ -52,7 +54,7 @@ export const login = async (req, res) => {
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     return res.status(200).json({
@@ -62,12 +64,11 @@ export const login = async (req, res) => {
       role: user.role,
       message: "Login successful",
     });
-
   } catch (error) {
-    console.error(error);
+    console.error("Login Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Login failed",
+      message: "Login failed due to an internal server error",
     });
   }
 };
@@ -79,20 +80,20 @@ export const register = async (req, res) => {
     if (!email || !password || !role) {
       return res.status(400).json({
         success: false,
-        message: "Email, password and role are required",
+        message: "Email, password, and role are required",
       });
     }
 
     if (!ALLOWED_ROLES.includes(role)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid role",
+        message: "Invalid role selected",
       });
     }
 
     const existing = await pool.query(
       `SELECT id FROM auth_users WHERE email = $1`,
-      [email]
+      [email],
     );
 
     if (existing.rows.length) {
@@ -104,45 +105,58 @@ export const register = async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const uuid = randomUUID();
+
+    // Initialize DB transaction variables
     const client = await pool.connect();
     let authUserId;
     let userId;
     let companyId = null;
+
     try {
       await client.query("BEGIN");
-      const user = await client.query(
+
+      // 1. Insert into auth_users
+      const authUserResult = await client.query(
         `INSERT INTO auth_users (email, password_hash, role, uuid_id)
          VALUES ($1, $2, $3, $4)
-         RETURNING id` ,
-        [email, passwordHash, role, uuid]
+         RETURNING id`,
+        [email, passwordHash, role, uuid],
       );
-      authUserId = user.rows[0].id;
+      authUserId = authUserResult.rows[0].id;
+
+      // 2. Insert into users
       const userResult = await client.query(
         `INSERT INTO users (auth_user_id, email, role, created_at, phone, username)
-         VALUES ($1, $2, $3, NOW(), $4, $5)
+         VALUES ($1, $2, $3, NOW(), NULL, $4)
          RETURNING id`,
-        [authUserId, email, role, null, email.split('@')[0]]
+        [authUserId, email, role, email.split("@")[0]],
       );
       userId = userResult.rows[0].id;
 
-      if (role === 'company') {
+      // 3. Role-specific table insertions
+      if (role === "mentor") {
+        await client.query(`INSERT INTO mentors (user_id) VALUES ($1)`, [
+          userId,
+        ]);
+      } else if (role === "company") {
         const companyResult = await client.query(
           `INSERT INTO companies (user_id, name, email)
            VALUES ($1, $2, $3)
            RETURNING id`,
-          [userId, email.split('@')[0] + ' Corporate', email]
+          [userId, `${email.split("@")[0]} Corporate`, email],
         );
         companyId = companyResult.rows[0].id;
       }
 
       await client.query("COMMIT");
-    }
-    catch (err) {
+    } catch (err) {
       await client.query("ROLLBACK");
-      throw err;
+      throw err; // Pass to outer catch block
     } finally {
-      client.release();
+      client.release(); // Crucial: Prevents connection pool leaks
     }
+
+    // Generate Token
     const token = jwt.sign(
       {
         id: userId,
@@ -151,10 +165,10 @@ export const register = async (req, res) => {
         authUserId: authUserId,
         email,
         role,
-        companyId,
+        companyId, // Null if not a company
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     return res.status(201).json({
@@ -163,13 +177,11 @@ export const register = async (req, res) => {
       token,
       message: "User registered successfully",
     });
-
   } catch (error) {
-    console.error(error);
+    console.error("Registration Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Registration failed",
+      message: "Registration failed due to an internal server error",
     });
   }
 };
-// reload backend server

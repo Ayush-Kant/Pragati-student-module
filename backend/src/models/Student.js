@@ -12,7 +12,7 @@ Student.init(
     },
     fullName: {
       type: DataTypes.STRING,
-      field: "full_name",
+      columnName: "full_name",
       allowNull: false,
     },
     email: {

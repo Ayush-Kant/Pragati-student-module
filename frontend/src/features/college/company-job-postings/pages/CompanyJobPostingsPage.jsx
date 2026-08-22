@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   Building2,
   BriefcaseBusiness,
   CircleCheckBig,
   CircleX,
 } from "lucide-react";
-
+ 
 import useCompanyData from "../hooks/useCompanyData";
 import useJobPosting from "../hooks/useJobPosting";
 import useJobFilters from "../hooks/useJobFilters";
@@ -30,6 +31,7 @@ import ConfirmationModal from "../components/common/ConfirmationModal";
 import DeleteJobPostingModal from "../components/forms/DeleteJobPostingModal";
 
 const CompanyJobPostingsPage = () => {
+  const { darkMode } = useOutletContext();
   const {
     companies,
     loading: companyLoading,
@@ -92,19 +94,40 @@ const CompanyJobPostingsPage = () => {
     setViewCompany(company);
   };
 
-  const handleSubmitCompany = async (data) => {
-    if (editingCompany) {
-      await editCompany(editingCompany.id, data);
-      setEditingCompany(null);
-      // Update viewCompany if it's currently selected for viewing
-      if (viewCompany?.id === editingCompany.id) {
-        setViewCompany({ ...viewCompany, ...data });
-      }
-    } else {
-      await addCompany(data);
-    }
-  };
+ const handleSubmitCompany = async (data) => {
 
+  const payload = {
+    name: data.name,
+    location: data.location,
+    package: data.package
+};
+
+
+  if (editingCompany) {
+
+    await editCompany(
+      editingCompany.id,
+      payload
+    );
+
+    setEditingCompany(null);
+
+    if (viewCompany?.id === editingCompany.id) {
+
+      setViewCompany({
+        ...viewCompany,
+        ...payload,
+      });
+
+    }
+
+  } else {
+
+    await addCompany(payload);
+
+  }
+
+};
   const handleDeleteCompanyClick = (id) => {
     setCompanyToDelete(id);
   };
@@ -146,28 +169,29 @@ const CompanyJobPostingsPage = () => {
   };
 
   if (companyLoading || jobLoading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner darkMode={darkMode} />;
   }
 
   if (companyError || jobError) {
     return (
       <ErrorState
         message={companyError || jobError}
+        darkMode={darkMode}
       />
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 p-6">
+    <div className={`min-h-screen p-6 ${darkMode ? 'bg-[#1A1A1A]' : 'bg-slate-100'}`}>
 
       {/* Header */}
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">
+        <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : ''}`}>
           Company Job Postings
         </h1>
 
-        <p className="text-slate-500">
+        <p className={`${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
           Placement Management Dashboard
         </p>
       </div>
@@ -176,59 +200,59 @@ const CompanyJobPostingsPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
 
-        <div className="bg-white rounded-xl shadow p-6 flex justify-between">
+        <div className={`rounded-xl shadow p-6 flex justify-between ${darkMode ? 'bg-[#2D2D2D]' : 'bg-white'}`}>
           <div>
-            <p className="text-slate-500">Companies</p>
-            <h2 className="text-3xl font-bold">
+            <p className={`${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Companies</p>
+            <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : ''}`}>
               {companies.length}
             </h2>
           </div>
 
           <Building2
             size={42}
-            className="text-blue-600"
+            className={darkMode ? 'text-[#ff6d34]' : 'text-blue-600'}
           />
         </div>
 
-        <div className="bg-white rounded-xl shadow p-6 flex justify-between">
+        <div className={`rounded-xl shadow p-6 flex justify-between ${darkMode ? 'bg-[#2D2D2D]' : 'bg-white'}`}>
           <div>
-            <p className="text-slate-500">Job Postings</p>
-            <h2 className="text-3xl font-bold">
+            <p className={`${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Job Postings</p>
+            <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : ''}`}>
               {jobs.length}
             </h2>
           </div>
 
           <BriefcaseBusiness
             size={42}
-            className="text-purple-600"
+            className={darkMode ? 'text-[#00bea3]' : 'text-purple-600'}
           />
         </div>
 
-        <div className="bg-white rounded-xl shadow p-6 flex justify-between">
+        <div className={`rounded-xl shadow p-6 flex justify-between ${darkMode ? 'bg-[#2D2D2D]' : 'bg-white'}`}>
           <div>
-            <p className="text-slate-500">Open Jobs</p>
-            <h2 className="text-3xl font-bold">
+            <p className={`${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Open Jobs</p>
+            <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : ''}`}>
               {openJobs}
             </h2>
           </div>
 
           <CircleCheckBig
             size={42}
-            className="text-green-600"
+            className={darkMode ? 'text-[#00bea3]' : 'text-green-600'}
           />
         </div>
 
-        <div className="bg-white rounded-xl shadow p-6 flex justify-between">
+        <div className={`rounded-xl shadow p-6 flex justify-between ${darkMode ? 'bg-[#2D2D2D]' : 'bg-white'}`}>
           <div>
-            <p className="text-slate-500">Closed Jobs</p>
-            <h2 className="text-3xl font-bold">
+            <p className={`${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>Closed Jobs</p>
+            <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : ''}`}>
               {closedJobs}
             </h2>
           </div>
 
           <CircleX
             size={42}
-            className="text-red-500"
+            className={darkMode ? 'text-red-400' : 'text-red-500'}
           />
         </div>
 
@@ -236,9 +260,9 @@ const CompanyJobPostingsPage = () => {
 
       {/* Filters */}
 
-      <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+      <div className={`rounded-xl shadow-md p-6 mb-8 ${darkMode ? 'bg-[#2D2D2D] border border-[#3D3D3D]' : 'bg-white'}`}>
 
-        <h2 className="text-xl font-semibold mb-5">
+        <h2 className={`text-xl font-semibold mb-5 ${darkMode ? 'text-white' : ''}`}>
           Search & Filters
         </h2>
 
@@ -247,27 +271,32 @@ const CompanyJobPostingsPage = () => {
           <SearchCompany
             value={search}
             onSearch={setSearch}
+            darkMode={darkMode}
           />
 
           <CompanyFilter
             companies={companies}
             selectedCompany={selectedCompany}
             onChange={setSelectedCompany}
+            darkMode={darkMode}
           />
 
           <DepartmentFilter
             value={department}
             onChange={setDepartment}
+            darkMode={darkMode}
           />
 
           <BatchFilter
             value={batch}
             onChange={setBatch}
+            darkMode={darkMode}
           />
 
           <JobStatusFilter
             value={status}
             onChange={setStatus}
+            darkMode={darkMode}
           />
 
         </div>
@@ -283,6 +312,7 @@ const CompanyJobPostingsPage = () => {
             editingCompany={editingCompany}
             onSubmit={handleSubmitCompany}
             companies={companies}
+            darkMode={darkMode}
           />
         </div>
 
@@ -293,9 +323,10 @@ const CompanyJobPostingsPage = () => {
               onView={handleViewCompany}
               onEdit={handleEditCompany}
               onDelete={handleDeleteCompanyClick}
+              darkMode={darkMode}
             />
           ) : (
-            <EmptyState message="No Companies Found" />
+            <EmptyState message="No Companies Found" darkMode={darkMode} />
           )}
         </div>
 
@@ -303,7 +334,7 @@ const CompanyJobPostingsPage = () => {
 
       {viewCompany && (
         <div className="mb-10">
-          <CompanyDetails company={viewCompany} />
+          <CompanyDetails company={viewCompany} darkMode={darkMode} />
         </div>
       )}
 
@@ -317,6 +348,7 @@ const CompanyJobPostingsPage = () => {
             editingJob={editingJob}
             onSubmit={handleSubmitJob}
             jobs={jobs}
+            darkMode={darkMode}
           />
 
         </div>
@@ -329,9 +361,10 @@ const CompanyJobPostingsPage = () => {
               onEdit={handleEditJob}
               onDelete={handleDeleteJobClick}
               onToggleStatus={toggleJobStatus}
+              darkMode={darkMode}
             />
           ) : (
-            <EmptyState message="No Job Postings Found" />
+            <EmptyState message="No Job Postings Found" darkMode={darkMode} />
           )}
 
         </div>
@@ -345,12 +378,14 @@ const CompanyJobPostingsPage = () => {
         message="Are you sure you want to delete this company?"
         onConfirm={handleConfirmDeleteCompany}
         onCancel={() => setCompanyToDelete(null)}
+        darkMode={darkMode}
       />
 
       <DeleteJobPostingModal
         isOpen={!!jobToDelete}
         onClose={() => setJobToDelete(null)}
         onConfirm={handleConfirmDeleteJob}
+        darkMode={darkMode}
       />
 
     </div>

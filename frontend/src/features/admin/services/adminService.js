@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5001",
 });
 
 API.interceptors.request.use(
@@ -436,7 +436,35 @@ export const PIPELINE_STAGES = [
 
 // Feature Flag: Use mock data instead of backend APIs
 // Set to false to use real backend APIs (when available)
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
+
+export const createDrive = async (driveData) => {
+  if (USE_MOCK_DATA) {
+    return {
+      success: true,
+      drive: {
+        id: `drive_${Date.now()}`,
+        ...driveData,
+        status: "active",
+        currentStage: "application",
+        candidates: 0,
+      },
+    };
+  }
+
+  try {
+    const response = await API.post(
+      "/api/v1/admin/drives",
+      driveData,
+      getConfig()
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const getDriveById = async (driveId) => {
   if (USE_MOCK_DATA) {
     return mockDriveDetail;

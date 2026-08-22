@@ -18,8 +18,8 @@ export const validateStudent = (data) => {
 
   // Required fields
   if (!data.enrollmentNo) errors.push('Enrollment number is required');
-  if (!data.name)         errors.push('Name is required');
-  if (!data.email)        errors.push('Email is required');
+  if (!data.name) errors.push('Name is required');
+  if (!data.email) errors.push('Email is required');
 
   // Email format
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
@@ -47,9 +47,9 @@ export const validateStudent = (data) => {
     }
   }
 
-  // Enrollment number format
-  if (data.enrollmentNo && !/^[A-Za-z0-9]+$/.test(data.enrollmentNo)) {
-    errors.push('Enrollment number must be alphanumeric');
+  // Enrollment number format — allow alphanumeric plus common separators (- _ /)
+  if (data.enrollmentNo && !/^[A-Za-z0-9\-_\/]+$/.test(data.enrollmentNo)) {
+    errors.push('Enrollment number must contain only letters, numbers, hyphens, underscores, or slashes');
   }
 
   return errors;

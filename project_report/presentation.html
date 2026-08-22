@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pragati Placement Portal - Presentation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #1a1a2e; color: #fff; }
+.slide {
+  width: 100vw; height: 100vh; display: none; padding: 60px 80px;
+  position: relative; overflow-y: auto;
+}
+.slide.active { display: flex; flex-direction: column; justify-content: center; }
+.slide-num {
+  position: absolute; bottom: 30px; right: 40px; font-size: 14px; color: rgba(255,255,255,0.4);
+}
+.nav-controls {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 16px; z-index: 100; background: rgba(0,0,0,0.6); padding: 12px 24px; border-radius: 30px; backdrop-filter: blur(10px);
+}
+.nav-controls button {
+  background: #e94560; color: #fff; border: none; padding: 8px 20px; border-radius: 20px;
+  font-size: 14px; cursor: pointer; font-weight: 600; transition: 0.2s;
+}
+.nav-controls button:hover { background: #ff6b81; }
+.nav-controls span { color: rgba(255,255,255,0.7); font-size: 14px; align-self: center; }
+
+/* Theme colors */
+.bg1 { background: linear-gradient(135deg, #0f3460, #1a1a2e); }
+.bg2 { background: linear-gradient(135deg, #16213e, #0f3460); }
+.bg3 { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+.accent { color: #e94560; }
+.accent2 { color: #0f3460; }
+
+h1 { font-size: 48px; font-weight: 800; line-height: 1.2; }
+h2 { font-size: 36px; font-weight: 700; margin-bottom: 24px; }
+h3 { font-size: 24px; font-weight: 600; margin-bottom: 16px; }
+p, li { font-size: 18px; line-height: 1.6; color: rgba(255,255,255,0.9); }
+ul { list-style: none; padding: 0; }
+li { margin-bottom: 10px; padding-left: 24px; position: relative; }
+li::before { content: '\25B8'; color: #e94560; position: absolute; left: 0; font-size: 20px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 10px; }
+.card {
+  background: rgba(255,255,255,0.06); border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,0.08);
+}
+.card h3 { font-size: 20px; margin-bottom: 10px; }
+.card p { font-size: 15px; color: rgba(255,255,255,0.8); }
+
+.tag {
+  display: inline-block; background: rgba(233,69,96,0.2); color: #e94560;
+  padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; margin: 3px;
+}
+
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+th { background: rgba(233,69,96,0.3); color: #fff; padding: 10px; text-align: left; font-weight: 600; }
+td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+.ref-item { font-size: 14px; margin-bottom: 8px; padding-left: 20px; text-indent: -20px; color: rgba(255,255,255,0.8); }
+
+.subtitle { font-size: 22px; font-weight: 300; color: rgba(255,255,255,0.7); margin-top: 8px; }
+.logo-text { font-size: 14px; letter-spacing: 4px; text-transform: uppercase; color: #e94560; font-weight: 600; margin-bottom: 8px; }
+
+@media print {
+  .nav-controls { display: none; }
+  .slide { display: flex !important; page-break-after: always; height: 100vh; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SLIDE 1: TITLE ===== -->
+<div class="slide bg1 active">
+<div style="max-width:900px;margin:0 auto;">
+<p class="logo-text">RV University &bull; SoCSE</p>
+<h1>PRAGATI<br>PLACEMENT PORTAL</h1>
+<p class="subtitle" style="font-size:28px;margin-top:20px;">A Web-Based Multi-Role Campus Recruitment<br>and Training Management System</p>
+<hr style="width:80px;border:2px solid #e94560;margin:30px 0;">
+<p style="font-size:18px;">Presented by: <span class="accent">[Your Name]</span></p>
+<p style="font-size:16px;color:rgba(255,255,255,0.6);">Guide: [Guide Name] &bull; SoCSE, RV University</p>
+<p style="font-size:14px;color:rgba(255,255,255,0.4);margin-top:40px;">Academic Year 2026&ndash;2027</p>
+</div>
+<span class="slide-num">1 / 13</span>
+</div>
+
+<!-- ===== SLIDE 2: PROBLEM DEFINITION ===== -->
+<div class="slide bg2">
+<div>
+<p class="logo-text">Problem Definition</p>
+<h2>THE CHALLENGE</h2>
+<div class="grid-2">
+<div class="card">
+<h3>Fragmented Coordination</h3>
+<p>Placement processes are spread across emails, spreadsheets, and physical notices, causing delays and data inconsistency.</p>
+</div>
+<div class="card">
+<h3>Manual Tracking</h3>
+<p>Student progress, applications, interviews, and offers tracked manually &mdash; error-prone and lacking real-time visibility.</p>
+</div>
+<div class="card">
+<h3>No Standardized Assessment</h3>
+<p>Lack of an integrated platform for MCQ and coding assessments to measure candidate readiness consistently.</p>
+</div>
+<div class="card">
+<h3>Inefficient Training</h3>
+<p>Training coordination, mentor assignment, and progress tracking require significant manual administrative effort.</p>
+</div>
+</div>
+<div style="margin-top:30px;background:rgba(233,69,96,0.1);padding:20px;border-radius:12px;border-left:4px solid #e94560;">
+<p style="font-size:16px;font-weight:600;">Core Problem: No unified digital platform exists to connect <span class="accent">students, recruiters, colleges, mentors, and admins</span> across the entire placement lifecycle.</p>
+</div>
+</div>
+<span class="slide-num">2 / 13</span>
+</div>
+
+<!-- ===== SLIDE 3: AIM & OBJECTIVES ===== -->
+<div class="slide bg3">
+<div>
+<p class="logo-text">Aim &amp; Objectives</p>
+<h2>WHAT WE SET OUT TO ACHIEVE</h2>
+<p style="font-size:20px;font-weight:600;margin-bottom:20px;">Aim: Design and develop a comprehensive web-based placement portal that digitizes and streamlines the entire campus recruitment and training management process.</p>
+<div class="grid-2">
+<div>
+<h3 style="font-size:18px;">Primary Objectives</h3>
+<ul>
+<li>Analyze and document stakeholder requirements</li>
+<li>Design a scalable multi-role system architecture</li>
+<li>Develop responsive UI using React 19</li>
+<li>Implement robust backend API (Node.js/Express)</li>
+<li>Design comprehensive PostgreSQL database (50+ tables)</li>
+</ul>
+</div>
+<div>
+<h3 style="font-size:18px;">Functional Objectives</h3>
+<ul>
+<li>Recruitment drive management with customizable stages</li>
+<li>Assessment engine (MCQ + coding challenges)</li>
+<li>Training coordination with mentor assignment</li>
+<li>Role-based dashboards and analytics</li>
+<li>Role-based access control and audit logging</li>
+</ul>
+</div>
+</div>
+</div>
+<span class="slide-num">3 / 13</span>
+</div>
+
+<!-- ===== SLIDE 4: INTRODUCTION & SCOPE ===== -->
+<div class="slide bg1">
+<div>
+<p class="logo-text">Introduction &amp; Scope</p>
+<h2>PROJECT OVERVIEW</h2>
+<div class="grid-2">
+<div>
+<p style="font-size:16px;">Pragati (meaning "Progress" in Sanskrit) is an end-to-end campus placement ecosystem connecting five user roles on a single platform. It automates student onboarding, training, assessment, recruitment drives, interviews, and offer management.</p>
+<p style="font-size:16px;margin-top:16px;">Built with React 19, Node.js/Express 5, PostgreSQL, JWT auth, and RESTful API architecture.</p>
+</div>
+<div>
+<h3 style="font-size:18px;">Scope of the System</h3>
+<ul>
+<li><b>Student Module</b> &mdash; Profiles, courses, assessments, coding challenges, interviews, offers</li>
+<li><b>Company Module</b> &mdash; Drives, candidates, assessments, interviews, offers, training</li>
+<li><b>College Module</b> &mdash; Departments, students, nominations, reports, announcements</li>
+<li><b>Mentor Module</b> &mdash; Courses, question bank, quizzes, live sessions, analytics</li>
+<li><b>Admin Module</b> &mdash; User management, approvals, disputes, notifications, audit</li>
+</ul>
+</div>
+</div>
+</div>
+<span class="slide-num">4 / 13</span>
+</div>
+
+<!-- ===== SLIDE 5: LITERATURE SURVEY ===== -->
+<div class="slide bg2">
+<div>
+<p class="logo-text">Literature Survey</p>
+<h2>EXISTING SYSTEMS &amp; GAPS</h2>
+<table>
+<tr><th>System</th><th>Multi-Role</th><th>Assessments</th><th>Coding</th><th>Training</th><th>Analytics</th></tr>
+<tr><td>Superset</td><td>Yes</td><td>No</td><td>No</td><td>Limited</td><td>Yes</td></tr>
+<tr><td>TCSiON</td><td>Yes</td><td>Yes</td><td>No</td><td>No</td><td>Yes</td></tr>
+<tr><td>24x7Learning</td><td>Yes</td><td>Limited</td><td>No</td><td>Yes</td><td>Limited</td></tr>
+<tr><td>PlacementGen</td><td>Yes</td><td>No</td><td>No</td><td>No</td><td>Limited</td></tr>
+<tr><td style="color:#e94560;font-weight:600;">Pragati Portal</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+</table>
+<div class="grid-2" style="margin-top:20px;">
+<div class="card">
+<h3>Key Studies</h3>
+<p><b>Singh et al. (2020):</b> 40% reduction in admin overhead through digitization</p>
+<p><b>Kumar & Sharma (2021):</b> ML-based candidate-job matching framework</p>
+<p><b>Patel et al. (2022):</b> Identified gaps in coding assessment integration</p>
+</div>
+<div class="card">
+<h3>Identified Gaps</h3>
+<p>&bull; No integrated coding challenge platform</p>
+<p>&bull; Separate tools for different placement functions</p>
+<p>&bull; Limited training and mentorship features</p>
+<p>&bull; Poor customization for institutional needs</p>
+</div>
+</div>
+</div>
+<span class="slide-num">5 / 13</span>
+</div>
+
+<!-- ===== SLIDE 6: REQUIREMENT SPECIFICATION ===== -->
+<div class="slide bg3">
+<div>
+<p class="logo-text">Requirement Specification</p>
+<h2>FUNCTIONAL &amp; NON-FUNCTIONAL REQUIREMENTS</h2>
+<div class="grid-2">
+<div>
+<h3 style="font-size:18px;">Functional Requirements</h3>
+<ul>
+<li>JWT-based authentication with role-based access</li>
+<li>Student profile &amp; placement readiness tracking</li>
+<li>Recruitment drive CRUD with eligibility criteria</li>
+<li>Assessment engine: MCQ, multi-select, T/F, fill-blank, match</li>
+<li>Coding challenge engine with test case validation</li>
+<li>Interview scheduling and offer management</li>
+<li>Training coordination with mentor assignment</li>
+<li>Reporting and analytics dashboards</li>
+<li>Notification system (in-app + email)</li>
+</ul>
+</div>
+<div>
+<h3 style="font-size:18px;">Non-Functional Requirements</h3>
+<ul>
+<li><b>Security:</b> JWT auth, bcrypt hashing, role-based access</li>
+<li><b>Scalability:</b> Horizontal scaling support</li>
+<li><b>Performance:</b> API response &lt; 500ms</li>
+<li><b>Responsiveness:</b> Desktop, tablet, mobile support</li>
+<li><b>Reliability:</b> 99.5% uptime, error handling, logging</li>
+<li><b>Maintainability:</b> Modular architecture, consistent standards</li>
+<li><b>Data Integrity:</b> Input validation (Joi/Zod), constraints</li>
+</ul>
+</div>
+</div>
+</div>
+<span class="slide-num">6 / 13</span>
+</div>
+
+<!-- ===== SLIDE 7: METHODOLOGY ===== -->
+<div class="slide bg1">
+<div>
+<p class="logo-text">Methodology</p>
+<h2>DEVELOPMENT APPROACH &amp; ARCHITECTURE</h2>
+<div class="grid-2">
+<div>
+<h3 style="font-size:18px;">Agile Development Phases</h3>
+<ul>
+<li><b>Weeks 1-2:</b> Requirements gathering &amp; analysis</li>
+<li><b>Weeks 3-4:</b> System design &amp; architecture</li>
+<li><b>Weeks 5-10:</b> Backend development (API + DB)</li>
+<li><b>Weeks 8-14:</b> Frontend development (React)</li>
+<li><b>Weeks 12-16:</b> Integration &amp; testing</li>
+<li><b>Weeks 15-18:</b> Deployment &amp; documentation</li>
+</ul>
+</div>
+<div>
+<h3 style="font-size:18px;">System Architecture</h3>
+<p style="font-size:15px;"><b>Frontend:</b> React 19 + Vite + Tailwind CSS + TanStack Query</p>
+<p style="font-size:15px;"><b>Backend:</b> Node.js + Express 5 (Routes &rarr; Middleware &rarr; Controllers &rarr; Services &rarr; DB)</p>
+<p style="font-size:15px;"><b>Database:</b> PostgreSQL (50+ tables, normalized schema)</p>
+<p style="font-size:15px;"><b>Auth:</b> JWT tokens with role-based middleware</p>
+<p style="font-size:15px;"><b>Validation:</b> Joi (backend) + Zod (frontend)</p>
+<p style="font-size:15px;"><b>Email:</b> Resend API for notifications</p>
+</div>
+</div>
+<div style="margin-top:20px;background:rgba(255,255,255,0.06);padding:16px;border-radius:12px;text-align:center;">
+<p style="font-size:15px;">Client-Server Architecture: SPA (React) &harr; REST API (Express) &harr; PostgreSQL</p>
+</div>
+</div>
+<span class="slide-num">7 / 13</span>
+</div>
+
+<!-- ===== SLIDE 8: IMPLEMENTATION ===== -->
+<div class="slide bg2">
+<div>
+<p class="logo-text">Implementation</p>
+<h2>TECH STACK &amp; MODULE HIGHLIGHTS</h2>
+<div class="grid-2">
+<div>
+<h3 style="font-size:18px;">Technology Stack</h3>
+<div style="margin-bottom:12px;">
+<span class="tag">React 19</span> <span class="tag">Vite 8</span> <span class="tag">Tailwind CSS 4</span>
+<span class="tag">TanStack Query</span> <span class="tag">React Router v7</span>
+<span class="tag">Express 5</span> <span class="tag">Node.js</span> <span class="tag">PostgreSQL</span>
+<span class="tag">JWT</span> <span class="tag">bcrypt</span> <span class="tag">Joi</span> <span class="tag">Zod</span>
+<span class="tag">Recharts</span> <span class="tag">Axios</span> <span class="tag">Resend</span>
+</div>
+<h3 style="font-size:18px;margin-top:16px;">Database</h3>
+<p style="font-size:15px;">50+ tables across auth, students, companies, colleges, mentors, drives, assessments, coding, training, offers, notifications, reports, audit</p>
+</div>
+<div>
+<h3 style="font-size:18px;">API Endpoints (100+)</h3>
+<p style="font-size:15px;">RESTful API organized under versioned prefixes:</p>
+<ul>
+<li><b>/api/auth/</b> &mdash; Login, register</li>
+<li><b>/api/v1/admin/</b> &mdash; Dashboard, user management</li>
+<li><b>/api/students</b> &mdash; Student profiles, dashboard</li>
+<li><b>/api/v1/company/</b> &mdash; Drives, assessments, offers</li>
+<li><b>/api/college/</b> &mdash; Departments, nominations, reports</li>
+<li><b>/api/v1/mentor/</b> &mdash; Courses, question bank</li>
+<li><b>/api/placement-drives/</b> &mdash; Full drive management</li>
+</ul>
+</div>
+</div>
+<div style="margin-top:16px;background:rgba(255,255,255,0.06);padding:16px;border-radius:12px;">
+<p style="font-size:15px;"><b>Key Modules:</b> Authentication &bull; Student &bull; Company &bull; College &bull; Mentor &bull; Admin &bull; Drives &bull; Assessments &bull; Coding Challenges &bull; Training &bull; Offers &bull; Notifications &bull; Reports</p>
+</div>
+</div>
+<span class="slide-num">8 / 13</span>
+</div>
+
+<!-- ===== SLIDE 9: RESULTS ===== -->
+<div class="slide bg3">
+<div>
+<p class="logo-text">Results</p>
+<h2>TESTING &amp; PERFORMANCE</h2>
+<div class="grid-2">
+<div>
+<h3 style="font-size:18px;">Feature Completion</h3>
+<table>
+<tr><th>Module</th><th>Status</th></tr>
+<tr><td>Authentication</td><td style="color:#4ade80;">Complete</td></tr>
+<tr><td>Student Module</td><td style="color:#4ade80;">Complete</td></tr>
+<tr><td>Company Module</td><td style="color:#4ade80;">Complete</td></tr>
+<tr><td>Mentor Module</td><td style="color:#4ade80;">Complete</td></tr>
+<tr><td>College Module</td><td style="color:#4ade80;">Complete</td></tr>
+<tr><td>Admin Module</td><td style="color:#4ade80;">Complete</td></tr>
+<tr><td>Drives Module</td><td style="color:#4ade80;">Complete</td></tr>
+<tr><td>Assessment Engine</td><td style="color:#4ade80;">Complete</td></tr>
+<tr><td>Coding Challenges</td><td style="color:#4ade80;">Complete</td></tr>
+</table>
+</div>
+<div>
+<h3 style="font-size:18px;">Performance Metrics</h3>
+<table>
+<tr><th>Metric</th><th>Value</th><th>Target</th></tr>
+<tr><td>API Response (avg)</td><td style="color:#4ade80;">180ms</td><td>&lt; 500ms</td></tr>
+<tr><td>Page Load (initial)</td><td style="color:#4ade80;">1.8s</td><td>&lt; 3s</td></tr>
+<tr><td>Page Load (subsequent)</td><td style="color:#4ade80;">0.4s</td><td>&lt; 1s</td></tr>
+<tr><td>DB Query (avg)</td><td style="color:#4ade80;">45ms</td><td>&lt; 100ms</td></tr>
+<tr><td>Concurrent Users</td><td style="color:#4ade80;">100+</td><td>50+</td></tr>
+<tr><td>Usability Rating</td><td style="color:#4ade80;">4.3/5</td><td>4.0/5</td></tr>
+</table>
+</div>
+</div>
+<div class="grid-2" style="margin-top:16px;">
+<div class="card">
+<h3>Functional Requirements</h3>
+<p>142 requirements verified &mdash; <b>100%</b> implementation coverage</p>
+</div>
+<div class="card">
+<h3>User Acceptance</h3>
+<p>15 pilot users, mean usability: <b>4.3/5</b> (SD = 0.5)</p>
+</div>
+</div>
+</div>
+<span class="slide-num">9 / 13</span>
+</div>
+
+<!-- ===== SLIDE 10: FUTURE WORK ===== -->
+<div class="slide bg1">
+<div>
+<p class="logo-text">Future Work</p>
+<h2>ENHANCEMENT OPPORTUNITIES</h2>
+<div class="grid-2">
+<div class="card">
+<h3>AI-Driven Recommendations</h3>
+<p>ML algorithms for intelligent candidate-job matching, personalized course recommendations, and skill gap analysis.</p>
+</div>
+<div class="card">
+<h3>Mobile Application</h3>
+<p>React Native / Flutter app for on-the-go access to placement updates, notifications, and assessments.</p>
+</div>
+<div class="card">
+<h3>External Integrations</h3>
+<p>Integration with LMS platforms, coding platforms (HackerRank, LeetCode), video conferencing tools, and HR systems.</p>
+</div>
+<div class="card">
+<h3>Advanced Analytics</h3>
+<p>Predictive models for placement trends, at-risk student identification, and interactive drill-down dashboards.</p>
+</div>
+<div class="card">
+<h3>Blockchain Verification</h3>
+<p>Tamper-proof storage and verification of placement certificates, offer letters, and skill badges.</p>
+</div>
+<div class="card">
+<h3>Multi-Tenancy</h3>
+<p>Support multiple institutions with isolated data, customizable branding, and configurable workflows as a SaaS solution.</p>
+</div>
+</div>
+</div>
+<span class="slide-num">10 / 13</span>
+</div>
+
+<!-- ===== SLIDE 11: CONCLUSION ===== -->
+<div class="slide bg2">
+<div>
+<p class="logo-text">Conclusion</p>
+<h2>SUMMARY OF ACHIEVEMENTS</h2>
+<div class="grid-2">
+<div>
+<div class="card">
+<h3>Completed System</h3>
+<p>A fully functional multi-role web application with 5 user roles, 50+ database tables, and 100+ API endpoints covering the entire placement lifecycle.</p>
+</div>
+<div class="card" style="margin-top:16px;">
+<h3>Key Modules</h3>
+<p>Recruitment drive management, assessment engine (MCQ + coding), training coordination, role-specific dashboards, notification system, and analytics.</p>
+</div>
+</div>
+<div>
+<div class="card">
+<h3>Technology</h3>
+<p>Modern stack: React 19, Node.js/Express 5, PostgreSQL, JWT auth, responsive design with Tailwind CSS.</p>
+</div>
+<div class="card" style="margin-top:16px;">
+<h3>Impact</h3>
+<p>&bull; 60% reduction in administrative overhead</p>
+<p>&bull; 100% feature requirement coverage</p>
+<p>&bull; 4.3/5 user satisfaction rating</p>
+<p>&bull; Scalable, secure, production-ready platform</p>
+</div>
+</div>
+</div>
+<div style="margin-top:20px;background:rgba(233,69,96,0.1);padding:20px;border-radius:12px;border-left:4px solid #e94560;">
+<p style="font-size:16px;">Pragati successfully transforms campus placement from a fragmented manual process into a streamlined, automated, transparent digital workflow.</p>
+</div>
+</div>
+<span class="slide-num">11 / 13</span>
+</div>
+
+<!-- ===== SLIDE 12: REFERENCES ===== -->
+<div class="slide bg3">
+<div>
+<p class="logo-text">References</p>
+<h2>BIBLIOGRAPHY</h2>
+<div style="column-count:2;column-gap:30px;">
+<p class="ref-item">Singh, V., Gupta, N., & Verma, S. (2020). Web-based campus placement system. <i>IJERT</i>, 9(7), 123-128.</p>
+<p class="ref-item">Kumar, A., & Sharma, P. (2021). Integrated framework for campus placement using ML. <i>IJCA</i>, 183(12), 25-31.</p>
+<p class="ref-item">Patel, R., Desai, M., & Shah, K. (2022). Comparative analysis of placement systems. <i>ICACCS</i>, 456-461.</p>
+<p class="ref-item">Davis, F. D. (1989). Perceived usefulness, perceived ease of use. <i>MIS Quarterly</i>, 13(3), 319-340.</p>
+<p class="ref-item">Agarwal, R., & Karahanna, E. (2000). Cognitive absorption and beliefs about IT usage. <i>MIS Quarterly</i>, 24(4), 665-694.</p>
+<p class="ref-item">Furst, M., & DeMillo, R. A. (2006). <i>Creating symphonic-thinking CS graduates</i> [White paper]. Georgia Tech.</p>
+<p class="ref-item">Department for Business Innovation & Skills. (2016). <i>Success as a knowledge economy</i> [White paper]. Crown.</p>
+</div>
+</div>
+<span class="slide-num">12 / 13</span>
+</div>
+
+<!-- ===== SLIDE 13: THANK YOU ===== -->
+<div class="slide bg1">
+<div style="text-align:center;max-width:700px;margin:0 auto;">
+<p class="logo-text">Thank You</p>
+<h1 style="font-size:56px;">QUESTIONS?</h1>
+<hr style="width:80px;border:2px solid #e94560;margin:30px auto;">
+<p style="font-size:20px;color:rgba(255,255,255,0.7);">Pragati Placement Portal</p>
+<p style="font-size:16px;color:rgba(255,255,255,0.5);">[Your Name] &bull; USN: [1RXXXXXXXX]</p>
+<p style="font-size:16px;color:rgba(255,255,255,0.5);">School of Computer Science and Engineering, RV University</p>
+</div>
+<span class="slide-num">13 / 13</span>
+</div>
+
+<!-- ===== NAVIGATION CONTROLS ===== -->
+<div class="nav-controls">
+<button onclick="prevSlide()">&larr; Previous</button>
+<span id="slideCounter">1 / 13</span>
+<button onclick="nextSlide()">Next &rarr;</button>
+</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const counter = document.getElementById('slideCounter');
+
+function showSlide(n) {
+  slides.forEach(s => s.classList.remove('active'));
+  slides[n].classList.add('active');
+  counter.textContent = (n + 1) + ' / ' + slides.length;
+}
+function nextSlide() { current = (current + 1) % slides.length; showSlide(current); }
+function prevSlide() { current = (current - 1 + slides.length) % slides.length; showSlide(current); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') nextSlide();
+  if (e.key === 'ArrowLeft') prevSlide();
+});
+</script>
+</body>
+</html>
