@@ -1,56 +1,46 @@
-import {
-  dashboardApiResponse,
-  leaderboardData,
-} from "../types/dashboardDummyData";
+import { mockDashboardData, mockLeaderboardData } from "../data/dashboardDummyData";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
-const getHeaders = () => ({
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-});
-
-// ── Helper — simulate API delay with dummy data ───────
-
-const simulateApi = (data, delay = 600) =>
-  new Promise((resolve) => setTimeout(() => resolve(data), delay));
-
-// ─────────────────────────────────────────────────────
-// FULL DASHBOARD (single combined call)
-// ─────────────────────────────────────────────────────
-
-export const getDashboardData = async (studentId) => {
-  return simulateApi(dashboardApiResponse.data);
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  };
 };
 
-export const getLeaderboard = async () => {
-  return simulateApi(leaderboardData);
+export const fetchStudentDashboard = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/student/dashboard`, {
+      headers: getAuthHeaders()
+    });
+
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+      throw new Error("Unauthorized");
+    }
+
+    if (!res.ok) throw new Error("Failed to fetch dashboard data");
+    const json = await res.json();
+    return json.data || json;
+  } catch {
+    // Fallback to mock data during local development
+    return new Promise((resolve) => setTimeout(() => resolve(mockDashboardData), 400));
+  }
 };
 
-// ─────────────────────────────────────────────────────
-// INDIVIDUAL SECTIONS (used if components fetch independently)
-// ─────────────────────────────────────────────────────
-
-export const getActiveDrive = async (studentId) => {
-  return simulateApi(dashboardApiResponse.data.activeDrive);
-};
-
-export const getQuickStats = async (studentId) => {
-  return simulateApi(dashboardApiResponse.data.quickStats);
-};
-
-export const getProgressRing = async (studentId) => {
-  return simulateApi(dashboardApiResponse.data.progressRing);
-};
-
-export const getUpcomingSessions = async (studentId) => {
-  return simulateApi(dashboardApiResponse.data.upcomingSessions);
-};
-
-export const getPendingTasks = async (studentId) => {
-  return simulateApi(dashboardApiResponse.data.pendingTasks);
-};
-
-export const getRecentNotifications = async (studentId) => {
-  return simulateApi(dashboardApiResponse.data.recentNotifications);
+export const fetchLeaderboard = async (driveId) => {
+  if (!driveId) return mockLeaderboardData;
+  try {
+    const res = await fetch(`${API_BASE_URL}/student/dashboard/leaderboard/${driveId}`, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error("Failed to fetch leaderboard");
+    const json = await res.json();
+    return json.leaderboard || json;
+  } catch {
+    return new Promise((resolve) => setTimeout(() => resolve(mockLeaderboardData), 400));
+  }
 };

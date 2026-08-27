@@ -1,65 +1,37 @@
 import { useState, useEffect, useCallback } from "react";
-import { getDashboardData } from "../services/dashboardService";
-import { LOADING_STATES } from "../constants/dashboardConstants";
+import { fetchStudentDashboard, fetchLeaderboard } from "../services/dashboardService";
 
-// ── Demo student ID — replace with auth context later ─
-const DEMO_STUDENT_ID = "demo-student-01";
-
-const useDashboardData = (studentId = DEMO_STUDENT_ID) => {
-  const [activeDrive,         setActiveDrive]         = useState(null);
-  const [quickStats,          setQuickStats]          = useState(null);
-  const [progressRing,        setProgressRing]        = useState(null);
-  const [upcomingSessions,    setUpcomingSessions]    = useState([]);
-  const [pendingTasks,        setPendingTasks]        = useState([]);
-  const [leaderboard,         setLeaderboard]         = useState([]);
-  const [recentNotifications, setRecentNotifications] = useState([]);
-
-  const [loadingState, setLoadingState] = useState(LOADING_STATES.IDLE);
+export const useDashboardData = () => {
+  const [data, setData] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchDashboard = useCallback(async () => {
-    setLoadingState(LOADING_STATES.LOADING);
+  const loadData = useCallback(async () => {
+    setLoading(true);
     setError(null);
     try {
-      const data = await getDashboardData(studentId);
-
-      setActiveDrive(data.activeDrive);
-      setQuickStats(data.quickStats);
-      setProgressRing(data.progressRing);
-      setUpcomingSessions(data.upcomingSessions);
-      setPendingTasks(data.pendingTasks);
-      setLeaderboard(data.leaderboard);
-      setRecentNotifications(data.recentNotifications);
-
-      setLoadingState(LOADING_STATES.SUCCESS);
+      const dashboardRes = await fetchStudentDashboard();
+      setData(dashboardRes);
+      
+      if (dashboardRes?.activeDrive?.driveId) {
+        const lbRes = await fetchLeaderboard(dashboardRes.activeDrive.driveId);
+        setLeaderboard(lbRes);
+      }
     } catch (err) {
-      setError(err.message || "Failed to load dashboard data");
-      setLoadingState(LOADING_STATES.ERROR);
+      setError(err.message || "Unable to load your dashboard.");
+    } finally {
+      setLoading(false);
     }
-  }, [studentId]);
+  }, []);
 
   useEffect(() => {
-    fetchDashboard();
-  }, [fetchDashboard]);
+    let isMounted = true;
+    if (isMounted) loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, [loadData]);
 
-  return {
-    // Data
-    activeDrive,
-    quickStats,
-    progressRing,
-    upcomingSessions,
-    pendingTasks,
-    leaderboard,
-    recentNotifications,
-
-    // States
-    loading: loadingState === LOADING_STATES.LOADING,
-    loadingState,
-    error,
-
-    // Actions
-    refetch: fetchDashboard,
-  };
+  return { data, leaderboard, loading, error, retry: loadData };
 };
-
-export default useDashboardData;

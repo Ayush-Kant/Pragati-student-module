@@ -1,5 +1,9 @@
 import { Navigate, Route } from "react-router-dom";
 import PrivateRoute from "../../../routes/PrivateRoute";
+import DashboardPage from "../dashboard/pages/DashboardPage";
+
+// Inside your routes declaration:
+<Route path="dashboard" element={<DashboardPage />} />
 
 import VerificationPage from "../pages/public/VerificationPage";
 import LoginPage from "../../auth/LoginPage";
