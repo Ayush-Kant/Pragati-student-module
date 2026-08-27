@@ -45,13 +45,39 @@ export function useMilestones(projectId) {
   }, [projectId]);
 
   useEffect(() => {
+    if (!projectId) return;
+
     let cancelled = false;
-    (async () => {
-      if (cancelled) return;
-      await fetchMilestones();
-    })();
-    return () => { cancelled = true; };
-  }, [fetchMilestones]);
+
+    const loadData = async () => {
+      try {
+        const result = await getMilestones(projectId);
+        if (!cancelled) {
+          if (result.success) {
+            setMilestones(sortMilestonesByOrder(result.data));
+          } else {
+            setError(result.error);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setError('Failed to load milestones. Please try again.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    setIsLoading(true);
+    setError(null);
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
   const progress = useMemo(() => getMilestoneProgress(milestones), [milestones]);
   const activeMilestone = useMemo(() => getActiveMilestone(milestones), [milestones]);

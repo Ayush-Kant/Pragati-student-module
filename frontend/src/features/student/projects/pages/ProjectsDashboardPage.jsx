@@ -8,7 +8,7 @@ import { useProjects } from '../hooks/useProjects';
 import ProjectCard from '../components/dashboard/ProjectCard';
 import ProjectStatsBar from '../components/dashboard/ProjectStatsBar';
 import ProjectFilters from '../components/dashboard/ProjectFilters';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import SkeletonLoader from '../components/common/SkeletonLoader';
 import ErrorState from '../components/common/ErrorState';
 import EmptyState from '../components/common/EmptyState';
 
@@ -26,8 +26,7 @@ const ProjectsDashboardPage = () => {
     refetch,
   } = useProjects();
 
-  if (isLoading) return <LoadingSpinner size="lg" label="Loading projects…" />;
-  if (error)     return <ErrorState error={error} onRetry={refetch} />;
+  if (error) return <ErrorState error={error} onRetry={refetch} />;
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-gray-100 px-4 py-8 max-w-7xl mx-auto">
@@ -45,51 +44,62 @@ const ProjectsDashboardPage = () => {
         </p>
       </div>
 
-      {/* Stats bar */}
-      {projects.length > 0 && <ProjectStatsBar stats={stats} />}
+      {/* Stats bar — only shown when data is loaded */}
+      {!isLoading && projects.length > 0 && <ProjectStatsBar stats={stats} />}
 
-      {/* Filters */}
-      <ProjectFilters
-        searchQuery={searchQuery}
-        statusFilter={statusFilter}
-        onSearchChange={setSearchQuery}
-        onStatusChange={setStatusFilter}
-      />
+      {/* Filters — still render during loading for progressive layout stability */}
+      {!isLoading && (
+        <ProjectFilters
+          searchQuery={searchQuery}
+          statusFilter={statusFilter}
+          onSearchChange={setSearchQuery}
+          onStatusChange={setStatusFilter}
+        />
+      )}
+
+      {/* Loading state — card skeletons preserve grid layout */}
+      {isLoading && (
+        <SkeletonLoader variant="card" count={6} />
+      )}
 
       {/* Results count */}
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-gray-500">
-          {filteredProjects.length}{' '}
-          {filteredProjects.length === 1 ? 'project' : 'projects'}
-          {filteredProjects.length !== projects.length
-            ? ` (filtered from ${projects.length} total)`
-            : ''}
-        </p>
-      </div>
+      {!isLoading && (
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-gray-500">
+            {filteredProjects.length}{' '}
+            {filteredProjects.length === 1 ? 'project' : 'projects'}
+            {filteredProjects.length !== projects.length
+              ? ` (filtered from ${projects.length} total)`
+              : ''}
+          </p>
+        </div>
+      )}
 
       {/* Grid */}
-      {filteredProjects.length === 0 ? (
-        <EmptyState
-          title="No projects found"
-          description={
-            projects.length === 0
-              ? 'You have not been assigned any projects yet.'
-              : 'Try adjusting your filters or search query.'
-          }
-          icon={projects.length === 0 ? '📁' : '🔍'}
-        />
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredProjects.map((project, idx) => (
-            <div
-              key={project.id}
-              className="animate-slide-up"
-              style={{ animationDelay: `${idx * 50}ms` }}
-            >
-              <ProjectCard project={project} />
-            </div>
-          ))}
-        </div>
+      {!isLoading && (
+        filteredProjects.length === 0 ? (
+          <EmptyState
+            title="No projects found"
+            description={
+              projects.length === 0
+                ? 'You have not been assigned any projects yet.'
+                : 'Try adjusting your filters or search query.'
+            }
+            icon={projects.length === 0 ? '📁' : '🔍'}
+          />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredProjects.map((project, idx) => (
+              <div
+                key={project.id}
+                className="animate-slide-up"
+                style={{ animationDelay: `${idx * 50}ms` }}
+              >
+                <ProjectCard project={project} />
+              </div>
+            ))}
+          </div>
+        )
       )}
     </div>
   );
