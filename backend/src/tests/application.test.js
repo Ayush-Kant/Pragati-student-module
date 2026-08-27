@@ -93,7 +93,7 @@ describe("Application Service", () => {
     });
   });
 
-  it("deleteApplication withdraws application successfully", async () => {
+  it("deleteApplication withdraws application successfully and retains record", async () => {
     const studentId = 205;
     const created = await applicationService.createApplication(studentId, {
       companyName: "Meta",
@@ -102,5 +102,10 @@ describe("Application Service", () => {
 
     const deleteResult = await applicationService.deleteApplication(studentId, created.id);
     expect(deleteResult.success).toBe(true);
+    expect(deleteResult.status).toBe("WITHDRAWN");
+
+    const withdrawnApp = await applicationService.getApplicationById(studentId, created.id);
+    expect(withdrawnApp.status).toBe("WITHDRAWN");
+    expect(withdrawnApp.history.some((h) => h.status === "WITHDRAWN")).toBe(true);
   });
 });

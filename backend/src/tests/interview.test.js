@@ -1,6 +1,7 @@
 import { describe, it, expect } from "@jest/globals";
 
 import interviewService from "../services/interviewService.js";
+import applicationService from "../services/applicationService.js";
 import { isValidInterviewTransition } from "../utils/placementHelpers.js";
 
 describe("Interview Service", () => {
@@ -32,6 +33,26 @@ describe("Interview Service", () => {
     expect(created.status).toBe("SCHEDULED");
     expect(created.rounds.length).toBe(2);
     expect(created.rounds[0].roundName).toBe("Technical Round 1");
+  });
+
+  it("createInterview rejects invalid or unowned applicationId", async () => {
+    const studentId = 305;
+    const otherStudentId = 306;
+
+    const otherApp = await applicationService.createApplication(otherStudentId, {
+      companyName: "Stripe",
+      jobTitle: "Backend Developer",
+    });
+
+    await expect(
+      interviewService.createInterview(studentId, {
+        companyName: "Stripe",
+        applicationId: otherApp.id,
+        dateTime: "2026-09-02T10:00:00Z",
+      })
+    ).rejects.toMatchObject({
+      status: 404,
+    });
   });
 
   it("updateInterview updates status, feedback, and score", async () => {

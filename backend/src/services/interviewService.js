@@ -1,25 +1,30 @@
 import Interview from "../models/interviewModel.js";
 import InterviewRound from "../models/interviewRoundModel.js";
 import connectDB from "../../config/db.js";
+import { getApplicationById } from "./applicationService.js";
 import { isValidInterviewTransition } from "../utils/placementHelpers.js";
 import { ERROR_CODES } from "../constants/placementConstants.js";
 
 const mockInterviews = [];
 let mockIdCounter = 1;
 
-export const getInterviews = async (studentId, filters = {}) => {
+const isDbAvailable = () => {
   try {
-    if (Interview.sequelize) {
-      const whereClause = { studentId };
-      if (filters.status) whereClause.status = filters.status;
-      const interviews = await Interview.findAll({
-        where: whereClause,
-        order: [["date_time", "ASC"]],
-      });
-      return interviews.map((i) => (i.toJSON ? i.toJSON() : i));
-    }
-  } catch (e) {
-    // Fallback
+    return Boolean(connectDB.sequelize && Interview.sequelize);
+  } catch {
+    return false;
+  }
+};
+
+export const getInterviews = async (studentId, filters = {}) => {
+  if (isDbAvailable()) {
+    const whereClause = { studentId };
+    if (filters.status) whereClause.status = filters.status;
+    const interviews = await Interview.findAll({
+      where: whereClause,
+      order: [["date_time", "ASC"]],
+    });
+    return interviews.map((i) => (i.toJSON ? i.toJSON() : i));
   }
 
   return mockInterviews.filter(
@@ -30,15 +35,17 @@ export const getInterviews = async (studentId, filters = {}) => {
 export const getInterviewById = async (studentId, interviewId) => {
   const intId = Number(interviewId);
 
-  try {
-    if (Interview.sequelize) {
-      const interview = await Interview.findOne({
-        where: { id: intId, studentId },
-      });
-      if (interview) return interview.toJSON ? interview.toJSON() : interview;
+  if (isDbAvailable()) {
+    const interview = await Interview.findOne({
+      where: { id: intId, studentId },
+    });
+    if (!interview) {
+      const error = new Error("Interview not found or access denied");
+      error.status = 404;
+      error.code = ERROR_CODES.RESOURCE_NOT_FOUND;
+      throw error;
     }
-  } catch (e) {
-    // Fallback
+    return interview.toJSON ? interview.toJSON() : interview;
   }
 
   const interview = mockInterviews.find((i) => i.id === intId && i.studentId === studentId);
@@ -54,16 +61,17 @@ export const getInterviewById = async (studentId, interviewId) => {
 export const createInterview = async (studentId, data) => {
   const { companyName, jobTitle, applicationId, dateTime, location, type, rounds } = data;
 
+  if (applicationId) {
+    await getApplicationById(studentId, applicationId);
+  }
+
   const defaultRounds = rounds || [
     { roundName: "Technical Round 1", roundOrder: 1, status: "SCHEDULED" },
   ];
 
-  const sequelizeInstance = connectDB.sequelize;
-  let transaction = null;
-
-  if (sequelizeInstance && typeof sequelizeInstance.transaction === "function" && Interview.sequelize) {
+  if (isDbAvailable()) {
+    const transaction = await connectDB.sequelize.transaction();
     try {
-      transaction = await sequelizeInstance.transaction();
       const interview = await Interview.create(
         {
           studentId,
@@ -93,8 +101,11 @@ export const createInterview = async (studentId, data) => {
 
       await transaction.commit();
       return interview.toJSON ? interview.toJSON() : interview;
-    } catch (dbErr) {
-      if (transaction) await transaction.rollback();
+    } catch (err) {
+      if (transaction && !transaction.finished) {
+        await transaction.rollback();
+      }
+      throw err;
     }
   }
 
@@ -125,6 +136,50 @@ export const createInterview = async (studentId, data) => {
 };
 
 export const updateInterview = async (studentId, interviewId, data) => {
+  const intId = Number(interviewId);
+
+  if (isDbAvailable()) {
+    const transaction = await connectDB.sequelize.transaction();
+    try {
+      const dbInterview = await Interview.findOne({
+        where: { id: intId, studentId },
+        transaction,
+        lock: transaction.LOCK ? transaction.LOCK.UPDATE : undefined,
+      });
+
+      if (!dbInterview) {
+        const error = new Error("Interview not found or access denied");
+        error.status = 404;
+        error.code = ERROR_CODES.RESOURCE_NOT_FOUND;
+        throw error;
+      }
+
+      if (data.status && !isValidInterviewTransition(dbInterview.status, data.status)) {
+        const error = new Error(
+          `Invalid interview status transition from ${dbInterview.status} to ${data.status}`
+        );
+        error.status = 400;
+        error.code = ERROR_CODES.INVALID_STATUS_TRANSITION;
+        throw error;
+      }
+
+      if (data.status) dbInterview.status = data.status;
+      if (data.feedback !== undefined) dbInterview.feedback = data.feedback;
+      if (data.score !== undefined) dbInterview.score = data.score;
+      if (data.dateTime) dbInterview.dateTime = new Date(data.dateTime);
+      if (data.location) dbInterview.location = data.location;
+
+      await dbInterview.save({ transaction });
+      await transaction.commit();
+      return dbInterview.toJSON ? dbInterview.toJSON() : dbInterview;
+    } catch (err) {
+      if (transaction && !transaction.finished) {
+        await transaction.rollback();
+      }
+      throw err;
+    }
+  }
+
   const interview = await getInterviewById(studentId, interviewId);
 
   if (data.status && !isValidInterviewTransition(interview.status, data.status)) {
@@ -134,33 +189,6 @@ export const updateInterview = async (studentId, interviewId, data) => {
     error.status = 400;
     error.code = ERROR_CODES.INVALID_STATUS_TRANSITION;
     throw error;
-  }
-
-  const sequelizeInstance = connectDB.sequelize;
-  let transaction = null;
-
-  if (sequelizeInstance && typeof sequelizeInstance.transaction === "function" && Interview.sequelize) {
-    try {
-      transaction = await sequelizeInstance.transaction();
-      const dbInterview = await Interview.findOne({
-        where: { id: interview.id, studentId },
-        transaction,
-      });
-
-      if (dbInterview) {
-        if (data.status) dbInterview.status = data.status;
-        if (data.feedback !== undefined) dbInterview.feedback = data.feedback;
-        if (data.score !== undefined) dbInterview.score = data.score;
-        if (data.dateTime) dbInterview.dateTime = new Date(data.dateTime);
-        if (data.location) dbInterview.location = data.location;
-
-        await dbInterview.save({ transaction });
-        await transaction.commit();
-        return dbInterview.toJSON ? dbInterview.toJSON() : dbInterview;
-      }
-    } catch (dbErr) {
-      if (transaction) await transaction.rollback();
-    }
   }
 
   if (data.status) interview.status = data.status;

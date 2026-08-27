@@ -10,7 +10,7 @@ import {
   validateDateRange,
 } from "../validations/placementValidation.js";
 
-import placementController from "../controllers/placementController.js";
+import placementController from "../controllers/studentPlacementController.js";
 
 const router = express.Router();
 

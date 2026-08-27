@@ -64,12 +64,7 @@ export const generateMonthlyTrends = (applications = []) => {
 
 export const calculateReadinessProgression = (history = []) => {
   if (!history || history.length === 0) {
-    return [
-      { month: "Month 1", score: 55 },
-      { month: "Month 2", score: 68 },
-      { month: "Month 3", score: 75 },
-      { month: "Month 4", score: 82 },
-    ];
+    return [];
   }
   return history;
 };

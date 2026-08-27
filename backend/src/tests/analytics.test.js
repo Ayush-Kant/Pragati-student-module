@@ -6,6 +6,7 @@ import {
   calculateConversionRates,
   calculateInterviewSuccessRate,
   generateMonthlyTrends,
+  calculateReadinessProgression,
 } from "../utils/analyticsHelpers.js";
 
 describe("Analytics & Readiness Services", () => {
@@ -53,6 +54,11 @@ describe("Analytics & Readiness Services", () => {
     expect(trends[1].total).toBe(1);
   });
 
+  it("calculateReadinessProgression returns empty array when no history provided", () => {
+    expect(calculateReadinessProgression([])).toEqual([]);
+    expect(calculateReadinessProgression(null)).toEqual([]);
+  });
+
   it("getSkillReadiness and getSkillGaps return structured skill metrics", async () => {
     const studentId = 401;
     const skills = await readinessService.getSkillReadiness(studentId);
@@ -71,6 +77,7 @@ describe("Analytics & Readiness Services", () => {
 
     expect(analytics.studentId).toBe(402);
     expect(analytics.conversionRates).toBeDefined();
+    expect(analytics.readinessProgression).toEqual([]);
     expect(Array.isArray(recommendations)).toBe(true);
     expect(recommendations.length).toBeGreaterThan(0);
     expect(recommendations[0].title).toBeDefined();

@@ -1,5 +1,6 @@
 import CareerRecommendation from "../models/careerRecommendationModel.js";
 import PlacementAnalytics from "../models/placementAnalyticsModel.js";
+import connectDB from "../../config/db.js";
 import { getApplications } from "./applicationService.js";
 import { getInterviews } from "./interviewService.js";
 import { getReadinessReport } from "./readinessService.js";
@@ -9,6 +10,14 @@ import {
   generateMonthlyTrends,
   calculateReadinessProgression,
 } from "../utils/analyticsHelpers.js";
+
+const isDbAvailable = () => {
+  try {
+    return Boolean(connectDB.sequelize && CareerRecommendation.sequelize);
+  } catch {
+    return false;
+  }
+};
 
 export const getPlacementAnalytics = async (studentId) => {
   const applications = await getApplications(studentId);
@@ -42,28 +51,23 @@ export const getPlacementAnalytics = async (studentId) => {
 };
 
 export const getCareerRecommendations = async (studentId) => {
-  try {
-    if (CareerRecommendation.sequelize) {
-      const recs = await CareerRecommendation.findAll({
-        where: { studentId },
-      });
-      if (recs && recs.length > 0) {
-        return recs.map((r) => (r.toJSON ? r.toJSON() : r));
-      }
+  if (isDbAvailable()) {
+    const recs = await CareerRecommendation.findAll({
+      where: { studentId },
+    });
+    if (recs && recs.length > 0) {
+      return recs.map((r) => (r.toJSON ? r.toJSON() : r));
     }
-  } catch (e) {
-    // Fallback
   }
 
   const readiness = await getReadinessReport(studentId);
   const highPriorityGaps = readiness.skillGaps.filter((g) => g.priority === "HIGH");
 
-  const recommendations = [];
+  const generated = [];
 
   if (highPriorityGaps.length > 0) {
     highPriorityGaps.forEach((gap) => {
-      recommendations.push({
-        id: recommendations.length + 1,
+      generated.push({
         studentId,
         title: `Improve ${gap.skill} Mastery`,
         priority: "HIGH",
@@ -74,8 +78,7 @@ export const getCareerRecommendations = async (studentId) => {
       });
     });
   } else {
-    recommendations.push({
-      id: 1,
+    generated.push({
       studentId,
       title: "Maintain Technical Excellence",
       priority: "MEDIUM",
@@ -86,8 +89,7 @@ export const getCareerRecommendations = async (studentId) => {
     });
   }
 
-  recommendations.push({
-    id: recommendations.length + 1,
+  generated.push({
     studentId,
     title: "Expand Job Application Target Volume",
     priority: "MEDIUM",
@@ -97,7 +99,12 @@ export const getCareerRecommendations = async (studentId) => {
     recommendedAction: "Apply to recommended high-match corporate drives this week.",
   });
 
-  return recommendations;
+  if (isDbAvailable()) {
+    const createdRecs = await CareerRecommendation.bulkCreate(generated);
+    return createdRecs.map((r) => (r.toJSON ? r.toJSON() : r));
+  }
+
+  return generated.map((r, idx) => ({ id: idx + 1, ...r }));
 };
 
 export default {
