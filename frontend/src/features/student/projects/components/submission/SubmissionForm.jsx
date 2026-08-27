@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { GitBranch, Globe, FileText, MessageSquare, Send, AlertCircle } from 'lucide-react';
 import { FileUploadZone, FileList } from './FileUploadZone';
-import { useProjectUpload } from '../../hooks/useProjectUpload';
 import { SUBMISSION_STATE } from '../../constants/projectConstants';
 import { getSubmissionStateLabel, getSubmissionStateColor } from '../../utils/submissionHelpers';
 
 /**
  * Full project submission form.
+ *
+ * `upload` is provided by the parent (ProjectDetailsPage) so that file state
+ * is shared with useProjectSubmission and IDs reach the submission payload.
  *
  * @param {{
  *   projectId: string,
@@ -14,14 +16,16 @@ import { getSubmissionStateLabel, getSubmissionStateColor } from '../../utils/su
  *   formErrors: string[],
  *   existingSubmission: object | null,
  *   onSubmit: (payload: object) => void,
+ *   upload: object,
  * }} props
  */
 const SubmissionForm = ({
-  projectId,
+  projectId: _projectId,
   submissionState,
   formErrors,
   existingSubmission,
   onSubmit,
+  upload,
 }) => {
   const isReadOnly = [
     SUBMISSION_STATE.SUBMITTED,
@@ -38,8 +42,6 @@ const SubmissionForm = ({
     documentation: existingSubmission?.documentation ?? '',
     additionalComments: existingSubmission?.additionalComments ?? '',
   });
-
-  const upload = useProjectUpload(projectId);
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -174,8 +176,8 @@ const SubmissionForm = ({
         />
       </div>
 
-      {/* File attachments */}
-      {!isReadOnly && (
+      {/* File attachments — upload prop comes from parent via useProjectUpload */}
+      {!isReadOnly && upload && (
         <div>
           <p className="text-xs font-medium text-gray-400 mb-2">File Attachments</p>
           <FileUploadZone
@@ -221,6 +223,7 @@ const SubmissionForm = ({
         <button
           type="submit"
           disabled={isSubmitting}
+          aria-label={isSubmitting ? 'Submitting project, please wait' : 'Submit project'}
           className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-white
             bg-gradient-to-r from-violet-600 to-violet-500 shadow-lg shadow-violet-500/25
             hover:shadow-violet-500/40 hover:scale-[1.01] transition-all duration-200

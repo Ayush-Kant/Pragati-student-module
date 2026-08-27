@@ -38,13 +38,39 @@ export function useProjectEvaluation(projectId) {
   }, [projectId]);
 
   useEffect(() => {
+    if (!projectId) return;
+
     let cancelled = false;
-    (async () => {
-      if (cancelled) return;
-      await fetchEvaluation();
-    })();
-    return () => { cancelled = true; };
-  }, [fetchEvaluation]);
+
+    const loadData = async () => {
+      try {
+        const result = await getProjectEvaluation(projectId);
+        if (!cancelled) {
+          if (result.success) {
+            setEvaluation(result.data);
+          } else {
+            setError(result.error);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setError('Failed to load evaluation. Please try again.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    setIsLoading(true);
+    setError(null);
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
   return { evaluation, isLoading, error, refetch: fetchEvaluation };
 }

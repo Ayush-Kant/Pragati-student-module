@@ -47,12 +47,36 @@ export function useProjects() {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      if (cancelled) return;
-      await fetchProjects();
-    })();
-    return () => { cancelled = true; };
-  }, [fetchProjects]);
+
+    const loadData = async () => {
+      try {
+        const result = await getProjects();
+        if (!cancelled) {
+          if (result.success) {
+            setProjects(result.data);
+          } else {
+            setError(result.error);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setError('Failed to load projects. Please try again.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    setIsLoading(true);
+    setError(null);
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filteredProjects = useMemo(() => {
     let result = projects;

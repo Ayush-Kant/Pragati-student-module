@@ -42,13 +42,39 @@ export function useProjectDetails(projectId) {
   }, [projectId]);
 
   useEffect(() => {
+    if (!projectId) return;
+
     let cancelled = false;
-    (async () => {
-      if (cancelled) return;
-      await fetchProject();
-    })();
-    return () => { cancelled = true; };
-  }, [fetchProject]);
+
+    const loadData = async () => {
+      try {
+        const result = await getProjectById(projectId);
+        if (!cancelled) {
+          if (result.success) {
+            setProject(result.data);
+          } else {
+            setError(result.error);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setError('Failed to load project details. Please try again.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    setIsLoading(true);
+    setError(null);
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
   return {
     project,

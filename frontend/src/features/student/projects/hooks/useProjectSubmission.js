@@ -1,6 +1,14 @@
 /**
  * useProjectSubmission — full submission workflow state machine.
- * Coordinates validation → upload state → submit → history.
+ * Coordinates validation → submit → history.
+ *
+ * State flow:
+ *   DRAFT → VALIDATING → SUBMITTING → SUBMITTED
+ *   DRAFT → VALIDATING → DRAFT (validation failed)
+ *   SUBMITTING → DRAFT (submission error)
+ *
+ * The READY intermediate state is intentionally skipped to avoid
+ * unnecessary re-renders and stale state transitions.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -15,7 +23,7 @@ import { SUBMISSION_STATE } from '../constants/projectConstants';
 
 /**
  * @param {string} projectId
- * @param {object[]} fileEntries — from useProjectUpload
+ * @param {object[]} fileEntries — from useProjectUpload (owned by parent)
  * @returns {{
  *   submission: object | null,
  *   history: object[],
@@ -28,12 +36,14 @@ import { SUBMISSION_STATE } from '../constants/projectConstants';
  * }}
  */
 export function useProjectSubmission(projectId, fileEntries = []) {
-  const [submission, setSubmission]       = useState(null);
-  const [history, setHistory]             = useState([]);
+  const [submission, setSubmission]           = useState(null);
+  const [history, setHistory]                 = useState([]);
   const [submissionState, setSubmissionState] = useState(SUBMISSION_STATE.DRAFT);
-  const [formErrors, setFormErrors]       = useState([]);
-  const [isLoading, setIsLoading]         = useState(true);
-  const [error, setError]                 = useState(null);
+  const [formErrors, setFormErrors]           = useState([]);
+  const [isLoading, setIsLoading]             = useState(true);
+  const [error, setError]                     = useState(null);
+
+  // ── Initial data fetch ──────────────────────────────────────────────────────
 
   const fetchData = useCallback(async () => {
     if (!projectId) return;
@@ -65,17 +75,59 @@ export function useProjectSubmission(projectId, fileEntries = []) {
   }, [projectId]);
 
   useEffect(() => {
+    if (!projectId) return;
+
     let cancelled = false;
-    (async () => {
-      if (cancelled) return;
-      await fetchData();
-    })();
-    return () => { cancelled = true; };
-  }, [fetchData]);
+
+    const loadData = async () => {
+      try {
+        const [subResult, histResult] = await Promise.all([
+          getProjectSubmission(projectId),
+          getSubmissionHistory(projectId),
+        ]);
+
+        if (!cancelled) {
+          if (subResult.success) {
+            setSubmission(subResult.data);
+            if (subResult.data?.status) {
+              setSubmissionState(subResult.data.status);
+            }
+          } else {
+            setError(subResult.error);
+          }
+
+          if (histResult.success) {
+            setHistory(histResult.data);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setError('Failed to load submission data. Please try again.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    setIsLoading(true);
+    setError(null);
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
+
+  // ── Submit ──────────────────────────────────────────────────────────────────
 
   const submit = useCallback(
     async (payload) => {
-      // Validate
+      // Prevent duplicate submissions
+      if (submissionState === SUBMISSION_STATE.SUBMITTING) return;
+
+      // Step 1: validate
       setSubmissionState(SUBMISSION_STATE.VALIDATING);
       setFormErrors([]);
 
@@ -86,20 +138,19 @@ export function useProjectSubmission(projectId, fileEntries = []) {
         return;
       }
 
-      // Transition to ready (upload already handled by useProjectUpload)
-      setSubmissionState(SUBMISSION_STATE.READY);
+      // Step 2: collect uploaded file IDs (deduped)
+      const rawIds = getUploadedFileIds(fileEntries);
+      const fileIds = [...new Set(rawIds)];
 
-      // Collect uploaded file IDs
-      const fileIds = getUploadedFileIds(fileEntries);
-
-      // Submit
+      // Step 3: submit (skip READY — go directly to SUBMITTING)
       setSubmissionState(SUBMISSION_STATE.SUBMITTING);
       try {
         const result = await submitProject(projectId, { ...payload, fileIds });
         if (result.success) {
           setSubmission(result.data);
           setSubmissionState(SUBMISSION_STATE.SUBMITTED);
-          // Refresh history
+
+          // Refresh history after successful submission
           const histResult = await getSubmissionHistory(projectId);
           if (histResult.success) setHistory(histResult.data);
         } else {
@@ -111,7 +162,7 @@ export function useProjectSubmission(projectId, fileEntries = []) {
         setSubmissionState(SUBMISSION_STATE.DRAFT);
       }
     },
-    [projectId, fileEntries]
+    [projectId, fileEntries, submissionState]
   );
 
   return {

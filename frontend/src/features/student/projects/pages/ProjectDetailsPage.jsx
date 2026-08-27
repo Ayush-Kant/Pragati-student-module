@@ -1,6 +1,9 @@
 /**
  * ProjectDetailsPage — tabbed detail view for a single project.
  * Route: /student/projects/:projectId
+ *
+ * useProjectUpload is owned here so that upload.fileEntries flows
+ * into useProjectSubmission and the final payload contains real file IDs.
  */
 
 import { useParams, Link } from 'react-router-dom';
@@ -8,6 +11,7 @@ import { ArrowLeft, Cpu, Wrench } from 'lucide-react';
 import { useProjectDetails } from '../hooks/useProjectDetails';
 import { useMilestones } from '../hooks/useMilestones';
 import { useProjectSubmission } from '../hooks/useProjectSubmission';
+import { useProjectUpload } from '../hooks/useProjectUpload';
 import { useProjectEvaluation } from '../hooks/useProjectEvaluation';
 import ProjectDetailTabs from '../components/details/ProjectDetailTabs';
 import ProjectOverview from '../components/details/ProjectOverview';
@@ -32,6 +36,11 @@ const ProjectDetailsPage = () => {
 
   const { milestones, isLoading: mlLoading } = useMilestones(projectId);
 
+  // Upload hook lives here so fileEntries are shared with the submission hook.
+  // SubmissionForm receives the upload object as a prop — it does NOT maintain
+  // its own upload state.
+  const upload = useProjectUpload(projectId);
+
   const {
     submission,
     history,
@@ -39,7 +48,7 @@ const ProjectDetailsPage = () => {
     formErrors,
     isLoading: subLoading,
     submit,
-  } = useProjectSubmission(projectId, []);
+  } = useProjectSubmission(projectId, upload.fileEntries);
 
   const { evaluation, isLoading: evalLoading } = useProjectEvaluation(projectId);
 
@@ -154,6 +163,7 @@ const ProjectDetailsPage = () => {
                   formErrors={formErrors}
                   existingSubmission={submission}
                   onSubmit={submit}
+                  upload={upload}
                 />
                 <SubmissionHistory history={history} />
               </>

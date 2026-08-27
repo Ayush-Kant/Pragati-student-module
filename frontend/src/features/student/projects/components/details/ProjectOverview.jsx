@@ -1,10 +1,13 @@
 import { Calendar, User, Clock, Layers } from 'lucide-react';
 import StatusBadge from '../common/StatusBadge';
 import ProgressBar from '../common/ProgressBar';
+import ProjectObjectives from './ProjectObjectives';
+import TechnologyStack from './TechnologyStack';
 import { formatDeadline, formatDate, isOverdue, isApproachingDeadline } from '../../utils/projectHelpers';
 
 /**
  * Project overview section — hero info card.
+ * Composed of smaller focused sub-components for objectives and tech stack.
  * @param {{ project: object }} props
  */
 const ProjectOverview = ({ project }) => {
@@ -69,35 +72,9 @@ const ProjectOverview = ({ project }) => {
         <ProgressBar value={project.overallProgress} showLabel={false} size="lg" />
       </div>
 
-      {/* Objectives */}
-      <div>
-        <h3 className="text-sm font-semibold text-gray-200 mb-3">Objectives</h3>
-        <ul className="space-y-2">
-          {project.objectives?.map((obj, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-sm text-gray-400">
-              <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-xs text-violet-400 font-medium">
-                {i + 1}
-              </span>
-              {obj}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Tech Stack */}
-      <div>
-        <h3 className="text-sm font-semibold text-gray-200 mb-3">Technology Stack</h3>
-        <div className="flex flex-wrap gap-2">
-          {project.techStack?.map((tech) => (
-            <span
-              key={tech}
-              className="px-3 py-1 rounded-full text-xs font-medium bg-violet-500/10 text-violet-300 border border-violet-500/20"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
+      {/* Extracted sub-components */}
+      <ProjectObjectives objectives={project.objectives} />
+      <TechnologyStack techStack={project.techStack} />
     </div>
   );
 };
