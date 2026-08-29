@@ -15,8 +15,8 @@ export default function StudentSidebar({ isOpen, onClose }) {
         { to: "/student/courses", label: "Courses", icon: "📚" },
         { to: "/student/sessions", label: "Live Sessions", icon: "🎥" },
         { to: "/student/assignments", label: "Assignments", icon: "📝" },
-        { to: "/student/assessments", label: "Assessments", icon: "✍️" },
-        { to: "/student/coding", label: "Coding Challenges", icon: "💻" },
+        { to: "/student/quizzes", label: "Assessments", icon: "✍️" },
+        { to: "/student/coding-challenges", label: "Coding Challenges", icon: "💻" },
         { to: "/student/projects", label: "Projects", icon: "🚀" }
       ]
     },

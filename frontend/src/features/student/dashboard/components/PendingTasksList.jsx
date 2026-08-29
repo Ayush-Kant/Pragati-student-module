@@ -18,7 +18,7 @@ export default function PendingTasksList({ tasks = [] }) {
           {tasks.map((t) => (
             <Link
               key={t.taskId}
-              to={t.type === "assignment" ? "/student/assignments" : "/student/assessments"}
+              to={t.type === "assignment" ? "/student/assignments" : "/student/quizzes"}
               className="block p-3 bg-gray-50 rounded-lg hover:bg-blue-50/50 transition border"
             >
               <div className="flex justify-between items-center">

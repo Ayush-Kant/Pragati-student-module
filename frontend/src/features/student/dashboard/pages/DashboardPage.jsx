@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import StudentDashboardHeader from "../components/StudentDashboardHeader";
+import { useAuth } from "../../../../context/AuthContext";
 import StudentSidebar from "../components/StudentSidebar";
+import StudentDashboardHeader from "../components/StudentDashboardHeader";
 import ActiveDriveCard from "../components/ActiveDriveCard";
 import QuickStatsBar from "../components/QuickStatsBar";
 import ProgressSection from "../components/ProgressSection";
@@ -12,65 +13,68 @@ import { useDashboardData } from "../hooks/useDashboardData";
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { data, leaderboard, loading, error, retry } = useDashboardData();
+  const { user, logout } = useAuth();
+  const { dashboardData, loading, error, retry } = useDashboardData();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm text-gray-500">Loading your student dashboard...</p>
-        </div>
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white p-6 rounded-xl border max-w-md w-full text-center space-y-4 shadow-sm">
-          <p className="text-red-600 font-semibold">Unable to load your dashboard.</p>
-          <p className="text-xs text-gray-500">{error}</p>
-          <button
-            onClick={retry}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm font-medium transition"
-          >
-            Retry
-          </button>
-        </div>
+      <div className="flex h-screen flex-col items-center justify-center bg-gray-50 p-6 space-y-4">
+        <p className="text-red-600 font-semibold text-lg">{error}</p>
+        <button
+          onClick={retry}
+          className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
+        >
+          Retry
+        </button>
       </div>
     );
   }
 
-  const unreadCount = data?.recentNotifications?.filter((n) => !n.readAt).length || 0;
-
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50/50 flex flex-col">
       <StudentDashboardHeader
-        unreadCount={unreadCount}
+        user={user}
+        unreadCount={dashboardData?.notifications?.filter((n) => !n.read).length || 0}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        onLogout={logout}
       />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex flex-1">
         <StudentSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 overflow-hidden">
-          <h1 className="text-2xl font-bold text-gray-900">Good morning, Student 👋</h1>
-
-          <ActiveDriveCard drive={data?.activeDrive} />
-          <QuickStatsBar stats={data?.quickStats} />
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <ProgressSection progressRing={data?.progressRing} />
-            <UpcomingSessionsList sessions={data?.upcomingSessions} />
+        <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full space-y-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Good morning, {user?.name || "Student"} 👋
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Here is your learning summary and upcoming schedule for today.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <PendingTasksList tasks={data?.pendingTasks} />
-            <RecentNotifications notifications={data?.recentNotifications} />
-          </div>
+          <ActiveDriveCard drive={dashboardData?.activeDrive} />
+          <QuickStatsBar stats={dashboardData?.stats} />
 
-          <LeaderboardPreview leaderboard={leaderboard} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <ProgressSection progress={dashboardData?.progress} />
+              <UpcomingSessionsList sessions={dashboardData?.upcomingSessions} />
+              <PendingTasksList tasks={dashboardData?.pendingTasks} />
+            </div>
+
+            <div className="space-y-6">
+              <LeaderboardPreview leaderboard={dashboardData?.leaderboard} />
+              <RecentNotifications notifications={dashboardData?.notifications} />
+            </div>
+          </div>
         </main>
       </div>
     </div>

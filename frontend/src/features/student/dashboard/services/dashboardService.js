@@ -1,46 +1,33 @@
-import { mockDashboardData, mockLeaderboardData } from "../data/dashboardDummyData";
+import { mockDashboardData } from "./dashboardDummyData";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-const getAuthHeaders = () => {
+export const fetchDashboardData = async () => {
   const token = localStorage.getItem("token");
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {})
-  };
-};
 
-export const fetchStudentDashboard = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/student/dashboard`, {
-      headers: getAuthHeaders()
+    const res = await fetch(`${API_BASE_URL}/api/student/dashboard`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
     });
 
-    if (res.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-      throw new Error("Unauthorized");
+    if (res.ok) {
+      return await res.json();
     }
 
-    if (!res.ok) throw new Error("Failed to fetch dashboard data");
-    const json = await res.json();
-    return json.data || json;
-  } catch {
-    // Fallback to mock data during local development
-    return new Promise((resolve) => setTimeout(() => resolve(mockDashboardData), 400));
-  }
-};
+    if (res.status === 404) {
+      // Endpoint not ready on backend yet -> fallback to mock data
+      return mockDashboardData;
+    }
 
-export const fetchLeaderboard = async (driveId) => {
-  if (!driveId) return mockLeaderboardData;
-  try {
-    const res = await fetch(`${API_BASE_URL}/student/dashboard/leaderboard/${driveId}`, {
-      headers: getAuthHeaders()
-    });
-    if (!res.ok) throw new Error("Failed to fetch leaderboard");
-    const json = await res.json();
-    return json.leaderboard || json;
-  } catch {
-    return new Promise((resolve) => setTimeout(() => resolve(mockLeaderboardData), 400));
+    throw new Error(`Failed to load dashboard (status: ${res.status})`);
+  } catch (err) {
+    if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
+      // Local dev server offline fallback
+      return mockDashboardData;
+    }
+    throw err;
   }
 };
