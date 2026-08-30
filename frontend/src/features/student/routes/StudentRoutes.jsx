@@ -88,10 +88,10 @@ const studentRoute = (
         <Route path="projects/:projectId/workspace" element={<ProjectWorkspacePage />} />
         <Route path="projects/:projectId/evaluation" element={<ProjectEvaluationPage />} />
 
-        {/* Certificates */}
+        {/* Certificates (Fixed: uses :certificateId matching useParams) */}
         <Route path="certificates" element={<CertificatesPage />} />
-        <Route path="certificates/:id" element={<CertificateDetailsPage />} />
-        <Route path="certificates/:id/preview" element={<CertificatePreviewPage />} />
+        <Route path="certificates/:certificateId" element={<CertificateDetailsPage />} />
+        <Route path="certificates/:certificateId/preview" element={<CertificatePreviewPage />} />
         <Route path="certificates/verify" element={<CertificateVerificationPage />} />
 
         {/* Account & Career */}

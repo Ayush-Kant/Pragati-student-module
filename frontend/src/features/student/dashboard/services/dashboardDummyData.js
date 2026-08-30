@@ -1,6 +1,7 @@
 export const mockDashboardData = {
   activeDrive: {
     id: "drive-2026-01",
+    driveId: "drive-2026-01",
     title: "Full Stack Engineer Campus Placement Drive",
     companyName: "TechCorp Global",
     appliedDate: "2026-08-15",
@@ -9,6 +10,10 @@ export const mockDashboardData = {
     nextStep: "Technical Interview on Aug 30, 2026"
   },
   stats: {
+    xpEarned: 1450,
+    assignmentsCompleted: 14,
+    sessionsAttended: 18,
+    overallScore: 92,
     coursesCompleted: 4,
     assessmentsTaken: 12,
     codingProblemsSolved: 86,
@@ -16,6 +21,7 @@ export const mockDashboardData = {
   },
   progress: {
     overallPercentage: 78,
+    completionPercent: 78,
     modulesCompleted: 7,
     totalModules: 9
   },
@@ -50,10 +56,34 @@ export const mockDashboardData = {
     }
   ],
   leaderboard: [
-    { rank: 1, name: "Aarav Patel", score: 1450 },
-    { rank: 2, name: "Sneha Reddy", score: 1390 },
-    { rank: 3, name: "Rudransh Pandey", score: 1320 },
-    { rank: 4, name: "Vikram Malhotra", score: 1280 }
+    {
+      rank: 1,
+      name: "Aarav Patel",
+      studentName: "Aarav Patel",
+      score: 1450,
+      percentile: 99
+    },
+    {
+      rank: 2,
+      name: "Sneha Reddy",
+      studentName: "Sneha Reddy",
+      score: 1390,
+      percentile: 96
+    },
+    {
+      rank: 3,
+      name: "Rudransh Pandey",
+      studentName: "Rudransh Pandey",
+      score: 1320,
+      percentile: 92
+    },
+    {
+      rank: 4,
+      name: "Vikram Malhotra",
+      studentName: "Vikram Malhotra",
+      score: 1280,
+      percentile: 88
+    }
   ],
   notifications: [
     {
