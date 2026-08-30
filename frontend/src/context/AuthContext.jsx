@@ -12,12 +12,22 @@ const isTokenValid = (token) => {
   }
 };
 
-const getRoleFromToken = (token) => {
+const getUserFromToken = (token) => {
   try {
     const decoded = jwtDecode(token);
-    return decoded.role ?? null;
+    return {
+      name: decoded.name || decoded.fullName || decoded.username || "Student",
+      email: decoded.email || "candidate@pragati.com",
+      role: decoded.role ?? null,
+      id: decoded.id || decoded.userId || decoded.sub || null,
+    };
   } catch {
-    return null;
+    try {
+      const storedUser = localStorage.getItem("user");
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
   }
 };
 
@@ -31,23 +41,29 @@ export const AuthProvider = ({ children }) => {
 
   const [userRole, setUserRole] = useState(() => {
     const stored = localStorage.getItem("token");
-    return stored && isTokenValid(stored) ? getRoleFromToken(stored) : null;
+    return stored && isTokenValid(stored) ? getUserFromToken(stored)?.role : null;
+  });
+
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem("token");
+    return stored && isTokenValid(stored) ? getUserFromToken(stored) : null;
   });
 
   const [loading, setLoading] = useState(false);
 
-  const login = (userRole, jwtToken) => {
-    if (!userRole || !jwtToken) return;
+  const login = (role, jwtToken) => {
+    if (!role || !jwtToken) return;
     localStorage.setItem("token", jwtToken);
     setToken(jwtToken);
-    setUserRole(userRole);
+    setUserRole(role);
+    setUser(getUserFromToken(jwtToken));
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     sessionStorage.removeItem("token");
-    
-    // Clear any potential cookies named token that might be causing issues
+
     document.cookie.split(";").forEach((c) => {
       const cookieName = c.split("=")[0].trim();
       document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
@@ -55,11 +71,13 @@ export const AuthProvider = ({ children }) => {
 
     setToken(null);
     setUserRole(null);
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
+        user,
         userRole,
         token,
         loading,

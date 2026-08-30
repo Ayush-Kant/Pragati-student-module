@@ -34,14 +34,17 @@ import ProjectDetailPage from "../pages/projects/ProjectDetailPage";
 import ProjectWorkspacePage from "../projects/pages/ProjectWorkspacePage";
 import ProjectEvaluationPage from "../projects/pages/ProjectEvaluationPage";
 
-// Performance, Interviews, Settings & Certificates
+// Certificates module imports (from Ayush's official feature module)
+import CertificatesPage from "../certificates/pages/CertificatesPage";
+import CertificateDetailsPage from "../certificates/pages/CertificateDetailsPage";
+import CertificatePreviewPage from "../certificates/pages/CertificatePreviewPage";
+import CertificateVerificationPage from "../certificates/pages/CertificateVerificationPage";
+
+// Performance, Interviews & Settings
 import PerformancePage from "../pages/performance/PerformancePage";
 import InterviewsPage from "../pages/interviews/InterviewsPage";
 import NotificationsPage from "../pages/notifications/NotificationsPage";
 import NotificationPreferences from "../pages/settings/NotificationPreferences";
-
-// Existing feature-level Certificates Page
-import CertificatesPage from "../certificates/pages/CertificatesPage";
 
 const studentRoute = (
   <>
@@ -63,11 +66,11 @@ const studentRoute = (
         <Route path="assignments" element={<AssignmentsPage />} />
         <Route path="assignments/:id" element={<AssignmentDetail />} />
 
-        {/* Assessments */}
+        {/* Assessments (Fixed: uses :assessmentId matching useParams) */}
         <Route path="assessments" element={<AssessmentsPage />} />
-        <Route path="assessments/:id" element={<AssessmentDetailsPage />} />
-        <Route path="assessments/:id/attempt" element={<AssessmentAttemptPage />} />
-        <Route path="assessments/:id/result" element={<AssessmentResultPage />} />
+        <Route path="assessments/:assessmentId" element={<AssessmentDetailsPage />} />
+        <Route path="assessments/:assessmentId/attempt" element={<AssessmentAttemptPage />} />
+        <Route path="assessments/:assessmentId/result" element={<AssessmentResultPage />} />
         <Route path="quizzes" element={<Navigate to="/student/assessments" replace />} />
 
         {/* Coding Challenges */}
@@ -85,12 +88,17 @@ const studentRoute = (
         <Route path="projects/:projectId/workspace" element={<ProjectWorkspacePage />} />
         <Route path="projects/:projectId/evaluation" element={<ProjectEvaluationPage />} />
 
+        {/* Certificates */}
+        <Route path="certificates" element={<CertificatesPage />} />
+        <Route path="certificates/:id" element={<CertificateDetailsPage />} />
+        <Route path="certificates/:id/preview" element={<CertificatePreviewPage />} />
+        <Route path="certificates/verify" element={<CertificateVerificationPage />} />
+
         {/* Account & Career */}
         <Route path="performance" element={<PerformancePage />} />
         <Route path="interviews" element={<InterviewsPage />} />
         <Route path="notifications" element={<NotificationsPage />} />
         <Route path="settings/notifications" element={<NotificationPreferences />} />
-        <Route path="certificates" element={<CertificatesPage />} />
       </Route>
     </Route>
   </>

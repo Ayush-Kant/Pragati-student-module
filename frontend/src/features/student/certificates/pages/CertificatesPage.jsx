@@ -1,222 +1,532 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Award,
+  Download,
+  History,
+  Search,
+  ShieldCheck,
+} from "lucide-react";
 
-const mockCertificates = [
-  {
-    id: "cert-01",
-    title: "MERN Stack Full Development",
-    issuedBy: "Pragati - TechCorp Drive",
-    issueDate: "2026-06-15",
-    credentialId: "PRG-2026-MERN-8492",
-    grade: "Distinction",
-    skills: ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS"]
-  },
-  {
-    id: "cert-02",
-    title: "Frontend Engineering & React Mastery",
-    issuedBy: "Pragati Upskilling Program",
-    issueDate: "2026-05-10",
-    credentialId: "PRG-2026-FE-1048",
-    grade: "Excellent",
-    skills: ["React.js", "Redux Toolkit", "REST APIs", "JavaScript ES6+"]
-  },
-  {
-    id: "cert-03",
-    title: "Data Structures & Algorithms in Java",
-    issuedBy: "Uptoskills Engineering",
-    issueDate: "2026-03-20",
-    credentialId: "PRG-2026-DSA-5519",
-    grade: "A+",
-    skills: ["Java", "Algorithms", "Problem Solving", "System Design"]
+import CertificateCard from "../components/certificate/CertificateCard";
+
+import EligibilityCard from "../components/eligibility/EligibilityCard";
+
+import CertificateHistory from "../components/history/CertificateHistory";
+
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import EmptyState from "../components/common/EmptyState";
+import ErrorState from "../components/common/ErrorState";
+import SectionHeader from "../components/common/SectionHeader";
+import ConfirmationModal from "../components/common/ConfirmationModal";
+
+import useCertificates from "../hooks/useCertificates";
+import useCertificateEligibility from "../hooks/useCertificateEligibility";
+import useCertificateDownload from "../hooks/useCertificateDownload";
+
+import {
+  isCertificateIssued,
+} from "../utils/certificateHelpers";
+
+/**
+ * Main Certificates page.
+ *
+ * Responsibilities:
+ * - Display earned certificates
+ * - Display certificate eligibility
+ * - Navigate to certificate details
+ * - Start certificate downloads after confirmation
+ * - Display certificate history
+ * - Display download history
+ * - Handle loading, empty, and error states
+ *
+ * The page intentionally contains no direct API calls.
+ * Data access is handled by the feature hooks.
+ *
+ * @returns {JSX.Element}
+ */
+const CertificatesPage = () => {
+  const navigate = useNavigate();
+
+  const {
+    certificates,
+    history,
+    downloadHistory,
+    loading,
+    historyLoading,
+    downloadHistoryLoading,
+    error,
+    historyError,
+    downloadHistoryError,
+    refetch,
+    refetchHistory,
+    refetchDownloadHistory,
+  } = useCertificates();
+
+  const {
+    eligibility,
+    loading: eligibilityLoading,
+    error: eligibilityError,
+    refetch: refetchEligibility,
+  } = useCertificateEligibility();
+
+  const {
+    loading: downloadLoading,
+    success: downloadSuccess,
+    error: downloadError,
+    download,
+    reset: resetDownload,
+  } = useCertificateDownload();
+
+  const [
+    selectedCertificate,
+    setSelectedCertificate,
+  ] = useState(null);
+
+  const [
+    isDownloadModalOpen,
+    setIsDownloadModalOpen,
+  ] = useState(false);
+
+ const handleViewCertificate = (
+  certificateOrId
+) => {
+  const certificateId =
+    typeof certificateOrId === "string"
+      ? certificateOrId
+      : certificateOrId?.id;
+
+  if (!certificateId) {
+    return;
   }
-];
 
-export default function CertificatesPage() {
-  const [selectedCert, setSelectedCert] = useState(null);
-  const [copiedId, setCopiedId] = useState(null);
+  navigate(
+    `/student/certificates/${certificateId}`
+  );
+};
 
-  const handleCopy = (id, credId) => {
-    navigator.clipboard.writeText(credId);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleOpenDownloadModal = (
+    certificate
+  ) => {
+    if (
+      !certificate ||
+      !isCertificateIssued(certificate)
+    ) {
+      return;
+    }
+
+    resetDownload();
+
+    setSelectedCertificate(
+      certificate
+    );
+
+    setIsDownloadModalOpen(true);
+  };
+
+  const handleCloseDownloadModal = () => {
+    if (downloadLoading) {
+      return;
+    }
+
+    setIsDownloadModalOpen(false);
+    setSelectedCertificate(null);
+    resetDownload();
+  };
+
+  const handleConfirmDownload = async () => {
+    if (!selectedCertificate) {
+      return;
+    }
+
+    const response = await download(
+      selectedCertificate.id,
+      selectedCertificate
+    );
+
+    if (response?.success === true) {
+      setIsDownloadModalOpen(false);
+      setSelectedCertificate(null);
+
+      /*
+       * Reset download state after the modal is closed
+       * so the next download starts from a clean state.
+       */
+      window.setTimeout(() => {
+        resetDownload();
+      }, 300);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6 md:p-8 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-            <Link to="/student/dashboard" className="hover:text-blue-600">
-              Dashboard
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">Certificates</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Earned Certificates</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            View, download, and share your verified credentials and achievement awards.
-          </p>
-        </div>
+    <main className="min-h-[calc(100vh-80px)] bg-slate-50 px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-9 lg:px-10 lg:py-10">
+      <div className="mx-auto w-full max-w-7xl">
+        {/* ------------------------------------------------------------------ */}
+        {/* Page Header                                                        */}
+        {/* ------------------------------------------------------------------ */}
 
-        <Link
-          to="/student/dashboard"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50 shadow-sm transition"
-        >
-          ← Back to Dashboard
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Total Issued
-          </p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">3</p>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Verified Credentials
-          </p>
-          <p className="text-2xl font-bold text-emerald-600 mt-1">100%</p>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Latest Achievement
-          </p>
-          <p className="text-sm font-bold text-gray-800 mt-2 truncate">
-            MERN Stack Full Development
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {mockCertificates.map((cert) => (
-          <div
-            key={cert.id}
-            className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4"
-          >
-            <div className="space-y-3">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 mb-2">
-                    Verified Award
-                  </span>
-                  <h3 className="text-lg font-bold text-gray-900">{cert.title}</h3>
-                  <p className="text-sm text-gray-600 font-medium mt-0.5">{cert.issuedBy}</p>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-xl shrink-0">
-                  📜
-                </div>
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 md:p-6 lg:p-7">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 sm:h-12 sm:w-12">
+                <Award
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs py-2 border-y border-gray-100">
-                <div>
-                  <span className="text-gray-400 font-medium">Issue Date: </span>
-                  <span className="text-gray-700 font-semibold">{cert.issueDate}</span>
-                </div>
-                <div>
-                  <span className="text-gray-400 font-medium">Grade / Rating: </span>
-                  <span className="text-emerald-700 font-semibold">{cert.grade}</span>
-                </div>
-              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 sm:text-[11px]">
+                  Student Certificates
+                </p>
 
-              <div>
-                <p className="text-xs font-medium text-gray-400 mb-1.5">Validated Skills</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {cert.skills.map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-md font-medium"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
+                <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
+                  My Certificates
+                </h1>
 
-              <div className="text-xs text-gray-500 font-mono bg-gray-50 p-2.5 rounded-lg border border-gray-100 flex items-center justify-between">
-                <span className="truncate">ID: {cert.credentialId}</span>
-                <button
-                  onClick={() => handleCopy(cert.id, cert.credentialId)}
-                  className="text-blue-600 hover:text-blue-800 font-semibold ml-2 shrink-0"
-                >
-                  {copiedId === cert.id ? "Copied!" : "Copy ID"}
-                </button>
+                <p className="mt-1.5 max-w-2xl text-xs leading-5 text-slate-500 sm:text-sm sm:leading-6">
+                  View your earned certificates, check eligibility, download certificates, and review your certificate history.
+                </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                onClick={() => setSelectedCert(cert)}
-                className="flex-1 px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition text-center shadow-sm"
+            <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+              <Link
+                to="/student/certificates/verify"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors duration-200 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2 sm:w-auto"
               >
-                View & Share
-              </button>
-              <button
-                onClick={() => alert(`Downloading certificate: ${cert.credentialId}`)}
-                className="px-4 py-2 text-xs font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                <ShieldCheck
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
+
+                <span>
+                  Verify Certificate
+                </span>
+              </Link>
+
+              <Link
+                to="/student/certificates"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2 sm:w-auto"
               >
-                Download PDF
-              </button>
+                <Award
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
+
+                <span>
+                  Certificates
+                </span>
+              </Link>
             </div>
           </div>
-        ))}
-      </div>
+        </section>
 
-      {selectedCert && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-bold text-gray-900 text-base">Certificate Preview</h3>
-              <button
-                onClick={() => setSelectedCert(null)}
-                className="text-gray-400 hover:text-gray-600 text-lg"
+        {/* ------------------------------------------------------------------ */}
+        {/* Eligibility                                                        */}
+        {/* ------------------------------------------------------------------ */}
+
+        <section className="mt-6 sm:mt-7">
+          <EligibilityCard
+            eligibility={eligibility}
+            loading={eligibilityLoading}
+            error={eligibilityError}
+            onRetry={refetchEligibility}
+          />
+        </section>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Earned Certificates                                                */}
+        {/* ------------------------------------------------------------------ */}
+
+        <section className="mt-8 sm:mt-10">
+          <SectionHeader
+            eyebrow="Achievements"
+            title="Earned Certificates"
+            description="Your certificates are displayed here once they have been issued."
+            action={
+              <Link
+                to="/student/certificates/verify"
+                className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 transition-colors hover:text-slate-900 sm:text-sm"
               >
-                ✕
-              </button>
-            </div>
+                <Search
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
 
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 p-6 rounded-xl text-center space-y-3">
-              <span className="text-3xl">🎓</span>
-              <h4 className="text-base font-bold text-gray-900">{selectedCert.title}</h4>
-              <p className="text-xs text-gray-600">Issued by {selectedCert.issuedBy}</p>
-              <p className="text-[11px] font-mono text-gray-500 pt-2 border-t border-blue-100">
-                Credential: {selectedCert.credentialId}
-              </p>
-            </div>
+                <span>
+                  Verify a Certificate
+                </span>
+              </Link>
+            }
+          />
 
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-700">Share verification link</p>
-              <input
-                type="text"
-                readOnly
-                value={`https://pragati.uptoskills.com/verify/${selectedCert.credentialId}`}
-                className="w-full text-xs font-mono bg-gray-50 border rounded-lg p-2.5 text-gray-600 outline-none select-all"
+          <div className="mt-5">
+            {loading ? (
+              <div className="rounded-2xl border border-slate-200 bg-white px-4 py-10 shadow-sm sm:px-6 sm:py-12">
+                <LoadingSpinner
+                  size="lg"
+                  label="Loading certificates..."
+                />
+              </div>
+            ) : error ? (
+              <ErrorState
+                title="Unable to load certificates"
+                message={error}
+                onRetry={refetch}
+                retryLabel="Try again"
               />
-            </div>
+            ) : !Array.isArray(
+                certificates
+              ) ||
+              certificates.length === 0 ? (
+              <EmptyState
+                icon={Award}
+                title="No certificates yet"
+                description="Your earned certificates will appear here once you complete the required program criteria and a certificate is issued."
+              />
+            ) : (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+                {certificates.map(
+                  (certificate) => (
+                    <CertificateCard
+                      key={certificate.id}
+                      certificate={
+                        certificate
+                      }
+                      onView={
+                        handleViewCertificate
+                      }
+                      onDownload={
+                        handleOpenDownloadModal
+                      }
+                      downloadLoading={
+                        downloadLoading &&
+                        selectedCertificate?.id ===
+                          certificate.id
+                      }
+                    />
+                  )
+                )}
+              </div>
+            )}
+          </div>
+        </section>
 
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                onClick={() => setSelectedCert(null)}
-                className="px-4 py-2 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    `https://pragati.uptoskills.com/verify/${selectedCert.credentialId}`
-                  );
-                  alert("Verification link copied to clipboard!");
-                }}
-                className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm"
-              >
-                Copy Link
-              </button>
+        {/* ------------------------------------------------------------------ */}
+        {/* Certificate Activity Summary                                       */}
+        {/* ------------------------------------------------------------------ */}
+
+        {!loading &&
+        Array.isArray(certificates) &&
+        certificates.length > 0 ? (
+          <section className="mt-8 sm:mt-10">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      Total Certificates
+                    </p>
+
+                    <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+                      {certificates.length}
+                    </p>
+                  </div>
+
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                    <Award
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </div>
+
+                <p className="mt-2 text-xs text-slate-500">
+                  Certificates currently available in your account.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      Verified
+                    </p>
+
+                    <p className="mt-2 text-2xl font-bold tracking-tight text-emerald-600">
+                      {
+                        certificates.filter(
+                          (certificate) =>
+                            certificate.verificationStatus ===
+                            "Verified"
+                        ).length
+                      }
+                    </p>
+                  </div>
+
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                    <ShieldCheck
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </div>
+
+                <p className="mt-2 text-xs text-slate-500">
+                  Certificates with verified authenticity.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      Download Activity
+                    </p>
+
+                    <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+                      {Array.isArray(
+                        downloadHistory
+                      )
+                        ? downloadHistory.length
+                        : 0}
+                    </p>
+                  </div>
+
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                    <Download
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </div>
+
+                <p className="mt-2 text-xs text-slate-500">
+                  Recorded certificate download activity.
+                </p>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Certificate History                                                */}
+        {/* ------------------------------------------------------------------ */}
+
+        <section className="mt-8 sm:mt-10">
+          <CertificateHistory
+            history={history}
+            downloadHistory={
+              downloadHistory
+            }
+            loading={loading}
+            historyLoading={
+              historyLoading
+            }
+            downloadHistoryLoading={
+              downloadHistoryLoading
+            }
+            error={error}
+            historyError={
+              historyError
+            }
+            downloadHistoryError={
+              downloadHistoryError
+            }
+            onRetry={refetch}
+            onRetryHistory={
+              refetchHistory
+            }
+            onRetryDownloadHistory={
+              refetchDownloadHistory
+            }
+            onView={
+              handleViewCertificate
+            }
+          />
+        </section>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Download Confirmation                                              */}
+        {/* ------------------------------------------------------------------ */}
+
+        <ConfirmationModal
+          isOpen={isDownloadModalOpen}
+          title="Download Certificate?"
+          description={
+            selectedCertificate
+              ? `You're about to download "${selectedCertificate.title}" as a PDF.`
+              : "You're about to download this certificate."
+          }
+          confirmLabel="Download Certificate"
+          cancelLabel="Cancel"
+          loading={downloadLoading}
+          loadingLabel="Preparing certificate..."
+          onConfirm={
+            handleConfirmDownload
+          }
+          onCancel={
+            handleCloseDownloadModal
+          }
+        />
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Download error outside modal                                       */}
+        {/* ------------------------------------------------------------------ */}
+
+        {downloadError &&
+        !isDownloadModalOpen ? (
+          <div className="mt-5">
+            <ErrorState
+              title="Certificate download failed"
+              message={downloadError}
+              onRetry={() => {
+                if (
+                  selectedCertificate
+                ) {
+                  handleConfirmDownload();
+                }
+              }}
+              retryLabel="Try download again"
+            />
+          </div>
+        ) : null}
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Download success feedback                                          */}
+        {/* ------------------------------------------------------------------ */}
+
+        {downloadSuccess ? (
+          <div
+            className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3.5 sm:px-5"
+            role="status"
+            aria-live="polite"
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+                <Download
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-emerald-800">
+                  Certificate downloaded successfully
+                </p>
+
+                <p className="mt-0.5 text-xs leading-5 text-emerald-700 sm:text-sm">
+                  Your certificate PDF has been downloaded to your device.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        ) : null}
+      </div>
+    </main>
   );
-}
+};
+
+export default CertificatesPage;
