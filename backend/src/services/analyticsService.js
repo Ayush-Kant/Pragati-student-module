@@ -1,6 +1,6 @@
 import CareerRecommendation from "../models/careerRecommendationModel.js";
 import PlacementAnalytics from "../models/placementAnalyticsModel.js";
-import connectDB from "../../config/db.js";
+import sequelize from "../../config/sequelize.js";
 import { getApplications } from "./applicationService.js";
 import { getInterviews } from "./interviewService.js";
 import { getReadinessReport } from "./readinessService.js";
@@ -11,14 +11,6 @@ import {
   calculateReadinessProgression,
 } from "../utils/analyticsHelpers.js";
 
-const isDbAvailable = () => {
-  try {
-    return Boolean(connectDB.sequelize && CareerRecommendation.sequelize);
-  } catch {
-    return false;
-  }
-};
-
 export const getPlacementAnalytics = async (studentId) => {
   const applications = await getApplications(studentId);
   const interviews = await getInterviews(studentId);
@@ -27,7 +19,7 @@ export const getPlacementAnalytics = async (studentId) => {
   const conversion = calculateConversionRates(applications);
   const interviewSuccessRate = calculateInterviewSuccessRate(interviews);
   const monthlyTrends = generateMonthlyTrends(applications);
-  const readinessProgression = calculateReadinessProgression();
+  const readinessProgression = calculateReadinessProgression(readiness.history || []);
 
   const shortlistedCount = applications.filter((a) =>
     ["SHORTLISTED", "ASSESSMENT", "TECHNICAL_INTERVIEW", "HR_INTERVIEW", "SELECTED"].includes(a.status)
@@ -51,13 +43,11 @@ export const getPlacementAnalytics = async (studentId) => {
 };
 
 export const getCareerRecommendations = async (studentId) => {
-  if (isDbAvailable()) {
-    const recs = await CareerRecommendation.findAll({
-      where: { studentId },
-    });
-    if (recs && recs.length > 0) {
-      return recs.map((r) => (r.toJSON ? r.toJSON() : r));
-    }
+  const recs = await CareerRecommendation.findAll({
+    where: { studentId },
+  });
+  if (recs && recs.length > 0) {
+    return recs.map((r) => (r.toJSON ? r.toJSON() : r));
   }
 
   const readiness = await getReadinessReport(studentId);
@@ -99,12 +89,20 @@ export const getCareerRecommendations = async (studentId) => {
     recommendedAction: "Apply to recommended high-match corporate drives this week.",
   });
 
-  if (isDbAvailable()) {
-    const createdRecs = await CareerRecommendation.bulkCreate(generated);
-    return createdRecs.map((r) => (r.toJSON ? r.toJSON() : r));
-  }
+  return await sequelize.transaction(async (transaction) => {
+    const existingCheck = await CareerRecommendation.findAll({
+      where: { studentId },
+      transaction,
+      lock: transaction.LOCK ? transaction.LOCK.UPDATE : undefined,
+    });
 
-  return generated.map((r, idx) => ({ id: idx + 1, ...r }));
+    if (existingCheck && existingCheck.length > 0) {
+      return existingCheck.map((r) => (r.toJSON ? r.toJSON() : r));
+    }
+
+    const createdRecs = await CareerRecommendation.bulkCreate(generated, { transaction });
+    return createdRecs.map((r) => (r.toJSON ? r.toJSON() : r));
+  });
 };
 
 export default {

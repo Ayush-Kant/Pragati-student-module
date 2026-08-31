@@ -7,7 +7,7 @@ import {
 const certificateIdSchema = Joi.string().trim().min(3).required();
 
 export const verificationRequestSchema = Joi.object({
-  verificationCode: Joi.string().trim().min(1).required(),
+  verificationCode: Joi.string().trim().optional(),
 }).unknown(true).required();
 
 export const generateCertificateSchema = Joi.object({

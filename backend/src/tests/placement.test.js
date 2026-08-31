@@ -1,11 +1,47 @@
-import { describe, it, expect } from "@jest/globals";
-
+import { describe, it, expect, jest, beforeEach } from "@jest/globals";
+import Application from "../models/applicationModel.js";
+import Interview from "../models/interviewModel.js";
+import SkillReadiness from "../models/skillReadinessModel.js";
+import CareerRecommendation from "../models/careerRecommendationModel.js";
+import sequelize from "../../config/sequelize.js";
 import placementService from "../services/placementService.js";
 import placementRoutes from "../routes/placementRoutes.js";
 import { formatSuccessResponse, formatErrorResponse } from "../utils/placementHelpers.js";
 
 describe("Placement Service & Routes", () => {
+  let mockTransaction;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockTransaction = {
+      commit: jest.fn().mockResolvedValue(),
+      rollback: jest.fn().mockResolvedValue(),
+      finished: false,
+      LOCK: { UPDATE: "UPDATE" },
+    };
+    jest.spyOn(sequelize, "transaction").mockImplementation(async (arg1, arg2) => {
+      const cb = typeof arg1 === "function" ? arg1 : typeof arg2 === "function" ? arg2 : null;
+      if (cb) {
+        try {
+          const res = await cb(mockTransaction);
+          await mockTransaction.commit();
+          return res;
+        } catch (err) {
+          await mockTransaction.rollback();
+          throw err;
+        }
+      }
+      return mockTransaction;
+    });
+  });
+
   it("getPlacementDashboard aggregates readiness score, application stats, and recommendations", async () => {
+    jest.spyOn(Application, "findAll").mockResolvedValue([]);
+    jest.spyOn(Interview, "findAll").mockResolvedValue([]);
+    jest.spyOn(SkillReadiness, "findAll").mockResolvedValue([]);
+    jest.spyOn(CareerRecommendation, "findAll").mockResolvedValue([]);
+    jest.spyOn(CareerRecommendation, "bulkCreate").mockResolvedValue([]);
+
     const studentId = 101;
     const dashboard = await placementService.getPlacementDashboard(studentId);
 

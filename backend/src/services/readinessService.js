@@ -1,5 +1,4 @@
 import SkillReadiness from "../models/skillReadinessModel.js";
-import connectDB from "../../config/db.js";
 import { getApplications } from "./applicationService.js";
 import { getInterviews } from "./interviewService.js";
 import {
@@ -7,33 +6,11 @@ import {
   identifySkillGaps,
 } from "../utils/readinessHelpers.js";
 
-const defaultMockSkills = [
-  { id: 1, skillName: "Data Structures & Algorithms", currentScore: 78, targetScore: 90, priority: "HIGH", category: "Technical" },
-  { id: 2, skillName: "System Design", currentScore: 62, targetScore: 85, priority: "HIGH", category: "Technical" },
-  { id: 3, skillName: "Full Stack Development", currentScore: 85, targetScore: 85, priority: "MEDIUM", category: "Technical" },
-  { id: 4, skillName: "Communication & Behavioral", currentScore: 80, targetScore: 85, priority: "LOW", category: "Soft Skills" },
-  { id: 5, skillName: "Aptitude & Problem Solving", currentScore: 70, targetScore: 85, priority: "MEDIUM", category: "Aptitude" },
-];
-
-const isDbAvailable = () => {
-  try {
-    return Boolean(connectDB.sequelize && SkillReadiness.sequelize);
-  } catch {
-    return false;
-  }
-};
-
 export const getSkillReadiness = async (studentId) => {
-  if (isDbAvailable()) {
-    const skills = await SkillReadiness.findAll({
-      where: { studentId },
-    });
-    if (skills && skills.length > 0) {
-      return skills.map((s) => (s.toJSON ? s.toJSON() : s));
-    }
-  }
-
-  return defaultMockSkills.map((s) => ({ ...s, studentId }));
+  const skills = await SkillReadiness.findAll({
+    where: { studentId },
+  });
+  return skills.map((s) => (s.toJSON ? s.toJSON() : s));
 };
 
 export const getSkillGaps = async (studentId) => {

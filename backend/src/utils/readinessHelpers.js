@@ -1,8 +1,8 @@
 import { SKILL_PRIORITY } from "../constants/placementConstants.js";
 
 export const calculateOverallReadiness = (skillReadinessList = [], applications = [], interviews = []) => {
-  if (skillReadinessList.length === 0) {
-    return 65;
+  if (!skillReadinessList || skillReadinessList.length === 0) {
+    return 0;
   }
 
   const totalCurrentScore = skillReadinessList.reduce(
