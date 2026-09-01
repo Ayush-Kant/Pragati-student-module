@@ -1,4 +1,5 @@
-import { describe, it, expect, jest, beforeEach } from "@jest/globals";
+import { describe, it, beforeEach } from "node:test";
+import assert from "node:assert/strict";
 import Application from "../models/applicationModel.js";
 import sequelize from "../../config/sequelize.js";
 import applicationService from "../services/applicationService.js";
@@ -6,16 +7,19 @@ import { isValidApplicationTransition } from "../utils/placementHelpers.js";
 
 describe("Application Service", () => {
   let mockTransaction;
+  let committed = false;
+  let rolledBack = false;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    committed = false;
+    rolledBack = false;
     mockTransaction = {
-      commit: jest.fn().mockResolvedValue(),
-      rollback: jest.fn().mockResolvedValue(),
+      commit: async () => { committed = true; },
+      rollback: async () => { rolledBack = true; },
       finished: false,
       LOCK: { UPDATE: "UPDATE" },
     };
-    jest.spyOn(sequelize, "transaction").mockImplementation(async (arg1, arg2) => {
+    sequelize.transaction = async (arg1, arg2) => {
       const cb = typeof arg1 === "function" ? arg1 : typeof arg2 === "function" ? arg2 : null;
       if (cb) {
         try {
@@ -28,17 +32,17 @@ describe("Application Service", () => {
         }
       }
       return mockTransaction;
-    });
+    };
   });
 
   it("isValidApplicationTransition validates transitions", () => {
-    expect(isValidApplicationTransition("APPLIED", "SHORTLISTED")).toBe(true);
-    expect(isValidApplicationTransition("SHORTLISTED", "TECHNICAL_INTERVIEW")).toBe(true);
-    expect(isValidApplicationTransition("REJECTED", "SELECTED")).toBe(false);
+    assert.strictEqual(isValidApplicationTransition("APPLIED", "SHORTLISTED"), true);
+    assert.strictEqual(isValidApplicationTransition("SHORTLISTED", "TECHNICAL_INTERVIEW"), true);
+    assert.strictEqual(isValidApplicationTransition("REJECTED", "SELECTED"), false);
   });
 
   it("createApplication creates application and records initial history", async () => {
-    jest.spyOn(Application, "findAll").mockResolvedValue([]);
+    Application.findAll = async () => [];
     const mockApp = {
       id: 1,
       studentId: 201,
@@ -50,16 +54,16 @@ describe("Application Service", () => {
         return this;
       },
     };
-    jest.spyOn(Application, "create").mockResolvedValue(mockApp);
+    Application.create = async () => mockApp;
 
     const created = await applicationService.createApplication(201, {
       companyName: "Google",
       jobTitle: "Software Engineer",
     });
 
-    expect(created.id).toBe(1);
-    expect(created.status).toBe("APPLIED");
-    expect(mockTransaction.commit).toHaveBeenCalled();
+    assert.strictEqual(created.id, 1);
+    assert.strictEqual(created.status, "APPLIED");
+    assert.strictEqual(committed, true);
   });
 
   it("createApplication throws 409 conflict when duplicate application created", async () => {
@@ -68,38 +72,39 @@ describe("Application Service", () => {
       jobTitle: "Software Engineer",
       status: "APPLIED",
     };
-    jest.spyOn(Application, "findAll").mockResolvedValue([existingApp]);
+    Application.findAll = async () => [existingApp];
 
-    await expect(
-      applicationService.createApplication(201, {
-        companyName: "Google",
-        jobTitle: "Software Engineer",
-      })
-    ).rejects.toMatchObject({
-      status: 409,
-      code: "DUPLICATE_APPLICATION",
-    });
-    expect(mockTransaction.rollback).toHaveBeenCalled();
+    await assert.rejects(
+      async () => {
+        await applicationService.createApplication(201, {
+          companyName: "Google",
+          jobTitle: "Software Engineer",
+        });
+      },
+      (err) => err.status === 409 && err.code === "DUPLICATE_APPLICATION"
+    );
+    assert.strictEqual(rolledBack, true);
   });
 
   it("updateApplicationStatus performs valid status transition and records history", async () => {
+    let saved = false;
     const dbApp = {
       id: 10,
       studentId: 202,
       status: "APPLIED",
       history: [{ status: "APPLIED" }],
-      save: jest.fn().mockResolvedValue(),
+      save: async function () { saved = true; },
       toJSON: function () {
         return this;
       },
     };
-    jest.spyOn(Application, "findOne").mockResolvedValue(dbApp);
+    Application.findOne = async () => dbApp;
 
     const updated = await applicationService.updateApplicationStatus(202, 10, "SHORTLISTED");
 
-    expect(updated.status).toBe("SHORTLISTED");
-    expect(dbApp.save).toHaveBeenCalled();
-    expect(mockTransaction.commit).toHaveBeenCalled();
+    assert.strictEqual(updated.status, "SHORTLISTED");
+    assert.strictEqual(saved, true);
+    assert.strictEqual(committed, true);
   });
 
   it("updateApplicationStatus rejects invalid status transition with 400 error", async () => {
@@ -109,39 +114,43 @@ describe("Application Service", () => {
       status: "REJECTED",
       history: [{ status: "REJECTED" }],
     };
-    jest.spyOn(Application, "findOne").mockResolvedValue(dbApp);
+    Application.findOne = async () => dbApp;
 
-    await expect(
-      applicationService.updateApplicationStatus(203, 10, "SELECTED")
-    ).rejects.toMatchObject({
-      status: 400,
-      code: "INVALID_STATUS_TRANSITION",
-    });
-    expect(mockTransaction.rollback).toHaveBeenCalled();
+    await assert.rejects(
+      async () => {
+        await applicationService.updateApplicationStatus(203, 10, "SELECTED");
+      },
+      (err) => err.status === 400 && err.code === "INVALID_STATUS_TRANSITION"
+    );
+    assert.strictEqual(rolledBack, true);
   });
 
   it("getApplicationById throws 404 for non-existent or other student application", async () => {
-    jest.spyOn(Application, "findOne").mockResolvedValue(null);
+    Application.findOne = async () => null;
 
-    await expect(applicationService.getApplicationById(204, 99999)).rejects.toMatchObject({
-      status: 404,
-    });
+    await assert.rejects(
+      async () => {
+        await applicationService.getApplicationById(204, 99999);
+      },
+      (err) => err.status === 404
+    );
   });
 
   it("deleteApplication withdraws application successfully and retains record", async () => {
+    let saved = false;
     const dbApp = {
       id: 15,
       studentId: 205,
       status: "APPLIED",
       history: [],
-      save: jest.fn().mockResolvedValue(),
+      save: async function () { saved = true; },
     };
-    jest.spyOn(Application, "findOne").mockResolvedValue(dbApp);
+    Application.findOne = async () => dbApp;
 
     const deleteResult = await applicationService.deleteApplication(205, 15);
-    expect(deleteResult.success).toBe(true);
-    expect(deleteResult.status).toBe("WITHDRAWN");
-    expect(dbApp.status).toBe("WITHDRAWN");
-    expect(mockTransaction.commit).toHaveBeenCalled();
+    assert.strictEqual(deleteResult.success, true);
+    assert.strictEqual(deleteResult.status, "WITHDRAWN");
+    assert.strictEqual(dbApp.status, "WITHDRAWN");
+    assert.strictEqual(committed, true);
   });
 });

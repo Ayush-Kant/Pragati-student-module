@@ -1,5 +1,5 @@
 import express from "express";
-import authenticateJWT from "../middleware/authMiddleware.js";
+import authMiddleware from "../../middleware/authMiddleware.js";
 import { extractStudentId, enforceStudentIsolation } from "../middleware/placementMiddleware.js";
 import {
   validateApplication,
@@ -14,7 +14,7 @@ import placementController from "../controllers/studentPlacementController.js";
 
 const router = express.Router();
 
-router.use(authenticateJWT, extractStudentId, enforceStudentIsolation);
+router.use(authMiddleware, extractStudentId, enforceStudentIsolation);
 
 // --- Placement Dashboard ---
 router.get("/dashboard", placementController.getPlacementDashboard);

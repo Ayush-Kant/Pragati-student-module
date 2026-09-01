@@ -4,7 +4,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --detectOpenHandles --forceExit",
+    "test": "node --test src/tests/analytics.test.js src/tests/application.test.js src/tests/interview.test.js src/tests/placement.test.js src/tests/certificate.test.js",
     "lint": "eslint \"src/**/*.js\"",
     "dev": "nodemon server.js"
   },

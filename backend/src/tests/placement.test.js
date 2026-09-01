@@ -1,4 +1,5 @@
-import { describe, it, expect, jest, beforeEach } from "@jest/globals";
+import { describe, it, beforeEach } from "node:test";
+import assert from "node:assert/strict";
 import Application from "../models/applicationModel.js";
 import Interview from "../models/interviewModel.js";
 import SkillReadiness from "../models/skillReadinessModel.js";
@@ -12,14 +13,13 @@ describe("Placement Service & Routes", () => {
   let mockTransaction;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     mockTransaction = {
-      commit: jest.fn().mockResolvedValue(),
-      rollback: jest.fn().mockResolvedValue(),
+      commit: async () => {},
+      rollback: async () => {},
       finished: false,
       LOCK: { UPDATE: "UPDATE" },
     };
-    jest.spyOn(sequelize, "transaction").mockImplementation(async (arg1, arg2) => {
+    sequelize.transaction = async (arg1, arg2) => {
       const cb = typeof arg1 === "function" ? arg1 : typeof arg2 === "function" ? arg2 : null;
       if (cb) {
         try {
@@ -32,41 +32,41 @@ describe("Placement Service & Routes", () => {
         }
       }
       return mockTransaction;
-    });
+    };
   });
 
   it("getPlacementDashboard aggregates readiness score, application stats, and recommendations", async () => {
-    jest.spyOn(Application, "findAll").mockResolvedValue([]);
-    jest.spyOn(Interview, "findAll").mockResolvedValue([]);
-    jest.spyOn(SkillReadiness, "findAll").mockResolvedValue([]);
-    jest.spyOn(CareerRecommendation, "findAll").mockResolvedValue([]);
-    jest.spyOn(CareerRecommendation, "bulkCreate").mockResolvedValue([]);
+    Application.findAll = async () => [];
+    Interview.findAll = async () => [];
+    SkillReadiness.findAll = async () => [];
+    CareerRecommendation.findAll = async () => [];
+    CareerRecommendation.bulkCreate = async () => [];
 
     const studentId = 101;
     const dashboard = await placementService.getPlacementDashboard(studentId);
 
-    expect(dashboard.studentId).toBe(101);
-    expect(typeof dashboard.readinessScore).toBe("number");
-    expect(typeof dashboard.applicationsCount).toBe("number");
-    expect(typeof dashboard.interviewsCount).toBe("number");
-    expect(Array.isArray(dashboard.skillReadiness)).toBe(true);
-    expect(Array.isArray(dashboard.careerRecommendations)).toBe(true);
-    expect(dashboard.applicationStatistics).toBeDefined();
-    expect(dashboard.interviewStatistics).toBeDefined();
+    assert.strictEqual(dashboard.studentId, 101);
+    assert.strictEqual(typeof dashboard.readinessScore, "number");
+    assert.strictEqual(typeof dashboard.applicationsCount, "number");
+    assert.strictEqual(typeof dashboard.interviewsCount, "number");
+    assert.strictEqual(Array.isArray(dashboard.skillReadiness), true);
+    assert.strictEqual(Array.isArray(dashboard.careerRecommendations), true);
+    assert.ok(dashboard.applicationStatistics !== undefined);
+    assert.ok(dashboard.interviewStatistics !== undefined);
   });
 
   it("formatSuccessResponse formats API payload cleanly", () => {
     const response = formatSuccessResponse({ score: 90 }, "Data fetched");
-    expect(response.success).toBe(true);
-    expect(response.message).toBe("Data fetched");
-    expect(response.data.score).toBe(90);
+    assert.strictEqual(response.success, true);
+    assert.strictEqual(response.message, "Data fetched");
+    assert.strictEqual(response.data.score, 90);
   });
 
   it("formatErrorResponse formats structured error output", () => {
     const response = formatErrorResponse("Invalid payload", "VALIDATION_ERROR");
-    expect(response.success).toBe(false);
-    expect(response.message).toBe("Invalid payload");
-    expect(response.code).toBe("VALIDATION_ERROR");
+    assert.strictEqual(response.success, false);
+    assert.strictEqual(response.message, "Invalid payload");
+    assert.strictEqual(response.code, "VALIDATION_ERROR");
   });
 
   it("placementRoutes exposes all required API endpoint paths", () => {
@@ -74,16 +74,16 @@ describe("Placement Service & Routes", () => {
       .filter((layer) => layer.route)
       .map((layer) => layer.route.path);
 
-    expect(registeredPaths).toContain("/dashboard");
-    expect(registeredPaths).toContain("/applications");
-    expect(registeredPaths).toContain("/applications/:applicationId");
-    expect(registeredPaths).toContain("/applications/:applicationId/status");
-    expect(registeredPaths).toContain("/interviews");
-    expect(registeredPaths).toContain("/interviews/:interviewId");
-    expect(registeredPaths).toContain("/skills");
-    expect(registeredPaths).toContain("/skills/gaps");
-    expect(registeredPaths).toContain("/readiness");
-    expect(registeredPaths).toContain("/analytics");
-    expect(registeredPaths).toContain("/recommendations");
+    assert.ok(registeredPaths.includes("/dashboard"));
+    assert.ok(registeredPaths.includes("/applications"));
+    assert.ok(registeredPaths.includes("/applications/:applicationId"));
+    assert.ok(registeredPaths.includes("/applications/:applicationId/status"));
+    assert.ok(registeredPaths.includes("/interviews"));
+    assert.ok(registeredPaths.includes("/interviews/:interviewId"));
+    assert.ok(registeredPaths.includes("/skills"));
+    assert.ok(registeredPaths.includes("/skills/gaps"));
+    assert.ok(registeredPaths.includes("/readiness"));
+    assert.ok(registeredPaths.includes("/analytics"));
+    assert.ok(registeredPaths.includes("/recommendations"));
   });
 });

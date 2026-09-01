@@ -1,4 +1,5 @@
-import { describe, it, expect, jest, beforeEach } from "@jest/globals";
+import { describe, it, beforeEach } from "node:test";
+import assert from "node:assert/strict";
 import Interview from "../models/interviewModel.js";
 import InterviewRound from "../models/interviewRoundModel.js";
 import Application from "../models/applicationModel.js";
@@ -8,16 +9,19 @@ import { isValidInterviewTransition } from "../utils/placementHelpers.js";
 
 describe("Interview Service", () => {
   let mockTransaction;
+  let committed = false;
+  let rolledBack = false;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    committed = false;
+    rolledBack = false;
     mockTransaction = {
-      commit: jest.fn().mockResolvedValue(),
-      rollback: jest.fn().mockResolvedValue(),
+      commit: async () => { committed = true; },
+      rollback: async () => { rolledBack = true; },
       finished: false,
       LOCK: { UPDATE: "UPDATE" },
     };
-    jest.spyOn(sequelize, "transaction").mockImplementation(async (arg1, arg2) => {
+    sequelize.transaction = async (arg1, arg2) => {
       const cb = typeof arg1 === "function" ? arg1 : typeof arg2 === "function" ? arg2 : null;
       if (cb) {
         try {
@@ -30,14 +34,14 @@ describe("Interview Service", () => {
         }
       }
       return mockTransaction;
-    });
+    };
   });
 
   it("isValidInterviewTransition validates interview status flow", () => {
-    expect(isValidInterviewTransition("SCHEDULED", "IN_PROGRESS")).toBe(true);
-    expect(isValidInterviewTransition("IN_PROGRESS", "COMPLETED")).toBe(true);
-    expect(isValidInterviewTransition("SCHEDULED", "CANCELLED")).toBe(true);
-    expect(isValidInterviewTransition("COMPLETED", "SCHEDULED")).toBe(false);
+    assert.strictEqual(isValidInterviewTransition("SCHEDULED", "IN_PROGRESS"), true);
+    assert.strictEqual(isValidInterviewTransition("IN_PROGRESS", "COMPLETED"), true);
+    assert.strictEqual(isValidInterviewTransition("SCHEDULED", "CANCELLED"), true);
+    assert.strictEqual(isValidInterviewTransition("COMPLETED", "SCHEDULED"), false);
   });
 
   it("createInterview schedules an interview with multi-round support", async () => {
@@ -61,8 +65,8 @@ describe("Interview Service", () => {
       },
     };
 
-    jest.spyOn(Interview, "create").mockResolvedValue(mockInterview);
-    jest.spyOn(InterviewRound, "create").mockResolvedValue(mockRound);
+    Interview.create = async () => mockInterview;
+    InterviewRound.create = async () => mockRound;
 
     const interviewData = {
       companyName: "Apple",
@@ -74,37 +78,39 @@ describe("Interview Service", () => {
 
     const created = await interviewService.createInterview(301, interviewData);
 
-    expect(created.id).toBe(5);
-    expect(created.status).toBe("SCHEDULED");
-    expect(created.rounds.length).toBe(1);
-    expect(mockTransaction.commit).toHaveBeenCalled();
+    assert.strictEqual(created.id, 5);
+    assert.strictEqual(created.status, "SCHEDULED");
+    assert.strictEqual(created.rounds.length, 1);
+    assert.strictEqual(committed, true);
   });
 
   it("createInterview rejects invalid or unowned applicationId", async () => {
-    jest.spyOn(Application, "findOne").mockResolvedValue(null);
+    Application.findOne = async () => null;
 
-    await expect(
-      interviewService.createInterview(305, {
-        companyName: "Stripe",
-        applicationId: 999,
-        dateTime: "2026-09-02T10:00:00Z",
-      })
-    ).rejects.toMatchObject({
-      status: 404,
-    });
+    await assert.rejects(
+      async () => {
+        await interviewService.createInterview(305, {
+          companyName: "Stripe",
+          applicationId: 999,
+          dateTime: "2026-09-02T10:00:00Z",
+        });
+      },
+      (err) => err.status === 404
+    );
   });
 
   it("updateInterview updates status, feedback, and score", async () => {
+    let saved = false;
     const dbInterview = {
       id: 8,
       studentId: 302,
       status: "SCHEDULED",
-      save: jest.fn().mockResolvedValue(),
+      save: async function () { saved = true; },
       toJSON: function () {
         return this;
       },
     };
-    jest.spyOn(Interview, "findOne").mockResolvedValue(dbInterview);
+    Interview.findOne = async () => dbInterview;
 
     const updated = await interviewService.updateInterview(302, 8, {
       status: "COMPLETED",
@@ -112,10 +118,10 @@ describe("Interview Service", () => {
       score: 92,
     });
 
-    expect(updated.status).toBe("COMPLETED");
-    expect(updated.score).toBe(92);
-    expect(dbInterview.save).toHaveBeenCalled();
-    expect(mockTransaction.commit).toHaveBeenCalled();
+    assert.strictEqual(updated.status, "COMPLETED");
+    assert.strictEqual(updated.score, 92);
+    assert.strictEqual(saved, true);
+    assert.strictEqual(committed, true);
   });
 
   it("updateInterview rejects invalid state transitions with 400 error", async () => {
@@ -124,22 +130,25 @@ describe("Interview Service", () => {
       studentId: 303,
       status: "COMPLETED",
     };
-    jest.spyOn(Interview, "findOne").mockResolvedValue(dbInterview);
+    Interview.findOne = async () => dbInterview;
 
-    await expect(
-      interviewService.updateInterview(303, 9, { status: "SCHEDULED" })
-    ).rejects.toMatchObject({
-      status: 400,
-      code: "INVALID_STATUS_TRANSITION",
-    });
-    expect(mockTransaction.rollback).toHaveBeenCalled();
+    await assert.rejects(
+      async () => {
+        await interviewService.updateInterview(303, 9, { status: "SCHEDULED" });
+      },
+      (err) => err.status === 400 && err.code === "INVALID_STATUS_TRANSITION"
+    );
+    assert.strictEqual(rolledBack, true);
   });
 
   it("getInterviewById throws 404 for non-existent interview", async () => {
-    jest.spyOn(Interview, "findOne").mockResolvedValue(null);
+    Interview.findOne = async () => null;
 
-    await expect(interviewService.getInterviewById(304, 99999)).rejects.toMatchObject({
-      status: 404,
-    });
+    await assert.rejects(
+      async () => {
+        await interviewService.getInterviewById(304, 99999);
+      },
+      (err) => err.status === 404
+    );
   });
 });
