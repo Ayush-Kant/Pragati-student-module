@@ -58,6 +58,12 @@ export const validateInterview = (req, res, next) => {
       .json(formatErrorResponse(`Invalid interview status: ${req.body.status}`, ERROR_CODES.VALIDATION_ERROR));
   }
 
+  if (req.body.score !== undefined && (typeof req.body.score !== "number" || req.body.score < 0 || req.body.score > 100)) {
+    return res
+      .status(400)
+      .json(formatErrorResponse("score must be a number between 0 and 100", ERROR_CODES.VALIDATION_ERROR));
+  }
+
   next();
 };
 

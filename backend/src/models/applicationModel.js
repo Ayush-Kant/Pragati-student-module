@@ -59,6 +59,7 @@ Application.init(
     timestamps: true,
     indexes: [
       {
+        name: "idx_job_applications_student_company_title",
         unique: true,
         fields: ["student_id", "company_name", "job_title"],
       },
