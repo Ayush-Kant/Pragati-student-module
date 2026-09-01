@@ -127,11 +127,14 @@ app.use("/api/v1/auth", authLimiter);
 app.use("/api/auth", authLimiter);
 app.use("/api", generalLimiter);
 
+import placementRoutes from "./src/routes/placementRoutes.js";
+
 // Routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
+app.use("/api/student/placement", placementRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
