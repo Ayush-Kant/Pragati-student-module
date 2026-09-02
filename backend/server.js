@@ -24,6 +24,7 @@ import adminCompanyRoutes from "./routes/admin.company.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import studentProfileRoutes from "./routes/studentProfile.routes.js";
+import studentAssessmentRoutes from "./routes/studentAssessment.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import collegeProfileRoutes from "./routes/collage.profile.routes.js";
@@ -111,6 +112,7 @@ app.use("/api/auth", authRouter);
 // Student
 app.use("/api/students", studentRoutes);
 app.use("/api/student/profile", studentProfileRoutes);
+app.use("/api/student/assessments", studentAssessmentRoutes);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 
@@ -218,10 +220,6 @@ connectDB()
   })
   .catch((err) => {
     console.error("⚠️ PostgreSQL connection failed:", err.message);
-    console.warn(
-      "Starting server without a database connection. Routes that require PostgreSQL will fail until the database is reachable.",
-    );
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on PORT : ${PORT} (database unavailable)`);
-    });
   });
+
+export default app;
