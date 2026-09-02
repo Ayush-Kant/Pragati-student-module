@@ -23,6 +23,7 @@ import adminCompanyRoutes from "./routes/admin.company.routes.js";
 // Standard & Role-Specific Routes
 import authRouter from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
+import studentProfileRoutes from "./routes/studentProfile.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import collegeProfileRoutes from "./routes/collage.profile.routes.js";
@@ -109,6 +110,7 @@ app.use("/api/auth", authRouter);
 
 // Student
 app.use("/api/students", studentRoutes);
+app.use("/api/student/profile", studentProfileRoutes);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 
