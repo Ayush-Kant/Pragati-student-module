@@ -1,44 +1,113 @@
-import { pool } from "../config/db.js";
+import { resolveStudentId } from "../utils/studentProfileIdentity.js";
+import * as studentProfileService from "../services/studentProfile.service.js";
 
-export const getStudentProfile = async (req, res) => {
+const sendProfile = async (req, res, operation) => {
+  const studentId = await resolveStudentId(req.user);
+  const profile = await operation(studentId);
+
+  if (!profile) {
+    return res.status(404).json({
+      success: false,
+      message: "Student profile not found",
+    });
+  }
+
+  return res.status(200).json({ success: true, data: profile });
+};
+
+export const getMyProfile = async (req, res, next) => {
   try {
-    const userId = req.user.userId;
-
-    const result = await pool.query(
-      `SELECT * FROM student_profile
-       WHERE user_id = (
-         SELECT users.id FROM users
-         INNER JOIN auth_users ON auth_users.id = users.auth_user_id
-         WHERE auth_users.uuid_id = $1
-       )`,
-      [userId]
-    );
-
-    return res.json(result.rows[0]);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return await sendProfile(req, res, (studentId) => studentProfileService.getMyProfile(studentId));
+  } catch (error) {
+    next(error);
   }
 };
 
-export const updateStudentProfile = async (req, res) => {
+export const updateMyProfile = async (req, res, next) => {
   try {
-    const userId = req.user.userId;
-    const { name, phone, city, department, cgpa, skills } = req.body;
+    return await sendProfile(req, res, (studentId) => studentProfileService.updateMyProfile(studentId, req.body));
+  } catch (error) {
+    next(error);
+  }
+};
 
-    const result = await pool.query(
-      `UPDATE student_profile
-       SET name=$1, phone=$2, city=$3, department=$4, cgpa=$5, skills=$6
-       WHERE user_id = (
-         SELECT users.id FROM users
-         INNER JOIN auth_users ON auth_users.id = users.auth_user_id
-         WHERE auth_users.uuid_id = $7
-       )
-       RETURNING *`,
-      [name, phone, city, department, cgpa, skills, userId]
+const updateSection = (section) => async (req, res, next) => {
+  try {
+    return await sendProfile(req, res, (studentId) =>
+      studentProfileService.updateMyProfile(studentId, { [section]: req.body }),
     );
+  } catch (error) {
+    next(error);
+  }
+};
 
-    return res.json(result.rows[0]);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+export const updatePersonal = updateSection("personal");
+export const updateContact = updateSection("contact");
+export const updateAcademic = updateSection("academic");
+
+export const updateSkills = async (req, res, next) => {
+  try {
+    return await sendProfile(req, res, (studentId) =>
+      studentProfileService.updateMyProfile(studentId, { skills: req.body }),
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateCertifications = async (req, res, next) => {
+  try {
+    return await sendProfile(req, res, (studentId) =>
+      studentProfileService.updateMyProfile(studentId, { certifications: req.body }),
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateSocial = updateSection("social");
+
+export const updateResume = async (req, res, next) => {
+  try {
+    return await sendProfile(req, res, (studentId) =>
+      studentProfileService.updateMyProfile(studentId, { resume: req.body }),
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteResume = async (req, res, next) => {
+  try {
+    return await sendProfile(req, res, (studentId) =>
+      studentProfileService.updateMyProfile(studentId, { resume: null }),
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateDocuments = async (req, res, next) => {
+  try {
+    return await sendProfile(req, res, (studentId) =>
+      studentProfileService.updateMyProfile(studentId, { documents: req.body }),
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCompleteness = async (req, res, next) => {
+  try {
+    const studentId = await resolveStudentId(req.user);
+    const result = await studentProfileService.getProfileCompleteness(studentId);
+
+    if (!result) {
+      return res.status(404).json({ success: false, message: "Student profile not found" });
+    }
+
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    next(error);
   }
 };
