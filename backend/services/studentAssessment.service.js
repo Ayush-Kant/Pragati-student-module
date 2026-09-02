@@ -103,13 +103,14 @@ const gradeAttempt = async (client, attemptId) => {
   }
 
   const assessmentRes = await client.query(
-    `SELECT total_marks FROM assessments a
+    `SELECT a.total_marks AS assessment_total_marks
+     FROM assessments a
      JOIN student_assessment_attempts sa ON sa.assessment_id = a.id
      WHERE sa.id = $1`,
     [attemptId],
   );
 
-  const assessmentTotal = Number(assessmentRes.rows[0]?.total_marks);
+  const assessmentTotal = Number(assessmentRes.rows[0]?.assessment_total_marks);
   const effectiveTotal = assessmentTotal > 0 ? assessmentTotal : totalMarks;
   const percentage = effectiveTotal > 0 ? Number(((score / effectiveTotal) * 100).toFixed(2)) : 0;
   const passed = percentage >= 40;
@@ -183,13 +184,10 @@ class StudentAssessmentService {
     );
 
     return {
+      ...assessment,
       id: `assess_${assessment.id}`,
-      title: assessment.title,
-      type: assessment.type,
-      difficulty: assessment.difficulty,
       timeLimitMinutes: Number(assessment.time_limit_minutes),
       totalMarks: Number(assessment.total_marks),
-      status: assessment.status,
       questions: questions.rows.map((question, index) => publicQuestion(question, index + 1)),
     };
   }
@@ -462,7 +460,7 @@ class StudentAssessmentService {
       expiresAt: row.expires_at,
       submittedAt: row.submitted_at,
       score: Number(row.score || 0),
-      totalMarks: Number(row.total_marks || row.time_limit_minutes || 0),
+      totalMarks: Number(row.total_marks || 0),
       percentage: Number(row.percentage || 0),
       passed: Boolean(row.passed),
       tabSwitchCount: Number(row.tab_switch_count || 0),
