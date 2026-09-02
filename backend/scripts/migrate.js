@@ -56,13 +56,13 @@ const migrationFiles = [
   "022_seed_college_modules.sql",
   "015_upgrade_announcements_saas_fields.sql",
   "024_create_student_profile_foundation.sql",
+  "025_create_student_assessment_engine.sql",
 ];
 
 async function runMigrationsFresh() {
   try {
     console.log("Dropping existing tables and types to start fresh...");
 
-    // 1. Dynamically fetch and drop all tables in the public schema.
     const { rows: tables } = await pool.query(`
       SELECT tablename
       FROM pg_tables
@@ -75,7 +75,6 @@ async function runMigrationsFresh() {
       console.log(`✔ Dropped ${tables.length} existing tables.`);
     }
 
-    // 2. Dynamically fetch and drop all custom types (like ENUMs) in the public schema.
     const { rows: types } = await pool.query(`
       SELECT t.typname
       FROM pg_type t
