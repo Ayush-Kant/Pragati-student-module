@@ -9,7 +9,6 @@ import toast from 'react-hot-toast';
 const RegisterPage = () => {
   const navigate = useNavigate();
 
-  // Track the currently selected role ('student', 'faculty', 'corporate')
   const [selectedRole, setSelectedRole] = useState('student');
 
   const [formData, setFormData] = useState({
@@ -21,6 +20,7 @@ const RegisterPage = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const rolesInfo = {
     student: {
@@ -39,7 +39,7 @@ const RegisterPage = () => {
       title: 'Campus / Faculty',
       description: 'Organise Competitions, Manage Placements, and structure academic benchmarks.',
       image: manager,
-      bgColor: 'bg-[#00a896]', 
+      bgColor: 'bg-[#00a896]',
       textColor: 'text-[#00a896]',
       borderColor: 'border-[#00a896]',
       focusRing: 'focus:ring-[#00a896]/20',
@@ -59,7 +59,7 @@ const RegisterPage = () => {
       lightBg: 'bg-[#EA580C]/10',
       footerText: "Collaborate with Uptoskills • Easy Talent Access & AI Tools."
     },
-    company : {
+    company: {
       title: 'Corporate',
       description: 'Speed up your hiring with AI Tools, interactive ATS, and global tracking.',
       image: mentor,
@@ -75,7 +75,6 @@ const RegisterPage = () => {
 
   const currentTheme = rolesInfo[selectedRole];
 
-  // Password Strength logic
   const getPasswordStrength = (password) => {
     if (!password) return { label: '', color: 'bg-slate-200', width: 'w-0' };
     let points = 0;
@@ -94,7 +93,9 @@ const RegisterPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
+    if (errors[name] || errors.apiError) {
+      setErrors((prev) => ({ ...prev, [name]: '', apiError: '' }));
+    }
   };
 
   const handleRoleChange = (role) => {
@@ -127,23 +128,32 @@ const RegisterPage = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-    } else {
-       const registerres = await registerApi(formData,selectedRole);
-       if(registerres.success){
+      return;
+    }
+
+    setSubmitting(true);
+    setErrors({});
+
+    try {
+      const registerres = await registerApi(formData, selectedRole);
+      if (registerres.success) {
         toast.success(registerres.message || 'Registration successful! Please log in.');
         navigate('/login');
-       }
-       else{        setErrors({ apiError: registerres.message || 'Registration failed' });
-       }
-
+      } else {
+        setErrors({ apiError: registerres.message || 'Registration failed' });
+      }
+    } catch (error) {
+      setErrors({
+        apiError: error?.response?.data?.message || error?.message || 'Registration failed',
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#FFFBF7] p-4 md:p-8 font-sans antialiased">
       <div className="max-w-4xl w-full bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col md:flex-row relative p-4 gap-4 border border-gray-100">
-        
-        {/* LEFT HAND SIDE */}
         <div className={`w-full md:w-[48%] ${currentTheme.bgColor} rounded-[24px] p-6 md:p-8 flex flex-col justify-between text-white transition-all duration-700 ease-in-out relative min-h-[490px] md:min-h-[540px]`}>
           <div className="text-2xl font-black tracking-tight bg-white/15 inline-block px-4 py-1.5 rounded-xl backdrop-blur-md border border-white/10 self-start shadow-sm">
             Uptoskills
@@ -168,7 +178,6 @@ const RegisterPage = () => {
           </div>
         </div>
 
-        {/* RIGHT HAND SIDE */}
         <div className={`w-full md:w-[52%] p-3 md:p-6 flex flex-col justify-center border-2 ${currentTheme.borderColor} rounded-[24px] transition-all duration-700 ease-in-out`}>
           <div className="w-full max-w-sm mx-auto space-y-5 my-auto">
             <div className="text-center space-y-1">
@@ -176,8 +185,7 @@ const RegisterPage = () => {
               <p className="text-sm text-gray-400 font-medium">Please enter your details to sign up</p>
             </div>
 
-            {/* Role Tabs */}
-            <div className={`grid grid-cols-3 gap-1 p-1 rounded-xl border transition-colors duration-500 ${currentTheme.lightBg} border-gray-100`}>
+            <div className={`grid grid-cols-4 gap-1 p-1 rounded-xl border transition-colors duration-500 ${currentTheme.lightBg} border-gray-100`}>
               {Object.keys(rolesInfo).map((role) => (
                 <button key={role} type="button" onClick={() => handleRoleChange(role)} className={`py-2 text-xs font-bold rounded-lg transition-all capitalize ${selectedRole === role ? `bg-white shadow-sm ${rolesInfo[role].textColor}` : 'text-gray-500 hover:text-gray-800'}`}>
                   {role}
@@ -186,14 +194,18 @@ const RegisterPage = () => {
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-              {/* Email */}
+              {errors.apiError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  {errors.apiError}
+                </div>
+              )}
+
               <div className="space-y-1">
                 <label htmlFor="email" className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">Email Address</label>
                 <input id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm ${errors.email ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 ${currentTheme.focusRing} ${currentTheme.focusBorder}`}`} />
                 {errors.email && <p className="text-xs text-red-500 font-medium pl-1 mt-0.5">{errors.email}</p>}
               </div>
 
-              {/* Password */}
               <div className="space-y-1">
                 <label htmlFor="password" className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">Password</label>
                 <div className="relative">
@@ -202,8 +214,6 @@ const RegisterPage = () => {
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
-
-                {/* Password Strength Indicator Bar */}
                 {formData.password && (
                   <div className="mt-1.5 space-y-1 px-1">
                     <div className="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
@@ -218,7 +228,6 @@ const RegisterPage = () => {
                 {errors.password && <p className="text-xs text-red-500 font-medium pl-1 mt-0.5">{errors.password}</p>}
               </div>
 
-              {/* Confirm Password */}
               <div className="space-y-1">
                 <label htmlFor="confirmPassword" className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">Confirm Password</label>
                 <div className="relative">
@@ -230,8 +239,8 @@ const RegisterPage = () => {
                 {errors.confirmPassword && <p className="text-xs text-red-500 font-medium pl-1 mt-0.5">{errors.confirmPassword}</p>}
               </div>
 
-              <button type="submit" className={`w-full mt-2 flex justify-center py-3 px-4 rounded-xl shadow-md text-sm font-bold text-white ${currentTheme.bgColor} opacity-90 hover:opacity-100 active:scale-[0.99] transition-all duration-500 outline-none`}>
-                Create Account
+              <button disabled={submitting} type="submit" className={`w-full mt-2 flex justify-center py-3 px-4 rounded-xl shadow-md text-sm font-bold text-white ${currentTheme.bgColor} opacity-90 hover:opacity-100 active:scale-[0.99] transition-all duration-500 outline-none disabled:cursor-not-allowed disabled:opacity-50`}>
+                {submitting ? 'Creating Account...' : 'Create Account'}
               </button>
             </form>
 
@@ -245,7 +254,6 @@ const RegisterPage = () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
