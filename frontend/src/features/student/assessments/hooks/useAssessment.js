@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getAssessmentById } from "../services/assessmentService";
 
 export const useAssessment = (id) => {
@@ -8,25 +8,33 @@ export const useAssessment = (id) => {
 
   useEffect(() => {
     let isMounted = true;
+
     if (!id) {
+      setAssessment(null);
+      setError("Assessment id is required");
       setLoading(false);
-      return;
+      return () => {
+        isMounted = false;
+      };
     }
 
-    setLoading(true);
-    setError(null);
-
-    getAssessmentById(id)
-      .then((data) => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getAssessmentById(id);
         if (isMounted) setAssessment(data);
-      })
-      .catch((err) => {
-        if (isMounted) setError(err.message);
-      })
-      .finally(() => {
+      } catch (err) {
+        if (isMounted) {
+          setError(err?.response?.data?.message || err?.message || "Failed to load assessment");
+          setAssessment(null);
+        }
+      } finally {
         if (isMounted) setLoading(false);
-      });
+      }
+    };
 
+    load();
     return () => {
       isMounted = false;
     };
