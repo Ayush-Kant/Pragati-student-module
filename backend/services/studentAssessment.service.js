@@ -32,25 +32,22 @@ const publicQuestion = (question, order) => ({
 
 const getEligibleAssessment = async (client, assessmentId, studentId) => {
   const result = await client.query(
-    `SELECT DISTINCT a.*
+    `SELECT a.*
      FROM assessments a
-     LEFT JOIN assessment_assignments aa ON aa.assessment_id = a.id
-     LEFT JOIN recruitment_drives rd ON rd.id = aa.drive_id
      WHERE a.id = $1
        AND a.status = 'active'
        AND (
-         aa.id IS NULL
-         OR EXISTS (
+         NOT EXISTS (
            SELECT 1
-           FROM nominations n
-           WHERE n.drive_id = aa.drive_id
-             AND n.student_id = $2
+           FROM assessment_assignments aa
+           WHERE aa.assessment_id = a.id
          )
          OR EXISTS (
            SELECT 1
-           FROM recruitment_drives rdx
-           WHERE rdx.id = aa.drive_id
-             AND rdx.student_id = $2
+           FROM assessment_assignments aa
+           JOIN student_drive_progress sdp ON sdp.drive_id = aa.drive_id
+           WHERE aa.assessment_id = a.id
+             AND sdp.student_id = $2
          )
        )
      LIMIT 1`,
@@ -123,7 +120,7 @@ const gradeAttempt = async (client, attemptId) => {
 class StudentAssessmentService {
   async listAssessments(studentId) {
     const result = await pool.query(
-      `SELECT DISTINCT
+      `SELECT
          a.id,
          a.title,
          a.type,
@@ -131,15 +128,33 @@ class StudentAssessmentService {
          a.time_limit_minutes AS "timeLimitMinutes",
          a.total_marks AS "totalMarks",
          a.status,
-         COUNT(DISTINCT aq.id)::INTEGER AS "questionsCount",
-         COALESCE(MAX(saa.attempt_number), 0)::INTEGER AS "attemptsUsed"
+         (
+           SELECT COUNT(*)::INTEGER
+           FROM assessment_questions aq
+           WHERE aq.assessment_id = a.id
+         ) AS "questionsCount",
+         (
+           SELECT COALESCE(MAX(saa.attempt_number), 0)::INTEGER
+           FROM student_assessment_attempts saa
+           WHERE saa.assessment_id = a.id
+             AND saa.student_id = $1
+         ) AS "attemptsUsed"
        FROM assessments a
-       LEFT JOIN assessment_assignments aa ON aa.assessment_id = a.id
-       LEFT JOIN assessment_questions aq ON aq.assessment_id = a.id
-       LEFT JOIN student_assessment_attempts saa
-         ON saa.assessment_id = a.id AND saa.student_id = $1
        WHERE a.status = 'active'
-       GROUP BY a.id
+         AND (
+           NOT EXISTS (
+             SELECT 1
+             FROM assessment_assignments aa0
+             WHERE aa0.assessment_id = a.id
+           )
+           OR EXISTS (
+             SELECT 1
+             FROM assessment_assignments aa0
+             JOIN student_drive_progress sdp ON sdp.drive_id = aa0.drive_id
+             WHERE aa0.assessment_id = a.id
+               AND sdp.student_id = $1
+           )
+         )
        ORDER BY a.created_at DESC`,
       [studentId],
     );
@@ -148,27 +163,16 @@ class StudentAssessmentService {
       ...row,
       id: `assess_${row.id}`,
       totalMarks: Number(row.totalMarks),
+      questionsCount: Number(row.questionsCount),
+      attemptsUsed: Number(row.attemptsUsed),
     }));
   }
 
   async getAssessment(studentId, assessmentIdValue) {
     const assessmentId = parseAssessmentId(assessmentIdValue);
+    const assessment = await getEligibleAssessment(pool, assessmentId, studentId);
 
-    const assessment = await pool.query(
-      `SELECT
-         a.id,
-         a.title,
-         a.type,
-         a.difficulty,
-         a.time_limit_minutes AS "timeLimitMinutes",
-         a.total_marks AS "totalMarks",
-         a.status
-       FROM assessments a
-       WHERE a.id = $1 AND a.status = 'active'`,
-      [assessmentId],
-    );
-
-    if (!assessment.rows[0]) return null;
+    if (!assessment) return null;
 
     const questions = await pool.query(
       `SELECT aq.*
@@ -179,9 +183,13 @@ class StudentAssessmentService {
     );
 
     return {
-      ...assessment.rows[0],
-      id: `assess_${assessment.rows[0].id}`,
-      totalMarks: Number(assessment.rows[0].totalMarks),
+      id: `assess_${assessment.id}`,
+      title: assessment.title,
+      type: assessment.type,
+      difficulty: assessment.difficulty,
+      timeLimitMinutes: Number(assessment.time_limit_minutes),
+      totalMarks: Number(assessment.total_marks),
+      status: assessment.status,
       questions: questions.rows.map((question, index) => publicQuestion(question, index + 1)),
     };
   }
