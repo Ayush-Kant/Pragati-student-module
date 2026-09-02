@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { getAssessments } from "../services/assessmentService";
 
+const normalizeAssessment = (assessment) => ({
+  ...assessment,
+  category: assessment?.type,
+  description: assessment?.description || `${assessment?.type || "Assessment"} assessment at ${assessment?.difficulty || "standard"} difficulty.`,
+  durationMinutes: assessment?.timeLimitMinutes,
+  totalQuestions: assessment?.questionsCount,
+});
+
 export const useAssessments = () => {
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +28,7 @@ export const useAssessments = () => {
             ? response.assessments
             : [];
 
-        if (isMounted) setAssessments(list);
+        if (isMounted) setAssessments(list.map(normalizeAssessment));
       } catch (err) {
         if (isMounted) {
           setError(err?.response?.data?.message || err?.message || "Failed to load assessments");
