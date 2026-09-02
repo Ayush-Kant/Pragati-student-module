@@ -57,6 +57,7 @@ const migrationFiles = [
   "015_upgrade_announcements_saas_fields.sql",
   "024_create_student_profile_foundation.sql",
   "025_create_student_assessment_engine.sql",
+  "026_seed_student_assessment_demo.sql",
 ];
 
 async function runMigrationsFresh() {
@@ -70,7 +71,7 @@ async function runMigrationsFresh() {
     `);
 
     if (tables.length > 0) {
-      const tableNames = tables.map((t) => `"${t.tablename}"`).join(", ");
+      const tableNames = tables.map((t) => `\"${t.tablename}\"`).join(", ");
       await pool.query(`DROP TABLE IF EXISTS ${tableNames} CASCADE;`);
       console.log(`✔ Dropped ${tables.length} existing tables.`);
     }
@@ -84,7 +85,7 @@ async function runMigrationsFresh() {
     `);
 
     if (types.length > 0) {
-      const typeNames = types.map((t) => `"${t.typname}"`).join(", ");
+      const typeNames = types.map((t) => `\"${t.typname}\"`).join(", ");
       await pool.query(`DROP TYPE IF EXISTS ${typeNames} CASCADE;`);
       console.log(`✔ Dropped ${types.length} existing custom types.`);
     }
