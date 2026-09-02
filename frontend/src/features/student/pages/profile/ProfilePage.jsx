@@ -110,7 +110,7 @@ const ProfilePage = () => {
 
     try {
       const response = await studentProfileService.getMyProfile();
-      setProfile(response?.data || EMPTY_PROFILE);
+      setProfile(response || EMPTY_PROFILE);
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, "Unable to load your profile."));
     } finally {
@@ -129,7 +129,7 @@ const ProfilePage = () => {
 
     try {
       const response = await studentProfileService.updateProfile(payload);
-      setProfile(response?.data || EMPTY_PROFILE);
+      setProfile(response || EMPTY_PROFILE);
       setIsEditing(false);
       setSuccess("Profile updated successfully.");
     } catch (requestError) {
