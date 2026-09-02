@@ -1,64 +1,54 @@
 import api from "../../../services/api";
 
+const unwrap = (response) => response?.data?.data ?? response?.data ?? null;
+
 const studentProfileService = {
   async getMyProfile() {
-    const { data } = await api.get("/student/profile");
-    return data;
+    return unwrap(await api.get("/student/profile"));
   },
 
   async updateProfile(profile) {
-    const { data } = await api.put("/student/profile", profile);
-    return data;
+    return unwrap(await api.put("/student/profile", profile));
   },
 
   async getCompleteness() {
-    const { data } = await api.get("/student/profile/completeness");
-    return data;
+    return unwrap(await api.get("/student/profile/completeness"));
   },
 
   async updatePersonal(personal) {
-    const { data } = await api.patch("/student/profile/personal", personal);
-    return data;
+    return unwrap(await api.patch("/student/profile/personal", personal));
   },
 
   async updateContact(contact) {
-    const { data } = await api.patch("/student/profile/contact", contact);
-    return data;
+    return unwrap(await api.patch("/student/profile/contact", contact));
   },
 
   async updateAcademic(academic) {
-    const { data } = await api.patch("/student/profile/academic", academic);
-    return data;
+    return unwrap(await api.patch("/student/profile/academic", academic));
   },
 
   async updateSkills(skills) {
-    const { data } = await api.put("/student/profile/skills", skills);
-    return data;
+    return unwrap(await api.put("/student/profile/skills", skills));
   },
 
   async updateCertifications(certifications) {
-    const { data } = await api.put("/student/profile/certifications", certifications);
-    return data;
+    return unwrap(await api.put("/student/profile/certifications", certifications));
   },
 
   async updateSocial(social) {
-    const { data } = await api.patch("/student/profile/social", social);
-    return data;
+    return unwrap(await api.patch("/student/profile/social", social));
   },
 
   async updateResume(resume) {
-    const { data } = await api.put("/student/profile/resume", resume);
-    return data;
+    return unwrap(await api.put("/student/profile/resume", resume));
   },
 
   async deleteResume() {
-    const { data } = await api.delete("/student/profile/resume");
-    return data;
+    return unwrap(await api.delete("/student/profile/resume"));
   },
 
   async updateDocuments(documents) {
-    const { data } = await api.put("/student/profile/documents", documents);
-    return data;
+    return unwrap(await api.put("/student/profile/documents", documents));
   },
 };
 
