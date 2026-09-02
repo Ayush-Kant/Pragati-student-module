@@ -11,13 +11,7 @@ dns.setDefaultResultOrder("ipv4first");
 // Use absolute path so .env is found regardless of the working directory
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
-const { Pool, types } = pg;
-
-// PostgreSQL DATE values represent calendar dates, not instants in time.
-// Keep them as YYYY-MM-DD strings so API responses do not shift the date
-// when JavaScript/UTC serialization is applied (for example, a birth date
-// of 2003-05-15 must remain 2003-05-15 in every timezone).
-types.setTypeParser(1082, (value) => value);
+const { Pool } = pg;
 
 const connectionString = process.env.POSTGRESQL_URI;
 
