@@ -29,7 +29,9 @@ const profileSelect = `
     s.id, s.user_id, s.college_id, s.name, s.email, s.phone, s.enrollment_no,
     s.department, s.course, s.semester, s.batch, s.cgpa, s.address, s.linkedin,
     s.github, s.resume_status, s.profile_image,
-    sp.bio, sp.gender, sp.date_of_birth, sp.avatar_url, sp.address_line1,
+    sp.bio, sp.gender,
+    TO_CHAR(sp.date_of_birth, 'YYYY-MM-DD') AS date_of_birth,
+    sp.avatar_url, sp.address_line1,
     sp.address_line2, sp.city, sp.state, sp.country, sp.pincode,
     sp.alternate_phone, sp.alternate_email, sp.profile_completeness,
     sp.created_at AS profile_created_at, sp.updated_at AS profile_updated_at,
@@ -65,7 +67,9 @@ const hydrate = async (studentId, client = pool) => {
       [studentId],
     ),
     client.query(
-      `SELECT id, name, issuing_organization, issue_date, expiry_date,
+      `SELECT id, name, issuing_organization,
+              TO_CHAR(issue_date, 'YYYY-MM-DD') AS issue_date,
+              TO_CHAR(expiry_date, 'YYYY-MM-DD') AS expiry_date,
               credential_id, credential_url, created_at, updated_at
        FROM student_certifications
        WHERE student_id = $1
