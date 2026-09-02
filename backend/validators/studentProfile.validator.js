@@ -6,9 +6,19 @@ const optionalEmail = (value) =>
 const optionalUrl = (value) =>
   value === null || value === undefined ||
   (typeof value === "string" && /^https?:\/\/\S+$/i.test(value));
-const optionalDate = (value) =>
-  value === null || value === undefined ||
-  (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value));
+const optionalDate = (value) => {
+  if (value === null || value === undefined) return true;
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+};
 const optionalPhone = (value) =>
   value === null || value === undefined ||
   (typeof value === "string" && /^[0-9+()\-\s]{7,20}$/.test(value));
@@ -28,7 +38,7 @@ const validatePersonal = (personal) => {
   if (!isPlainObject(personal)) throw fail("personal must be an object");
   if (!optionalString(personal.name, 150)) throw fail("personal.name must be a valid string");
   if (!optionalPhone(personal.phone)) throw fail("personal.phone must be a valid phone number");
-  if (!optionalDate(personal.dateOfBirth)) throw fail("personal.dateOfBirth must use YYYY-MM-DD format");
+  if (!optionalDate(personal.dateOfBirth)) throw fail("personal.dateOfBirth must use a valid YYYY-MM-DD date");
   for (const [field, max] of [["bio", 2000], ["gender", 30], ["avatarUrl", 1000], ["profileImage", 1000]]) {
     if (!optionalString(personal[field], max)) throw fail(`personal.${field} is invalid`);
   }
@@ -101,7 +111,7 @@ const validateCertifications = (certifications) => {
       if (!optionalString(item[field], max)) throw fail(`certifications[${index}].${field} is invalid`);
     }
     if (!optionalDate(item.issueDate) || !optionalDate(item.expiryDate)) {
-      throw fail(`certifications[${index}] dates must use YYYY-MM-DD format`);
+      throw fail(`certifications[${index}] dates must use valid YYYY-MM-DD dates`);
     }
     if (!optionalUrl(item.credentialUrl)) throw fail(`certifications[${index}].credentialUrl is invalid`);
   });
