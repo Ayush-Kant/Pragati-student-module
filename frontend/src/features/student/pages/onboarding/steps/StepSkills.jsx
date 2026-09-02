@@ -1,11 +1,13 @@
-// StepSkills.jsx
-// Purpose: Onboarding Step 3 with a tag-based skill selector for the student to declare competencies (SM-01)
+import SkillTagSelector from "../../../components/profile/SkillTagSelector";
 
-const StepSkills = () => {
+const StepSkills = ({ skills = [], onChange }) => {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800">StepSkills</h1>
-      <p className="text-gray-500 mt-2">Onboarding Step 3 with a tag-based skill selector for the student to declare competencies (SM-01)</p>
+    <div className="space-y-5">
+      <div>
+        <h3 className="text-sm font-semibold text-slate-700">What are you comfortable working with?</h3>
+        <p className="text-xs text-slate-400 mt-1">Add a few technologies, tools, or competencies. You can change these later from your profile.</p>
+      </div>
+      <SkillTagSelector skills={skills} onChange={onChange} />
     </div>
   );
 };
