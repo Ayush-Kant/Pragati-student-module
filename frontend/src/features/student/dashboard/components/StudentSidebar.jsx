@@ -1,13 +1,11 @@
 import React from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export default function StudentSidebar({ isOpen, onClose }) {
-  const location = useLocation();
-
   const navGroups = [
     {
       title: null,
-      links: [{ to: "/student/dashboard", label: "Dashboard", icon: "📊" }]
+      links: [{ to: "/student/dashboard", label: "Dashboard", icon: "📊" }],
     },
     {
       title: "LEARN",
@@ -15,26 +13,26 @@ export default function StudentSidebar({ isOpen, onClose }) {
         { to: "/student/courses", label: "Courses", icon: "📚" },
         { to: "/student/sessions", label: "Live Sessions", icon: "🎥" },
         { to: "/student/assignments", label: "Assignments", icon: "📝" },
-        { to: "/student/quizzes", label: "Assessments", icon: "✍️" },
+        { to: "/student/assessments", label: "Assessments", icon: "✍️" },
         { to: "/student/coding-challenges", label: "Coding Challenges", icon: "💻" },
-        { to: "/student/projects", label: "Projects", icon: "🚀" }
-      ]
+        { to: "/student/projects", label: "Projects", icon: "🚀" },
+      ],
     },
     {
       title: "CAREER",
       links: [
         { to: "/student/performance", label: "Performance", icon: "📈" },
-        { to: "/student/interviews", label: "Interviews", icon: "💼" }
-      ]
+        { to: "/student/interviews", label: "Interviews", icon: "💼" },
+      ],
     },
     {
       title: "ACCOUNT",
       links: [
         { to: "/student/profile", label: "Profile", icon: "👤" },
         { to: "/student/notifications", label: "Notifications", icon: "🔔" },
-        { to: "/student/certificates", label: "Certificates", icon: "📜" }
-      ]
-    }
+        { to: "/student/certificates", label: "Certificates", icon: "📜" },
+      ],
+    },
   ];
 
   return (
@@ -59,24 +57,24 @@ export default function StudentSidebar({ isOpen, onClose }) {
                   {group.title}
                 </p>
               )}
-              {group.links.map((link) => {
-                const isActive = location.pathname.startsWith(link.to);
-                return (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    onClick={onClose}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
+
+              {group.links.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
                       isActive
                         ? "bg-blue-50 text-blue-700 font-semibold"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    }`}
-                  >
-                    <span>{link.icon}</span>
-                    <span>{link.label}</span>
-                  </NavLink>
-                );
-              })}
+                    }`
+                  }
+                >
+                  <span>{link.icon}</span>
+                  <span>{link.label}</span>
+                </NavLink>
+              ))}
             </div>
           ))}
         </div>
