@@ -1,7 +1,7 @@
 import { pool } from "../config/db.js";
 
-const valuesFromUser = (user) =>
-  [...new Set([user?.userId, user?.uid, user?.authUserId, user?.id].filter(Boolean).map(String))];
+const uniqueStrings = (values) =>
+  [...new Set(values.filter((value) => value !== undefined && value !== null && value !== "").map(String))];
 
 export const resolveStudentId = async (user) => {
   if (!user) {
@@ -10,46 +10,56 @@ export const resolveStudentId = async (user) => {
     throw error;
   }
 
-  const values = valuesFromUser(user);
-
-  for (const value of values) {
-    if (!/^\d+$/.test(value)) continue;
-
-    const directStudent = await pool.query(
-      "SELECT id FROM students WHERE id = $1 LIMIT 1",
-      [Number(value)],
-    );
-
-    if (directStudent.rows[0]) return directStudent.rows[0].id;
-  }
-
-  for (const value of values) {
-    const authLinkedStudent = await pool.query(
+  // auth.controller.js issues JWTs with:
+  // - userId: auth_users.uuid_id
+  // - authUserId: auth_users.id
+  // - id / uid: users.id
+  // Resolve through the canonical auth -> users -> students relationship.
+  if (user.userId) {
+    const byUuid = await pool.query(
       `SELECT s.id
        FROM auth_users au
-       INNER JOIN users u ON u.email = au.email
+       INNER JOIN users u ON u.auth_user_id = au.id
        INNER JOIN students s ON LOWER(s.email) = LOWER(u.email)
        WHERE au.uuid_id::text = $1
        LIMIT 1`,
-      [value],
+      [String(user.userId)],
     );
 
-    if (authLinkedStudent.rows[0]) return authLinkedStudent.rows[0].id;
+    if (byUuid.rows[0]) return byUuid.rows[0].id;
   }
 
-  for (const value of values) {
-    if (!/^\d+$/.test(value)) continue;
+  const authUserIds = uniqueStrings([user.authUserId]);
+  for (const authUserId of authUserIds) {
+    if (!/^\d+$/.test(authUserId)) continue;
 
-    const userLinkedStudent = await pool.query(
+    const byAuthId = await pool.query(
+      `SELECT s.id
+       FROM auth_users au
+       INNER JOIN users u ON u.auth_user_id = au.id
+       INNER JOIN students s ON LOWER(s.email) = LOWER(u.email)
+       WHERE au.id = $1
+       LIMIT 1`,
+      [Number(authUserId)],
+    );
+
+    if (byAuthId.rows[0]) return byAuthId.rows[0].id;
+  }
+
+  const userIds = uniqueStrings([user.id, user.uid]);
+  for (const userId of userIds) {
+    if (!/^\d+$/.test(userId)) continue;
+
+    const byUserId = await pool.query(
       `SELECT s.id
        FROM users u
        INNER JOIN students s ON LOWER(s.email) = LOWER(u.email)
        WHERE u.id = $1
        LIMIT 1`,
-      [Number(value)],
+      [Number(userId)],
     );
 
-    if (userLinkedStudent.rows[0]) return userLinkedStudent.rows[0].id;
+    if (byUserId.rows[0]) return byUserId.rows[0].id;
   }
 
   const error = new Error("Student account is not linked to a student profile");
