@@ -20,14 +20,16 @@ export default function AssessmentResultPage() {
   if (error || !result) return <ErrorState message={error || "Result unavailable"} />;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="mx-auto w-full max-w-5xl space-y-6 p-4 sm:p-6">
       <ScoreCard
         score={result.score}
         totalMarks={result.totalMarks}
         percentage={result.percentage}
+        passed={result.passed}
+        title={result.title || "Assessment Completed"}
       />
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid gap-6 md:grid-cols-2">
         <ResultSummary result={result} />
         <PerformanceChart percentage={result.percentage} />
       </div>
@@ -38,15 +40,13 @@ export default function AssessmentResultPage() {
 
       <button
         onClick={() => navigate("/student/assessments")}
-        className="w-full bg-gray-900 text-white font-bold py-3 rounded-lg hover:bg-gray-800 transition"
+        className="w-full rounded-xl bg-gray-900 py-3.5 font-bold text-white transition hover:bg-gray-800"
       >
         Back to Assessments
       </button>
 
       {assessmentId && (
-        <p className="text-center text-xs text-gray-400">
-          Assessment: {assessmentId}
-        </p>
+        <p className="text-center text-xs text-gray-400">Assessment: {assessmentId}</p>
       )}
     </div>
   );
