@@ -1,50 +1,82 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { recordTabSwitch, saveAssessmentAnswer } from "../services/assessmentService";
 
-export const useAssessmentAttempt = (assessment, onSubmit) => {
+const getInitialTimeLeft = (attempt) => {
+  if (!attempt?.expiresAt) return 0;
+  return Math.max(0, Math.floor((new Date(attempt.expiresAt).getTime() - Date.now()) / 1000));
+};
+
+export const useAssessmentAttempt = ({ assessment, attempt, onSubmit }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [answers, setAnswers] = useState(() => attempt?.answers || {});
+  const [timeLeft, setTimeLeft] = useState(() => getInitialTimeLeft(attempt));
+  const [savingQuestionId, setSavingQuestionId] = useState(null);
 
   const answersRef = useRef(answers);
+  const submittingRef = useRef(false);
   answersRef.current = answers;
 
-  const onSubmitRef = useRef(onSubmit);
-  onSubmitRef.current = onSubmit;
+  const submitTest = useCallback(
+    async (reason = "submitted") => {
+      if (submittingRef.current) return;
+      submittingRef.current = true;
+      try {
+        await onSubmit?.(answersRef.current, reason);
+      } finally {
+        submittingRef.current = false;
+      }
+    },
+    [onSubmit],
+  );
 
-  // Synchronize timeLeft when assessment loads asynchronously
   useEffect(() => {
-    if (assessment?.durationMinutes) {
-      setTimeLeft(assessment.durationMinutes * 60);
-    }
-  }, [assessment?.durationMinutes]);
+    setAnswers(attempt?.answers || {});
+    setCurrentIndex(0);
+    setTimeLeft(getInitialTimeLeft(attempt));
+  }, [attempt]);
 
-  const handleSelectAnswer = (optionIndex) => {
-    setAnswers((prev) => ({ ...prev, [currentIndex]: optionIndex }));
-  };
-
-  const submitTest = useCallback(() => {
-    if (typeof onSubmitRef.current === "function") {
-      onSubmitRef.current(answersRef.current);
-    }
-  }, []);
-
-  // Timer effect starts correctly when timeLeft becomes > 0
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    if (!attempt?.expiresAt || !attempt?.attemptId) return undefined;
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          submitTest();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const tick = () => {
+      const remaining = getInitialTimeLeft(attempt);
+      setTimeLeft(remaining);
+      if (remaining <= 0) {
+        void submitTest("timeout");
+      }
+    };
 
-    return () => clearInterval(timer);
-  }, [timeLeft > 0, submitTest]);
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
+  }, [attempt, submitTest]);
+
+  useEffect(() => {
+    if (!attempt?.attemptId) return undefined;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") return;
+      void recordTabSwitch(attempt.attemptId).catch(() => undefined);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [attempt?.attemptId]);
+
+  const handleSelectAnswer = useCallback(
+    (optionIndex) => {
+      const question = assessment?.questions?.[currentIndex];
+      if (!question || !attempt?.attemptId) return;
+
+      const answer = { optionIndex };
+      setAnswers((prev) => ({ ...prev, [currentIndex]: answer }));
+      setSavingQuestionId(question.id);
+      void saveAssessmentAnswer(attempt.attemptId, question.id, answer)
+        .catch(() => undefined)
+        .finally(() => setSavingQuestionId(null));
+    },
+    [assessment, attempt?.attemptId, currentIndex],
+  );
 
   return {
     currentIndex,
@@ -52,6 +84,7 @@ export const useAssessmentAttempt = (assessment, onSubmit) => {
     answers,
     handleSelectAnswer,
     timeLeft,
-    submitTest
+    submitTest,
+    savingQuestionId,
   };
 };
