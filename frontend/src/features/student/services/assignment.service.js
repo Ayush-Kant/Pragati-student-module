@@ -19,6 +19,11 @@ export const getAssignmentSubmission = async (id) => {
   return unwrap(response);
 };
 
+export const getAssignmentSubmissions = async () => {
+  const response = await api.get('/assignments/submissions');
+  return unwrap(response);
+};
+
 export const submitAssignment = async (id, payload) => {
   const response = await api.post(`/assignments/${id}/submit`, payload);
   return unwrap(response);
