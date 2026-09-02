@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, Route } from "react-router-dom";
 import PrivateRoute from "../../../routes/PrivateRoute";
+import StudentLayout from "../layout/StudentLayout";
 import DashboardPage from "../dashboard/pages/DashboardPage";
 
 import VerificationPage from "../pages/public/VerificationPage";
@@ -48,7 +49,7 @@ const studentRoute = (
     <Route path="verify/:code" element={<VerificationPage />} />
 
     <Route element={<PrivateRoute />}>
-      <Route path="student">
+      <Route path="student" element={<StudentLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="onboarding" element={<OnboardingWizard />} />
