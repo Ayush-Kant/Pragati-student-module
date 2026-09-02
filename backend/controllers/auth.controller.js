@@ -21,7 +21,7 @@ export const login = async (req, res) => {
       `SELECT a.id AS auth_user_id, a.uuid_id, a.email, a.role, a.password_hash, u.id AS user_id
        FROM auth_users a
        LEFT JOIN users u ON u.auth_user_id = a.id
-       WHERE a.email = $1`,
+       WHERE LOWER(a.email) = LOWER($1)`,
       [email],
     );
 
@@ -43,7 +43,7 @@ export const login = async (req, res) => {
       });
     }
 
-    // Comprehensive JWT Payload matching your present ecosystem
+    // Comprehensive JWT Payload matching the present ecosystem
     const token = jwt.sign(
       {
         id: user.user_id,
@@ -91,9 +91,11 @@ export const register = async (req, res) => {
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     const existing = await pool.query(
-      `SELECT id FROM auth_users WHERE email = $1`,
-      [email],
+      `SELECT id FROM auth_users WHERE LOWER(email) = LOWER($1)`,
+      [normalizedEmail],
     );
 
     if (existing.rows.length) {
@@ -120,7 +122,7 @@ export const register = async (req, res) => {
         `INSERT INTO auth_users (email, password_hash, role, uuid_id)
          VALUES ($1, $2, $3, $4)
          RETURNING id`,
-        [email, passwordHash, role, uuid],
+        [normalizedEmail, passwordHash, role, uuid],
       );
       authUserId = authUserResult.rows[0].id;
 
@@ -129,12 +131,23 @@ export const register = async (req, res) => {
         `INSERT INTO users (auth_user_id, email, role, created_at, phone, username)
          VALUES ($1, $2, $3, NOW(), NULL, $4)
          RETURNING id`,
-        [authUserId, email, role, email.split("@")[0]],
+        [authUserId, normalizedEmail, role, normalizedEmail.split("@")[0]],
       );
       userId = userResult.rows[0].id;
 
-      // 3. Role-specific table insertions
-      if (role === "mentor") {
+      // 3. Create the canonical students row for student accounts.
+      // The student profile module extends this row rather than creating a
+      // second student identity system. Name is intentionally a placeholder
+      // until the student fills their profile.
+      if (role === "student") {
+        await client.query(
+          `INSERT INTO students (user_id, name, email, status)
+           VALUES ($1, $2, $3, 'pending')
+           ON CONFLICT (email) DO UPDATE
+           SET user_id = EXCLUDED.user_id`,
+          [userId, normalizedEmail.split("@")[0], normalizedEmail],
+        );
+      } else if (role === "mentor") {
         await client.query(`INSERT INTO mentors (user_id) VALUES ($1)`, [
           userId,
         ]);
@@ -143,7 +156,7 @@ export const register = async (req, res) => {
           `INSERT INTO companies (user_id, name, email)
            VALUES ($1, $2, $3)
            RETURNING id`,
-          [userId, `${email.split("@")[0]} Corporate`, email],
+          [userId, `${normalizedEmail.split("@")[0]} Corporate`, normalizedEmail],
         );
         companyId = companyResult.rows[0].id;
       }
@@ -151,9 +164,9 @@ export const register = async (req, res) => {
       await client.query("COMMIT");
     } catch (err) {
       await client.query("ROLLBACK");
-      throw err; // Pass to outer catch block
+      throw err;
     } finally {
-      client.release(); // Crucial: Prevents connection pool leaks
+      client.release();
     }
 
     // Generate Token
@@ -163,9 +176,9 @@ export const register = async (req, res) => {
         uid: userId,
         userId: uuid,
         authUserId: authUserId,
-        email,
+        email: normalizedEmail,
         role,
-        companyId, // Null if not a company
+        companyId,
       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
