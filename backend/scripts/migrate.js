@@ -11,7 +11,8 @@ const __dirname = path.dirname(__filename);
 
 const migrationsDir = path.join(__dirname, "../migrations");
 
-// Hardcoded execution order based on your dependencies
+// Hardcoded execution order based on the repository's current dependency graph.
+// New migrations must be appended only after their prerequisites exist.
 const migrationFiles = [
   "001_create_users_mentors.sql",
   "002_create_content_tables.sql",
@@ -54,14 +55,15 @@ const migrationFiles = [
   "021_fix_drive_data_redundancy.sql",
   "021_update_interviews_table.sql",
   "022_seed_college_modules.sql",
-  "015_upgrade_announcements_saas_fields.sql"
+  "015_upgrade_announcements_saas_fields.sql",
+  "024_create_student_profile_foundation.sql",
 ];
 
 async function runMigrationsFresh() {
   try {
     console.log("Dropping existing tables and types to start fresh...");
 
-    // 1. Dynamically fetch and drop all tables in the public schema
+    // 1. Dynamically fetch and drop all tables in the public schema.
     const { rows: tables } = await pool.query(`
       SELECT tablename
       FROM pg_tables
@@ -74,13 +76,13 @@ async function runMigrationsFresh() {
       console.log(`✔ Dropped ${tables.length} existing tables.`);
     }
 
-    // 2. Dynamically fetch and drop all custom types (like ENUMs) in the public schema
+    // 2. Dynamically fetch and drop all custom types (like ENUMs) in the public schema.
     const { rows: types } = await pool.query(`
       SELECT t.typname
       FROM pg_type t
       JOIN pg_namespace n ON t.typnamespace = n.oid
       WHERE n.nspname = 'public'
-        AND t.typtype = 'e'; -- 'e' stands for enum
+        AND t.typtype = 'e';
     `);
 
     if (types.length > 0) {
@@ -92,7 +94,7 @@ async function runMigrationsFresh() {
     console.log("Database clean slate ready.");
   } catch (error) {
     console.error("❌ Failed to drop existing database objects:", error);
-    throw error; // Halt execution if we can't get a clean slate
+    throw error;
   }
 }
 
@@ -193,9 +195,7 @@ function splitSqlStatements(sql) {
 
     if (char === ";") {
       const statement = current.trim();
-      if (statement) {
-        statements.push(statement);
-      }
+      if (statement) statements.push(statement);
       current = "";
       continue;
     }
@@ -204,9 +204,7 @@ function splitSqlStatements(sql) {
   }
 
   const tail = current.trim();
-  if (tail) {
-    statements.push(tail);
-  }
+  if (tail) statements.push(tail);
 
   return statements;
 }
@@ -224,7 +222,6 @@ async function runMigrations() {
     for (const file of migrationFiles) {
       const filePath = path.join(migrationsDir, file);
 
-      // Check if file exists before trying to read it
       if (!fs.existsSync(filePath)) {
         throw new Error(`File not found: ${filePath}`);
       }
@@ -240,7 +237,7 @@ async function runMigrations() {
         } catch (statementError) {
           console.error(`\n❌ Error executing a statement in file: ${file}`);
           console.error(`SQL Snippet: \n${statement.substring(0, 150)}...\n`);
-          throw statementError; // Send to main catch block
+          throw statementError;
         }
       }
 
@@ -264,7 +261,6 @@ async function runMigrations() {
   }
 }
 
-// Execute Sequence
 (async () => {
   try {
     await runMigrationsFresh();
