@@ -1,107 +1,47 @@
 import { pool } from "../config/db.js";
 
-const toNullable = (value) => {
+const has = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+
+const nullable = (value) => {
   if (value === undefined) return undefined;
   if (value === null) return null;
-  if (typeof value === "string" && value.trim() === "") return null;
-  return value;
+  return typeof value === "string" && value.trim() === "" ? null : value;
 };
 
-const parseInteger = (value) => {
-  if (value === undefined || value === null || value === "") return null;
+const integerValue = (value) => {
+  if (value === undefined) return undefined;
+  if (value === null || value === "") return null;
   const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) ? parsed : null;
+  if (!Number.isFinite(parsed)) throw new Error("Invalid integer value");
+  return parsed;
 };
 
-const parseDecimal = (value) => {
-  if (value === undefined || value === null || value === "") return null;
+const decimalValue = (value) => {
+  if (value === undefined) return undefined;
+  if (value === null || value === "") return null;
   const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? parsed : null;
+  if (!Number.isFinite(parsed)) throw new Error("Invalid numeric value");
+  return parsed;
 };
 
-const mapCertification = (row) => ({
-  id: row.id,
-  name: row.name,
-  issuingOrganization: row.issuing_organization,
-  issueDate: row.issue_date,
-  expiryDate: row.expiry_date,
-  credentialId: row.credential_id,
-  credentialUrl: row.credential_url,
-  createdAt: row.created_at,
-  updatedAt: row.updated_at,
-});
-
-const mapDocument = (row) => ({
-  id: row.id,
-  documentType: row.document_type,
-  documentName: row.document_name,
-  fileName: row.file_name,
-  documentUrl: row.document_url,
-  fileSize: row.file_size,
-  mimeType: row.mime_type,
-  uploadedAt: row.uploaded_at,
-});
-
-const getProfileQuery = `
+const profileSelect = `
   SELECT
-    s.id,
-    s.user_id,
-    s.college_id,
-    s.name,
-    s.email,
-    s.phone,
-    s.enrollment_no,
-    s.department,
-    s.course,
-    s.semester,
-    s.batch,
-    s.cgpa,
-    s.address,
-    s.linkedin,
-    s.github,
-    s.resume_status,
-    s.profile_image,
-    sp.bio,
-    sp.gender,
-    sp.date_of_birth,
-    sp.avatar_url,
-    sp.address_line1,
-    sp.address_line2,
-    sp.city,
-    sp.state,
-    sp.country,
-    sp.pincode,
-    sp.alternate_phone,
-    sp.alternate_email,
-    sp.profile_completeness,
-    sp.created_at AS profile_created_at,
-    sp.updated_at AS profile_updated_at,
-    sad.institution_name,
-    sad.department AS academic_department,
-    sad.course AS academic_course,
-    sad.degree,
-    sad.semester AS academic_semester,
-    sad.graduation_year,
-    sad.cgpa AS academic_cgpa,
-    sad.enrollment_number,
-    sad.admission_year,
-    sad.academic_email,
-    sad.tenth_percentage,
-    sad.twelfth_percentage,
-    sad.backlogs,
-    sad.active_backlogs,
-    sr.id AS resume_id,
-    sr.resume_url,
-    sr.file_name AS resume_file_name,
-    sr.file_size AS resume_file_size,
-    sr.mime_type AS resume_mime_type,
-    sr.uploaded_at AS resume_uploaded_at,
-    sr.updated_at AS resume_updated_at,
-    ssl.linkedin_url,
-    ssl.github_url,
-    ssl.portfolio_url,
-    ssl.twitter_url,
-    ssl.website_url
+    s.id, s.user_id, s.college_id, s.name, s.email, s.phone, s.enrollment_no,
+    s.department, s.course, s.semester, s.batch, s.cgpa, s.address, s.linkedin,
+    s.github, s.resume_status, s.profile_image,
+    sp.bio, sp.gender, sp.date_of_birth, sp.avatar_url, sp.address_line1,
+    sp.address_line2, sp.city, sp.state, sp.country, sp.pincode,
+    sp.alternate_phone, sp.alternate_email, sp.profile_completeness,
+    sp.created_at AS profile_created_at, sp.updated_at AS profile_updated_at,
+    sad.institution_name, sad.department AS academic_department,
+    sad.course AS academic_course, sad.degree, sad.semester AS academic_semester,
+    sad.graduation_year, sad.cgpa AS academic_cgpa, sad.enrollment_number,
+    sad.admission_year, sad.academic_email, sad.tenth_percentage,
+    sad.twelfth_percentage, sad.backlogs, sad.active_backlogs,
+    sr.id AS resume_id, sr.resume_url, sr.file_name AS resume_file_name,
+    sr.file_size AS resume_file_size, sr.mime_type AS resume_mime_type,
+    sr.uploaded_at AS resume_uploaded_at, sr.updated_at AS resume_updated_at,
+    ssl.linkedin_url, ssl.github_url, ssl.portfolio_url, ssl.twitter_url, ssl.website_url
   FROM students s
   LEFT JOIN student_profiles sp ON sp.student_id = s.id
   LEFT JOIN student_academic_details sad ON sad.student_id = s.id
@@ -110,61 +50,36 @@ const getProfileQuery = `
   WHERE s.id = $1
 `;
 
-const getSkills = async (client, studentId) => {
-  const result = await client.query(
-    `SELECT id, skill_name, skill_level, category, created_at, updated_at
-     FROM student_skills
-     WHERE student_id = $1
-     ORDER BY id`,
-    [studentId],
-  );
+const hydrate = async (studentId, client = pool) => {
+  const { rows } = await client.query(profileSelect, [studentId]);
+  if (!rows[0]) return null;
 
-  return result.rows.map((row) => ({
-    id: row.id,
-    name: row.skill_name,
-    level: row.skill_level,
-    category: row.category,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  }));
-};
+  const row = rows[0];
 
-const getCertifications = async (client, studentId) => {
-  const result = await client.query(
-    `SELECT id, name, issuing_organization, issue_date, expiry_date,
-            credential_id, credential_url, created_at, updated_at
-     FROM student_certifications
-     WHERE student_id = $1
-     ORDER BY issue_date DESC NULLS LAST, id DESC`,
-    [studentId],
-  );
-
-  return result.rows.map(mapCertification);
-};
-
-const getDocuments = async (client, studentId) => {
-  const result = await client.query(
-    `SELECT id, document_type, document_name, file_name, document_url,
-            file_size, mime_type, uploaded_at
-     FROM student_documents
-     WHERE student_id = $1
-     ORDER BY uploaded_at DESC NULLS LAST, id DESC`,
-    [studentId],
-  );
-
-  return result.rows.map(mapDocument);
-};
-
-const hydrateProfile = async (client, studentId, baseRow = null) => {
-  const result = baseRow ? { rows: [baseRow] } : await client.query(getProfileQuery, [studentId]);
-  const row = result.rows[0];
-
-  if (!row) return null;
-
-  const [skills, certifications, documents] = await Promise.all([
-    getSkills(client, studentId),
-    getCertifications(client, studentId),
-    getDocuments(client, studentId),
+  const [skillsResult, certificationsResult, documentsResult] = await Promise.all([
+    client.query(
+      `SELECT id, skill_name, skill_level, category, created_at, updated_at
+       FROM student_skills
+       WHERE student_id = $1
+       ORDER BY id`,
+      [studentId],
+    ),
+    client.query(
+      `SELECT id, name, issuing_organization, issue_date, expiry_date,
+              credential_id, credential_url, created_at, updated_at
+       FROM student_certifications
+       WHERE student_id = $1
+       ORDER BY issue_date DESC NULLS LAST, id DESC`,
+      [studentId],
+    ),
+    client.query(
+      `SELECT id, document_type, document_name, file_name, document_url,
+              file_size, mime_type, uploaded_at
+       FROM student_documents
+       WHERE student_id = $1
+       ORDER BY uploaded_at DESC NULLS LAST, id DESC`,
+      [studentId],
+    ),
   ]);
 
   return {
@@ -194,6 +109,7 @@ const hydrateProfile = async (client, studentId, baseRow = null) => {
     },
     academic: {
       enrollmentNo: row.enrollment_no,
+      enrollmentNumber: row.enrollment_number || row.enrollment_no,
       institutionName: row.institution_name,
       department: row.academic_department || row.department,
       course: row.academic_course || row.course,
@@ -203,14 +119,20 @@ const hydrateProfile = async (client, studentId, baseRow = null) => {
       graduationYear: row.graduation_year,
       admissionYear: row.admission_year,
       cgpa: row.academic_cgpa ?? row.cgpa,
-      enrollmentNumber: row.enrollment_number || row.enrollment_no,
       academicEmail: row.academic_email,
       tenthPercentage: row.tenth_percentage,
       twelfthPercentage: row.twelfth_percentage,
       backlogs: row.backlogs,
       activeBacklogs: row.active_backlogs,
     },
-    skills,
+    skills: skillsResult.rows.map((row) => ({
+      id: row.id,
+      name: row.skill_name,
+      level: row.skill_level,
+      category: row.category,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    })),
     resume: row.resume_id
       ? {
           id: row.resume_id,
@@ -222,7 +144,17 @@ const hydrateProfile = async (client, studentId, baseRow = null) => {
           updatedAt: row.resume_updated_at,
         }
       : null,
-    certifications,
+    certifications: certificationsResult.rows.map((item) => ({
+      id: item.id,
+      name: item.name,
+      issuingOrganization: item.issuing_organization,
+      issueDate: item.issue_date,
+      expiryDate: item.expiry_date,
+      credentialId: item.credential_id,
+      credentialUrl: item.credential_url,
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
+    })),
     social: {
       linkedin: row.linkedin_url || row.linkedin,
       github: row.github_url || row.github,
@@ -230,7 +162,16 @@ const hydrateProfile = async (client, studentId, baseRow = null) => {
       twitter: row.twitter_url,
       website: row.website_url,
     },
-    documents,
+    documents: documentsResult.rows.map((item) => ({
+      id: item.id,
+      documentType: item.document_type,
+      documentName: item.document_name,
+      fileName: item.file_name,
+      documentUrl: item.document_url,
+      fileSize: item.file_size,
+      mimeType: item.mime_type,
+      uploadedAt: item.uploaded_at,
+    })),
     profileCompleteness: row.profile_completeness ?? 0,
     createdAt: row.profile_created_at || null,
     updatedAt: row.profile_updated_at || null,
@@ -240,8 +181,17 @@ const hydrateProfile = async (client, studentId, baseRow = null) => {
   };
 };
 
-export const getStudentProfile = async (studentId, client = pool) => {
-  return hydrateProfile(client, studentId);
+export const getStudentProfile = (studentId) => hydrate(studentId);
+
+export const updateProfileCompleteness = async (studentId, completeness) => {
+  await pool.query(
+    `INSERT INTO student_profiles (student_id, profile_completeness)
+     VALUES ($1, $2)
+     ON CONFLICT (student_id) DO UPDATE SET
+       profile_completeness = EXCLUDED.profile_completeness,
+       updated_at = NOW()`,
+    [studentId, completeness],
+  );
 };
 
 export const updateStudentProfile = async (studentId, payload) => {
@@ -250,8 +200,12 @@ export const updateStudentProfile = async (studentId, payload) => {
   try {
     await client.query("BEGIN");
 
-    const studentCheck = await client.query("SELECT id FROM students WHERE id = $1 FOR UPDATE", [studentId]);
-    if (!studentCheck.rows[0]) {
+    const student = await client.query(
+      "SELECT id FROM students WHERE id = $1 FOR UPDATE",
+      [studentId],
+    );
+
+    if (!student.rows[0]) {
       await client.query("ROLLBACK");
       return null;
     }
@@ -261,43 +215,33 @@ export const updateStudentProfile = async (studentId, payload) => {
     const academic = payload.academic || {};
     const social = payload.social || {};
 
-    const studentUpdates = [];
+    const studentSet = [];
     const studentValues = [];
 
     const addStudentField = (column, value) => {
-      studentUpdates.push(`${column} = $${studentValues.length + 1}`);
+      studentSet.push(`${column} = $${studentValues.length + 1}`);
       studentValues.push(value);
     };
 
-    if (Object.prototype.hasOwnProperty.call(personal, "name")) {
-      addStudentField("name", toNullable(personal.name));
-    }
-    if (Object.prototype.hasOwnProperty.call(personal, "phone")) {
-      addStudentField("phone", toNullable(personal.phone));
-    }
-    if (Object.prototype.hasOwnProperty.call(contact, "address")) {
-      addStudentField("address", toNullable(contact.address));
-    }
-    if (Object.prototype.hasOwnProperty.call(social, "linkedin")) {
-      addStudentField("linkedin", toNullable(social.linkedin));
-    }
-    if (Object.prototype.hasOwnProperty.call(social, "github")) {
-      addStudentField("github", toNullable(social.github));
-    }
+    if (has(personal, "name")) addStudentField("name", nullable(personal.name));
+    if (has(personal, "phone")) addStudentField("phone", nullable(personal.phone));
+    if (has(personal, "profileImage")) addStudentField("profile_image", nullable(personal.profileImage));
+    if (has(contact, "address")) addStudentField("address", nullable(contact.address));
+    if (has(social, "linkedin")) addStudentField("linkedin", nullable(social.linkedin));
+    if (has(social, "github")) addStudentField("github", nullable(social.github));
 
-    if (studentUpdates.length > 0) {
-      addStudentField("updated_at", new Date());
+    if (studentSet.length) {
+      studentSet.push("updated_at = NOW()");
       studentValues.push(studentId);
-      const idPlaceholder = `$${studentValues.length}`;
       await client.query(
         `UPDATE students
-         SET ${studentUpdates.join(", ")}
-         WHERE id = ${idPlaceholder}`,
+         SET ${studentSet.join(", ")}
+         WHERE id = $${studentValues.length}`,
         studentValues,
       );
     }
 
-    const profileColumns = [
+    const profileFields = [
       ["bio", personal.bio],
       ["gender", personal.gender],
       ["date_of_birth", personal.dateOfBirth],
@@ -310,50 +254,19 @@ export const updateStudentProfile = async (studentId, payload) => {
       ["pincode", contact.pincode],
       ["alternate_phone", contact.alternatePhone],
       ["alternate_email", contact.alternateEmail],
-    ];
+    ].filter(([, value]) => value !== undefined);
 
-    if (Object.prototype.hasOwnProperty.call(personal, "profileImage")) {
-      profileColumns.push(["avatar_url", personal.profileImage]);
-      profileColumns.push(["__profile_image", personal.profileImage]);
-    }
-
-    const definedProfileValues = profileColumns.filter(([, value]) => value !== undefined);
-
-    if (definedProfileValues.length > 0) {
-      const setters = [];
-      const values = [studentId];
-
-      for (const [column, value] of definedProfileValues) {
-        if (column === "__profile_image") continue;
-        setters.push(`${column} = $${values.length + 1}`);
-        values.push(toNullable(value));
-      }
-
-      setters.push("updated_at = NOW()");
-
+    if (profileFields.length) {
+      const columns = profileFields.map(([column]) => column);
+      const values = profileFields.map(([, value]) => nullable(value));
       await client.query(
-        `INSERT INTO student_profiles (student_id)
-         VALUES ($1)
-         ON CONFLICT (student_id) DO NOTHING`,
-        [studentId],
+        `INSERT INTO student_profiles (student_id, ${columns.join(", ")})
+         VALUES ($1, ${values.map((_, index) => `$${index + 2}`).join(", ")})
+         ON CONFLICT (student_id) DO UPDATE SET
+           ${columns.map((column) => `${column} = EXCLUDED.${column}`).join(", ")},
+           updated_at = NOW()`,
+        [studentId, ...values],
       );
-
-      if (setters.length > 1) {
-        await client.query(
-          `UPDATE student_profiles
-           SET ${setters.join(", ")}
-           WHERE student_id = $1`,
-          values,
-        );
-      }
-
-      const profileImageValue = definedProfileValues.find(([column]) => column === "__profile_image")?.[1];
-      if (profileImageValue !== undefined) {
-        await client.query("UPDATE students SET profile_image = $1, updated_at = NOW() WHERE id = $2", [
-          toNullable(profileImageValue),
-          studentId,
-        ]);
-      }
     }
 
     const academicFields = [
@@ -361,79 +274,71 @@ export const updateStudentProfile = async (studentId, payload) => {
       ["department", academic.department],
       ["course", academic.course],
       ["degree", academic.degree],
-      ["semester", parseInteger(academic.semester)],
-      ["graduation_year", parseInteger(academic.graduationYear)],
-      ["cgpa", parseDecimal(academic.cgpa)],
-      ["enrollment_number", academic.enrollmentNumber || academic.enrollmentNo],
-      ["admission_year", parseInteger(academic.admissionYear)],
+      ["semester", integerValue(academic.semester)],
+      ["graduation_year", integerValue(academic.graduationYear)],
+      ["cgpa", decimalValue(academic.cgpa)],
+      ["enrollment_number", academic.enrollmentNumber ?? academic.enrollmentNo],
+      ["admission_year", integerValue(academic.admissionYear)],
       ["academic_email", academic.academicEmail],
-      ["tenth_percentage", parseDecimal(academic.tenthPercentage)],
-      ["twelfth_percentage", parseDecimal(academic.twelfthPercentage)],
-      ["backlogs", parseInteger(academic.backlogs)],
-      ["active_backlogs", parseInteger(academic.activeBacklogs)],
+      ["tenth_percentage", decimalValue(academic.tenthPercentage)],
+      ["twelfth_percentage", decimalValue(academic.twelfthPercentage)],
+      ["backlogs", integerValue(academic.backlogs)],
+      ["active_backlogs", integerValue(academic.activeBacklogs)],
     ].filter(([, value]) => value !== undefined);
 
-    if (academicFields.length > 0) {
+    if (academicFields.length) {
       const columns = academicFields.map(([column]) => column);
-      const values = academicFields.map(([, value]) => toNullable(value));
-      const placeholders = values.map((_, index) => `$${index + 2}`);
+      const values = academicFields.map(([, value]) => nullable(value));
 
       await client.query(
         `INSERT INTO student_academic_details (student_id, ${columns.join(", ")})
-         VALUES ($1, ${placeholders.join(", ")})
+         VALUES ($1, ${values.map((_, index) => `$${index + 2}`).join(", ")})
          ON CONFLICT (student_id) DO UPDATE SET
-           ${columns.map((column, index) => `${column} = EXCLUDED.${column}`).join(", ")},
+           ${columns.map((column) => `${column} = EXCLUDED.${column}`).join(", ")},
            updated_at = NOW()`,
         [studentId, ...values],
       );
 
-      const canonicalUpdates = [];
+      const canonicalSet = [];
       const canonicalValues = [];
-      const addCanonical = (column, value) => {
-        canonicalUpdates.push(`${column} = $${canonicalValues.length + 1}`);
+      const addCanonicalField = (column, value) => {
+        canonicalSet.push(`${column} = $${canonicalValues.length + 1}`);
         canonicalValues.push(value);
       };
 
-      if (Object.prototype.hasOwnProperty.call(academic, "department")) addCanonical("department", toNullable(academic.department));
-      if (Object.prototype.hasOwnProperty.call(academic, "course")) addCanonical("course", toNullable(academic.course));
-      if (Object.prototype.hasOwnProperty.call(academic, "semester")) addCanonical("semester", parseInteger(academic.semester));
-      if (Object.prototype.hasOwnProperty.call(academic, "cgpa")) addCanonical("cgpa", parseDecimal(academic.cgpa));
-      if (Object.prototype.hasOwnProperty.call(academic, "enrollmentNo")) addCanonical("enrollment_no", toNullable(academic.enrollmentNo));
+      if (has(academic, "department")) addCanonicalField("department", nullable(academic.department));
+      if (has(academic, "course")) addCanonicalField("course", nullable(academic.course));
+      if (has(academic, "semester")) addCanonicalField("semester", integerValue(academic.semester));
+      if (has(academic, "cgpa")) addCanonicalField("cgpa", decimalValue(academic.cgpa));
+      if (has(academic, "enrollmentNo")) addCanonicalField("enrollment_no", nullable(academic.enrollmentNo));
 
-      if (canonicalUpdates.length > 0) {
-        canonicalUpdates.push("updated_at = NOW()");
+      if (canonicalSet.length) {
+        canonicalSet.push("updated_at = NOW()");
         canonicalValues.push(studentId);
         await client.query(
-          `UPDATE students SET ${canonicalUpdates.join(", ")} WHERE id = $${canonicalValues.length}`,
+          `UPDATE students
+           SET ${canonicalSet.join(", ")}
+           WHERE id = $${canonicalValues.length}`,
           canonicalValues,
         );
       }
     }
 
-    if (Object.prototype.hasOwnProperty.call(payload, "skills")) {
-      if (!Array.isArray(payload.skills)) throw new Error("skills must be an array");
-
+    if (has(payload, "skills")) {
       await client.query("DELETE FROM student_skills WHERE student_id = $1", [studentId]);
-
       for (const skill of payload.skills) {
         await client.query(
           `INSERT INTO student_skills (student_id, skill_name, skill_level, category, updated_at)
            VALUES ($1, $2, $3, $4, NOW())`,
-          [
-            studentId,
-            toNullable(skill.name),
-            toNullable(skill.level),
-            toNullable(skill.category),
-          ],
+          [studentId, nullable(skill.name), nullable(skill.level), nullable(skill.category)],
         );
       }
     }
 
-    if (Object.prototype.hasOwnProperty.call(payload, "social")) {
+    if (has(payload, "social")) {
       await client.query(
-        `INSERT INTO student_social_links (
-           student_id, linkedin_url, github_url, portfolio_url, twitter_url, website_url, updated_at
-         )
+        `INSERT INTO student_social_links
+           (student_id, linkedin_url, github_url, portfolio_url, twitter_url, website_url, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, NOW())
          ON CONFLICT (student_id) DO UPDATE SET
            linkedin_url = EXCLUDED.linkedin_url,
@@ -442,25 +347,18 @@ export const updateStudentProfile = async (studentId, payload) => {
            twitter_url = EXCLUDED.twitter_url,
            website_url = EXCLUDED.website_url,
            updated_at = NOW()`,
-        [
-          studentId,
-          toNullable(social.linkedin),
-          toNullable(social.github),
-          toNullable(social.portfolio),
-          toNullable(social.twitter),
-          toNullable(social.website),
-        ],
+        [studentId, nullable(social.linkedin), nullable(social.github), nullable(social.portfolio), nullable(social.twitter), nullable(social.website)],
       );
     }
 
-    if (Object.prototype.hasOwnProperty.call(payload, "resume")) {
-      const resume = payload.resume;
-      if (resume === null) {
+    if (has(payload, "resume")) {
+      if (payload.resume === null) {
         await client.query("DELETE FROM student_resumes WHERE student_id = $1", [studentId]);
         await client.query("UPDATE students SET resume_status = 'Not Uploaded', updated_at = NOW() WHERE id = $1", [studentId]);
       } else {
         await client.query(
-          `INSERT INTO student_resumes (student_id, resume_url, file_name, file_size, mime_type, updated_at)
+          `INSERT INTO student_resumes
+             (student_id, resume_url, file_name, file_size, mime_type, updated_at)
            VALUES ($1, $2, $3, $4, $5, NOW())
            ON CONFLICT (student_id) DO UPDATE SET
              resume_url = EXCLUDED.resume_url,
@@ -468,63 +366,47 @@ export const updateStudentProfile = async (studentId, payload) => {
              file_size = EXCLUDED.file_size,
              mime_type = EXCLUDED.mime_type,
              updated_at = NOW()`,
-          [
-            studentId,
-            resume.url,
-            toNullable(resume.fileName),
-            resume.fileSize ?? null,
-            toNullable(resume.mimeType),
-          ],
+          [studentId, payload.resume.url, nullable(payload.resume.fileName), payload.resume.fileSize ?? null, nullable(payload.resume.mimeType)],
         );
         await client.query("UPDATE students SET resume_status = 'Uploaded', updated_at = NOW() WHERE id = $1", [studentId]);
       }
     }
 
-    if (Object.prototype.hasOwnProperty.call(payload, "certifications")) {
-      if (!Array.isArray(payload.certifications)) throw new Error("certifications must be an array");
-
+    if (has(payload, "certifications")) {
       await client.query("DELETE FROM student_certifications WHERE student_id = $1", [studentId]);
-
       for (const certification of payload.certifications) {
         await client.query(
-          `INSERT INTO student_certifications (
-             student_id, name, issuing_organization, issue_date, expiry_date,
-             credential_id, credential_url
-           )
+          `INSERT INTO student_certifications
+             (student_id, name, issuing_organization, issue_date, expiry_date, credential_id, credential_url)
            VALUES ($1, $2, $3, $4, $5, $6, $7)`,
           [
             studentId,
             certification.name,
-            toNullable(certification.issuingOrganization),
-            toNullable(certification.issueDate),
-            toNullable(certification.expiryDate),
-            toNullable(certification.credentialId),
-            toNullable(certification.credentialUrl),
+            nullable(certification.issuingOrganization),
+            nullable(certification.issueDate),
+            nullable(certification.expiryDate),
+            nullable(certification.credentialId),
+            nullable(certification.credentialUrl),
           ],
         );
       }
     }
 
-    if (Object.prototype.hasOwnProperty.call(payload, "documents")) {
-      if (!Array.isArray(payload.documents)) throw new Error("documents must be an array");
-
+    if (has(payload, "documents")) {
       await client.query("DELETE FROM student_documents WHERE student_id = $1", [studentId]);
-
       for (const document of payload.documents) {
         await client.query(
-          `INSERT INTO student_documents (
-             student_id, document_type, document_name, file_name, document_url,
-             file_size, mime_type
-           )
+          `INSERT INTO student_documents
+             (student_id, document_type, document_name, file_name, document_url, file_size, mime_type)
            VALUES ($1, $2, $3, $4, $5, $6, $7)`,
           [
             studentId,
-            toNullable(document.documentType),
-            toNullable(document.documentName),
-            toNullable(document.fileName),
-            toNullable(document.documentUrl),
+            nullable(document.documentType),
+            nullable(document.documentName),
+            nullable(document.fileName),
+            nullable(document.documentUrl),
             document.fileSize ?? null,
-            toNullable(document.mimeType),
+            nullable(document.mimeType),
           ],
         );
       }
@@ -538,8 +420,7 @@ export const updateStudentProfile = async (studentId, payload) => {
     );
 
     await client.query("COMMIT");
-
-    return getStudentProfile(studentId);
+    return hydrate(studentId);
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
