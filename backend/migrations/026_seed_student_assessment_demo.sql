@@ -68,3 +68,16 @@ WHERE a.title = 'MERN Stack Screening Test'
     WHERE aq.assessment_id = a.id
       AND aq.question_text = seed.question_text
   );
+
+-- Student account identity integrity. Existing legacy student rows that share
+-- the same email as a user are linked to that user's canonical id.
+UPDATE students s
+SET user_id = u.id,
+    updated_at = COALESCE(s.updated_at, NOW())
+FROM users u
+WHERE s.user_id IS NULL
+  AND LOWER(s.email) = LOWER(u.email);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_students_user_id
+  ON students(user_id)
+  WHERE user_id IS NOT NULL;
