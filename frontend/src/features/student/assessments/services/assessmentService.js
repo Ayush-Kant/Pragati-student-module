@@ -1,81 +1,48 @@
-import { dummyAssessments, dummyHistory } from "../types/assessmentDummyData";
+import api from "../../../../services/api";
+
+const unwrap = (response) => response?.data?.data ?? response?.data;
 
 export const getAssessments = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(dummyAssessments), 300);
-  });
+  const response = await api.get("/student/assessments");
+  return unwrap(response);
 };
 
 export const getAssessmentById = async (id) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Safe stringified ID comparison
-      const found = dummyAssessments.find((a) => String(a.id) === String(id));
-      if (found) resolve(found);
-      else reject(new Error("Assessment not found"));
-    }, 300);
-  });
+  const response = await api.get(`/student/assessments/${id}`);
+  return unwrap(response);
 };
 
 export const startAssessment = async (id) => {
-  return getAssessmentById(id);
+  const response = await api.post(`/student/assessments/${id}/start`);
+  return unwrap(response);
 };
 
-export const submitAssessment = async (id, answers) => {
-  const assessment = await getAssessmentById(id);
-  let score = 0;
+export const saveAssessmentAnswer = async (attemptId, questionId, answer) => {
+  const response = await api.put(
+    `/student/assessments/attempts/${attemptId}/questions/${questionId}/answer`,
+    { answer },
+  );
+  return unwrap(response);
+};
 
-  const defaultWeight =
-    assessment.questions?.length > 0
-      ? assessment.totalMarks / assessment.questions.length
-      : 0;
+export const recordTabSwitch = async (attemptId) => {
+  const response = await api.post(`/student/assessments/attempts/${attemptId}/tab-switch`);
+  return unwrap(response);
+};
 
-  assessment.questions?.forEach((q, idx) => {
-    if (answers[idx] === q.correctOption) {
-      score += q.marks || defaultWeight;
-    }
+export const submitAssessment = async (attemptId, reason = "submitted") => {
+  const response = await api.post(`/student/assessments/attempts/${attemptId}/submit`, {
+    reason,
   });
-
-  const percentage = assessment.totalMarks
-    ? Math.round((score / assessment.totalMarks) * 100)
-    : 0;
-
-  const result = {
-    attemptId: `att-${Date.now()}`,
-    assessmentId: id,
-    title: assessment.title,
-    score,
-    totalMarks: assessment.totalMarks,
-    percentage,
-    status: score >= assessment.passingMarks ? "passed" : "failed",
-    submittedAt: new Date().toISOString(),
-    timeSpentMinutes: assessment.durationMinutes || 15,
-    answers,
-    questions: assessment.questions
-  };
-
-  dummyHistory.unshift(result);
-  return result;
+  return unwrap(response);
 };
 
 export const getAssessmentResult = async (attemptId) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const found = dummyHistory.find(
-        (item) => String(item.attemptId) === String(attemptId)
-      );
-      if (found) {
-        resolve(found);
-      } else {
-        // Explicitly throw error when attemptId is not found
-        reject(new Error("Result not found"));
-      }
-    }, 300);
-  });
+  const response = await api.get(`/student/assessments/attempts/${attemptId}/result`);
+  return unwrap(response);
 };
 
 export const getAssessmentHistory = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(dummyHistory), 300);
-  });
+  const response = await api.get("/student/assessments/history");
+  return unwrap(response);
 };
