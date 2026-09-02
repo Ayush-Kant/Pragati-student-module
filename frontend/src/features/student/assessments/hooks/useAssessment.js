@@ -1,6 +1,18 @@
 import { useEffect, useState } from "react";
 import { getAssessmentById } from "../services/assessmentService";
 
+const normalizeAssessment = (assessment) => ({
+  ...assessment,
+  category: assessment?.type,
+  description: assessment?.description || `${assessment?.type || "Assessment"} assessment at ${assessment?.difficulty || "standard"} difficulty.`,
+  durationMinutes: assessment?.timeLimitMinutes,
+  totalQuestions: assessment?.questions?.length || 0,
+  questions: (assessment?.questions || []).map((question) => ({
+    ...question,
+    text: question?.text || question?.questionText,
+  })),
+});
+
 export const useAssessment = (id) => {
   const [assessment, setAssessment] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,7 +35,7 @@ export const useAssessment = (id) => {
         setLoading(true);
         setError(null);
         const data = await getAssessmentById(id);
-        if (isMounted) setAssessment(data);
+        if (isMounted) setAssessment(normalizeAssessment(data));
       } catch (err) {
         if (isMounted) {
           setError(err?.response?.data?.message || err?.message || "Failed to load assessment");
