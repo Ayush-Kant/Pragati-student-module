@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getAssessments } from "../services/assessmentService";
 
 export const useAssessments = () => {
@@ -9,39 +9,28 @@ export const useAssessments = () => {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchAssessments = async () => {
+    const load = async () => {
       try {
         setLoading(true);
         setError(null);
-        
         const response = await getAssessments();
+        const list = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.assessments)
+            ? response.assessments
+            : [];
 
-        // Safely extract array from flat array or nested response object
-        let dataList = [];
-        if (Array.isArray(response)) {
-          dataList = response;
-        } else if (response && Array.isArray(response.assessments)) {
-          dataList = response.assessments;
-        } else if (response && Array.isArray(response.data)) {
-          dataList = response.data;
-        }
-
-        if (isMounted) {
-          setAssessments(dataList);
-        }
+        if (isMounted) setAssessments(list);
       } catch (err) {
         if (isMounted) {
-          setError(err?.message || "Failed to fetch assessments");
+          setError(err?.response?.data?.message || err?.message || "Failed to load assessments");
         }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
-    fetchAssessments();
-
+    load();
     return () => {
       isMounted = false;
     };
