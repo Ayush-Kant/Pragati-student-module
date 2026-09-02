@@ -156,7 +156,12 @@ const ProfileEditForm = ({ profile, onSave, onCancel, saving = false }) => {
         : null,
     };
 
-    await onSave(payload);
+    try {
+      await onSave(payload);
+    } catch {
+      // Parent owns the request error state. Keep the edit form mounted so the
+      // student can correct or retry without losing their entered values.
+    }
   };
 
   return (
