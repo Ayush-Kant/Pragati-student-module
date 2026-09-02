@@ -10,17 +10,31 @@ export const resolveStudentId = async (user) => {
     throw error;
   }
 
-  // auth.controller.js issues JWTs with:
-  // - userId: auth_users.uuid_id
-  // - authUserId: auth_users.id
-  // - id / uid: users.id
-  // Resolve through the canonical auth -> users -> students relationship.
+  // The canonical relationship is auth_users -> users -> students through
+  // users.id = students.user_id. Email matching remains only as a legacy
+  // fallback for older student rows that predate account linking.
+  const userIds = uniqueStrings([user.id, user.uid]);
+  for (const userId of userIds) {
+    if (!/^\d+$/.test(userId)) continue;
+
+    const byUserId = await pool.query(
+      `SELECT s.id
+       FROM users u
+       INNER JOIN students s ON s.user_id = u.id
+       WHERE u.id = $1
+       LIMIT 1`,
+      [Number(userId)],
+    );
+
+    if (byUserId.rows[0]) return byUserId.rows[0].id;
+  }
+
   if (user.userId) {
     const byUuid = await pool.query(
       `SELECT s.id
        FROM auth_users au
        INNER JOIN users u ON u.auth_user_id = au.id
-       INNER JOIN students s ON LOWER(s.email) = LOWER(u.email)
+       INNER JOIN students s ON s.user_id = u.id
        WHERE au.uuid_id::text = $1
        LIMIT 1`,
       [String(user.userId)],
@@ -37,7 +51,7 @@ export const resolveStudentId = async (user) => {
       `SELECT s.id
        FROM auth_users au
        INNER JOIN users u ON u.auth_user_id = au.id
-       INNER JOIN students s ON LOWER(s.email) = LOWER(u.email)
+       INNER JOIN students s ON s.user_id = u.id
        WHERE au.id = $1
        LIMIT 1`,
       [Number(authUserId)],
@@ -46,20 +60,18 @@ export const resolveStudentId = async (user) => {
     if (byAuthId.rows[0]) return byAuthId.rows[0].id;
   }
 
-  const userIds = uniqueStrings([user.id, user.uid]);
-  for (const userId of userIds) {
-    if (!/^\d+$/.test(userId)) continue;
-
-    const byUserId = await pool.query(
+  // Legacy compatibility: some old seeded student rows only have email.
+  // This fallback allows those rows to be discovered until they are linked.
+  if (user.email) {
+    const byEmail = await pool.query(
       `SELECT s.id
-       FROM users u
-       INNER JOIN students s ON LOWER(s.email) = LOWER(u.email)
-       WHERE u.id = $1
+       FROM students s
+       WHERE LOWER(s.email) = LOWER($1)
        LIMIT 1`,
-      [Number(userId)],
+      [String(user.email)],
     );
 
-    if (byUserId.rows[0]) return byUserId.rows[0].id;
+    if (byEmail.rows[0]) return byEmail.rows[0].id;
   }
 
   const error = new Error("Student account is not linked to a student profile");
