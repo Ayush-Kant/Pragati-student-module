@@ -1,6 +1,6 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import { logoutStudentApi } from "../features/auth/services/studentAuth.services";
+import { logoutStudentApi, refreshStudentApi } from "../features/auth/services/studentAuth.services";
 import { firebaseAuth } from "../firebase/studentFirebaseAuth";
 import { signOut } from "firebase/auth";
 
@@ -53,14 +53,41 @@ export const AuthProvider = ({ children }) => {
     return stored && isTokenValid(stored) ? getUserFromToken(stored) : null;
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem("student_session")));
+
+  useEffect(() => {
+    if (!localStorage.getItem("student_session")) return;
+
+    let mounted = true;
+    refreshStudentApi()
+      .then((session) => {
+        if (!mounted || !session?.accessToken) return;
+        localStorage.setItem("token", session.accessToken);
+        setToken(session.accessToken);
+        setUserRole("student");
+        setUser(getUserFromToken(session.accessToken));
+      })
+      .catch(() => {
+        if (!mounted) return;
+        localStorage.removeItem("token");
+        localStorage.removeItem("student_session");
+        setToken(null);
+        setUserRole(null);
+        setUser(null);
+      })
+      .finally(() => mounted && setLoading(false));
+
+    return () => { mounted = false; };
+  }, []);
 
   const login = (role, jwtToken) => {
     if (!role || !jwtToken) return;
     localStorage.setItem("token", jwtToken);
+    if (role === "student") localStorage.setItem("student_session", "1");
     setToken(jwtToken);
     setUserRole(role);
     setUser(getUserFromToken(jwtToken));
+    setLoading(false);
   };
 
   const logout = async () => {
@@ -79,9 +106,9 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("student_session");
     sessionStorage.removeItem("token");
 
-    // Legacy applications may still set readable cookies; remove them client-side.
     document.cookie.split(";").forEach((c) => {
       const cookieName = c.split("=")[0].trim();
       if (cookieName) {
@@ -92,21 +119,11 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUserRole(null);
     setUser(null);
+    setLoading(false);
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        userRole,
-        token,
-        loading,
-        setLoading,
-        login,
-        logout,
-        isAuthenticated: !!token,
-      }}
-    >
+    <AuthContext.Provider value={{ user, userRole, token, loading, setLoading, login, logout, isAuthenticated: !!token }}>
       {children}
     </AuthContext.Provider>
   );
