@@ -16,6 +16,11 @@ import {
 
 const router = express.Router();
 
+// Signed resource URLs are intentionally bearer-token independent. The URL is
+// protected by a short-lived HMAC signature bound to the student + resource.
+// Keep this route BEFORE router-level JWT middleware.
+router.get('/resources/:resourceId/file', serveResourceFile);
+
 router.use(authMiddleware, roleMiddleware('student'));
 
 // Static sub-routes MUST be declared before /:courseId so values such as
@@ -28,7 +33,6 @@ router.patch('/lessons/:lessonId/notes/:noteId', saveLessonNote);
 router.delete('/lessons/:lessonId/notes/:noteId', deleteLessonNote);
 
 router.get('/resources/:resourceId/download', createResourceDownloadUrl);
-router.get('/resources/:resourceId/file', serveResourceFile);
 
 router.get('/', listCourses);
 router.get('/:courseId', getCourse);
