@@ -16,6 +16,8 @@ export default function AssessmentDetailsPage() {
   if (error || !assessment) return <ErrorState message={error || "Assessment not found"} />;
 
   const duration = assessment.timeLimitMinutes ?? 0;
+  const questions = Array.isArray(assessment.questions) ? assessment.questions : [];
+  const hasQuestions = questions.length > 0;
   const instructions = assessment.instructions || [
     "Do not refresh or close the assessment window while attempting the test.",
     "Your answers are saved as you move through the assessment.",
@@ -39,13 +41,25 @@ export default function AssessmentDetailsPage() {
         }}
       />
 
+      {!hasQuestions && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <p className="font-semibold">This assessment is not ready yet.</p>
+          <p className="mt-1">
+            No questions are currently configured for this assessment, so it cannot be started safely.
+            Please return to the assessment list and choose another published assessment.
+          </p>
+        </div>
+      )}
+
       <AssessmentInstructions instructions={instructions} />
 
       <button
+        type="button"
+        disabled={!hasQuestions}
         onClick={() => navigate(`/student/assessments/${assessment.id}/attempt`)}
-        className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition"
+        className="w-full rounded-lg bg-blue-600 py-3 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
       >
-        Start Assessment Now
+        {hasQuestions ? "Start Assessment Now" : "Assessment Unavailable"}
       </button>
     </div>
   );
