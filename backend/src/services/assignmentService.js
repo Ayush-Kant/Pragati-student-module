@@ -30,8 +30,8 @@ class AssignmentService {
         return assignmentModel.listAssignments(filters);
     }
 
-    static async getAssignmentById(id) {
-        const assignment = await assignmentModel.getAssignmentById(id);
+    static async getAssignmentById(id, studentId = null) {
+        const assignment = await assignmentModel.getAssignmentById(id, studentId);
         if (!assignment) throw normalizeError('Assignment not found', 404);
         return assignment;
     }
@@ -49,12 +49,14 @@ class AssignmentService {
     }
 
     static async submitAssignment(assignmentId, studentId, input) {
-        const assignment = await assignmentModel.getAssignmentById(assignmentId);
+        const assignment = await assignmentModel.getAssignmentById(assignmentId, studentId);
         if (!assignment) throw normalizeError('Assignment not found', 404);
         return assignmentSubmissionModel.submitAssignment(assignmentId, studentId, input);
     }
 
     static async getSubmission(assignmentId, studentId) {
+        const assignment = await assignmentModel.getAssignmentById(assignmentId, studentId);
+        if (!assignment) throw normalizeError('Assignment not found', 404);
         return assignmentSubmissionModel.getSubmissionByAssignment(assignmentId, studentId);
     }
 
@@ -75,7 +77,17 @@ class AssignmentService {
     static async addGrade(assignmentId, studentId, input) {
         const assignment = await assignmentModel.getAssignmentById(assignmentId);
         if (!assignment) throw normalizeError('Assignment not found', 404);
-        const grade = await assignmentGradeModel.addGrade(assignmentId, studentId, input);
+
+        const score = Number(input?.score);
+        const totalMarks = Number(assignment.totalMarks);
+        if (!Number.isFinite(score) || score < 0 || score > totalMarks) {
+            throw normalizeError(`Score must be between 0 and ${totalMarks}`, 422);
+        }
+
+        const grade = await assignmentGradeModel.addGrade(assignmentId, studentId, {
+            ...input,
+            score,
+        });
         try {
             await notificationService.sendNotificationToStudents({
                 studentIds: [studentId],
