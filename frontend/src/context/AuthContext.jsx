@@ -6,34 +6,41 @@ import { signOut } from "firebase/auth";
 
 const AuthContext = createContext();
 
-const isTokenValid = (token) => {
+const decodeToken = (token) => {
   try {
-    const { exp } = jwtDecode(token);
-    return Date.now() < exp * 1000;
+    return jwtDecode(token);
   } catch {
-    return false;
+    return null;
   }
 };
 
+const isTokenValid = (token) => {
+  const decoded = decodeToken(token);
+  return Boolean(decoded?.exp && Date.now() < decoded.exp * 1000);
+};
+
 const getUserFromToken = (token) => {
-  try {
-    const decoded = jwtDecode(token);
+  const decoded = decodeToken(token);
+  if (decoded) {
     return {
       name: decoded.name || decoded.fullName || decoded.username || "Student",
       email: decoded.email || "candidate@pragati.com",
       role: decoded.role ?? null,
       id: decoded.id || decoded.userId || decoded.sub || null,
       studentId: decoded.studentId || null,
+      firebaseUid: decoded.firebaseUid || null,
     };
+  }
+
+  try {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
   } catch {
-    try {
-      const storedUser = localStorage.getItem("user");
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch {
-      return null;
-    }
+    return null;
   }
 };
+
+const isFirebaseStudentToken = (jwtToken) => Boolean(decodeToken(jwtToken)?.firebaseUid);
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => {
@@ -56,7 +63,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem("student_session")));
 
   useEffect(() => {
-    if (!localStorage.getItem("student_session")) return;
+    if (!localStorage.getItem("student_session")) {
+      setLoading(false);
+      return undefined;
+    }
 
     let mounted = true;
     refreshStudentApi()
@@ -77,21 +87,30 @@ export const AuthProvider = ({ children }) => {
       })
       .finally(() => mounted && setLoading(false));
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const login = (role, jwtToken) => {
     if (!role || !jwtToken) return;
+
     localStorage.setItem("token", jwtToken);
-    if (role === "student") localStorage.setItem("student_session", "1");
+    if (role === "student" && isFirebaseStudentToken(jwtToken)) {
+      localStorage.setItem("student_session", "1");
+    } else if (role !== "student") {
+      localStorage.removeItem("student_session");
+    }
+
+    const nextUser = getUserFromToken(jwtToken);
     setToken(jwtToken);
     setUserRole(role);
-    setUser(getUserFromToken(jwtToken));
+    setUser(nextUser);
     setLoading(false);
   };
 
   const logout = async () => {
-    if (userRole === "student") {
+    if (userRole === "student" && isFirebaseStudentToken(token)) {
       try {
         await logoutStudentApi();
       } catch (error) {
