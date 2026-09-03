@@ -24,10 +24,13 @@ export const updateAssignmentSchema = Joi.object({
     status: Joi.string().valid(...Object.values(ASSIGNMENT_STATUS)).optional(),
 }).required();
 
+// File submissions arrive as multipart/form-data with the actual file on req.file.
+// Body-level validation must therefore not reject an otherwise valid file-only submission.
+// The assignment service performs the final submission-type/content/file validation.
 export const submitAssignmentSchema = Joi.object({
     content: Joi.string().trim().max(5000).optional(),
     fileUrl: Joi.string().uri().optional(),
-}).or('content', 'fileUrl').required();
+}).unknown(false).required();
 
 export const assignmentIdSchema = Joi.object({
     id: Joi.number().integer().min(1).required(),
@@ -41,6 +44,7 @@ export const assignmentIdAndStudentIdSchema = Joi.object({
 export const feedbackSchema = Joi.object({
     remarks: Joi.string().trim().min(1).max(4000).required(),
     grade: Joi.string().trim().min(1).max(FEEDBACK_GRADE_MAX_LENGTH).required(),
+    inlineComments: Joi.alternatives().try(Joi.array().items(Joi.object().unknown(true)), Joi.object().unknown(true)).optional(),
 }).required();
 
 export const gradeSchema = Joi.object({
