@@ -7,6 +7,7 @@
     "start": "node server.js",
     "dev": "npx nodemon server.js",
     "migrate": "node scripts/migrate.js",
+    "seed:student-college": "node scripts/seedStudentCollege.js",
     "seed:student-interviews": "node scripts/seedStudentInterviews.js",
     "seed:student-notifications": "node scripts/seedStudentNotifications.js"
   },
