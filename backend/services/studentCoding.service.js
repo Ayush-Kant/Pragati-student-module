@@ -126,11 +126,10 @@ const executeWithJudge0 = async ({ sourceCode, languageId, stdin, expectedOutput
   };
 };
 
-const buildTestResult = (testCase, result) => ({
+const buildTestResult = (testCase, result, { exposeCaseData = true } = {}) => ({
   id: testCase.id,
   passed: result.verdict === 'Accepted',
-  input: testCase.input,
-  expected: testCase.expectedOutput,
+  ...(exposeCaseData ? { input: testCase.input, expected: testCase.expectedOutput } : {}),
   actual: result.stdout.trim(),
   runtime: result.runtime,
   memory: result.memory,
@@ -252,7 +251,7 @@ const getTestCases = async (challengeId, hidden) => {
   return result.rows;
 };
 
-const runTests = async ({ tests, sourceCode, languageId }) => {
+const runTests = async ({ tests, sourceCode, languageId, exposeCaseData = true }) => {
   const results = [];
 
   for (const testCase of tests) {
@@ -263,11 +262,10 @@ const runTests = async ({ tests, sourceCode, languageId }) => {
       expectedOutput: testCase.expectedOutput,
       timeLimitMs: testCase.timeLimitMs,
     });
-    results.push(buildTestResult(testCase, result));
+    results.push(buildTestResult(testCase, result, { exposeCaseData }));
 
     if (result.verdict !== 'Accepted') {
-      // A compile/runtime/TLE/internal failure cannot be repaired by testing the
-      // remaining cases, and stopping preserves the first meaningful diagnostic.
+      // Preserve the first meaningful failure/diagnostic and avoid unnecessary execution.
       break;
     }
   }
@@ -296,7 +294,7 @@ export const runCode = async (studentUserId, payload) => {
     : [{ id: 0, input: challenge.sampleInput || '', expectedOutput: challenge.sampleOutput || '', timeLimitMs: 2000 }];
 
   const languageId = resolveLanguageId(payload.language);
-  const testResults = await runTests({ tests, sourceCode: payload.code, languageId });
+  const testResults = await runTests({ tests, sourceCode: payload.code, languageId, exposeCaseData: true });
   const failure = testResults.find((item) => item.verdict !== 'Accepted');
   const verdict = failure?.verdict || (testResults.length ? 'Accepted' : 'Pending');
   const diagnostics = firstDiagnostic(testResults);
@@ -322,6 +320,7 @@ export const submitSolution = async (studentUserId, payload) => {
   const hiddenTests = await getTestCases(challengeId, true);
   const publicTests = await getTestCases(challengeId, false);
   const tests = hiddenTests.length ? hiddenTests : publicTests;
+  const exposeCaseData = hiddenTests.length === 0;
 
   if (!tests.length) {
     const error = new Error('This coding challenge has no test cases configured');
@@ -330,7 +329,7 @@ export const submitSolution = async (studentUserId, payload) => {
   }
 
   const languageId = resolveLanguageId(payload.language);
-  const testResults = await runTests({ tests, sourceCode: payload.code, languageId });
+  const testResults = await runTests({ tests, sourceCode: payload.code, languageId, exposeCaseData });
   const passed = testResults.filter((result) => result.verdict === 'Accepted').length;
   const total = tests.length;
   const score = Math.round((passed / total) * 10000) / 100;
