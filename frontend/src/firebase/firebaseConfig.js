@@ -1,33 +1,17 @@
 import { initializeApp } from "firebase/app";
-
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA4kqZZJhVSAJEMhUiItJP6kNjfH9-p8B0",
-
-  authDomain:
-    "pragati-85095.firebaseapp.com",
-
-  projectId: "pragati-85095",
-
-  storageBucket:
-    "pragati-85095.firebasestorage.app",
-
-  messagingSenderId:
-    "984421547912",
-
-  appId:
-    "1:984421547912:web:3c3c4ee680730dea11443d",
-
-  measurementId:
-    "G-SK8711LXHX",
+  apiKey: "AIzaSyBkEvIh9H8-qZ_gPwruqUUJukVD10z4kiU",
+  authDomain: "pragatistudentmodule.firebaseapp.com",
+  projectId: "pragatistudentmodule",
+  storageBucket: "pragatistudentmodule.firebasestorage.app",
+  messagingSenderId: "526628460499",
+  appId: "1:526628460499:web:92f17de7856dcc2f920126",
 };
 
-const app =
-  initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-/* FIREBASE STORAGE */
-export const storage =
-  getStorage(app);
+export const storage = getStorage(app);
 
 export default app;
