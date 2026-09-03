@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, CheckCircle2, Clock3, FileText, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getAssignmentSubmissions, getAssignments } from '../../services/assignment.service';
+import {
+  getAssignmentStatistics,
+  getAssignmentSubmissions,
+  getAssignments,
+} from '../../services/assignment.service';
 import StudentPageShell from '../../components/common/StudentPageShell';
 import StudentPageHeader from '../../components/common/StudentPageHeader';
 import EmptyState from '../../components/common/EmptyState';
@@ -37,6 +41,7 @@ export default function AssignmentsPage() {
   const navigate = useNavigate();
   const [assignments, setAssignments] = useState([]);
   const [submissions, setSubmissions] = useState([]);
+  const [serverStats, setServerStats] = useState(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
@@ -48,13 +53,15 @@ export default function AssignmentsPage() {
       setLoading(true);
       setError('');
       try {
-        const [assignmentData, submissionData] = await Promise.all([
+        const [assignmentData, submissionData, statistics] = await Promise.all([
           getAssignments(),
           getAssignmentSubmissions(),
+          getAssignmentStatistics(),
         ]);
         if (!active) return;
         setAssignments(Array.isArray(assignmentData) ? assignmentData : []);
         setSubmissions(Array.isArray(submissionData) ? submissionData : []);
+        setServerStats(statistics || null);
       } catch (err) {
         if (!active) return;
         setError(err?.response?.data?.message || err?.message || 'Unable to load assignments.');
@@ -73,11 +80,32 @@ export default function AssignmentsPage() {
 
   const enriched = useMemo(
     () => assignments.map((assignment) => {
-      const submission = submissionByAssignment.get(String(assignment.id));
+      const submission = submissionByAssignment.get(String(assignment.id)) || assignment.submission || null;
       return { ...assignment, submission, studentStatus: statusLabel(assignment, submission) };
     }),
     [assignments, submissionByAssignment],
   );
+
+  const counts = useMemo(() => {
+    const local = enriched.reduce((acc, item) => {
+      acc.all += 1;
+      acc[item.studentStatus.toLowerCase()] = (acc[item.studentStatus.toLowerCase()] || 0) + 1;
+      return acc;
+    }, { all: 0, pending: 0, submitted: 0, overdue: 0, closed: 0 });
+
+    if (!serverStats) return local;
+
+    const total = Number(serverStats.total ?? local.all);
+    const submitted = Number(serverStats.submitted ?? local.submitted);
+    const closed = Number(serverStats.closed ?? local.closed);
+    return {
+      ...local,
+      all: total,
+      submitted,
+      closed,
+      pending: Math.max(0, total - submitted - closed),
+    };
+  }, [enriched, serverStats]);
 
   const filtered = useMemo(() => enriched.filter((assignment) => {
     const query = search.trim().toLowerCase();
@@ -85,12 +113,6 @@ export default function AssignmentsPage() {
     const matchesFilter = filter === 'all' || assignment.studentStatus.toLowerCase() === filter;
     return matchesSearch && matchesFilter;
   }), [enriched, filter, search]);
-
-  const counts = useMemo(() => enriched.reduce((acc, item) => {
-    acc.all += 1;
-    acc[item.studentStatus.toLowerCase()] = (acc[item.studentStatus.toLowerCase()] || 0) + 1;
-    return acc;
-  }, { all: 0, pending: 0, submitted: 0, overdue: 0, closed: 0 }), [enriched]);
 
   if (loading) {
     return (
@@ -110,9 +132,7 @@ export default function AssignmentsPage() {
     return (
       <StudentPageShell>
         <StudentPageHeader title="Assignments" subtitle="Stay on top of your pending and submitted coursework." />
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-          {error}
-        </div>
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">{error}</div>
       </StudentPageShell>
     );
   }
@@ -148,16 +168,8 @@ export default function AssignmentsPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           {['all', 'pending', 'submitted', 'overdue', 'closed'].map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setFilter(item)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-medium capitalize transition ${
-                filter === item
-                  ? 'border-blue-600 bg-blue-600 text-white'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
-              }`}
-            >
+            <button key={item} type="button" onClick={() => setFilter(item)}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-medium capitalize transition ${filter === item ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'}`}>
               {item} {item !== 'all' ? `(${counts[item] || 0})` : `(${counts.all})`}
             </button>
           ))}
@@ -179,22 +191,14 @@ export default function AssignmentsPage() {
                   {assignment.studentStatus}
                 </span>
               </div>
-
-              <p className="mb-5 line-clamp-2 text-sm leading-6 text-slate-600">
-                {assignment.description || 'No description provided.'}
-              </p>
-
+              <p className="mb-5 line-clamp-2 text-sm leading-6 text-slate-600">{assignment.description || 'No description provided.'}</p>
               <div className="flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500">
                 <span className="inline-flex items-center gap-1.5"><CalendarDays size={14} />Due {formatDate(assignment.dueDate)}</span>
                 <span>{assignment.totalMarks} marks</span>
               </div>
-
-              <button
-                type="button"
-                onClick={() => navigate(`/student/assignments/${assignment.id}`)}
-                className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                View assignment
+              <button type="button" onClick={() => navigate(`/student/assignments/${assignment.id}`)}
+                className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                {assignment.submission?.status === 'submitted' ? 'Review submission' : 'View assignment'}
               </button>
             </article>
           ))}
