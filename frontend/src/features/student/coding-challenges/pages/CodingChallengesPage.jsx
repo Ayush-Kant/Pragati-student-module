@@ -1,206 +1,99 @@
 import { useMemo } from 'react';
-import { Code2, CheckCircle2, Circle, Minus } from 'lucide-react';
+import { CheckCircle2, Circle, Code2, Minus, Search } from 'lucide-react';
 import { useCodingChallenges } from '../hooks/useCodingChallenges';
 import ChallengeCard from '../components/challenge/ChallengeCard';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorState from '../components/common/ErrorState';
 import EmptyState from '../components/common/EmptyState';
-import SectionHeader from '../components/common/SectionHeader';
 import Pagination from '../components/common/Pagination';
 import CodingChallengeErrorBoundary from '../components/common/CodingChallengeErrorBoundary';
-import {
-  DIFFICULTY,
-  CHALLENGE_STATUS,
-  TOPICS,
-} from '../constants/codingChallengeConstants';
+import { DIFFICULTY, CHALLENGE_STATUS, TOPICS } from '../constants/codingChallengeConstants';
 
-/**
- * Main coding challenges list page.
- * Displays filters, search, paginated grid of ChallengeCards.
- */
 const CodingChallengesPage = () => {
   const {
-    challenges,
-    filteredChallenges,
-    paginatedChallenges,
-    isLoading,
-    error,
-    searchQuery,
-    difficultyFilter,
-    topicFilter,
-    statusFilter,
-    currentPage,
-    totalPages,
-    setSearchQuery,
-    setDifficultyFilter,
-    setTopicFilter,
-    setStatusFilter,
-    setCurrentPage,
-    refetch,
+    challenges, filteredChallenges, paginatedChallenges, isLoading, error,
+    searchQuery, difficultyFilter, topicFilter, statusFilter, currentPage, totalPages,
+    setSearchQuery, setDifficultyFilter, setTopicFilter, setStatusFilter, setCurrentPage, refetch,
   } = useCodingChallenges();
 
-  const stats = useMemo(() => {
-    const solved    = challenges.filter((c) => c.status === CHALLENGE_STATUS.SOLVED).length;
-    const attempted = challenges.filter((c) => c.status === CHALLENGE_STATUS.ATTEMPTED).length;
-    const unsolved  = challenges.filter((c) => c.status === CHALLENGE_STATUS.UNSOLVED).length;
-    return { solved, attempted, unsolved, total: challenges.length };
-  }, [challenges]);
+  const stats = useMemo(() => ({
+    solved: challenges.filter((c) => c.status === CHALLENGE_STATUS.SOLVED).length,
+    attempted: challenges.filter((c) => c.status === CHALLENGE_STATUS.ATTEMPTED).length,
+    unsolved: challenges.filter((c) => c.status === CHALLENGE_STATUS.UNSOLVED).length,
+    total: challenges.length,
+  }), [challenges]);
 
-  if (isLoading) return <LoadingSpinner size="lg" label="Loading challenges…" />;
+  if (isLoading) return <div className="flex min-h-[60vh] items-center justify-center"><LoadingSpinner size="lg" label="Loading challenges…" /></div>;
   if (error) return <ErrorState error={error} onRetry={refetch} />;
 
   return (
     <CodingChallengeErrorBoundary>
-      <div className="min-h-screen bg-[#0f172a] text-gray-100 px-4 py-8 max-w-7xl mx-auto">
-        {/* Page header */}
-        <div className="mb-8 animate-fade-in">
-          <div className="flex items-center gap-3 mb-2">
-            <Code2 size={28} className="text-orange-500 drop-shadow-lg" aria-hidden="true" />
-            <h1 className="text-4xl font-extrabold text-orange-400 drop-shadow-[0_0_12px_rgba(251,146,60,0.5)]">
-              Coding Challenges
-            </h1>
+      <div className="min-h-full bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-7">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-blue-50 p-2.5 text-blue-600"><Code2 size={22} /></div>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Coding Challenges</h1>
+                <p className="mt-1 text-sm text-slate-500">Practice interview-style problems with the same focused workflow as a real coding round.</p>
+              </div>
+            </div>
           </div>
-          <p className="text-gray-400">
-            Sharpen your skills with curated algorithmic problems.
-          </p>
-        </div>
 
-        {/* Stats bar */}
-        {challenges.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 animate-slide-up">
+          <div className="mb-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[
-              { label: 'Total',     value: stats.total,    icon: Code2,         color: 'text-gray-300' },
-              { label: 'Solved',    value: stats.solved,   icon: CheckCircle2,  color: 'text-teal-400' },
-              { label: 'Attempted', value: stats.attempted, icon: Minus,        color: 'text-orange-400' },
-              { label: 'Unsolved',  value: stats.unsolved,  icon: Circle,       color: 'text-gray-500' },
-            ].map(({ label, value, icon: Icon, color }) => (
-              <div key={label} className="bg-gradient-to-br from-white/3 to-transparent border border-white/6 rounded-2xl p-4 text-center backdrop-blur-sm shadow-md">
-                <Icon size={18} className={`mx-auto mb-1 ${color}`} aria-hidden="true" />
-                <p className={`text-2xl font-bold ${color}`}>{value}</p>
-                <p className="text-xs text-gray-400">{label}</p>
+              ['Total', stats.total, Code2], ['Solved', stats.solved, CheckCircle2], ['Attempted', stats.attempted, Minus], ['Unsolved', stats.unsolved, Circle],
+            ].map(([label, value, Icon]) => (
+              <div key={label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <Icon size={18} className="mb-2 text-blue-600" />
+                <div className="text-2xl font-bold text-slate-900">{value}</div>
+                <div className="text-xs font-medium text-slate-500">{label}</div>
               </div>
             ))}
           </div>
-        )}
 
-        {/* Filters */}
-        <div className="space-y-4 mb-6 animate-slide-up">
-          {/* Search */}
-          <div className="relative">
-            <label htmlFor="challenge-search" className="sr-only">Search challenges</label>
-            <input
-              id="challenge-search"
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by title or topic…"
-              className="w-full px-4 py-2.5 pl-10 rounded-xl bg-[#0a0a0a] border border-gray-800 text-gray-200 text-sm
-                placeholder-gray-600 focus:outline-none focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/20
-                hover:border-gray-700 transition-all duration-200"
-            />
-            <Code2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600" aria-hidden="true" />
-          </div>
-
-          {/* Filter chips row */}
-          <div className="flex flex-wrap gap-3">
-            {/* Difficulty */}
-            <div className="flex items-center gap-1.5 flex-wrap" role="group" aria-label="Filter by difficulty">
-              {['All', ...Object.values(DIFFICULTY)].map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => setDifficultyFilter(d)}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-all duration-200 ${
-                    difficultyFilter === d
-                      ? 'bg-orange-500/20 border-orange-500/50 text-orange-400'
-                      : 'border-gray-800 text-gray-500 hover:border-gray-600 hover:text-gray-300'
-                  }`}
-                  aria-pressed={difficultyFilter === d}
-                >
-                  {d}
-                </button>
-              ))}
+          <div className="mb-7 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="relative">
+              <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by problem title or topic…"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100" />
             </div>
-
-            {/* Status */}
-            <div className="flex items-center gap-1.5 flex-wrap" role="group" aria-label="Filter by status">
-              {['All', ...Object.values(CHALLENGE_STATUS)].map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setStatusFilter(s)}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-all duration-200 ${
-                    statusFilter === s
-                      ? 'bg-teal-500/20 border-teal-500/50 text-teal-400'
-                      : 'border-gray-800 text-gray-500 hover:border-gray-600 hover:text-gray-300'
-                  }`}
-                  aria-pressed={statusFilter === s}
-                >
-                  {s}
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              {['All', ...Object.values(DIFFICULTY)].map((difficulty) => (
+                <button key={difficulty} type="button" onClick={() => setDifficultyFilter(difficulty)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${difficultyFilter === difficulty ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>
+                  {difficulty}
                 </button>
               ))}
+              <span className="mx-1 hidden h-5 w-px bg-slate-200 sm:block" />
+              {['All', ...Object.values(CHALLENGE_STATUS)].map((status) => (
+                <button key={status} type="button" onClick={() => setStatusFilter(status)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${statusFilter === status ? 'border-violet-600 bg-violet-600 text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>
+                  {status}
+                </button>
+              ))}
+              <select value={topicFilter} onChange={(e) => setTopicFilter(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500">
+                <option value="All">All topics</option>
+                {TOPICS.map((topic) => <option key={topic} value={topic}>{topic}</option>)}
+              </select>
             </div>
           </div>
 
-          {/* Topic select */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="topic-filter" className="text-xs text-gray-500 flex-shrink-0">Topic:</label>
-            <select
-              id="topic-filter"
-              value={topicFilter}
-              onChange={(e) => setTopicFilter(e.target.value)}
-              className="text-xs px-3 py-1.5 rounded-lg bg-[#0a0a0a] border border-gray-800 text-gray-300
-                focus:outline-none focus:border-orange-500/50 hover:border-gray-700 transition-all duration-200"
-            >
-              <option value="All">All Topics</option>
-              {TOPICS.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
+          <div className="mb-4 flex items-end justify-between">
+            <div><h2 className="text-lg font-bold text-slate-900">{filteredChallenges.length} {filteredChallenges.length === 1 ? 'challenge' : 'challenges'}</h2><p className="text-xs text-slate-500">{totalPages > 1 ? `Page ${currentPage} of ${totalPages}` : 'Choose a problem to begin solving.'}</p></div>
           </div>
+
+          {paginatedChallenges.length === 0 ? (
+            <EmptyState title="No challenges found" description="Try changing the search or filters." icon="🔍" />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {paginatedChallenges.map((challenge) => <ChallengeCard key={challenge.id} challenge={challenge} />)}
+              </div>
+              <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            </>
+          )}
         </div>
-
-        {/* Results count */}
-        <SectionHeader
-          title={`${filteredChallenges.length} ${filteredChallenges.length === 1 ? 'Challenge' : 'Challenges'}`}
-          subtitle={
-            filteredChallenges.length !== challenges.length
-              ? `Filtered from ${challenges.length} total`
-              : totalPages > 1
-              ? `Page ${currentPage} of ${totalPages}`
-              : undefined
-          }
-        />
-
-        {/* Grid */}
-        {paginatedChallenges.length === 0 ? (
-          <EmptyState
-            title="No challenges found"
-            description="Try adjusting your filters or search query."
-            icon="🔍"
-          />
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 scrollbar-thin">
-              {paginatedChallenges.map((challenge, idx) => (
-                <div
-                  key={challenge.id}
-                  className="animate-slide-up"
-                  style={{ animationDelay: `${idx * 40}ms` }}
-                >
-                  <ChallengeCard challenge={challenge} />
-                </div>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </>
-        )}
       </div>
     </CodingChallengeErrorBoundary>
   );
