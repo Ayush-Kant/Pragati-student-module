@@ -60,6 +60,7 @@ const migrationFiles = [
   "026_seed_student_assessment_demo.sql",
   "027_normalize_student_account_links.sql",
   "028_create_student_learning_engine.sql",
+  "029_complete_student_capabilities.sql",
 ];
 
 async function runMigrationsFresh() {
