@@ -18,8 +18,8 @@ router.get('/submissions', assignmentController.listSubmissions);
 router.get('/:id', validateRequest(assignmentIdSchema, 'params'), assignmentController.getAssignmentById);
 router.post(
   '/:id/submit',
-  uploadMiddleware,
   validateRequest(assignmentIdSchema, 'params'),
+  uploadMiddleware,
   validateRequest(submitAssignmentSchema, 'body'),
   assignmentController.submitAssignment,
 );
