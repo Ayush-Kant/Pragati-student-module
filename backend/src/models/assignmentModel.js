@@ -31,7 +31,7 @@ export const listAssignments = async (filters = {}) => {
 
     if (studentId !== undefined && studentId !== null && studentId !== '') {
         values.push(studentId);
-        conditions.push(`student_id = $${values.length}`);
+        conditions.push(`(student_id = $${values.length} OR student_id IS NULL)`);
     }
 
     if (status) {
