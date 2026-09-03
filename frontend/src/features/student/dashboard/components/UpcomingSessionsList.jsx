@@ -21,7 +21,8 @@ export default function UpcomingSessionsList({ sessions = [] }) {
       ) : (
         <div className="space-y-3">
           {normalizedSessions.map((session, index) => {
-            const key = session?.sessionId ?? session?.id ?? `${session?.scheduledAt ?? "session"}-${index}`;
+            const identity = session?.sessionId ?? session?.id ?? session?.scheduledAt ?? "session";
+            const key = `${identity}-${index}`;
             const scheduledAt = session?.scheduledAt ? new Date(session.scheduledAt) : null;
             const validDate = scheduledAt && !Number.isNaN(scheduledAt.getTime());
 
