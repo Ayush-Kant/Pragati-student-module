@@ -26,8 +26,6 @@ const courseSelect = `
 `;
 
 export const listStudentCourses = async (studentId) => {
-  // Published courses are the student's learning catalogue. A progress row is
-  // created lazily so newly registered students receive the same course list.
   const courses = await pool.query(
     `${courseSelect}
      WHERE tc.status = 'published'
@@ -274,4 +272,10 @@ const formatCourse = (row) => {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
+};
+
+export default {
+  listStudentCourses,
+  getStudentCourseById,
+  updateLessonProgress,
 };
