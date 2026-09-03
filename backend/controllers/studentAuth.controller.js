@@ -35,8 +35,14 @@ const getRefreshToken = (req) => {
 
 const handleError = (res, error) => {
   const status = Number(error?.statusCode) || (error?.code === "auth/email-already-exists" ? 409 : 500);
-  const message = status === 500 ? "Authentication service failed" : error.message;
-  return res.status(status).json({ success: false, message });
+  const message = status === 500 && process.env.NODE_ENV === "production"
+    ? "Authentication service failed"
+    : (error?.message || "Authentication service failed");
+  return res.status(status).json({
+    success: false,
+    message,
+    ...(process.env.NODE_ENV !== "production" && error?.code ? { code: error.code } : {}),
+  });
 };
 
 export const register = async (req, res) => {
