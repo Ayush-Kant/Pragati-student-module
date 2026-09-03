@@ -35,7 +35,7 @@ export default function StudentLayout() {
   }, [sidebarCollapsed]);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="student-shell min-h-screen bg-gray-50 text-gray-900">
       <StudentDashboardHeader
         user={user}
         unreadCount={unreadCount}
