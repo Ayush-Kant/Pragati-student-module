@@ -1,29 +1,27 @@
 import { memo } from 'react';
 import { FlaskConical } from 'lucide-react';
 
-/**
- * Displays sample (visible) test cases from the challenge definition.
- *
- * @param {{ testCases: object[] }} props
- */
 const SampleTestCases = memo(({ testCases }) => {
-  if (!testCases?.length) return null;
+  if (!testCases?.length) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+        No public sample test cases were configured for this challenge.
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-2">
-      <h3 className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+    <div className="space-y-3">
+      <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-600">
         <FlaskConical size={13} aria-hidden="true" />
         Sample Test Cases
       </h3>
-      {testCases.map((tc, idx) => (
-        <div
-          key={tc.id}
-          className="bg-[#0d0d0d] border border-gray-800 rounded-lg p-3 font-mono text-xs text-gray-400"
-        >
-          <p className="text-gray-600 mb-1 font-sans text-xs">Case {idx + 1}</p>
-          <div className="space-y-0.5">
-            <p><span className="text-gray-600">Input: </span>{tc.input}</p>
-            <p><span className="text-gray-600">Expected: </span><span className="text-teal-400">{tc.expectedOutput}</span></p>
+      {testCases.map((testCase, index) => (
+        <div key={testCase.id ?? index} className="rounded-xl border border-slate-200 bg-slate-50 p-4 font-mono text-xs text-slate-700">
+          <p className="mb-2 font-sans text-xs font-semibold text-slate-500">Case {index + 1}</p>
+          <div className="space-y-1">
+            <p><span className="font-sans text-slate-400">Input: </span>{testCase.input}</p>
+            <p><span className="font-sans text-slate-400">Expected: </span><span className="font-semibold text-emerald-700">{testCase.expectedOutput}</span></p>
           </div>
         </div>
       ))}
@@ -32,5 +30,4 @@ const SampleTestCases = memo(({ testCases }) => {
 });
 
 SampleTestCases.displayName = 'SampleTestCases';
-
 export default SampleTestCases;
