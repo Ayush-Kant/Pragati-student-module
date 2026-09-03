@@ -92,14 +92,14 @@ body {
 .student-shell [class*="bg-blue-50/"] { background-color: rgb(238 242 255 / 0.5) !important; }
 .student-shell [class*="bg-indigo-50/"] { background-color: rgb(238 242 255 / 0.5) !important; }
 
-/* Student hero cards use a warm terracotta tone to complement the indigo accent. */
+/* Student hero cards use the same indigo primary as the rest of the product. */
 .student-shell header.bg-gradient-to-br.p-5.text-white,
 .student-shell header.bg-gradient-to-br.sm\:p-7 {
   background-image: none !important;
-  background-color: #92400e !important;
+  background-color: var(--student-primary-600) !important;
 }
 
-/* Remove other promotional blue gradients from student page heroes. */
+/* Remove other promotional gradients from student page heroes. */
 .student-shell .bg-gradient-to-br,
 .student-shell .bg-gradient-to-r,
 .student-shell .bg-gradient-to-b {
