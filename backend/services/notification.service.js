@@ -168,16 +168,9 @@ export const markAsRead = async ({ userId, notificationIds, markAll = false }) =
 };
 
 const sendPushNotifications = async ({ subscriptions, payload }) => {
-  if (!subscriptions.length || !process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY || !process.env.VAPID_SUBJECT) {
-    return { sent: 0, skipped: subscriptions.length };
-  }
+  if (!subscriptions.length || !process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY || !process.env.VAPID_SUBJECT) return { sent: 0, skipped: subscriptions.length };
   let webpush;
-  try {
-    webpush = (await import('web-push')).default;
-  } catch {
-    console.warn('[notifications] Web Push requested but optional dependency "web-push" is not installed.');
-    return { sent: 0, skipped: subscriptions.length };
-  }
+  try { webpush = (await import('web-push')).default; } catch { return { sent: 0, skipped: subscriptions.length }; }
   webpush.setVapidDetails(process.env.VAPID_SUBJECT, process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
   let sent = 0;
   for (const subscription of subscriptions) {
@@ -185,11 +178,8 @@ const sendPushNotifications = async ({ subscriptions, payload }) => {
       await webpush.sendNotification(subscription, JSON.stringify(payload));
       sent += 1;
     } catch (error) {
-      if (error?.statusCode === 404 || error?.statusCode === 410) {
-        await pool.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [subscription.endpoint]);
-      } else {
-        console.error('[notifications] Push delivery failed:', error.message);
-      }
+      if (error?.statusCode === 404 || error?.statusCode === 410) await pool.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [subscription.endpoint]);
+      else console.error('[notifications] Push delivery failed:', error.message);
     }
   }
   return { sent, skipped: subscriptions.length - sent };
@@ -223,32 +213,22 @@ export const sendNotification = async ({ userIds, title, message, type = NOTIFIC
     const studentId = relation ? Number(relation.studentId) : null;
     const pref = preferenceByStudent.get(studentId) || DEFAULT_PREFERENCES[type];
     if (pref.in_app) {
-      await pool.query(
-        `INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES ($1, $2, $3, $4, $5, false)`,
-        [targetUserId, title, message, type, linkUrl],
-      );
+      await pool.query(`INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES ($1, $2, $3, $4, $5, false)`, [targetUserId, title, message, type, linkUrl]);
       delivered += 1;
     }
-    if (sendEmail && pref.email && isEmailQueueAvailable()) {
-      await emailQueue.add({ userId: targetUserId, title, message, type, linkUrl });
-    }
+    if (sendEmail && pref.email && isEmailQueueAvailable()) await emailQueue.add({ userId: targetUserId, title, message, type, linkUrl });
     if (sendPush && pref.push) pushUsers.push(targetUserId);
   }
 
   if (pushUsers.length) {
-    const { rows: subscriptions } = await pool.query(
-      `SELECT user_id AS "userId", endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = ANY($1::int[])`,
-      [pushUsers],
-    );
+    const { rows: subscriptions } = await pool.query(`SELECT user_id AS "userId", endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = ANY($1::int[])`, [pushUsers]);
     const grouped = new Map();
     for (const row of subscriptions) {
       const userId = Number(row.userId);
       if (!grouped.has(userId)) grouped.set(userId, []);
       grouped.get(userId).push({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } });
     }
-    for (const userId of pushUsers) {
-      await sendPushNotifications({ subscriptions: grouped.get(userId) || [], payload: { title, body: message, type, linkUrl } });
-    }
+    for (const userId of pushUsers) await sendPushNotifications({ subscriptions: grouped.get(userId) || [], payload: { title, body: message, type, linkUrl } });
   }
 
   return { success: true, message: "Notifications dispatched successfully", delivered };
@@ -271,12 +251,8 @@ export const registerPushSubscription = async (user, subscription) => {
     error.statusCode = 400;
     throw error;
   }
-  await pool.query(
-    `INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth, user_agent)
-     VALUES ($1, $2, $3, $4, $5)
-     ON CONFLICT (endpoint) DO UPDATE SET user_id = EXCLUDED.user_id, p256dh = EXCLUDED.p256dh, auth = EXCLUDED.auth, user_agent = EXCLUDED.user_agent, updated_at = NOW()`,
-    [userId, endpoint, p256dh, auth, null],
-  );
+  await pool.query(`INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth, user_agent) VALUES ($1, $2, $3, $4, $5)
+    ON CONFLICT (endpoint) DO UPDATE SET user_id = EXCLUDED.user_id, p256dh = EXCLUDED.p256dh, auth = EXCLUDED.auth, user_agent = EXCLUDED.user_agent, updated_at = NOW()`, [userId, endpoint, p256dh, auth, null]);
   return { success: true, message: "Push notifications enabled" };
 };
 
@@ -297,20 +273,21 @@ export const getPublicPushKey = () => {
 
 export const sendDailyDigests = async () => {
   if (!isEmailQueueAvailable()) return { sent: 0 };
+
   const candidates = await pool.query(
     `SELECT u.id AS "userId"
-     FROM users u JOIN students s ON s.user_id = u.id
+     FROM users u
+     JOIN students s ON s.user_id = u.id
      LEFT JOIN student_notification_preferences sp ON sp.student_id = s.id
-     WHERE COALESCE(sp.weekly_digest, true) = true`,
+     WHERE COALESCE(sp.weekly_digest, true) = true
+       AND (u.last_active_at IS NULL OR u.last_active_at < NOW() - INTERVAL '24 hours')`,
   );
+
   let sent = 0;
   for (const row of candidates.rows) {
     const alreadySent = await pool.query(`SELECT 1 FROM notification_digest_log WHERE user_id = $1 AND digest_date = CURRENT_DATE LIMIT 1`, [row.userId]);
     if (alreadySent.rows.length) continue;
-    const unread = await pool.query(
-      `SELECT COUNT(*)::int AS count FROM notifications WHERE user_id = $1 AND is_read = false AND created_at < NOW() - INTERVAL '24 hours'`,
-      [row.userId],
-    );
+    const unread = await pool.query(`SELECT COUNT(*)::int AS count FROM notifications WHERE user_id = $1 AND is_read = false AND created_at < NOW() - INTERVAL '24 hours'`, [row.userId]);
     const count = Number(unread.rows[0]?.count || 0);
     if (!count) continue;
     await emailQueue.add({ userId: row.userId, title: 'Your Pragati notification digest', message: `You have ${count} unread notification${count === 1 ? '' : 's'} waiting in Pragati.`, type: 'digest' });
