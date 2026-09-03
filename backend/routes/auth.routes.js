@@ -11,6 +11,7 @@ router.post("/register", register);
 // PRD SM-01 student-specific Firebase/JWT lifecycle.
 router.post("/student/register", studentAuthController.register);
 router.post("/student/login", studentAuthController.login);
+router.post("/student/google", studentAuthController.googleLogin);
 router.post("/student/refresh", studentAuthController.refresh);
 router.post("/student/logout", studentAuthController.logout);
 
