@@ -53,12 +53,37 @@ const createAssignmentTablesQuery = `
   CREATE INDEX IF NOT EXISTS idx_assignment_grades_student_id ON assignment_grades(student_id);
 `;
 
+const seedDevelopmentAssignments = async () => {
+  if (process.env.NODE_ENV === 'production') return;
+
+  await pool.query(`
+    INSERT INTO assignments (student_id, title, subject, description, due_date, total_marks, status)
+    SELECT seed.student_id, seed.title, seed.subject, seed.description,
+           seed.due_date::date, seed.total_marks, seed.status
+    FROM (
+      VALUES
+        (NULL::integer, 'React Component Architecture', 'Frontend Engineering', 'Build a small React feature demonstrating reusable components, props, state management, and clean component boundaries.', CURRENT_DATE + 7, 100, '${ASSIGNMENT_STATUS.OPEN}'),
+        (NULL::integer, 'PostgreSQL Query Optimization', 'Database Systems', 'Write and optimize SQL queries for a student dashboard. Explain the indexes and query choices used.', CURRENT_DATE + 14, 100, '${ASSIGNMENT_STATUS.OPEN}'),
+        (NULL::integer, 'REST API Design Exercise', 'Backend Engineering', 'Design a REST API for assignment management with validation, authentication, authorization, and consistent error responses.', CURRENT_DATE + 2, 50, '${ASSIGNMENT_STATUS.PENDING}'),
+        (NULL::integer, 'JavaScript Fundamentals Review', 'JavaScript', 'Complete a short review covering closures, promises, array transformations, asynchronous control flow, and error handling.', CURRENT_DATE - 2, 50, '${ASSIGNMENT_STATUS.OPEN}'),
+        (NULL::integer, 'Placement Readiness Reflection', 'Career Development', 'Write a brief reflection on your current strengths, technical gaps, interview goals, and next steps.', CURRENT_DATE + 21, 25, '${ASSIGNMENT_STATUS.CLOSED}')
+    ) AS seed(student_id, title, subject, description, due_date, total_marks, status)
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM assignments existing
+      WHERE existing.title = seed.title
+        AND existing.student_id IS NULL
+    );
+  `);
+};
+
 export const createAssignmentTables = async () => {
   await pool.query(createAssignmentTablesQuery);
 };
 
 export const initializeAssignmentModule = async () => {
   await createAssignmentTables();
+  await seedDevelopmentAssignments();
 };
 
 export default initializeAssignmentModule;
