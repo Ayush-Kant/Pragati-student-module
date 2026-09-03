@@ -55,6 +55,7 @@ const buildAccessToken = (student) => jwt.sign(
     userId: student.authUuid,
     authUserId: student.authUserId,
     studentId: student.studentId,
+    name: student.name,
     email: student.email,
     role: "student",
     firebaseUid: student.firebaseUid,
@@ -127,7 +128,7 @@ export const registerStudent = async ({ email, password, fullName, collegeId }) 
   if (!normalizedEmail || !/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
     const error = new Error("Valid email is required"); error.statusCode = 400; throw error;
   }
-  if (!name || name.length < 2 || name.length > 80 || !/^[A-Za-z][A-Za-z\s.'-]*$/.test(name)) {
+  if (!name || name.length < 2 || name.length > 80) {
     const error = new Error("Full name must be 2-80 characters"); error.statusCode = 400; throw error;
   }
   if (String(password || "").length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
