@@ -119,7 +119,7 @@ export const getPerformance = async (user, driveId = null) => {
        WHERE student_id = $1 AND status IN ('submitted','auto_submitted')
        UNION ALL
        SELECT ag.id, 'assignment', a.title,
-              ROUND(100.0 * ag.score / NULLIF(a.total_marks,0),2), ag.graded_at
+              ROUND(100.0 * ag.score / NULLIF(a.total_marks,0),2), ag.created_at
        FROM assignment_grades ag JOIN assignments a ON a.id = ag.assignment_id
        WHERE ag.student_id = $1
        ORDER BY "submittedAt" DESC NULLS LAST, "submissionId" DESC
@@ -154,6 +154,15 @@ export const getPerformance = async (user, driveId = null) => {
   const rankValue = ranking ? Number(ranking.rank) : null;
   const percentile = rankValue && totalStudents > 1 ? normalizeNumber(((totalStudents - rankValue) / (totalStudents - 1)) * 100) : rankValue === 1 ? 100 : 0;
 
+  const heatmapResult = await pool.query(
+    `SELECT TO_CHAR(DATE(attended_at), 'YYYY-MM-DD') AS day, COUNT(*)::int AS attended_count
+     FROM session_attendance
+     WHERE student_id = $1 AND attended = true AND attended_at >= CURRENT_DATE - INTERVAL '90 days'
+     GROUP BY DATE(attended_at)
+     ORDER BY day`,
+    [userId],
+  );
+
   return {
     overallScore,
     batchRank: rankValue,
@@ -177,7 +186,7 @@ export const getPerformance = async (user, driveId = null) => {
       totalLessons: Number(item.total_lessons || 0),
     })),
     improvementTrend: trend.rows.map((item) => ({ week: item.week, avgScore: normalizeNumber(item.score) })),
-    attendanceHeatmap: [],
+    attendanceHeatmap: heatmapResult.rows.map((item) => ({ day: item.day, attended: Number(item.attended_count || 0) })),
     submissionHistory: submissions.rows.map((item) => ({
       submissionId: String(item.submissionId),
       activityTitle: item.activityTitle,
@@ -215,7 +224,7 @@ export const getSubmissionHistory = async (user, filters = {}) => {
        WHERE saa.student_id = $1 AND saa.status IN ('submitted','auto_submitted')
        UNION ALL
        SELECT ag.id, 'assignment', a.title,
-              100.0 * ag.score / NULLIF(a.total_marks,0), ag.graded_at
+              100.0 * ag.score / NULLIF(a.total_marks,0), ag.created_at
        FROM assignment_grades ag JOIN assignments a ON a.id = ag.assignment_id
        WHERE ag.student_id = $1
        UNION ALL
