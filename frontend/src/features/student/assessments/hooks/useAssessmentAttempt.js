@@ -1,51 +1,59 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { recordTabSwitch, saveAssessmentAnswer } from "../services/assessmentService";
 
-const getInitialTimeLeft = (attempt) => {
+const getTimeLeft = (attempt) => {
   if (!attempt?.expiresAt) return 0;
-  return Math.max(0, Math.floor((new Date(attempt.expiresAt).getTime() - Date.now()) / 1000));
+  return Math.max(0, Math.ceil((new Date(attempt.expiresAt).getTime() - Date.now()) / 1000));
 };
 
 export const useAssessmentAttempt = ({ assessment, attempt, onSubmit }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState(() => attempt?.answers || {});
-  const [timeLeft, setTimeLeft] = useState(() => getInitialTimeLeft(attempt));
+  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(attempt));
+  const [tabSwitchCount, setTabSwitchCount] = useState(() => Number(attempt?.tabSwitchCount || 0));
   const [savingQuestionId, setSavingQuestionId] = useState(null);
+  const [saveError, setSaveError] = useState("");
 
   const answersRef = useRef(answers);
   const submittingRef = useRef(false);
+  const expirySubmittedRef = useRef(false);
   answersRef.current = answers;
 
-  const submitTest = useCallback(
-    async (reason = "submitted") => {
-      if (submittingRef.current) return;
-      submittingRef.current = true;
-      try {
-        await onSubmit?.(answersRef.current, reason);
-      } finally {
-        submittingRef.current = false;
-      }
-    },
-    [onSubmit],
-  );
+  const buildSubmissionAnswers = useCallback(() => {
+    return (assessment?.questions || []).map((question) => ({
+      questionId: question.id,
+      answer: answersRef.current[String(question.id)] ?? null,
+    }));
+  }, [assessment?.questions]);
+
+  const submitTest = useCallback(async (reason = "submitted") => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    try {
+      await onSubmit?.(buildSubmissionAnswers(), reason, tabSwitchCount);
+    } finally {
+      submittingRef.current = false;
+    }
+  }, [buildSubmissionAnswers, onSubmit, tabSwitchCount]);
 
   useEffect(() => {
     setAnswers(attempt?.answers || {});
     setCurrentIndex(0);
-    setTimeLeft(getInitialTimeLeft(attempt));
+    setTimeLeft(getTimeLeft(attempt));
+    setTabSwitchCount(Number(attempt?.tabSwitchCount || 0));
+    expirySubmittedRef.current = false;
   }, [attempt]);
 
   useEffect(() => {
-    if (!attempt?.expiresAt || !attempt?.attemptId) return undefined;
-
+    if (!attempt?.attemptId) return undefined;
     const tick = () => {
-      const remaining = getInitialTimeLeft(attempt);
+      const remaining = getTimeLeft(attempt);
       setTimeLeft(remaining);
-      if (remaining <= 0) {
+      if (remaining <= 0 && !expirySubmittedRef.current) {
+        expirySubmittedRef.current = true;
         void submitTest("timeout");
       }
     };
-
     tick();
     const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
@@ -53,38 +61,36 @@ export const useAssessmentAttempt = ({ assessment, attempt, onSubmit }) => {
 
   useEffect(() => {
     if (!attempt?.attemptId) return undefined;
-
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") return;
-      void recordTabSwitch(attempt.attemptId).catch(() => undefined);
+      if (document.visibilityState !== "hidden") return;
+      void recordTabSwitch(attempt.attemptId)
+        .then((result) => setTabSwitchCount(Number(result?.tabSwitchCount || 0)))
+        .catch(() => undefined);
     };
-
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [attempt?.attemptId]);
 
-  const handleSelectAnswer = useCallback(
-    (optionIndex) => {
-      const question = assessment?.questions?.[currentIndex];
-      if (!question || !attempt?.attemptId) return;
-
-      const answer = { optionIndex };
-      setAnswers((prev) => ({ ...prev, [currentIndex]: answer }));
-      setSavingQuestionId(question.id);
-      void saveAssessmentAnswer(attempt.attemptId, question.id, answer)
-        .catch(() => undefined)
-        .finally(() => setSavingQuestionId(null));
-    },
-    [assessment, attempt?.attemptId, currentIndex],
-  );
+  const handleChangeAnswer = useCallback((answer) => {
+    const question = assessment?.questions?.[currentIndex];
+    if (!question || !attempt?.attemptId) return;
+    setSaveError("");
+    setAnswers((prev) => ({ ...prev, [String(question.id)]: answer }));
+    setSavingQuestionId(question.id);
+    void saveAssessmentAnswer(attempt.attemptId, question.id, answer)
+      .catch((error) => setSaveError(error?.response?.data?.message || error?.message || "Answer could not be saved."))
+      .finally(() => setSavingQuestionId(null));
+  }, [assessment, attempt?.attemptId, currentIndex]);
 
   return {
     currentIndex,
     setCurrentIndex,
     answers,
-    handleSelectAnswer,
+    handleChangeAnswer,
     timeLeft,
+    tabSwitchCount,
     submitTest,
     savingQuestionId,
+    saveError,
   };
 };
