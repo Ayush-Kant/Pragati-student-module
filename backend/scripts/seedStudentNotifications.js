@@ -7,7 +7,7 @@ const seed = async () => {
   const result = await pool.query(
     `SELECT u.id AS "userId", s.id AS "studentId", s.name
      FROM users u JOIN students s ON s.user_id = u.id
-     WHERE LOWER(s.email) = LOWER($1) LIMIT 1`,
+     WHERE LOWER(s.email) = LOWER($1::text) LIMIT 1`,
     [DEMO_EMAIL],
   );
 
@@ -28,9 +28,14 @@ const seed = async () => {
   for (const [type, title, message, linkUrl] of rows) {
     await pool.query(
       `INSERT INTO notifications (user_id, title, message, type, link_url, is_read)
-       SELECT $1, $2, $3, $4, $5, false
+       SELECT $1::integer, $2::text, $3::text, $4::text, $5::text, false
        WHERE NOT EXISTS (
-         SELECT 1 FROM notifications WHERE user_id = $1 AND type = $4 AND title = $2 AND message = $3
+         SELECT 1
+         FROM notifications
+         WHERE user_id = $1::integer
+           AND type = $4::text
+           AND title = $2::text
+           AND message = $3::text
        )`,
       [userId, title, message, type, linkUrl],
     );
