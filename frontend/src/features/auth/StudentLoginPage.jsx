@@ -24,9 +24,20 @@ export default function StudentLoginPage() {
 
   const exchangeFirebaseSession = async () => {
     const idToken = await getFirebaseIdToken();
-    const session = await loginStudentApi(idToken);
-    login("student", session.accessToken);
-    return session;
+
+    try {
+      return await loginStudentApi(idToken);
+    } catch (loginError) {
+      if (loginError?.response?.status !== 404) throw loginError;
+      if (!/^\d+$/.test(collegeId.trim())) {
+        throw new Error("Enter your numeric College ID for the first Firebase sign-in");
+      }
+
+      // A student may already have a Firebase account created outside Pragati.
+      // Provision the platform-side student profile once, then complete the same
+      // Firebase -> Pragati JWT exchange used by normal student accounts.
+      return googleStudentApi(idToken, Number(collegeId));
+    }
   };
 
   const finish = (session) => {
@@ -44,6 +55,7 @@ export default function StudentLoginPage() {
     try {
       await signInStudentWithPassword(email.trim().toLowerCase(), password);
       const session = await exchangeFirebaseSession();
+      login("student", session.accessToken);
       toast.success("Welcome back");
       finish(session);
     } catch (requestError) {
@@ -108,11 +120,10 @@ export default function StudentLoginPage() {
         <form onSubmit={submit} className="space-y-4">
           <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" placeholder="student@college.edu" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
           <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete="current-password" placeholder="Password" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
-          <button disabled={loading} className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 disabled:opacity-60">{loading ? "Signing in…" : "Sign in"}</button>
         </form>
 
         <div className="mt-5">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">College ID for first Google sign-in</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">College ID for first Firebase sign-in</label>
           <input value={collegeId} onChange={(e) => setCollegeId(e.target.value)} inputMode="numeric" placeholder="e.g. 12" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
         </div>
 
