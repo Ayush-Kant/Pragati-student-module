@@ -30,3 +30,9 @@ export const updateLessonProgress = async (studentId, courseId, lessonId, comple
 
   return progress;
 };
+
+export default {
+  listCourses,
+  getCourse,
+  updateLessonProgress,
+};
