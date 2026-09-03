@@ -21,7 +21,12 @@ const uploader = multer({
   limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const extension = path.extname(file.originalname || '').toLowerCase();
-    cb(null, allowedMimeTypes.has(file.mimetype) && allowedExtensions.has(extension));
+    if (!allowedMimeTypes.has(file.mimetype) || !allowedExtensions.has(extension)) {
+      const error = new Error('Only PDF and ZIP files are accepted');
+      error.statusCode = 400;
+      return cb(error);
+    }
+    cb(null, true);
   },
 }).single('file');
 
