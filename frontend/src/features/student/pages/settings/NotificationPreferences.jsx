@@ -1,48 +1,55 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Bell, Mail, Save, Smartphone, Volume2 } from 'lucide-react';
-import StudentPageShell from '../../components/common/StudentPageShell';
-import StudentPageHeader from '../../components/common/StudentPageHeader';
-import { getNotificationPreferences, getPushPublicKey, subscribePush, updateNotificationPreferences } from '../../services/notification.service';
+import { useEffect, useMemo, useState } from "react";
+import { Bell, Mail, Save, Smartphone, Volume2 } from "lucide-react";
+import StudentPageShell from "../../components/common/StudentPageShell";
+import StudentPageHeader from "../../components/common/StudentPageHeader";
+import {
+  getNotificationPreferences,
+  getPushPublicKey,
+  subscribeToPush,
+  updateNotificationPreferences,
+} from "../../../../services/notification.service";
 
 const META = {
-  grade_released: { label: 'Grade released', description: 'When a mentor grades one of your submissions.' },
-  session_scheduled: { label: 'Session scheduled', description: 'When a new learning or live session is added.' },
-  assignment_published: { label: 'Assignment published', description: 'When a mentor publishes an assignment for you.' },
-  shortlisted: { label: 'Shortlisted', description: 'When you are shortlisted for a placement drive.' },
-  interview_invited: { label: 'Interview invitation', description: 'When an interview is scheduled or invitation is sent.' },
-  interview_outcome: { label: 'Interview outcome', description: 'When an interview result is published.' },
-  platform_announcement: { label: 'Platform announcements', description: 'Important announcements from the Pragati platform.' },
-  certificate_issued: { label: 'Certificate issued', description: 'When a certificate is generated for you.' },
+  grade_released: { label: "Grade released", description: "When a mentor grades one of your submissions." },
+  session_scheduled: { label: "Session scheduled", description: "When a new learning or live session is added." },
+  assignment_published: { label: "Assignment published", description: "When a mentor publishes an assignment for you." },
+  shortlisted: { label: "Shortlisted", description: "When you are shortlisted for a placement drive." },
+  interview_invited: { label: "Interview invitation", description: "When an interview is scheduled or invitation is sent." },
+  interview_outcome: { label: "Interview outcome", description: "When an interview result is published." },
+  platform_announcement: { label: "Platform announcements", description: "Important announcements from the Pragati platform." },
+  certificate_issued: { label: "Certificate issued", description: "When a certificate is generated for you." },
 };
 
 const CHANNELS = [
-  { key: 'inApp', label: 'In-app', icon: Bell },
-  { key: 'email', label: 'Email', icon: Mail },
-  { key: 'push', label: 'Push', icon: Smartphone },
+  { key: "inApp", label: "In-app", icon: Bell },
+  { key: "email", label: "Email", icon: Mail },
+  { key: "push", label: "Push", icon: Smartphone },
 ];
 
 export default function NotificationPreferences() {
   const [preferences, setPreferences] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [pushStatus, setPushStatus] = useState('');
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [pushStatus, setPushStatus] = useState("");
 
   const load = async () => {
     setLoading(true);
-    setError('');
+    setError("");
     try {
       const result = await getNotificationPreferences();
       setPreferences(result?.preferences || {});
     } catch (err) {
-      setError(err?.response?.data?.message || err?.message || 'Unable to load preferences.');
+      setError(err?.response?.data?.message || err?.message || "Unable to load preferences.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const orderedTypes = useMemo(() => Object.keys(META), []);
 
@@ -54,47 +61,49 @@ export default function NotificationPreferences() {
         [channel]: !(current[type]?.[channel] ?? false),
       },
     }));
-    setMessage('');
+    setMessage("");
   };
 
   const save = async () => {
     setSaving(true);
-    setMessage('');
-    setError('');
+    setMessage("");
+    setError("");
     try {
       const result = await updateNotificationPreferences(preferences);
       setPreferences(result?.preferences || preferences);
-      setMessage('Preferences saved successfully.');
+      setMessage("Preferences saved successfully.");
     } catch (err) {
-      setError(err?.response?.data?.message || err?.message || 'Unable to save preferences.');
+      setError(err?.response?.data?.message || err?.message || "Unable to save preferences.");
     } finally {
       setSaving(false);
     }
   };
 
   const enablePush = async () => {
-    setPushStatus('');
-    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-      setPushStatus('Browser push is not supported in this browser.');
+    setPushStatus("");
+    if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
+      setPushStatus("Browser push is not supported in this browser.");
       return;
     }
 
     try {
       const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        setPushStatus('Push permission was not granted.');
+      if (permission !== "granted") {
+        setPushStatus("Push permission was not granted.");
         return;
       }
 
       const keyResult = await getPushPublicKey();
-      const registration = await navigator.serviceWorker.register('/sw.js');
+      const registration = await navigator.serviceWorker.register("/sw.js");
       const existing = await registration.pushManager.getSubscription();
-      const subscription = existing || await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(keyResult.publicKey),
-      });
+      const subscription =
+        existing ||
+        (await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(keyResult.publicKey),
+        }));
 
-      await subscribePush(subscription.toJSON());
+      await subscribeToPush(subscription.toJSON());
       setPreferences((current) => ({
         ...current,
         session_scheduled: { ...(current.session_scheduled || {}), push: true },
@@ -102,9 +111,13 @@ export default function NotificationPreferences() {
         interview_invited: { ...(current.interview_invited || {}), push: true },
         interview_outcome: { ...(current.interview_outcome || {}), push: true },
       }));
-      setPushStatus('Browser push notifications are enabled on this device.');
+      setPushStatus("Browser push notifications are enabled on this device.");
     } catch (err) {
-      setPushStatus(err?.response?.data?.message || err?.message || 'Unable to enable browser push. Configure VAPID keys on the server first.');
+      setPushStatus(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Unable to enable browser push. Configure VAPID keys on the server first.",
+      );
     }
   };
 
@@ -149,8 +162,8 @@ export default function NotificationPreferences() {
                   </div>
                   {CHANNELS.map(({ key }) => (
                     <div key={key} className="flex justify-center">
-                      <button type="button" onClick={() => toggle(type, key)} aria-pressed={Boolean(values[key])} className={`h-7 w-12 rounded-full p-1 transition ${values[key] ? 'bg-blue-600' : 'bg-slate-200'}`}>
-                        <span className={`block h-5 w-5 rounded-full bg-white shadow-sm transition ${values[key] ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <button type="button" onClick={() => toggle(type, key)} aria-pressed={Boolean(values[key])} className={`h-7 w-12 rounded-full p-1 transition ${values[key] ? "bg-blue-600" : "bg-slate-200"}`}>
+                        <span className={`block h-5 w-5 rounded-full bg-white shadow-sm transition ${values[key] ? "translate-x-5" : "translate-x-0"}`} />
                       </button>
                     </div>
                   ))}
@@ -163,7 +176,7 @@ export default function NotificationPreferences() {
 
       <div className="mt-6 flex justify-end">
         <button type="button" onClick={save} disabled={saving || loading} className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300">
-          <Save size={16} /> {saving ? 'Saving…' : 'Save preferences'}
+          <Save size={16} /> {saving ? "Saving…" : "Save preferences"}
         </button>
       </div>
     </StudentPageShell>
@@ -171,8 +184,8 @@ export default function NotificationPreferences() {
 }
 
 function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const padding = "=".repeat((4 - (base64String?.length || 0) % 4) % 4);
+  const base64 = `${base64String}${padding}`.replace(/-/g, "+").replace(/_/g, "/");
   const rawData = window.atob(base64);
   return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
 }
