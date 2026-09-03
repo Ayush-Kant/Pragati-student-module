@@ -2,6 +2,12 @@
 -- Keeps the existing notifications table intact while adding the per-event
 -- channel controls and device-level Web Push registration required by SM-12.
 
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ;
+
+CREATE INDEX IF NOT EXISTS idx_users_last_active_at
+  ON users(last_active_at);
+
 CREATE TABLE IF NOT EXISTS notification_preferences (
   student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
   notification_type VARCHAR(64) NOT NULL,
