@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, Award, BarChart3, CalendarDays, ChevronLeft, ChevronRight, Clock3, Medal, RefreshCw, TrendingUp, Zap } from 'lucide-react';
 import StudentPageShell from '../../components/common/StudentPageShell';
 import StudentPageHeader from '../../components/common/StudentPageHeader';
-import { getPerformance, getSubmissionHistory } from '../../../services/performance.service';
+import { getPerformance, getSubmissionHistory } from '../../../../services/performance.service';
 
 const ACTIVITY_META = {
   all: { label: 'All activity' },
@@ -150,22 +150,25 @@ function MetricCard({ icon, label, value, hint }) {
 
 function ActivityBar({ label, score, meta }) {
   const numericScore = score == null ? null : Number(score);
-  return <div><div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-800">{label}</p><p className="mt-1 text-xs text-slate-400">{meta}</p></div><p className="text-sm font-bold text-slate-900">{numericScore == null ? '—' : `${numericScore.toFixed(1)}%`}</p></div><div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-600" style={{ width: `${numericScore == null ? 0 : Math.min(100, Math.max(0, numericScore))}%` }} /></div></div>;
+  const width = numericScore == null ? 0 : Math.min(100, Math.max(0, numericScore));
+  return <div><div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-800">{label}</p><p className="mt-1 text-xs text-slate-400">{meta}</p></div><p className="text-sm font-bold text-slate-900">{numericScore == null ? '—' : `${numericScore.toFixed(1)}%`}</p></div><div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-600" style={{ width: `${width}%` }} /></div></div>;
 }
 
 function buildChartPoints(values) {
   if (!values.length) return [];
-  const width = 632;
-  const height = 210;
   const left = 48;
+  const right = 680;
   const top = 25;
-  const usableWidth = width;
-  const step = values.length === 1 ? 0 : usableWidth / (values.length - 1);
-  return values.map((value, index) => ({ x: left + index * step, y: top + height - (Math.min(100, Math.max(0, value)) / 100) * height }));
+  const bottom = 235;
+  const span = Math.max(values.length - 1, 1);
+  return values.map((value, index) => ({
+    x: left + ((right - left) * index) / span,
+    y: bottom - (Math.min(100, Math.max(0, value)) / 100) * (bottom - top),
+  }));
 }
 
 function formatDate(value) {
+  if (!value) return '—';
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Date unavailable';
-  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString();
 }
