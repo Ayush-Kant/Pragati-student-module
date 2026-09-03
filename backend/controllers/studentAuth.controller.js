@@ -5,6 +5,7 @@ import {
   refreshStudentSession,
   logoutStudent,
 } from "../services/studentAuth.service.js";
+import { provisionStudentFromGoogle } from "../services/studentGoogleAuth.service.js";
 
 const REFRESH_COOKIE = "pragati_student_refresh";
 
@@ -79,6 +80,36 @@ export const login = async (req, res) => {
   }
 };
 
+export const googleLogin = async (req, res) => {
+  try {
+    await ensureStudentAuthSchema();
+    const provisioned = await provisionStudentFromGoogle({
+      idToken: req.body?.idToken,
+      collegeId: req.body?.collegeId,
+    });
+
+    const result = await loginStudentWithFirebase(req.body?.idToken);
+    res.cookie(REFRESH_COOKIE, result.refreshToken, cookieOptions());
+
+    return res.status(provisioned ? 201 : 200).json({
+      success: true,
+      accessToken: result.accessToken,
+      student: {
+        id: result.student.studentId,
+        userId: result.student.userId,
+        fullName: result.student.name,
+        email: result.student.email,
+        onboardingStep: result.student.onboardingStep,
+        profileComplete: result.student.profileCompleteness,
+      },
+      provisioned: Boolean(provisioned),
+    });
+  } catch (error) {
+    console.error("[student-auth] google login:", error);
+    return handleError(res, error);
+  }
+};
+
 export const refresh = async (req, res) => {
   try {
     await ensureStudentAuthSchema();
@@ -113,4 +144,4 @@ export const logout = async (req, res) => {
   }
 };
 
-export default { register, login, refresh, logout };
+export default { register, login, googleLogin, refresh, logout };
