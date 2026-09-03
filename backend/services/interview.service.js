@@ -1,5 +1,6 @@
 import { pool } from "../config/db.js";
 import { sendInterviewScheduledEmail, sendInterviewResultEmail } from "../src/modules/company/services/email.service.js";
+import notificationService from "./notification.service.js";
 
 const getInterviews = async () => {
   const result = await pool.query(`
@@ -32,21 +33,13 @@ const getInterviewById = async (id) => {
   return result.rows[0];
 };
 
-/**
- * Schedule an interview.
- * `applicationId` is the historical API name; the current interview schema
- * stores that relation in interviews.application_id -> student_drive_progress.id.
- */
 const createInterview = async ({ applicationId, scheduledAt, interviewType, interviewerId, studentId }) => {
   const meetingLink = `https://meet.google.com/mock-pragati-${Math.random().toString(36).slice(2, 7)}-${Math.random().toString(36).slice(2, 7)}`;
 
   let interviewStudentId = studentId ? Number(studentId) : null;
   if (applicationId) {
     const relation = await pool.query(
-      `SELECT student_id AS "studentId"
-       FROM student_drive_progress
-       WHERE id = $1
-       LIMIT 1`,
+      `SELECT student_id AS "studentId" FROM student_drive_progress WHERE id = $1 LIMIT 1`,
       [applicationId],
     );
     interviewStudentId = relation.rows[0]?.studentId ?? interviewStudentId;
@@ -60,8 +53,18 @@ const createInterview = async ({ applicationId, scheduledAt, interviewType, inte
 
   const result = await pool.query(
     `INSERT INTO interviews
-      (application_id, student_id, scheduled_at, title, interviewer_id, meeting_link, interview_type, status)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,'scheduled')
+      (application_id, student_id, drive_id, scheduled_at, title, interviewer_id, meeting_link, interview_type, status)
+     VALUES (
+       $1,
+       $2,
+       (SELECT drive_id FROM student_drive_progress WHERE id = $1),
+       $3,
+       $4,
+       $5,
+       $6,
+       $7,
+       'scheduled'
+     )
      RETURNING *`,
     [applicationId || null, interviewStudentId, scheduledAt, interviewType || 'Interview', interviewerId || null, meetingLink, interviewType || 'Technical'],
   );
@@ -69,10 +72,7 @@ const createInterview = async ({ applicationId, scheduledAt, interviewType, inte
   const interview = result.rows[0];
 
   try {
-    const candidateDetails = await pool.query(
-      `SELECT email, name AS full_name FROM students WHERE id = $1`,
-      [interviewStudentId],
-    );
+    const candidateDetails = await pool.query(`SELECT email, name AS full_name FROM students WHERE id = $1`, [interviewStudentId]);
     if (candidateDetails.rows.length > 0) {
       const { email, full_name } = candidateDetails.rows[0];
       await sendInterviewScheduledEmail(email, full_name, interviewType || 'Interview', scheduledAt, meetingLink);
@@ -81,14 +81,23 @@ const createInterview = async ({ applicationId, scheduledAt, interviewType, inte
     console.error("[interview.service] Failed to send email:", emailErr.message);
   }
 
+  try {
+    await notificationService.sendNotificationToStudents({
+      studentIds: [interviewStudentId],
+      title: 'Interview invitation',
+      message: `${interviewType || 'Interview'} has been scheduled for ${new Date(scheduledAt).toLocaleString()}.`,
+      type: notificationService.NOTIFICATION_TYPES.INTERVIEW_INVITED,
+      linkUrl: '/student/interviews',
+    });
+  } catch (notificationError) {
+    console.error('[interview.service] Failed to dispatch student notification:', notificationError.message);
+  }
+
   return interview;
 };
 
 const submitFeedback = async (id, feedback) => {
-  const result = await pool.query(
-    `UPDATE interviews SET feedback = $2, updated_at = NOW() WHERE id = $1 RETURNING *`,
-    [id, feedback],
-  );
+  const result = await pool.query(`UPDATE interviews SET feedback = $2, updated_at = NOW() WHERE id = $1 RETURNING *`, [id, feedback]);
   return result.rows[0];
 };
 
@@ -96,25 +105,32 @@ const updateResult = async (id, resultStatus, attendanceStatus) => {
   const attendance = attendanceStatus || 'present';
   const status = attendance === 'absent' ? 'no_show' : 'completed';
   const result = await pool.query(
-    `UPDATE interviews
-     SET result = $2, status = $3, attendance = $4, updated_at = NOW()
-     WHERE id = $1 RETURNING *`,
+    `UPDATE interviews SET result = $2, status = $3, attendance = $4, updated_at = NOW() WHERE id = $1 RETURNING *`,
     [id, resultStatus, status, attendance],
   );
   const interview = result.rows[0];
 
   if (interview) {
     try {
-      const candidateDetails = await pool.query(
-        `SELECT email, name AS full_name FROM students WHERE id = $1`,
-        [interview.student_id],
-      );
+      const candidateDetails = await pool.query(`SELECT email, name AS full_name FROM students WHERE id = $1`, [interview.student_id]);
       if (candidateDetails.rows.length > 0) {
         const { email, full_name } = candidateDetails.rows[0];
         await sendInterviewResultEmail(email, full_name, interview.title, resultStatus);
       }
     } catch (emailErr) {
       console.error("[interview.service] Failed to send email:", emailErr.message);
+    }
+
+    try {
+      await notificationService.sendNotificationToStudents({
+        studentIds: [interview.student_id],
+        title: 'Interview outcome available',
+        message: `Your ${interview.title || 'interview'} outcome is ${resultStatus}.`,
+        type: notificationService.NOTIFICATION_TYPES.INTERVIEW_OUTCOME,
+        linkUrl: `/student/interviews`,
+      });
+    } catch (notificationError) {
+      console.error('[interview.service] Failed to dispatch outcome notification:', notificationError.message);
     }
   }
 
