@@ -86,16 +86,31 @@ CREATE TABLE IF NOT EXISTS activity_submissions (
   UNIQUE (attempt_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_activity_submissions_student_assessment
+-- A few older developer databases may already contain a relation named
+-- activity_submissions or student_assessment_attempts with a reduced schema.
+-- Keep SM-07 resilient to that case before creating the covering indexes.
+ALTER TABLE activity_submissions
+  ADD COLUMN IF NOT EXISTS assessment_id INTEGER;
+
+ALTER TABLE activity_submissions
+  ADD COLUMN IF NOT EXISTS student_id INTEGER;
+
+ALTER TABLE student_assessment_attempts
+  ADD COLUMN IF NOT EXISTS assessment_id INTEGER;
+
+ALTER TABLE student_assessment_attempts
+  ADD COLUMN IF NOT EXISTS student_id INTEGER;
+
+CREATE INDEX IF NOT EXISTS idx_sm07_activity_submissions_student_assessment
   ON activity_submissions(student_id, assessment_id, submitted_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_activity_submissions_student
+CREATE INDEX IF NOT EXISTS idx_sm07_activity_submissions_student
   ON activity_submissions(student_id, created_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_assessment_attempts_student_assessment
+CREATE INDEX IF NOT EXISTS idx_sm07_assessment_attempts_student_assessment
   ON student_assessment_attempts(student_id, assessment_id, attempt_number DESC);
 
-CREATE INDEX IF NOT EXISTS idx_assessment_attempt_questions_order
+CREATE INDEX IF NOT EXISTS idx_sm07_assessment_attempt_questions_order
   ON student_assessment_attempt_questions(attempt_id, question_order);
 
 -- Normalize the existing demo assessment into a fully testable SM-07 fixture.
