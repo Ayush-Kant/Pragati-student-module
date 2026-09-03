@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
-  googleStudentApi,
   loginStudentApi,
   refreshStudentApi,
 } from "./services/studentAuth.services";
@@ -18,31 +17,21 @@ export default function StudentLoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [collegeId, setCollegeId] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const exchangeFirebaseSession = async () => {
     const idToken = await getFirebaseIdToken();
-
-    try {
-      return await loginStudentApi(idToken);
-    } catch (loginError) {
-      if (loginError?.response?.status !== 404) throw loginError;
-      if (!/^\d+$/.test(collegeId.trim())) {
-        throw new Error("Enter your numeric College ID for the first Firebase sign-in");
-      }
-
-      // A student may already have a Firebase account created outside Pragati.
-      // Provision the platform-side student profile once, then complete the same
-      // Firebase -> Pragati JWT exchange used by normal student accounts.
-      return googleStudentApi(idToken, Number(collegeId));
+    const session = await loginStudentApi(idToken);
+    if (!session?.success || !session?.accessToken) {
+      throw new Error(session?.message || "Unable to create your student session");
     }
+    return session;
   };
 
   const finish = (session) => {
-    const next = session?.student?.onboardingStep;
-    if (next && next < 4) navigate("/student/onboarding", { replace: true });
+    const next = Number(session?.student?.onboardingStep || 1);
+    if (next < 4) navigate("/student/onboarding", { replace: true });
     else navigate("/student/dashboard", { replace: true });
   };
 
@@ -59,7 +48,11 @@ export default function StudentLoginPage() {
       toast.success("Welcome back");
       finish(session);
     } catch (requestError) {
-      setError(requestError?.response?.data?.message || requestError?.message || "Unable to sign in");
+      const code = String(requestError?.code || "");
+      const message = code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found"
+        ? "Invalid email or password."
+        : requestError?.response?.data?.message || requestError?.message || "Unable to sign in";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -70,25 +63,16 @@ export default function StudentLoginPage() {
     setLoading(true);
     try {
       await signInStudentWithGoogle();
-      const idToken = await getFirebaseIdToken();
-      let session;
-      try {
-        session = await loginStudentApi(idToken);
-      } catch (loginError) {
-        if (loginError?.response?.status !== 404) throw loginError;
-        if (!/^\d+$/.test(collegeId.trim())) {
-          throw new Error("Enter your numeric College ID before your first Google sign-in");
-        }
-        const provisioned = await googleStudentApi(idToken, Number(collegeId));
-        session = provisioned;
-        login("student", session.accessToken);
-      }
-
+      const session = await exchangeFirebaseSession();
       login("student", session.accessToken);
       toast.success("Signed in with Google");
       finish(session);
     } catch (requestError) {
-      setError(requestError?.response?.data?.message || requestError?.message || "Google sign-in failed");
+      const code = String(requestError?.code || "");
+      const message = code === "auth/popup-closed-by-user"
+        ? "Google sign-in was cancelled."
+        : requestError?.response?.data?.message || requestError?.message || "Google sign-in failed";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -113,7 +97,7 @@ export default function StudentLoginPage() {
       <div className="w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-xl p-6 sm:p-8">
         <p className="text-xs font-bold tracking-widest uppercase text-blue-600">Pragati Student</p>
         <h1 className="text-3xl font-black text-slate-900 mt-2">Welcome back</h1>
-        <p className="text-sm text-slate-500 mt-2 mb-6">Sign in with Firebase to access your student account.</p>
+        <p className="text-sm text-slate-500 mt-2 mb-6">Sign in with your Firebase student account.</p>
 
         {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
@@ -124,11 +108,6 @@ export default function StudentLoginPage() {
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
-
-        <div className="mt-5">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">College ID for first Firebase sign-in</label>
-          <input value={collegeId} onChange={(e) => setCollegeId(e.target.value)} inputMode="numeric" placeholder="e.g. 12" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
-        </div>
 
         <button disabled={loading} onClick={googleLogin} className="w-full mt-3 rounded-xl border border-slate-200 bg-white py-3 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-60">Continue with Google</button>
         <button disabled={loading} onClick={useExistingSession} className="w-full mt-3 text-xs font-semibold text-slate-400 hover:text-slate-600">Restore existing student session</button>
