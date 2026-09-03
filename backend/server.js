@@ -34,6 +34,7 @@ import studentAssignmentRoutes from "./routes/studentAssignment.routes.js";
 import studentCertificateRoutes from "./routes/studentCertificate.routes.js";
 import studentPerformanceRoutes from "./routes/studentPerformance.routes.js";
 import studentInterviewRoutes from "./routes/studentInterview.routes.js";
+import studentPlacementRoutes from "./routes/studentPlacement.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import collegeProfileRoutes from "./routes/collage.profile.routes.js";
@@ -117,6 +118,7 @@ app.use("/api/student/assignments", studentAssignmentRoutes);
 app.use("/api/student/certificates", studentCertificateRoutes);
 app.use("/api/student/performance", studentPerformanceRoutes);
 app.use("/api/student/interviews", studentInterviewRoutes);
+app.use("/api/student/placement", studentPlacementRoutes);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 
