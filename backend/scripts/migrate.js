@@ -61,6 +61,7 @@ const migrationFiles = [
   "027_normalize_student_account_links.sql",
   "028_create_student_learning_engine.sql",
   "029_complete_student_capabilities.sql",
+  "030_student_interview_foundation.sql",
 ];
 
 async function runMigrationsFresh() {
