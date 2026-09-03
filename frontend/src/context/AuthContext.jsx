@@ -1,5 +1,8 @@
 import { createContext, useContext, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { logoutStudentApi } from "../features/auth/services/studentAuth.services";
+import { firebaseAuth } from "../firebase/studentFirebaseAuth";
+import { signOut } from "firebase/auth";
 
 const AuthContext = createContext();
 
@@ -20,6 +23,7 @@ const getUserFromToken = (token) => {
       email: decoded.email || "candidate@pragati.com",
       role: decoded.role ?? null,
       id: decoded.id || decoded.userId || decoded.sub || null,
+      studentId: decoded.studentId || null,
     };
   } catch {
     try {
@@ -59,14 +63,30 @@ export const AuthProvider = ({ children }) => {
     setUser(getUserFromToken(jwtToken));
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (userRole === "student") {
+      try {
+        await logoutStudentApi();
+      } catch (error) {
+        console.warn("Student session logout request failed:", error?.message || error);
+      }
+      try {
+        await signOut(firebaseAuth);
+      } catch (error) {
+        console.warn("Firebase sign-out failed:", error?.message || error);
+      }
+    }
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     sessionStorage.removeItem("token");
 
+    // Legacy applications may still set readable cookies; remove them client-side.
     document.cookie.split(";").forEach((c) => {
       const cookieName = c.split("=")[0].trim();
-      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      if (cookieName) {
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      }
     });
 
     setToken(null);
