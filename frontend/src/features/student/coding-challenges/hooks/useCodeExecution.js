@@ -20,23 +20,6 @@ import {
  *
  * @param {string} challengeId
  * @param {object | null} challengeStarterCode - Map of language → starter code from challenge data.
- * @returns {{
- *   language: string,
- *   code: string,
- *   executionResult: object | null,
- *   submissionResult: object | null,
- *   isExecuting: boolean,
- *   isSubmitting: boolean,
- *   executionError: string | null,
- *   submissionError: string | null,
- *   isDirty: boolean,
- *   setLanguage: Function,
- *   setCode: Function,
- *   handleRunCode: Function,
- *   handleSubmit: Function,
- *   handleReset: Function,
- *   clearExecutionResult: Function,
- * }}
  */
 export function useCodeExecution(challengeId, challengeStarterCode = null) {
   const [language, setLanguageState] = useState(DEFAULT_LANGUAGE);
@@ -48,80 +31,51 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
   const [submissionError, setSubmissionError] = useState(null);
   const [isDirty, setIsDirty] = useState(false);
 
-  // In-flight guards — prevent duplicate requests without waiting for React re-render.
   const executingRef = useRef(false);
   const submittingRef = useRef(false);
-
-  /**
-   * Per-language code storage — preserves user code across language switches.
-   * Keyed by language value; initialised with starter templates on demand.
-   */
   const codeByLanguage = useRef({});
 
-  /**
-   * Get the current editor code.
-   * Falls back to challenge-specific starter → global starter template.
-   */
   const getCode = useCallback(
     (lang) => {
-      if (codeByLanguage.current[lang] !== undefined) {
-        return codeByLanguage.current[lang];
-      }
-      // Initialise from challenge starter code or global template
-      const starter =
-        (challengeStarterCode && challengeStarterCode[lang]) ||
-        STARTER_TEMPLATES[lang] ||
-        '';
+      if (codeByLanguage.current[lang] !== undefined) return codeByLanguage.current[lang];
+      const starter = (challengeStarterCode && challengeStarterCode[lang]) || STARTER_TEMPLATES[lang] || '';
       codeByLanguage.current[lang] = starter;
       return starter;
     },
-    [challengeStarterCode]
+    [challengeStarterCode],
   );
 
-  // Issue 7 fix: useMemo prevents recomputing initialCode on every render.
-  // useState only consumes this value once (on mount), so the computation
-  // would otherwise be wasted work on subsequent renders.
   const initialCode = useMemo(
-    () =>
-      (challengeStarterCode && challengeStarterCode[DEFAULT_LANGUAGE]) ||
-      STARTER_TEMPLATES[DEFAULT_LANGUAGE] ||
-      '',
+    () => (challengeStarterCode && challengeStarterCode[DEFAULT_LANGUAGE]) || STARTER_TEMPLATES[DEFAULT_LANGUAGE] || '',
+    // The starter is intentionally only used as the initial state value.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [] // intentionally empty — initial value is only needed once
+    [],
   );
 
   const [code, setCodeState] = useState(initialCode);
 
-  /** Update code for the current language and propagate to state. */
   const setCode = useCallback(
     (newCode) => {
       codeByLanguage.current[language] = newCode;
       setCodeState(newCode);
       setIsDirty(true);
     },
-    [language]
+    [language],
   );
 
-  /** Switch language, persisting current code and loading the new language's code. */
   const setLanguage = useCallback(
     (newLang) => {
-      // Save current code before switching
       codeByLanguage.current[language] = code;
       setLanguageState(newLang);
       setCodeState(getCode(newLang));
-      // Clear results when language changes
       setExecutionResult(null);
       setExecutionError(null);
     },
-    [language, code, getCode]
+    [language, code, getCode],
   );
 
-  /** Reset editor to the starter template for the current language. */
   const handleReset = useCallback(() => {
-    const starter =
-      (challengeStarterCode && challengeStarterCode[language]) ||
-      STARTER_TEMPLATES[language] ||
-      '';
+    const starter = (challengeStarterCode && challengeStarterCode[language]) || STARTER_TEMPLATES[language] || '';
     codeByLanguage.current[language] = starter;
     setCodeState(starter);
     setExecutionResult(null);
@@ -129,14 +83,11 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
     setIsDirty(false);
   }, [language, challengeStarterCode]);
 
-  /** Run code against sample test cases. Duplicate-click safe. */
   const handleRunCode = useCallback(async () => {
-    // Duplicate request guard — check ref (instant) before state check.
     if (executingRef.current || submittingRef.current) return;
 
     const payload = { challengeId, language, code };
     const validation = validateExecutionRequest(payload);
-
     if (!validation.isValid) {
       setExecutionError(validation.errors.join(' '));
       return;
@@ -154,22 +105,19 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
       } else {
         setExecutionError(result.error);
       }
-    } catch {
-      setExecutionError('Code execution failed. Please try again.');
+    } catch (error) {
+      setExecutionError(error?.response?.data?.message || error?.message || 'Code execution failed. Please try again.');
     } finally {
       executingRef.current = false;
       setIsExecuting(false);
     }
   }, [challengeId, language, code]);
 
-  /** Submit solution for final evaluation. Duplicate-click safe. */
   const handleSubmit = useCallback(async () => {
-    // Duplicate request guard — check ref (instant) before state check.
     if (submittingRef.current || executingRef.current) return;
 
     const payload = { challengeId, language, code };
     const validation = validateSubmissionRequest(payload);
-
     if (!validation.isValid) {
       setSubmissionError(validation.errors.join(' '));
       return;
@@ -184,13 +132,16 @@ export function useCodeExecution(challengeId, challengeStarterCode = null) {
       const result = await submitSolution(payload);
       if (result.success) {
         setSubmissionResult(result.data);
-        // After a successful submission, mark as no longer dirty.
+        // Make the final submission visible in the same result panel used by
+        // Run Code, including compiler/runtime diagnostics returned by Judge0.
+        setExecutionResult(result.data);
+        setExecutionError(null);
         setIsDirty(false);
       } else {
         setSubmissionError(result.error);
       }
-    } catch {
-      setSubmissionError('Submission failed. Please try again.');
+    } catch (error) {
+      setSubmissionError(error?.response?.data?.message || error?.message || 'Submission failed. Please try again.');
     } finally {
       submittingRef.current = false;
       setIsSubmitting(false);
