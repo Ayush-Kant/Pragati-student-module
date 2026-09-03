@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { pool } from "../config/db.js";
 import { createFirebaseStudent, deleteFirebaseUser, verifyFirebaseIdToken } from "./firebaseAdmin.service.js";
@@ -42,6 +43,14 @@ export const ensureStudentAuthSchema = async () => {
   await pool.query(`
     CREATE INDEX IF NOT EXISTS idx_student_sessions_student
       ON student_sessions(student_id, expires_at DESC);
+  `);
+
+  await pool.query(`
+    INSERT INTO student_profiles (student_id)
+    SELECT s.id
+    FROM students s
+    LEFT JOIN student_profiles p ON p.student_id = s.id
+    WHERE p.student_id IS NULL
   `);
 };
 
@@ -185,7 +194,7 @@ export const registerStudent = async ({ email, password, fullName, collegeId }) 
       `INSERT INTO auth_users (email, password_hash, role, uuid_id)
        VALUES ($1, $2, 'student', $3)
        RETURNING id, uuid_id`,
-      [normalizedEmail, await import("bcrypt").then(({ default: bcrypt }) => bcrypt.hash(String(password), 10)), crypto.randomUUID()],
+      [normalizedEmail, await bcrypt.hash(String(password), 10), crypto.randomUUID()],
     );
 
     const authUserId = authResult.rows[0].id;
@@ -317,6 +326,12 @@ export const refreshStudentSession = async (refreshToken) => {
   }
 
   const row = result.rows[0];
+  if (row.status === "blocked") {
+    const error = new Error("Account is suspended by admin");
+    error.statusCode = 403;
+    throw error;
+  }
+
   await pool.query("UPDATE student_sessions SET last_used_at = NOW() WHERE id = $1", [row.session_id]);
 
   const student = {
@@ -331,10 +346,7 @@ export const refreshStudentSession = async (refreshToken) => {
     profileCompleteness: Number(row.profile_completeness || 0),
   };
 
-  return {
-    accessToken: buildAccessToken(student),
-    student,
-  };
+  return { accessToken: buildAccessToken(student), student };
 };
 
 export const logoutStudent = async (refreshToken) => {
