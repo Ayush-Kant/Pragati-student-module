@@ -120,6 +120,9 @@ export default function StudentLoginPage() {
         <form onSubmit={submit} className="space-y-4">
           <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" placeholder="student@college.edu" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
           <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete="current-password" placeholder="Password" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+          <button disabled={loading} className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 disabled:opacity-60">
+            {loading ? "Signing in…" : "Sign in"}
+          </button>
         </form>
 
         <div className="mt-5">
