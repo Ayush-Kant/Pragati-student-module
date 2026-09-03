@@ -1,4 +1,4 @@
-import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { applicationDefault, cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 
 let initializedAuth = null;
@@ -16,18 +16,35 @@ const parseServiceAccount = () => {
   }
 };
 
+const getProjectId = () => (
+  String(
+    process.env.FIREBASE_PROJECT_ID ||
+    process.env.GOOGLE_CLOUD_PROJECT ||
+    "pragati-85095",
+  ).trim()
+);
+
 export const getFirebaseAdminAuth = () => {
   if (initializedAuth) return initializedAuth;
 
   const apps = getApps();
   if (apps.length === 0) {
     const serviceAccount = parseServiceAccount();
+    const projectId = getProjectId();
 
     if (serviceAccount) {
-      initializeApp({ credential: cert(serviceAccount) });
+      initializeApp({
+        credential: cert(serviceAccount),
+        projectId: serviceAccount.project_id || projectId,
+      });
     } else {
-      // Uses GOOGLE_APPLICATION_CREDENTIALS / platform default credentials.
-      initializeApp();
+      // Local/server deployments may use GOOGLE_APPLICATION_CREDENTIALS.
+      // Supplying the project explicitly prevents Firebase Admin from trying
+      // to discover it from an unconfigured environment.
+      initializeApp({
+        credential: applicationDefault(),
+        projectId,
+      });
     }
   }
 
