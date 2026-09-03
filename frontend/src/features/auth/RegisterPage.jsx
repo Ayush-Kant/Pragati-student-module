@@ -99,6 +99,13 @@ const RegisterPage = () => {
   };
 
   const handleRoleChange = (role) => {
+    if (role === 'student') {
+      // Student registration now has its own Firebase-backed flow and four-step
+      // onboarding. Keep the legacy shared registration form for the other roles.
+      navigate('/student/register');
+      return;
+    }
+
     setSelectedRole(role);
     setFormData({ email: '', password: '', confirmPassword: '' });
     setErrors({});
