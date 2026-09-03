@@ -10,9 +10,25 @@ export const resolveStudentId = async (user) => {
     throw error;
   }
 
-  // The canonical relationship is auth_users -> users -> students through
-  // users.id = students.user_id. Email matching remains only as a legacy
-  // fallback for older student rows that predate account linking.
+  // New student tokens carry the canonical students.id directly. Validate it
+  // against the authenticated users row so the claim cannot select another
+  // student's profile.
+  if (/^\d+$/.test(String(user.studentId ?? ""))) {
+    const byStudentClaim = await pool.query(
+      `SELECT s.id
+       FROM students s
+       INNER JOIN users u ON u.id = s.user_id
+       WHERE s.id = $1
+         AND u.id = $2
+       LIMIT 1`,
+      [Number(user.studentId), Number(user.id)],
+    );
+
+    if (byStudentClaim.rows[0]) return byStudentClaim.rows[0].id;
+  }
+
+  // The canonical relationship is users.id = students.user_id. This is the
+  // primary compatibility path for tokens created before studentId was added.
   const userIds = uniqueStrings([user.id, user.uid]);
   for (const userId of userIds) {
     if (!/^\d+$/.test(userId)) continue;
@@ -60,8 +76,8 @@ export const resolveStudentId = async (user) => {
     if (byAuthId.rows[0]) return byAuthId.rows[0].id;
   }
 
-  // Legacy compatibility: some old seeded student rows only have email.
-  // This fallback allows those rows to be discovered until they are linked.
+  // Legacy compatibility: old seeded/imported student rows may not have been
+  // linked to users yet. Email is the final compatibility fallback.
   if (user.email) {
     const byEmail = await pool.query(
       `SELECT s.id
