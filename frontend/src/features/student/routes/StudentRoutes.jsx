@@ -14,6 +14,8 @@ import ProfilePage from "../pages/profile/ProfilePage";
 import SM02ProfileWorkspace from "../pages/profile/SM02ProfileWorkspace";
 import CoursesPage from "../pages/training/CoursesPage";
 import CourseDetailPage from "../pages/training/CourseDetailPage";
+import SM04LearningWorkspace from "../pages/training/SM04LearningWorkspace";
+import SM04CourseWorkspace from "../pages/training/SM04CourseWorkspace";
 import LiveSessionsPage from "../live-sessions/pages/LiveSessionsPage";
 import AssignmentsPage from "../pages/assignments/AssignmentsPage";
 import AssignmentDetail from "../pages/assignments/AssignmentDetail";
@@ -61,8 +63,11 @@ const studentRoute = (
         {/* SM-02: dedicated profile workspace. Legacy implementation remains available for rollback/reference. */}
         <Route path="profile" element={<SM02ProfileWorkspace />} />
         <Route path="profile/legacy" element={<ProfilePage />} />
-        <Route path="courses" element={<CoursesPage />} />
-        <Route path="courses/:courseId" element={<CourseDetailPage />} />
+        {/* SM-04: learning workspace. Existing learning screens remain available for rollback/reference. */}
+        <Route path="courses" element={<SM04LearningWorkspace />} />
+        <Route path="courses/legacy" element={<CoursesPage />} />
+        <Route path="courses/:courseId" element={<SM04CourseWorkspace />} />
+        <Route path="courses-legacy/:courseId" element={<CourseDetailPage />} />
         <Route path="sessions" element={<LiveSessionsPage />} />
         <Route path="assignments" element={<AssignmentsPage />} />
         <Route path="assignments/:id" element={<AssignmentDetail />} />
