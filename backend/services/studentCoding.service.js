@@ -126,6 +126,22 @@ const executeWithJudge0 = async ({ sourceCode, languageId, stdin, expectedOutput
   };
 };
 
+const buildTestResult = (testCase, result) => ({
+  id: testCase.id,
+  passed: result.verdict === 'Accepted',
+  input: testCase.input,
+  expected: testCase.expectedOutput,
+  actual: result.stdout.trim(),
+  runtime: result.runtime,
+  memory: result.memory,
+  stderr: result.stderr || null,
+  compileOutput: result.compileOutput || null,
+  message: result.message || null,
+  verdict: result.verdict,
+  statusId: result.statusId,
+  statusDescription: result.statusDescription,
+});
+
 const getChallengeRows = async (studentUserId) => {
   const result = await pool.query(
     `SELECT
@@ -236,43 +252,66 @@ const getTestCases = async (challengeId, hidden) => {
   return result.rows;
 };
 
-export const runCode = async (studentUserId, payload) => {
-  const challengeId = Number(payload.challengeId);
-  const challenge = await assertChallenge(challengeId);
-  const publicTests = await getTestCases(challengeId, false);
-  if (!publicTests.length) {
-    publicTests.push({ id: 0, input: challenge.sampleInput || '', expectedOutput: challenge.sampleOutput || '', timeLimitMs: 2000 });
-  }
-
-  const languageId = resolveLanguageId(payload.language);
+const runTests = async ({ tests, sourceCode, languageId }) => {
   const results = [];
-  for (const testCase of publicTests) {
+
+  for (const testCase of tests) {
     const result = await executeWithJudge0({
-      sourceCode: payload.code,
+      sourceCode,
       languageId,
       stdin: testCase.input,
       expectedOutput: testCase.expectedOutput,
       timeLimitMs: testCase.timeLimitMs,
     });
-    results.push({
-      id: testCase.id,
-      passed: result.verdict === 'Accepted',
-      input: testCase.input,
-      expected: testCase.expectedOutput,
-      actual: result.stdout.trim(),
-      runtime: result.runtime,
-      stderr: result.stderr || result.compileOutput || null,
-      verdict: result.verdict,
-    });
+    results.push(buildTestResult(testCase, result));
+
+    if (result.verdict !== 'Accepted') {
+      // A compile/runtime/TLE/internal failure cannot be repaired by testing the
+      // remaining cases, and stopping preserves the first meaningful diagnostic.
+      break;
+    }
   }
 
+  return results;
+};
+
+const firstDiagnostic = (results) => {
+  const failure = results.find((item) => item.verdict !== 'Accepted');
   return {
-    verdict: results.every((item) => item.passed) ? 'Accepted' : (results.find((item) => item.verdict !== 'Accepted')?.verdict || 'Wrong Answer'),
-    runtime: results.reduce((max, item) => Math.max(max, Number(item.runtime || 0)), 0),
-    memory: null,
-    testResults: results,
-    stdout: results.map((item) => item.actual).join('\n'),
-    stderr: results.find((item) => item.stderr)?.stderr || null,
+    stderr: failure?.stderr || null,
+    compileOutput: failure?.compileOutput || null,
+    message: failure?.message || null,
+    memory: failure?.memory ?? null,
+    statusId: failure?.statusId ?? null,
+    statusDescription: failure?.statusDescription || null,
+  };
+};
+
+export const runCode = async (studentUserId, payload) => {
+  const challengeId = Number(payload.challengeId);
+  const challenge = await assertChallenge(challengeId);
+  const publicTests = await getTestCases(challengeId, false);
+  const tests = publicTests.length
+    ? publicTests
+    : [{ id: 0, input: challenge.sampleInput || '', expectedOutput: challenge.sampleOutput || '', timeLimitMs: 2000 }];
+
+  const languageId = resolveLanguageId(payload.language);
+  const testResults = await runTests({ tests, sourceCode: payload.code, languageId });
+  const failure = testResults.find((item) => item.verdict !== 'Accepted');
+  const verdict = failure?.verdict || (testResults.length ? 'Accepted' : 'Pending');
+  const diagnostics = firstDiagnostic(testResults);
+
+  return {
+    verdict,
+    runtime: testResults.reduce((max, item) => Math.max(max, Number(item.runtime || 0)), 0),
+    memory: diagnostics.memory,
+    testResults,
+    stdout: testResults.map((item) => item.actual).filter(Boolean).join('\n'),
+    stderr: diagnostics.stderr,
+    compileOutput: diagnostics.compileOutput,
+    message: diagnostics.message,
+    statusId: diagnostics.statusId,
+    statusDescription: diagnostics.statusDescription,
     challengeId,
   };
 };
@@ -281,26 +320,23 @@ export const submitSolution = async (studentUserId, payload) => {
   const challengeId = Number(payload.challengeId);
   const challenge = await assertChallenge(challengeId);
   const hiddenTests = await getTestCases(challengeId, true);
-  const tests = hiddenTests.length ? hiddenTests : await getTestCases(challengeId, false);
-  const languageId = resolveLanguageId(payload.language);
-  const results = [];
+  const publicTests = await getTestCases(challengeId, false);
+  const tests = hiddenTests.length ? hiddenTests : publicTests;
 
-  for (const testCase of tests) {
-    const result = await executeWithJudge0({
-      sourceCode: payload.code,
-      languageId,
-      stdin: testCase.input,
-      expectedOutput: testCase.expectedOutput,
-      timeLimitMs: testCase.timeLimitMs,
-    });
-    results.push(result);
+  if (!tests.length) {
+    const error = new Error('This coding challenge has no test cases configured');
+    error.statusCode = 422;
+    throw error;
   }
 
-  const passed = results.filter((result) => result.verdict === 'Accepted').length;
-  const total = results.length;
-  const score = total ? Math.round((passed / total) * 10000) / 100 : 0;
-  const verdict = passed === total ? 'Accepted' : (results.find((result) => result.verdict !== 'Accepted')?.verdict || 'Wrong Answer');
-  const runtime = results.reduce((max, result) => Math.max(max, Number(result.runtime || 0)), 0);
+  const languageId = resolveLanguageId(payload.language);
+  const testResults = await runTests({ tests, sourceCode: payload.code, languageId });
+  const passed = testResults.filter((result) => result.verdict === 'Accepted').length;
+  const total = tests.length;
+  const score = Math.round((passed / total) * 10000) / 100;
+  const verdict = testResults.find((result) => result.verdict !== 'Accepted')?.verdict || 'Accepted';
+  const runtime = testResults.reduce((max, result) => Math.max(max, Number(result.runtime || 0)), 0);
+  const diagnostics = firstDiagnostic(testResults);
 
   const submission = await pool.query(
     `INSERT INTO challenge_submissions
@@ -316,8 +352,15 @@ export const submitSolution = async (studentUserId, payload) => {
     challengeTitle: challenge.title,
     language: payload.language,
     code: payload.code,
-    testResults: [],
+    testResults,
     status: verdict,
+    stdout: testResults.map((item) => item.actual).filter(Boolean).join('\n'),
+    stderr: diagnostics.stderr,
+    compileOutput: diagnostics.compileOutput,
+    message: diagnostics.message,
+    memory: diagnostics.memory,
+    statusId: diagnostics.statusId,
+    statusDescription: diagnostics.statusDescription,
   };
 };
 
