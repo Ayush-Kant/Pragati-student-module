@@ -1,54 +1,70 @@
 import { pool } from "../config/db.js";
 
-const isUuid = (value) =>
-  typeof value === "string" &&
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
-
-const candidateIds = (user) => [user?.userId, user?.uid, user?.authUserId, user?.id]
-  .filter((value) => value !== null && value !== undefined && value !== "")
-  .map(String)
-  .filter((value, index, values) => values.indexOf(value) === index);
+const unique = (values) => [...new Set(values.filter((value) => value !== null && value !== undefined && value !== "").map(String))];
+const isUuid = (value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 
 export const resolveStudentId = async (user) => {
-  for (const candidate of candidateIds(user)) {
-    if (/^\d+$/.test(candidate)) {
-      const direct = await pool.query(
-        "SELECT id FROM students WHERE id = $1 LIMIT 1",
-        [Number(candidate)],
-      );
-      if (direct.rows[0]) return direct.rows[0].id;
+  if (!user) throw Object.assign(new Error("Authentication required"), { statusCode: 401 });
 
-      const userResult = await pool.query(
-        "SELECT email FROM users WHERE id = $1 LIMIT 1",
-        [Number(candidate)],
-      );
-      const email = userResult.rows[0]?.email;
-      if (email) {
-        const studentResult = await pool.query(
-          "SELECT id FROM students WHERE LOWER(email) = LOWER($1) LIMIT 1",
-          [email],
-        );
-        if (studentResult.rows[0]) return studentResult.rows[0].id;
-      }
-    }
-
-    if (isUuid(candidate)) {
-      const result = await pool.query(
-        `SELECT s.id
-         FROM auth_users au
-         JOIN users u ON u.auth_user_id = au.id
-         JOIN students s ON LOWER(s.email) = LOWER(u.email)
-         WHERE au.uuid_id = $1
-         LIMIT 1`,
-        [candidate],
-      );
-      if (result.rows[0]) return result.rows[0].id;
-    }
+  if (/^\d+$/.test(String(user.studentId ?? "")) && /^\d+$/.test(String(user.id ?? ""))) {
+    const result = await pool.query(
+      `SELECT s.id
+       FROM students s
+       JOIN users u ON u.id = s.user_id
+       WHERE s.id = $1 AND u.id = $2
+       LIMIT 1`,
+      [Number(user.studentId), Number(user.id)],
+    );
+    if (result.rows[0]) return result.rows[0].id;
   }
 
-  throw Object.assign(new Error("Unable to resolve authenticated student"), {
-    statusCode: 403,
-  });
+  for (const candidate of unique([user.id, user.uid])) {
+    if (!/^\d+$/.test(candidate)) continue;
+    const result = await pool.query(
+      `SELECT s.id
+       FROM students s
+       JOIN users u ON u.id = s.user_id
+       WHERE u.id = $1
+       LIMIT 1`,
+      [Number(candidate)],
+    );
+    if (result.rows[0]) return result.rows[0].id;
+  }
+
+  for (const candidate of unique([user.authUserId])) {
+    if (!/^\d+$/.test(candidate)) continue;
+    const result = await pool.query(
+      `SELECT s.id
+       FROM students s
+       JOIN users u ON u.id = s.user_id
+       JOIN auth_users au ON au.id = u.auth_user_id
+       WHERE au.id = $1
+       LIMIT 1`,
+      [Number(candidate)],
+    );
+    if (result.rows[0]) return result.rows[0].id;
+  }
+
+  for (const candidate of unique([user.userId])) {
+    if (!isUuid(candidate)) continue;
+    const result = await pool.query(
+      `SELECT s.id
+       FROM students s
+       JOIN users u ON u.id = s.user_id
+       JOIN auth_users au ON au.id = u.auth_user_id
+       WHERE au.uuid_id::text = $1
+       LIMIT 1`,
+      [candidate],
+    );
+    if (result.rows[0]) return result.rows[0].id;
+  }
+
+  if (user.email) {
+    const result = await pool.query(`SELECT id FROM students WHERE LOWER(email) = LOWER($1) LIMIT 1`, [String(user.email)]);
+    if (result.rows[0]) return result.rows[0].id;
+  }
+
+  throw Object.assign(new Error("Unable to resolve authenticated student"), { statusCode: 403 });
 };
 
 export default resolveStudentId;
