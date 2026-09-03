@@ -94,7 +94,8 @@ const AuthPage = () => {
     }
 
     login('student', session.accessToken);
-    navigate('/student/dashboard');
+    const nextStep = Number(session.student?.onboardingStep || 1);
+    navigate(nextStep < 4 ? '/student/onboarding' : '/student/dashboard', { replace: true });
   };
 
   const handleSubmit = async (event) => {
@@ -132,31 +133,29 @@ const AuthPage = () => {
         return;
       }
 
-      // The shared login page historically used only the platform password table.
-      // Student accounts created through Firebase are authenticated by Firebase first,
-      // so transparently fall back to the dedicated student session exchange when the
-      // legacy endpoint rejects the credentials.
-      if (result.message === 'Invalid credentials') {
+      // Student authentication is owned by Firebase according to SM-01. The shared
+      // login page transparently falls through to the Firebase student flow without
+      // exposing implementation details to the user.
+      if (
+        result.message === 'Invalid credentials' ||
+        result.message === 'Student accounts must sign in with Firebase'
+      ) {
         try {
           await handleFirebaseStudentLogin();
           return;
         } catch (firebaseError) {
           console.error('Firebase student login fallback failed:', firebaseError);
           const firebaseCode = String(firebaseError?.code || '');
-          const backendStatus = firebaseError?.response?.status;
-
-          if (backendStatus === 404) {
-            setSubmitMessage({
-              type: 'error',
-              text: 'Firebase sign-in succeeded, but this email is not linked to a Pragati student profile. Use Student / Firebase login to complete student setup.',
-            });
-            return;
-          }
-
           if (firebaseCode === 'auth/invalid-credential' || firebaseCode === 'auth/wrong-password' || firebaseCode === 'auth/user-not-found') {
             setSubmitMessage({ type: 'error', text: 'Invalid email or password.' });
             return;
           }
+          if (firebaseCode === 'auth/too-many-requests') {
+            setSubmitMessage({ type: 'error', text: 'Too many sign-in attempts. Please try again later.' });
+            return;
+          }
+          setSubmitMessage({ type: 'error', text: firebaseError?.message || 'Unable to sign in with Firebase.' });
+          return;
         }
       }
 
