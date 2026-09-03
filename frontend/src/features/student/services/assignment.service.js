@@ -12,8 +12,9 @@ export const getAssignmentSubmission = async (id) => unwrap(await api.get(`/stud
 export const getAssignmentSubmissions = async () => unwrap(await api.get('/student/assignments/submissions'));
 
 export const submitAssignment = async (id, payload) => {
-  const isForm = typeof FormData !== 'undefined' && payload instanceof FormData;
-  const response = await api.post(`/student/assignments/${id}/submit`, payload, isForm ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined);
+  // Do not set multipart Content-Type manually. Axios/browser must add the boundary
+  // parameter for multipart/form-data so multer can parse the upload correctly.
+  const response = await api.post(`/student/assignments/${id}/submit`, payload);
   return unwrap(response);
 };
 
