@@ -29,6 +29,7 @@ export const buildAssignmentPayload = (assignment) => ({
     totalMarks: assignment.totalMarks,
     status: assignment.status,
     createdAt: assignment.createdAt,
+    submission: assignment.submission || null,
 });
 
 export const buildSubmissionPayload = (submission) => ({
