@@ -27,6 +27,7 @@ import studentProfileRoutes from "./routes/studentProfile.routes.js";
 import studentAssessmentRoutes from "./routes/studentAssessment.routes.js";
 import studentCourseRoutes from "./src/routes/studentCourseRoutes.js";
 import studentLiveSessionRoutes from "./src/routes/liveSessionRoutes.js";
+import studentProjectRoutes from "./routes/studentProject.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import collegeProfileRoutes from "./routes/collage.profile.routes.js";
@@ -117,8 +118,12 @@ app.use("/api/student/profile", studentProfileRoutes);
 app.use("/api/student/assessments", studentAssessmentRoutes);
 app.use("/api/student/courses", studentCourseRoutes);
 app.use("/api/student/sessions", studentLiveSessionRoutes);
+app.use("/api/student/projects", studentProjectRoutes);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
+
+// Public project/report assets
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Admin
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
