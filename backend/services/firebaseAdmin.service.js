@@ -1,19 +1,62 @@
-import { applicationDefault, cert, getApps, initializeApp } from "firebase-admin/app";
+import { readFileSync } from "node:fs";
+import { applicationDefault, cert, getApps, getApp, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 
 const FIREBASE_PROJECT_ID = "pragatistudentmodule";
 let initializedAuth = null;
 
-const parseServiceAccount = () => {
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+const normalizeServiceAccount = (serviceAccount) => {
+  if (serviceAccount?.private_key) {
+    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+  }
+  return serviceAccount;
+};
+
+const parseServiceAccountJson = (raw) => {
   if (!raw) return null;
 
   try {
-    const parsed = JSON.parse(raw);
-    if (parsed.private_key) parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
-    return parsed;
+    return normalizeServiceAccount(JSON.parse(raw));
   } catch {
     throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON");
+  }
+};
+
+const loadServiceAccount = () => {
+  const fromEnv = parseServiceAccountJson(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+  if (fromEnv) return fromEnv;
+
+  const configuredPath = String(process.env.GOOGLE_APPLICATION_CREDENTIALS || "").trim();
+  if (!configuredPath) return null;
+
+  let raw;
+  try {
+    raw = readFileSync(configuredPath, "utf8");
+  } catch (error) {
+    throw new Error(
+      `Firebase service account file could not be read at ${configuredPath}: ${error.message}`,
+    );
+  }
+
+  try {
+    return normalizeServiceAccount(JSON.parse(raw));
+  } catch {
+    throw new Error(`Firebase service account file at ${configuredPath} is not valid JSON`);
+  }
+};
+
+const getConfiguredProjectId = () => {
+  const projectId = String(process.env.FIREBASE_PROJECT_ID || FIREBASE_PROJECT_ID).trim();
+  if (!projectId) throw new Error("FIREBASE_PROJECT_ID is required for Firebase Admin");
+  return projectId;
+};
+
+const validateServiceAccountProject = (serviceAccount, configuredProjectId) => {
+  const serviceAccountProjectId = String(serviceAccount?.project_id || "").trim();
+  if (serviceAccountProjectId && serviceAccountProjectId !== configuredProjectId) {
+    throw new Error(
+      `Firebase service account project mismatch: expected ${configuredProjectId}, received ${serviceAccountProjectId}`,
+    );
   }
 };
 
@@ -22,26 +65,19 @@ export const getFirebaseAdminAuth = () => {
 
   const apps = getApps();
   if (apps.length === 0) {
-    const serviceAccount = parseServiceAccount();
-    const configuredProjectId = String(
-      process.env.FIREBASE_PROJECT_ID || FIREBASE_PROJECT_ID,
-    ).trim();
+    const serviceAccount = loadServiceAccount();
+    const configuredProjectId = getConfiguredProjectId();
 
     if (serviceAccount) {
-      const serviceAccountProjectId = String(serviceAccount.project_id || "").trim();
-      if (serviceAccountProjectId && serviceAccountProjectId !== configuredProjectId) {
-        throw new Error(
-          `Firebase service account project mismatch: expected ${configuredProjectId}, received ${serviceAccountProjectId}`,
-        );
-      }
-
+      validateServiceAccountProject(serviceAccount, configuredProjectId);
       initializeApp({
         credential: cert(serviceAccount),
         projectId: configuredProjectId,
       });
     } else {
-      // Local/server deployments may use GOOGLE_APPLICATION_CREDENTIALS.
-      // The project is explicit so Admin SDK does not depend on ambient project discovery.
+      // Google-hosted deployments may use ambient Application Default Credentials.
+      // Local development should set GOOGLE_APPLICATION_CREDENTIALS to the downloaded
+      // service-account JSON file so the credential source is deterministic.
       initializeApp({
         credential: applicationDefault(),
         projectId: configuredProjectId,
@@ -49,8 +85,18 @@ export const getFirebaseAdminAuth = () => {
     }
   }
 
-  initializedAuth = getAuth();
+  initializedAuth = getAuth(getApp());
   return initializedAuth;
+};
+
+export const verifyFirebaseAdminConfiguration = async () => {
+  const auth = getFirebaseAdminAuth();
+  const app = getApp();
+  await auth.listUsers(1);
+  return {
+    projectId: String(app.options.projectId || FIREBASE_PROJECT_ID),
+    credentialConfigured: true,
+  };
 };
 
 export const createFirebaseStudent = async ({ email, password, fullName }) => {
