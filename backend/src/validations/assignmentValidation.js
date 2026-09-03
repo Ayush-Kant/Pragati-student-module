@@ -33,7 +33,7 @@ export const updateAssignmentSchema = Joi.object({
     totalMarks: Joi.number().integer().min(1).optional(),
     status: Joi.string().valid(...Object.values(ASSIGNMENT_STATUS)).optional(),
     ...assignmentOptions,
-}).required();
+}).min(1).required();
 
 // File submissions arrive as multipart/form-data with the actual file on req.file.
 // Body-level validation must therefore not reject an otherwise valid file-only submission.
@@ -61,6 +61,6 @@ export const feedbackSchema = Joi.object({
 }).required();
 
 export const gradeSchema = Joi.object({
-    score: Joi.number().min(0).max(100).required(),
+    score: Joi.number().min(0).max(100000).required(),
     remarks: Joi.string().trim().max(2000).optional(),
 }).required();
