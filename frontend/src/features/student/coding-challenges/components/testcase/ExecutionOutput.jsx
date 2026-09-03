@@ -15,14 +15,14 @@ const VERDICT_ICONS = {
 };
 
 /**
- * Displays execution results, preserving the actual backend verdict instead
- * of collapsing every failed run into "Wrong Answer".
+ * Displays execution results without collapsing judge failures into
+ * "Wrong Answer" and preserves the diagnostics returned by Judge0.
  */
 const ExecutionOutput = memo(({ result, error, isLoading = false }) => {
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-slate-500 p-3">
-        <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" aria-hidden="true" />
+      <div className="flex items-center gap-2 p-3 text-sm text-slate-500">
+        <span className="h-2 w-2 animate-pulse rounded-full bg-blue-500" aria-hidden="true" />
         Running against sample test cases…
       </div>
     );
@@ -30,8 +30,8 @@ const ExecutionOutput = memo(({ result, error, isLoading = false }) => {
 
   if (error) {
     return (
-      <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
-        <p className="font-semibold mb-1">Execution Error</p>
+      <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="mb-1 font-semibold">Execution Error</p>
         <p>{error}</p>
       </div>
     );
@@ -46,27 +46,28 @@ const ExecutionOutput = memo(({ result, error, isLoading = false }) => {
   );
   const Icon = VERDICT_ICONS[verdict] || AlertTriangle;
   const verdictClasses = getVerdictClasses(verdict);
+  const hasDiagnostic = Boolean(result.compileOutput || result.stderr || result.message);
   const isCompilationError = verdict === VERDICT.COMPILATION_ERROR;
   const isRuntimeError = verdict === VERDICT.RUNTIME_ERROR;
 
   return (
     <div className="space-y-4">
-      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold border ${verdictClasses}`}>
+      <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold ${verdictClasses}`}>
         <Icon size={14} aria-hidden="true" />
         {verdict}
       </div>
 
-      <div className="flex items-center gap-4 flex-wrap rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
+      <div className="flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
         <RuntimeStatistics runtime={result.runtime} />
         <MemoryUsage memory={result.memory} />
       </div>
 
-      {(isCompilationError || isRuntimeError) && (result.stderr || result.compileOutput || result.message) && (
-        <div className="rounded-xl bg-red-50 border border-red-200 p-4">
-          <p className="text-sm font-semibold text-red-800 mb-2">
-            {isCompilationError ? 'Compiler output' : 'Runtime output'}
+      {hasDiagnostic && verdict !== VERDICT.ACCEPTED && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+          <p className="mb-2 text-sm font-semibold text-red-800">
+            {isCompilationError ? 'Compiler output' : isRuntimeError ? 'Runtime output' : 'Judge diagnostics'}
           </p>
-          <pre className="whitespace-pre-wrap break-words text-xs leading-5 font-mono text-red-700">
+          <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-5 text-red-700">
             {result.compileOutput || result.stderr || result.message}
           </pre>
         </div>
@@ -81,11 +82,11 @@ const ExecutionOutput = memo(({ result, error, isLoading = false }) => {
                 key={testCase.id ?? index}
                 className={`rounded-xl border p-4 text-sm ${
                   testCase.passed
-                    ? 'bg-emerald-50 border-emerald-200'
-                    : 'bg-red-50 border-red-200'
+                    ? 'border-emerald-200 bg-emerald-50'
+                    : 'border-red-200 bg-red-50'
                 }`}
               >
-                <div className="flex items-center gap-2 mb-2">
+                <div className="mb-2 flex items-center gap-2">
                   {testCase.passed ? (
                     <CheckCircle2 size={14} className="text-emerald-600" aria-hidden="true" />
                   ) : (
@@ -99,7 +100,7 @@ const ExecutionOutput = memo(({ result, error, isLoading = false }) => {
                   </span>
                 </div>
 
-                <div className="space-y-1 font-mono text-xs text-slate-600 break-words">
+                <div className="space-y-1 break-words font-mono text-xs text-slate-600">
                   <p><span className="text-slate-400">Input: </span>{testCase.input}</p>
                   <p><span className="text-slate-400">Expected: </span><span className="text-emerald-700">{testCase.expected}</span></p>
                   {!testCase.passed && (
@@ -113,15 +114,15 @@ const ExecutionOutput = memo(({ result, error, isLoading = false }) => {
       )}
 
       {result.stdout && !isCompilationError && !isRuntimeError && (
-        <div className="rounded-xl bg-slate-900 p-4 text-xs font-mono text-slate-100">
-          <p className="font-semibold text-slate-300 mb-2">Program output</p>
+        <div className="rounded-xl bg-slate-900 p-4 font-mono text-xs text-slate-100">
+          <p className="mb-2 font-semibold text-slate-300">Program output</p>
           <pre className="whitespace-pre-wrap break-words">{result.stdout}</pre>
         </div>
       )}
 
-      {result.stderr && !isCompilationError && !isRuntimeError && (
-        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-xs font-mono text-red-700">
-          <p className="font-semibold mb-1">stderr</p>
+      {result.stderr && !isCompilationError && !isRuntimeError && !hasDiagnostic && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 font-mono text-xs text-red-700">
+          <p className="mb-1 font-semibold">stderr</p>
           <pre className="whitespace-pre-wrap break-words">{result.stderr}</pre>
         </div>
       )}
