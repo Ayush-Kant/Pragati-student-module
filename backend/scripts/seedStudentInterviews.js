@@ -42,25 +42,47 @@ const seed = async () => {
     await pool.query(
       `INSERT INTO interviews
         (application_id, student_id, scheduled_at, title, interviewer_id, meeting_link, interview_type, result, status, attendance, feedback)
-       SELECT NULL, $1, $2::timestamptz, $3, NULL, $4, $5,
-              CASE WHEN $6 = 'completed' THEN 'PASS' ELSE 'PENDING' END,
-              $6,
-              CASE WHEN $6 = 'completed' THEN 'present' ELSE 'pending' END,
-              CASE WHEN $6 = 'completed' THEN 'Great communication and solid full-stack fundamentals.' ELSE NULL END
+       SELECT
+         $1::integer,
+         $2::integer,
+         $3::timestamptz,
+         $4::varchar(255),
+         NULL::integer,
+         $5::varchar(500),
+         $6::varchar(100),
+         CASE WHEN $7::varchar = 'completed' THEN 'PASS' ELSE 'PENDING' END,
+         $7::varchar,
+         CASE WHEN $7::varchar = 'completed' THEN 'present' ELSE 'pending' END,
+         CASE WHEN $7::varchar = 'completed'
+              THEN 'Great communication and solid full-stack fundamentals.'
+              ELSE NULL END
        WHERE NOT EXISTS (
-         SELECT 1 FROM interviews
-         WHERE student_id = $1 AND title = $3 AND scheduled_at = $2::timestamptz
+         SELECT 1
+         FROM interviews
+         WHERE student_id = $2::integer
+           AND title = $4::varchar(255)
+           AND scheduled_at = $3::timestamptz
        )`,
-      [student.id, interview.at, interview.title, interview.meeting, interview.type, interview.status],
+      [
+        null,
+        student.id,
+        interview.at,
+        interview.title,
+        interview.meeting,
+        interview.type,
+        interview.status,
+      ],
     );
   }
 
   const countResult = await pool.query(
-    `SELECT COUNT(*)::int AS count FROM interviews WHERE student_id = $1`,
+    `SELECT COUNT(*)::int AS count FROM interviews WHERE student_id = $1::integer`,
     [student.id],
   );
 
-  console.log(`Seeded/verified interviews for ${student.name} (${DEMO_EMAIL}). Total: ${countResult.rows[0].count}`);
+  console.log(
+    `Seeded/verified interviews for ${student.name} (${DEMO_EMAIL}). Total: ${countResult.rows[0].count}`,
+  );
 };
 
 try {
