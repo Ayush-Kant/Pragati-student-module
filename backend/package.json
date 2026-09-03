@@ -8,6 +8,7 @@
     "dev": "npx nodemon server.js",
     "migrate": "node scripts/migrate.js",
     "seed:student-college": "node scripts/seedStudentCollege.js",
+    "verify:firebase": "node scripts/checkFirebaseAdmin.js",
     "seed:student-interviews": "node scripts/seedStudentInterviews.js",
     "seed:student-notifications": "node scripts/seedStudentNotifications.js"
   },
@@ -29,6 +30,7 @@
     "joi": "^18.2.3",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.2.0",
+    "node-pg": "^8.21.0",
     "node-pg": "^1.0.1",
     "nodemailer": "^9.0.3",
     "pdfkit": "^0.19.1",
