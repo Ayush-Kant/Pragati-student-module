@@ -1,23 +1,49 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useState } from "react";
+import { Bell } from "lucide-react";
+import NotificationDropdown from "./NotificationDropdown";
+import { getNotifications } from "../../services/notification.service";
 
 export default function NotificationBell({ unreadCount = 0 }) {
-  const navigate = useNavigate();
+  const [count, setCount] = useState(Number(unreadCount) || 0);
+  const [open, setOpen] = useState(false);
+
+  const refreshCount = useCallback(async () => {
+    try {
+      const data = await getNotifications({ read: 'false', page: 1, limit: 1 });
+      setCount(Number(data?.unreadCount || 0));
+    } catch {
+      setCount(Number(unreadCount) || 0);
+    }
+  }, [unreadCount]);
+
+  useEffect(() => {
+    refreshCount();
+  }, [refreshCount]);
 
   return (
-    <button
-      onClick={() => navigate("/student/notifications")}
-      className="relative p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100 transition focus:outline-none"
-      aria-label="View Notifications"
-    >
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-      </svg>
-      {unreadCount > 0 && (
-        <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-          {unreadCount}
-        </span>
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className="relative rounded-full p-2 text-gray-600 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100"
+        aria-label={count > 0 ? `View notifications, ${count} unread` : "View notifications"}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+      >
+        <Bell className="h-6 w-6" />
+        {count > 0 && (
+          <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">
+            {count > 99 ? '99+' : count}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <NotificationDropdown
+          onUnreadCountChange={setCount}
+          onClose={() => setOpen(false)}
+        />
       )}
-    </button>
+    </div>
   );
 }
