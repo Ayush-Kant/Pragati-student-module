@@ -122,3 +122,53 @@ CROSS JOIN (
 ) seed(title, description, offset_days, milestone_order)
 WHERE p.title = 'Student Portfolio Platform'
   AND NOT EXISTS (SELECT 1 FROM project_milestones m WHERE m.project_id = p.id AND m.milestone_order = seed.milestone_order);
+
+-- Make the legacy coding round a real student challenge on fresh databases.
+UPDATE assessments
+SET status = 'active', published_at = COALESCE(published_at, NOW())
+WHERE title = 'DSA Coding Round';
+
+INSERT INTO assessment_questions
+  (assessment_id, type, problem_statement, language_support, sample_input, sample_output, hidden_test_cases, marks)
+SELECT a.id, 'Coding',
+       'Given an integer array, return the maximum sum of any contiguous subarray.',
+       ARRAY['javascript','python','java','cpp'],
+       '[−2,1,−3,4,−1,2,1,−5,4]',
+       '6',
+       '[{"input":"[5,4,-1,7,8]","output":"23"},{"input":"[-1,-2,-3]","output":"-1"}]'::jsonb,
+       100
+FROM assessments a
+WHERE a.title = 'DSA Coding Round'
+  AND NOT EXISTS (
+    SELECT 1 FROM assessment_questions q WHERE q.assessment_id = a.id AND q.type IN ('Coding','coding')
+  );
+
+INSERT INTO coding_test_cases (challenge_id, input, expected_output, is_hidden, weight_pct)
+SELECT a.id, seed.input, seed.expected_output, seed.is_hidden, seed.weight_pct
+FROM assessments a
+CROSS JOIN (
+  VALUES
+    ('[-2,1,-3,4,-1,2,1,-5,4]','6',false,25.0),
+    ('[5,4,-1,7,8]','23',false,25.0),
+    ('[-1,-2,-3]','-1',true,25.0),
+    ('[1]','1',true,25.0)
+) seed(input, expected_output, is_hidden, weight_pct)
+WHERE a.title = 'DSA Coding Round'
+  AND NOT EXISTS (
+    SELECT 1 FROM coding_test_cases t WHERE t.challenge_id = a.id AND t.input = seed.input
+  );
+
+INSERT INTO coding_languages (challenge_id, language_id, language_name)
+SELECT a.id, seed.language_id, seed.language_name
+FROM assessments a
+CROSS JOIN (
+  VALUES
+    (63,'javascript'),
+    (71,'python'),
+    (62,'java'),
+    (54,'cpp')
+) seed(language_id, language_name)
+WHERE a.title = 'DSA Coding Round'
+  AND NOT EXISTS (
+    SELECT 1 FROM coding_languages l WHERE l.challenge_id = a.id AND l.language_id = seed.language_id
+  );
