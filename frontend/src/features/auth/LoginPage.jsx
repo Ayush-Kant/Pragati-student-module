@@ -142,6 +142,21 @@ const AuthPage = () => {
           return;
         } catch (firebaseError) {
           console.error('Firebase student login fallback failed:', firebaseError);
+          const firebaseCode = String(firebaseError?.code || '');
+          const backendStatus = firebaseError?.response?.status;
+
+          if (backendStatus === 404) {
+            setSubmitMessage({
+              type: 'error',
+              text: 'Firebase sign-in succeeded, but this email is not linked to a Pragati student profile. Use Student / Firebase login to complete student setup.',
+            });
+            return;
+          }
+
+          if (firebaseCode === 'auth/invalid-credential' || firebaseCode === 'auth/wrong-password' || firebaseCode === 'auth/user-not-found') {
+            setSubmitMessage({ type: 'error', text: 'Invalid email or password.' });
+            return;
+          }
         }
       }
 
