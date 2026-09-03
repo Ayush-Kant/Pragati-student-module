@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, CheckCircle2, Clock3, ExternalLink, Play, RefreshCw, Video } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Clock3, Play, RefreshCw, Video } from 'lucide-react';
 import { getLiveSessions, joinSession, leaveSession } from '../services/liveSessionsService';
 import StudentPageShell from '../../components/common/StudentPageShell';
 import StudentPageHeader from '../../components/common/StudentPageHeader';
