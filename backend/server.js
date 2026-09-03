@@ -10,7 +10,6 @@ import { initializeAssignmentModule } from "./src/database/migrations/assignment
 import { startNotificationDigestScheduler } from "./services/notification.service.js";
 import { ensureStudentAuthSchema } from "./services/studentAuth.service.js";
 
-// Admin Routes
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
 import adminAssessmentRoutes from "./routes/admin.assessment.routes.js";
@@ -22,7 +21,6 @@ import adminStudentRoutes from "./routes/admin.student.routes.js";
 import adminMentorRoutes from "./routes/admin.mentor.routes.js";
 import adminCompanyRoutes from "./routes/admin.company.routes.js";
 
-// Standard & Role-Specific Routes
 import authRouter from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import studentProfileRoutes from "./routes/studentProfile.routes.js";
@@ -59,8 +57,6 @@ import collegeJobsRoutes from "./routes/college.jobs.routes.js";
 import nominationRoutes from "./routes/collegeStudentNominations.routes.js";
 import collegeReportsGenerationRoutes from "./routes/collegeReportsGeneration.routes.js";
 import collegeAnalyticsDashboardRouter from "./routes/collegeAnalyticsDashboard.routes.js";
-
-// Department Module Routes
 import departmentRoutes from "./routes/college.department.routes.js";
 import courseRoutes from "./routes/college.course.routes.js";
 import departmentStatisticsRoutes from "./routes/college.departmentstatistics.routes.js";
@@ -74,12 +70,9 @@ import { getStudentBadgesController } from "./controllers/badges.controller.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 import mentorHiringRoutes from "./routes/mentorHiring.routes.js";
 import notificationsRoutes from "./routes/notifications.routes.js";
-
-// Middleware
 import errorMiddleware from "./middleware/errorMiddleware.js";
 
 dotenv.config();
-
 console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
 
 const app = express();
@@ -87,32 +80,26 @@ const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ================= MIDDLEWARE =================
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:") || origin.startsWith("http://localhost")) callback(null, true);
+    else {
+      const clientUrl = process.env.CLIENT_URL;
+      if (clientUrl && origin === clientUrl) callback(null, true);
+      else callback(new Error("Not allowed by CORS"), false);
+    }
+  },
+  credentials: true,
+}));
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:") || origin.startsWith("http://localhost")) {
-        callback(null, true);
-      } else {
-        const clientUrl = process.env.CLIENT_URL;
-        if (clientUrl && origin === clientUrl) callback(null, true);
-        else callback(new Error("Not allowed by CORS"), false);
-      }
-    },
-    credentials: true,
-  })
-);
-
-// ================= ROUTES =================
 app.use("/api/auth", authRouter);
 app.use("/api/students", studentRoutes);
 app.use("/api/student/profile", studentProfileRoutes);
 app.use("/api/student/onboarding", studentOnboardingRoutes);
 app.use("/api/student/assessments", studentAssessmentRoutes);
+app.use("/api/student/quizzes", studentAssessmentRoutes);
 app.use("/api/student/courses", studentCourseRoutes);
 app.use("/api/student/sessions", studentLiveSessionRoutes);
 app.use("/api/student/projects", studentProjectRoutes);
@@ -124,7 +111,6 @@ app.use("/api/student/interviews", studentInterviewRoutes);
 app.use("/api/student/placement", studentPlacementRoutes);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/public", express.static(path.join(__dirname, "public")));
 
@@ -138,12 +124,10 @@ app.use("/api/v1/admin/drives", adminDriveRoutes);
 app.use("/api/v1/admin/company", adminCompanyRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/v1/admin/disputes", adminDisputeRoutes);
-
 app.use("/api/mentor/content", contentRoutes);
 app.use("/api/mentor", contentRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/v1/mentor", mentorHiringRoutes);
-
 app.use("/api/v1/company", companyProfileRoutes);
 app.use("/api/v1/company/candidates", companyCandidateRoutes);
 app.use("/api/v1/company/dashboard", companyDashboardRoutes);
@@ -156,22 +140,18 @@ app.use("/api/v1/company/offers", companyOfferRoutes);
 app.use("/api/v1/admin/company/interviews", interviewRoutes);
 app.use("/api/v1/company/training", trainingRoutes);
 app.use("/api/v1/company/jobs", collegeJobsRoutes);
-
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/v1/drives", drivesRoutes);
-
 app.use("/api/college/profile", collegeProfileRoutes);
 app.use("/api/college/dashboard", collegeDashboardRoutes);
 app.use("/api/college", nominationRoutes);
 app.use("/api/college", collegeJobsRoutes);
 app.use("/api/college/communication", collegeCommunicationAnnouncementsRoutes);
-
 app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/companies", companiesRoutes);
 app.use("/api/placement-drives", placementDriveRoutes);
-
 app.use("/api/v1/notifications", notificationsRoutes);
 app.use("/api/v1/certificates", certificatesRouter);
 app.use("/api/v1/badges", badgesRouter);
@@ -184,36 +164,16 @@ app.use(errorMiddleware);
 
 connectDB()
   .then(async () => {
-    try {
-      await ensureStudentAuthSchema();
-      console.log("✅ Student authentication/session schema ready");
-    } catch (error) {
-      console.error("⚠️ Student auth schema initialization failed:", error.message);
-    }
-
-    try {
-      await initializeLiveSessionModule();
-      console.log("✅ Live session module initialized");
-    } catch (error) {
-      console.error("⚠️ Live session module initialization failed:", error.message);
-    }
-
-    try {
-      await initializeAssignmentModule();
-      console.log("✅ Assignment module initialized");
-    } catch (error) {
-      console.error("⚠️ Assignment module initialization failed:", error.message);
-    }
-
+    try { await ensureStudentAuthSchema(); console.log("✅ Student authentication/session schema ready"); }
+    catch (error) { console.error("⚠️ Student auth schema initialization failed:", error.message); }
+    try { await initializeLiveSessionModule(); console.log("✅ Live session module initialized"); }
+    catch (error) { console.error("⚠️ Live session module initialization failed:", error.message); }
+    try { await initializeAssignmentModule(); console.log("✅ Assignment module initialized"); }
+    catch (error) { console.error("⚠️ Assignment module initialization failed:", error.message); }
     startNotificationDigestScheduler();
     console.log("✅ Student notification digest scheduler started");
-
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on PORT : ${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`✅ Server running on PORT : ${PORT}`));
   })
-  .catch((err) => {
-    console.error("⚠️ PostgreSQL connection failed:", err.message);
-  });
+  .catch((err) => console.error("⚠️ PostgreSQL connection failed:", err.message));
 
 export default app;
