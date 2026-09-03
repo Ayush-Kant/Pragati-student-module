@@ -4,6 +4,11 @@ import studentImage from "./images/student.png";
 import manager from "./images/managers.png";
 import mentor from "./images/mentor.png";
 import { loginApi } from './services/auth.services';
+import { loginStudentApi } from './services/studentAuth.services';
+import {
+  getFirebaseIdToken,
+  signInStudentWithPassword,
+} from '../../firebase/studentFirebaseAuth';
 import { useAuth } from '../../context/AuthContext';
 
 const AuthPage = () => {
@@ -79,6 +84,19 @@ const AuthPage = () => {
     if (submitMessage.text) setSubmitMessage({ type: '', text: '' });
   };
 
+  const handleFirebaseStudentLogin = async () => {
+    await signInStudentWithPassword(formData.email.trim().toLowerCase(), formData.password);
+    const idToken = await getFirebaseIdToken();
+    const session = await loginStudentApi(idToken);
+
+    if (!session?.success || !session?.accessToken) {
+      throw new Error(session?.message || 'Unable to create a student session');
+    }
+
+    login('student', session.accessToken);
+    navigate('/student/dashboard');
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -111,9 +129,23 @@ const AuthPage = () => {
         setSubmitMessage({ type: 'success', text: 'Signed in successfully.' });
         login(result.role, result.token);
         navigate(getRedirectPath(result.role));
-      } else {
-        setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
+        return;
       }
+
+      // The shared login page historically used only the platform password table.
+      // Student accounts created through Firebase are authenticated by Firebase first,
+      // so transparently fall back to the dedicated student session exchange when the
+      // legacy endpoint rejects the credentials.
+      if (result.message === 'Invalid credentials') {
+        try {
+          await handleFirebaseStudentLogin();
+          return;
+        } catch (firebaseError) {
+          console.error('Firebase student login fallback failed:', firebaseError);
+        }
+      }
+
+      setSubmitMessage({ type: 'error', text: result.message || 'Login failed' });
     } catch (err) {
       setSubmitMessage({ type: 'error', text: 'An unexpected error occurred. Please try again.' });
       console.error('Login error:', err);
@@ -177,6 +209,7 @@ const AuthPage = () => {
                   id="email"
                   name="email"
                   type="email"
+                  autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
@@ -195,6 +228,7 @@ const AuthPage = () => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="••••••••"
+                    autoComplete="current-password"
                     className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all duration-200 text-sm shadow-sm pr-12 ${errors.password ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 ${current.focusRing} ${current.focusBorder}`}`}
                   />
                   <button
@@ -223,7 +257,7 @@ const AuthPage = () => {
               </button>
             </form>
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <p className="text-sm text-gray-400 font-medium">
                 Don't have an account?{' '}
                 <button
@@ -233,6 +267,13 @@ const AuthPage = () => {
                   Sign up for free
                 </button>
               </p>
+              <button
+                type="button"
+                onClick={() => navigate('/student/login')}
+                className="text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Student / Firebase login
+              </button>
             </div>
           </div>
         </div>
