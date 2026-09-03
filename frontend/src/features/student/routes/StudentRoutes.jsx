@@ -3,6 +3,7 @@ import { Navigate, Route } from "react-router-dom";
 import PrivateRoute from "../../../routes/PrivateRoute";
 import StudentLayout from "../layout/StudentLayout";
 import DashboardPage from "../dashboard/pages/DashboardPage";
+import SM03DashboardPage from "../dashboard/pages/SM03DashboardPage";
 
 import VerificationPage from "../pages/public/VerificationPage";
 import LoginPage from "../../auth/LoginPage";
@@ -53,7 +54,9 @@ const studentRoute = (
     <Route element={<PrivateRoute />}>
       <Route path="student" element={<StudentLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        {/* SM-03: comprehensive student dashboard. Existing dashboard remains available for rollback/reference. */}
+        <Route path="dashboard" element={<SM03DashboardPage />} />
+        <Route path="dashboard/legacy" element={<DashboardPage />} />
         <Route path="onboarding" element={<OnboardingWizard />} />
         {/* SM-02: dedicated profile workspace. Legacy implementation remains available for rollback/reference. */}
         <Route path="profile" element={<SM02ProfileWorkspace />} />
