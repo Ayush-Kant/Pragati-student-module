@@ -111,14 +111,17 @@ export const getEligibility = async (req, res, next) => {
     );
 
     const row = result.rows[0] || {};
-    const eligible = Number(row.completed_courses || 0) > 0 && row.hasAssessment === true && row.hasProject === true;
+    const courseCompletion = Number(row.completed_courses || 0) > 0;
+    const assessmentCompletion = row.has_assessment === true;
+    const projectCompletion = row.has_project === true;
+
     res.json({
       success: true,
       data: {
-        courseCompletion: Number(row.completed_courses || 0) > 0,
-        assessmentCompletion: row.hasAssessment === true,
-        projectCompletion: row.hasProject === true,
-        eligible,
+        courseCompletion,
+        assessmentCompletion,
+        projectCompletion,
+        eligible: courseCompletion && assessmentCompletion && projectCompletion,
       },
     });
   } catch (error) {
