@@ -29,6 +29,7 @@ import studentCourseRoutes from "./src/routes/studentCourseRoutes.js";
 import studentLiveSessionRoutes from "./src/routes/liveSessionRoutes.js";
 import studentProjectRoutes from "./routes/studentProject.routes.js";
 import studentCodingRoutes from "./routes/studentCoding.routes.js";
+import studentAssignmentRoutes from "./routes/studentAssignment.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import collegeProfileRoutes from "./routes/collage.profile.routes.js";
@@ -121,6 +122,7 @@ app.use("/api/student/courses", studentCourseRoutes);
 app.use("/api/student/sessions", studentLiveSessionRoutes);
 app.use("/api/student/projects", studentProjectRoutes);
 app.use("/api/student/coding", studentCodingRoutes);
+app.use("/api/student/assignments", studentAssignmentRoutes);
 app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 
