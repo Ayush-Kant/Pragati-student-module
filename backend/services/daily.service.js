@@ -7,23 +7,17 @@ const dailyRequest = async (path, options = {}) => {
     error.status = 503;
     throw error;
   }
-
   const response = await fetch(`${DAILY_API_URL}${path}`, {
     ...options,
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', ...(options.headers || {}) },
   });
-
   const text = await response.text();
   let body = null;
   try { body = text ? JSON.parse(text) : null; } catch { body = { raw: text }; }
-
   if (!response.ok) {
     const error = new Error(body?.error || body?.info || `Daily.co request failed (${response.status})`);
     error.status = response.status >= 500 ? 502 : response.status;
+    error.dailyStatus = response.status;
     throw error;
   }
   return body;
@@ -31,14 +25,17 @@ const dailyRequest = async (path, options = {}) => {
 
 export const ensureRoom = async ({ roomName, meetingUrl }) => {
   if (meetingUrl) return { roomName, meetingUrl };
-  const body = await dailyRequest('/rooms', {
-    method: 'POST',
-    body: JSON.stringify({
-      name: roomName,
-      properties: { enable_recording: 'cloud' },
-    }),
-  });
-  return { roomName: body?.name || roomName, meetingUrl: body?.url || null };
+  try {
+    const body = await dailyRequest('/rooms', {
+      method: 'POST',
+      body: JSON.stringify({ name: roomName, properties: { enable_recording: 'cloud' } }),
+    });
+    return { roomName: body?.name || roomName, meetingUrl: body?.url || null };
+  } catch (error) {
+    if (error.dailyStatus !== 409) throw error;
+    const existing = await dailyRequest(`/rooms/${encodeURIComponent(roomName)}`);
+    return { roomName: existing?.name || roomName, meetingUrl: existing?.url || null };
+  }
 };
 
 export const createParticipantToken = async ({ roomName, userName, expiresAt }) => {
@@ -53,7 +50,12 @@ export const createParticipantToken = async ({ roomName, userName, expiresAt }) 
       },
     }),
   });
-  return body?.token || null;
+  if (!body?.token) {
+    const error = new Error('Daily.co did not return a participant token.');
+    error.status = 502;
+    throw error;
+  }
+  return body.token;
 };
 
 export default { ensureRoom, createParticipantToken };
