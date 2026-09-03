@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
+  googleStudentApi,
   loginStudentApi,
   refreshStudentApi,
 } from "./services/studentAuth.services";
@@ -17,6 +18,7 @@ export default function StudentLoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [collegeId, setCollegeId] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -29,11 +31,8 @@ export default function StudentLoginPage() {
 
   const finish = (session) => {
     const next = session?.student?.onboardingStep;
-    if (next && next < 4) {
-      navigate("/student/onboarding", { replace: true });
-    } else {
-      navigate("/student/dashboard", { replace: true });
-    }
+    if (next && next < 4) navigate("/student/onboarding", { replace: true });
+    else navigate("/student/dashboard", { replace: true });
   };
 
   const submit = async (event) => {
@@ -59,7 +58,21 @@ export default function StudentLoginPage() {
     setLoading(true);
     try {
       await signInStudentWithGoogle();
-      const session = await exchangeFirebaseSession();
+      const idToken = await getFirebaseIdToken();
+      let session;
+      try {
+        session = await loginStudentApi(idToken);
+      } catch (loginError) {
+        if (loginError?.response?.status !== 404) throw loginError;
+        if (!/^\d+$/.test(collegeId.trim())) {
+          throw new Error("Enter your numeric College ID before your first Google sign-in");
+        }
+        const provisioned = await googleStudentApi(idToken, Number(collegeId));
+        session = provisioned;
+        login("student", session.accessToken);
+      }
+
+      login("student", session.accessToken);
       toast.success("Signed in with Google");
       finish(session);
     } catch (requestError) {
@@ -97,6 +110,11 @@ export default function StudentLoginPage() {
           <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete="current-password" placeholder="Password" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
           <button disabled={loading} className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 disabled:opacity-60">{loading ? "Signing in…" : "Sign in"}</button>
         </form>
+
+        <div className="mt-5">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">College ID for first Google sign-in</label>
+          <input value={collegeId} onChange={(e) => setCollegeId(e.target.value)} inputMode="numeric" placeholder="e.g. 12" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+        </div>
 
         <button disabled={loading} onClick={googleLogin} className="w-full mt-3 rounded-xl border border-slate-200 bg-white py-3 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-60">Continue with Google</button>
         <button disabled={loading} onClick={useExistingSession} className="w-full mt-3 text-xs font-semibold text-slate-400 hover:text-slate-600">Restore existing student session</button>
