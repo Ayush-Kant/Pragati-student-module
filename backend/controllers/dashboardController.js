@@ -1,22 +1,39 @@
-const getDashboard = (req, res) => {
-  res.status(200).json({
-    message: "Dashboard API Working",
-  });
+import studentDashboardService from "../services/studentDashboard.service.js";
+
+const getDashboard = async (req, res, next) => {
+  try {
+    const dashboard = await studentDashboardService.getDashboard(req.user);
+    res.status(200).json({
+      success: true,
+      data: dashboard,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const getLeaderboard = (req, res) => {
-  const { driveId } = req.params;
-
-  res.status(200).json({
-    message: "Leaderboard API Working",
-    driveId,
-  });
+const getLeaderboard = async (req, res, next) => {
+  try {
+    const dashboard = await studentDashboardService.getDashboard(req.user);
+    res.status(200).json({
+      success: true,
+      leaderboard: dashboard.leaderboard,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const getNotifications = (req, res) => {
-  res.status(200).json({
-    message: "Notifications API Working",
-  });
+const getNotifications = async (req, res, next) => {
+  try {
+    const dashboard = await studentDashboardService.getDashboard(req.user);
+    res.status(200).json({
+      success: true,
+      notifications: dashboard.notifications,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export {
