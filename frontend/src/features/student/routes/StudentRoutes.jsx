@@ -21,7 +21,6 @@ import AssessmentDetailsPage from "../assessments/pages/AssessmentDetailsPage";
 import AssessmentAttemptPage from "../assessments/pages/AssessmentAttemptPage";
 import AssessmentResultPage from "../assessments/pages/AssessmentResultPage";
 
-import CodingChallengePage from "../pages/coding/CodingChallengePage";
 import CodingChallengesPage from "../coding-challenges/pages/CodingChallengesPage";
 import ChallengeDetailsPage from "../coding-challenges/pages/ChallengeDetailsPage";
 import SubmissionHistoryPage from "../coding-challenges/pages/SubmissionHistoryPage";
@@ -72,7 +71,7 @@ const studentRoute = (
         <Route path="coding-challenges/:challengeId/submissions" element={<SubmissionHistoryPage />} />
         <Route path="coding-challenges/:challengeId/leaderboard" element={<LeaderboardPage />} />
         <Route path="leaderboard" element={<LeaderboardPage />} />
-        <Route path="coding/:challengeId" element={<CodingChallengePage />} />
+        <Route path="coding/:challengeId" element={<Navigate to="/student/coding-challenges" replace />} />
 
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:projectId" element={<ProjectDetailPage />} />
