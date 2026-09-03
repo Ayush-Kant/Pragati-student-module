@@ -19,6 +19,15 @@ export const loginStudentApi = async (idToken) => {
   return response.data;
 };
 
+export const googleStudentApi = async (idToken, collegeId) => {
+  const response = await api.post(
+    "/auth/student/google",
+    { idToken, collegeId: collegeId || undefined },
+    { withCredentials: true },
+  );
+  return response.data;
+};
+
 export const refreshStudentApi = async () => {
   const response = await api.post(
     "/auth/student/refresh",
