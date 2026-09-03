@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { logoutStudentApi, refreshStudentApi } from "../features/auth/services/studentAuth.services";
 import { firebaseAuth } from "../firebase/studentFirebaseAuth";
-import { refreshStudentAccessToken } from "../services/api";
 import { signOut } from "firebase/auth";
 
 const AuthContext = createContext();
@@ -167,11 +166,6 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setLoading(false);
   };
-
-  // Keep the context state synchronized when the API interceptor refreshes a token.
-  // `refreshStudentAccessToken` is imported here so this module owns the same
-  // refresh implementation used for automatic 401 recovery.
-  void refreshStudentAccessToken;
 
   return (
     <AuthContext.Provider value={{ user, userRole, token, loading, setLoading, login, logout, isAuthenticated: !!token }}>
