@@ -1,4 +1,5 @@
 import liveSessionService from "../services/liveSessionService.js";
+import { normalizeStudentId } from "../utils/assignmentHelpers.js";
 
 export const getAllSessions = async (req, res, next) => {
   try {
@@ -28,7 +29,7 @@ export const getSessionById = async (req, res, next) => {
 export const joinSession = async (req, res, next) => {
   try {
     const { id: sessionId } = req.validatedParams || req.params;
-    const studentId = req.user.id;
+    const studentId = await normalizeStudentId(req);
     const participant = await liveSessionService.joinSession(sessionId, studentId);
     res.status(200).json({
       success: true,
@@ -43,7 +44,7 @@ export const joinSession = async (req, res, next) => {
 export const leaveSession = async (req, res, next) => {
   try {
     const { id: sessionId } = req.validatedParams || req.params;
-    const studentId = req.user.id;
+    const studentId = await normalizeStudentId(req);
     const participant = await liveSessionService.leaveSession(sessionId, studentId);
     res.status(200).json({
       success: true,
