@@ -13,13 +13,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const allowed = new Set([
-  'application/pdf',
-  'application/zip',
-  'application/x-zip-compressed',
-  'application/octet-stream',
-]);
-
+const allowed = new Set(['application/pdf', 'application/zip', 'application/x-zip-compressed', 'application/octet-stream']);
 const uploader = multer({
   storage,
   limits: { fileSize: 20 * 1024 * 1024 },
@@ -30,7 +24,7 @@ const uploadMiddleware = (req, res, next) => {
   uploader(req, res, (error) => {
     if (error) return next(error);
     if (req.file) {
-      const baseUrl = process.env.BACKEND_PUBLIC_URL || `http://localhost:${process.env.PORT || 5000}`;
+      const baseUrl = process.env.PUBLIC_API_URL || `http://localhost:${process.env.PORT || 5000}`;
       req.body = req.body || {};
       req.body.fileUrl = `${baseUrl}/uploads/assignments/${encodeURIComponent(req.file.filename)}`;
     }
