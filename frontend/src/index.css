@@ -75,6 +75,8 @@ body {
 .student-shell .bg-indigo-700 { background-color: var(--student-primary-700) !important; }
 .student-shell .bg-blue-800,
 .student-shell .bg-indigo-800 { background-color: var(--student-primary-800) !important; }
+.student-shell .text-blue-100,
+.student-shell .text-indigo-100 { color: #cbd5e1 !important; }
 .student-shell .text-blue-500,
 .student-shell .text-indigo-500 { color: var(--student-primary-500) !important; }
 .student-shell .text-blue-600,
@@ -87,6 +89,8 @@ body {
 .student-shell .border-indigo-100 { border-color: var(--student-primary-100) !important; }
 .student-shell .border-blue-200,
 .student-shell .border-indigo-200 { border-color: #c7d2fe !important; }
+.student-shell [class*="bg-blue-50/"] { background-color: rgb(238 242 255 / 0.5) !important; }
+.student-shell [class*="bg-indigo-50/"] { background-color: rgb(238 242 255 / 0.5) !important; }
 
 /* Remove the older promotional blue gradients from student page heroes. */
 .student-shell .bg-gradient-to-br,
