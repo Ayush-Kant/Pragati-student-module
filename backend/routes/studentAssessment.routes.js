@@ -20,6 +20,8 @@ router.use(authMiddleware, roleMiddleware("student"));
 router.get("/", listAssessments);
 router.get("/history", getHistory);
 router.get("/:assessmentId/review", getReview);
+router.post("/:assessmentId/attempt", startAssessment);
+router.post("/:assessmentId/attempt/:attemptId/submit", submitAssessment);
 router.get("/:assessmentId", getAssessment);
 router.post("/:assessmentId/start", startAssessment);
 router.put("/attempts/:attemptId/questions/:questionId/answer", saveAnswer);
