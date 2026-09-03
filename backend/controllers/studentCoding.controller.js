@@ -25,10 +25,21 @@ const codeBody = (body = {}) => {
   return body;
 };
 
+const getStudentUserId = async (user) => {
+  await resolveStudentId(user);
+  const studentUserId = Number(user?.id);
+  if (!Number.isInteger(studentUserId) || studentUserId <= 0) {
+    const error = new Error('Authenticated student is not valid');
+    error.statusCode = 401;
+    throw error;
+  }
+  return studentUserId;
+};
+
 export const listChallenges = async (req, res, next) => {
   try {
-    const studentId = await resolveStudentId(req.user);
-    res.json({ success: true, data: await studentCodingService.listChallenges(studentId) });
+    const studentUserId = await getStudentUserId(req.user);
+    res.json({ success: true, data: await studentCodingService.listChallenges(studentUserId) });
   } catch (error) {
     next(error);
   }
@@ -36,9 +47,9 @@ export const listChallenges = async (req, res, next) => {
 
 export const getChallenge = async (req, res, next) => {
   try {
-    const studentId = await resolveStudentId(req.user);
+    const studentUserId = await getStudentUserId(req.user);
     const challengeId = positiveId(req.params.challengeId, 'challengeId');
-    res.json({ success: true, data: await studentCodingService.getChallenge(studentId, challengeId) });
+    res.json({ success: true, data: await studentCodingService.getChallenge(studentUserId, challengeId) });
   } catch (error) {
     next(error);
   }
@@ -46,12 +57,12 @@ export const getChallenge = async (req, res, next) => {
 
 export const runCode = async (req, res, next) => {
   try {
-    const studentId = await resolveStudentId(req.user);
+    const studentUserId = await getStudentUserId(req.user);
     const body = codeBody(req.body);
     const challengeId = positiveId(body.challengeId ?? req.params.challengeId, 'challengeId');
     res.json({
       success: true,
-      data: await studentCodingService.runCode(studentId, { ...body, challengeId }),
+      data: await studentCodingService.runCode(studentUserId, { ...body, challengeId }),
     });
   } catch (error) {
     next(error);
@@ -60,12 +71,12 @@ export const runCode = async (req, res, next) => {
 
 export const submitSolution = async (req, res, next) => {
   try {
-    const studentId = await resolveStudentId(req.user);
+    const studentUserId = await getStudentUserId(req.user);
     const body = codeBody(req.body);
     const challengeId = positiveId(body.challengeId ?? req.params.challengeId, 'challengeId');
     res.status(201).json({
       success: true,
-      data: await studentCodingService.submitSolution(studentId, { ...body, challengeId }),
+      data: await studentCodingService.submitSolution(studentUserId, { ...body, challengeId }),
     });
   } catch (error) {
     next(error);
@@ -74,9 +85,9 @@ export const submitSolution = async (req, res, next) => {
 
 export const getSubmissionHistory = async (req, res, next) => {
   try {
-    const studentId = await resolveStudentId(req.user);
+    const studentUserId = await getStudentUserId(req.user);
     const challengeId = req.params.challengeId ? positiveId(req.params.challengeId, 'challengeId') : null;
-    res.json({ success: true, data: await studentCodingService.getSubmissionHistory(studentId, challengeId) });
+    res.json({ success: true, data: await studentCodingService.getSubmissionHistory(studentUserId, challengeId) });
   } catch (error) {
     next(error);
   }
@@ -84,6 +95,7 @@ export const getSubmissionHistory = async (req, res, next) => {
 
 export const getLeaderboard = async (req, res, next) => {
   try {
+    await getStudentUserId(req.user);
     const challengeId = req.params.challengeId ? positiveId(req.params.challengeId, 'challengeId') : null;
     res.json({ success: true, data: await studentCodingService.getLeaderboard(challengeId) });
   } catch (error) {
