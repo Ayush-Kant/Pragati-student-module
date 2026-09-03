@@ -41,6 +41,16 @@ const validateStep = (step, body) => {
       error.statusCode = 400;
       throw error;
     }
+    if (body.state !== undefined && text(body.state).length > 100) {
+      const error = new Error("State must be 100 characters or fewer");
+      error.statusCode = 400;
+      throw error;
+    }
+    if (body.pincode !== undefined && text(body.pincode) && !/^\d{4,10}$/.test(text(body.pincode))) {
+      const error = new Error("Invalid pincode");
+      error.statusCode = 400;
+      throw error;
+    }
     if (body.collegeId !== undefined && body.collegeId !== null && body.collegeId !== "") {
       const collegeId = Number(body.collegeId);
       if (!Number.isInteger(collegeId) || collegeId <= 0) {
@@ -117,7 +127,9 @@ const syncFirebaseOnboarding = async (studentId, step, profile, completeness) =>
 export const getOnboardingState = async (user) => {
   const studentId = await resolveStudentId(user);
   const result = await pool.query(
-    `SELECT s.onboarding_step, COALESCE(sp.profile_completeness, 0) AS profile_completeness
+    `SELECT s.onboarding_step,
+            s.college_id,
+            COALESCE(sp.profile_completeness, 0) AS profile_completeness
      FROM students s
      LEFT JOIN student_profiles sp ON sp.student_id = s.id
      WHERE s.id = $1`,
@@ -130,11 +142,21 @@ export const getOnboardingState = async (user) => {
     throw error;
   }
 
+  const currentStep = Number(result.rows[0].onboarding_step || 1);
+  const profile = await getMyProfile(studentId);
   return {
     studentId,
-    currentStep: Number(result.rows[0].onboarding_step || 1),
+    currentStep,
+    onboardingComplete: currentStep >= 4,
     profileCompleteness: Number(result.rows[0].profile_completeness || 0),
-    profile: await getMyProfile(studentId),
+    profile: {
+      ...(profile || {}),
+      collegeId: result.rows[0].college_id ?? null,
+      contact: {
+        ...((profile || {}).contact || {}),
+        collegeId: result.rows[0].college_id ?? null,
+      },
+    },
   };
 };
 
@@ -180,9 +202,21 @@ export const saveOnboardingStep = async (user, rawStep, body = {}, file = null) 
            gender = $2,
            bio = $3,
            city = $4,
+           state = $5,
+           country = $6,
+           pincode = $7,
            updated_at = NOW()
-       WHERE student_id = $5`,
-      [body.dateOfBirth || null, text(body.gender) || null, text(body.bio) || null, text(body.city) || null, studentId],
+       WHERE student_id = $8`,
+      [
+        body.dateOfBirth || null,
+        text(body.gender) || null,
+        text(body.bio) || null,
+        text(body.city) || null,
+        text(body.state) || null,
+        text(body.country) || "India",
+        text(body.pincode) || null,
+        studentId,
+      ],
     );
   }
 
@@ -294,6 +328,7 @@ export const saveOnboardingStep = async (user, rawStep, body = {}, file = null) 
     stepSaved: step,
     profileCompleteness: synced.completeness,
     nextStep: step === 4 ? 4 : nextStep,
+    onboardingComplete: step >= 4,
     profile: synced.profile,
   };
 };
