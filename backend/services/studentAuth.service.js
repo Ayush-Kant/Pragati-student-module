@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { pool } from "../config/db.js";
 import { createFirebaseStudent, deleteFirebaseUser, verifyFirebaseIdToken } from "./firebaseAdmin.service.js";
+import { syncStudentFirebaseProfile } from "./studentFirebaseProfile.service.js";
 
 const ACCESS_TTL = process.env.STUDENT_JWT_EXPIRES_IN || "15m";
 const REFRESH_TTL_DAYS = Number(process.env.STUDENT_REFRESH_TTL_DAYS || 7);
@@ -13,6 +14,15 @@ const parseCollegeId = (value) => {
   if (value === undefined || value === null || value === "") return null;
   const id = Number(value);
   return Number.isInteger(id) && id > 0 ? id : null;
+};
+
+const safeSyncFirebaseProfile = async (studentId, firebaseUid, data = {}) => {
+  try {
+    await syncStudentFirebaseProfile({ studentId, firebaseUid, ...data });
+  } catch (error) {
+    // Firebase Auth must remain available even when Firestore is temporarily unavailable.
+    console.warn("[student-auth] Firebase profile sync deferred:", error.message);
+  }
 };
 
 export const ensureStudentAuthSchema = async () => {
@@ -77,6 +87,160 @@ const createRefreshSession = async (studentId) => {
   return { token, expiresAt };
 };
 
+const createPlatformStudentForFirebase = async (firebaseUser) => {
+  const normalizedEmail = String(firebaseUser.email || "").trim().toLowerCase();
+  const firebaseUid = String(firebaseUser.uid || "").trim();
+  const displayName = String(firebaseUser.name || firebaseUser.displayName || normalizedEmail.split("@")[0]).trim().slice(0, 80);
+
+  if (!normalizedEmail || !firebaseUid) {
+    const error = new Error("Firebase account did not provide the required student identity");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const existingStudentResult = await client.query(
+      `SELECT s.id, s.user_id, s.college_id, s.name, s.email, s.status,
+              s.firebase_uid, s.onboarding_step
+       FROM students s
+       WHERE s.firebase_uid = $1 OR LOWER(s.email) = LOWER($2)
+       ORDER BY CASE WHEN s.firebase_uid = $1 THEN 0 ELSE 1 END, s.id
+       LIMIT 1
+       FOR UPDATE`,
+      [firebaseUid, normalizedEmail],
+    );
+    const existingStudent = existingStudentResult.rows[0] || null;
+
+    if (existingStudent?.status === "blocked") {
+      const error = new Error("Account is suspended by admin");
+      error.statusCode = 403;
+      throw error;
+    }
+
+    let authUserId = null;
+    let authUuid = null;
+
+    if (existingStudent?.user_id) {
+      const linkedAuth = await client.query(
+        `SELECT au.id, au.uuid_id, au.role
+         FROM users u
+         JOIN auth_users au ON au.id = u.auth_user_id
+         WHERE u.id = $1
+         LIMIT 1`,
+        [existingStudent.user_id],
+      );
+      authUserId = linkedAuth.rows[0]?.id || null;
+      authUuid = linkedAuth.rows[0]?.uuid_id || null;
+    }
+
+    if (!authUserId) {
+      const authLookup = await client.query(
+        `SELECT id, uuid_id, role
+         FROM auth_users
+         WHERE LOWER(email) = LOWER($1)
+         LIMIT 1
+         FOR UPDATE`,
+        [normalizedEmail],
+      );
+
+      if (authLookup.rows[0]) {
+        if (authLookup.rows[0].role !== "student") {
+          const error = new Error("This email is already linked to a non-student Pragati account");
+          error.statusCode = 409;
+          throw error;
+        }
+        authUserId = authLookup.rows[0].id;
+        authUuid = authLookup.rows[0].uuid_id;
+      } else {
+        authUuid = crypto.randomUUID();
+        const authResult = await client.query(
+          `INSERT INTO auth_users (email, password_hash, role, uuid_id)
+           VALUES ($1, $2, 'student', $3)
+           RETURNING id, uuid_id`,
+          [normalizedEmail, await bcrypt.hash(`${crypto.randomUUID()}-${crypto.randomBytes(16).toString("hex")}`, 12), authUuid],
+        );
+        authUserId = authResult.rows[0].id;
+        authUuid = authResult.rows[0].uuid_id;
+      }
+    }
+
+    let userId = existingStudent?.user_id || null;
+    if (!userId) {
+      const userLookup = await client.query(
+        `SELECT id
+         FROM users
+         WHERE auth_user_id = $1 AND role = 'student'
+         ORDER BY id
+         LIMIT 1
+         FOR UPDATE`,
+        [authUserId],
+      );
+      userId = userLookup.rows[0]?.id || null;
+    }
+
+    if (!userId) {
+      const userResult = await client.query(
+        `INSERT INTO users (auth_user_id, email, role, created_at, phone, username)
+         VALUES ($1, $2, 'student', NOW(), NULL, $3)
+         RETURNING id`,
+        [authUserId, normalizedEmail, normalizedEmail.split("@")[0]],
+      );
+      userId = userResult.rows[0].id;
+    }
+
+    let studentId = existingStudent?.id || null;
+    if (studentId) {
+      await client.query(
+        `UPDATE students
+         SET user_id = $1,
+             email = $2,
+             name = CASE WHEN NULLIF(name, '') IS NULL THEN $3 ELSE name END,
+             firebase_uid = $4,
+             onboarding_step = COALESCE(onboarding_step, 1),
+             updated_at = NOW()
+         WHERE id = $5`,
+        [userId, normalizedEmail, displayName, firebaseUid, studentId],
+      );
+    } else {
+      const studentResult = await client.query(
+        `INSERT INTO students
+          (user_id, college_id, name, email, status, firebase_uid, onboarding_step)
+         VALUES ($1, NULL, $2, $3, 'pending', $4, 1)
+         RETURNING id`,
+        [userId, displayName, normalizedEmail, firebaseUid],
+      );
+      studentId = studentResult.rows[0].id;
+    }
+
+    await client.query(
+      `INSERT INTO student_profiles (student_id)
+       VALUES ($1)
+       ON CONFLICT (student_id) DO NOTHING`,
+      [studentId],
+    );
+
+    await client.query("COMMIT");
+
+    return {
+      studentId,
+      userId,
+      authUserId,
+      authUuid,
+      firebaseUid,
+      email: normalizedEmail,
+      name: displayName,
+    };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
 const loadStudentByIdToken = async (idToken) => {
   const firebaseUser = await verifyFirebaseIdToken(idToken);
   const result = await pool.query(
@@ -93,21 +257,36 @@ const loadStudentByIdToken = async (idToken) => {
      LIMIT 1`,
     [firebaseUser.uid, firebaseUser.email || ""],
   );
-  if (!result.rows.length) {
-    const error = new Error("No student account found for this Firebase user");
-    error.statusCode = 404;
-    throw error;
+
+  let student = result.rows[0] || null;
+  if (!student) {
+    const provisioned = await createPlatformStudentForFirebase(firebaseUser);
+    return {
+      studentId: provisioned.studentId,
+      userId: provisioned.userId,
+      authUserId: provisioned.authUserId,
+      authUuid: provisioned.authUuid,
+      firebaseUid: provisioned.firebaseUid,
+      email: provisioned.email,
+      name: provisioned.name,
+      onboardingStep: 1,
+      profileCompleteness: 0,
+    };
   }
-  const student = result.rows[0];
+
   if (student.status === "blocked") {
     const error = new Error("Account is suspended by admin");
     error.statusCode = 403;
     throw error;
   }
   if (student.firebase_uid !== firebaseUser.uid) {
-    await pool.query(`UPDATE students SET firebase_uid = $1, updated_at = NOW() WHERE id = $2`, [firebaseUser.uid, student.student_id]);
+    await pool.query(
+      `UPDATE students SET firebase_uid = $1, updated_at = NOW() WHERE id = $2`,
+      [firebaseUser.uid, student.student_id],
+    );
     student.firebase_uid = firebaseUser.uid;
   }
+
   return {
     studentId: student.student_id,
     userId: student.user_id,
@@ -191,6 +370,16 @@ export const registerStudent = async ({ email, password, fullName, collegeId }) 
     }
     await client.query(`INSERT INTO student_profiles (student_id) VALUES ($1) ON CONFLICT (student_id) DO NOTHING`, [studentId]);
     await client.query("COMMIT");
+
+    await safeSyncFirebaseProfile(studentId, firebaseUser.uid, {
+      registration: {
+        email: normalizedEmail,
+        fullName: name,
+        collegeId: normalizedCollegeId,
+        completedAt: new Date().toISOString(),
+      },
+    });
+
     return { studentId, userId, authUuid, firebaseUid: firebaseUser.uid, onboardingStep: 1, profileCompleteness: 0 };
   } catch (error) {
     await client.query("ROLLBACK");
@@ -203,6 +392,12 @@ export const registerStudent = async ({ email, password, fullName, collegeId }) 
 
 export const loginStudentWithFirebase = async (idToken) => {
   const student = await loadStudentByIdToken(idToken);
+  await safeSyncFirebaseProfile(student.studentId, student.firebaseUid, {
+    onboarding: {
+      currentStep: student.onboardingStep,
+      profileCompleteness: student.profileCompleteness,
+    },
+  });
   const { token: refreshToken, expiresAt } = await createRefreshSession(student.studentId);
   return { accessToken: buildAccessToken(student), refreshToken, refreshExpiresAt: expiresAt, student };
 };
@@ -232,6 +427,12 @@ export const refreshStudentSession = async (refreshToken) => {
     name: row.name, onboardingStep: row.onboarding_step || 1,
     profileCompleteness: Number(row.profile_completeness || 0),
   };
+  await safeSyncFirebaseProfile(student.studentId, student.firebaseUid, {
+    onboarding: {
+      currentStep: student.onboardingStep,
+      profileCompleteness: student.profileCompleteness,
+    },
+  });
   return { accessToken: buildAccessToken(student), student };
 };
 
