@@ -9,7 +9,7 @@ import { getOnboardingStateApi, saveOnboardingStepApi } from "../../../auth/serv
 
 const EMPTY_FORM = {
   personal: { fullName: "", phone: "", dateOfBirth: "", gender: "", bio: "" },
-  contact: { city: "", state: "", country: "India", pincode: "" },
+  contact: { collegeId: "", city: "", state: "", country: "India", pincode: "" },
   academic: { institutionName: "", department: "", course: "", degree: "", semester: "", graduationYear: "", cgpa: "", admissionYear: "", academicEmail: "" },
   skills: [],
   social: { linkedinUrl: "", githubUrl: "" },
@@ -32,6 +32,7 @@ const profileToForm = (profile) => {
       bio: p.personal?.bio || "",
     },
     contact: {
+      collegeId: p.contact?.collegeId ?? p.collegeId ?? "",
       city: p.contact?.city || "",
       state: p.contact?.state || "",
       country: p.contact?.country || "India",
@@ -66,6 +67,7 @@ const validateStep = (step, form) => {
     if (name.length < 2 || name.length > 80 || !/^[A-Za-z][A-Za-z\s.'-]*$/.test(name)) errors.fullName = "Name must be 2-80 characters.";
     if (form.personal.phone && !/^[0-9+()\-\s]{7,20}$/.test(form.personal.phone.trim())) errors.phone = "Enter a valid phone number.";
     if (!form.contact.city.trim()) errors.city = "City is required.";
+    if (form.contact.collegeId && !/^\d+$/.test(String(form.contact.collegeId).trim())) errors.collegeId = "Enter a valid numeric College ID.";
   }
 
   if (step === 2) {
@@ -103,6 +105,10 @@ export default function OnboardingWizard() {
         const state = await getOnboardingStateApi();
         if (!mounted) return;
         const current = Number(state?.data?.currentStep || 1);
+        if (Boolean(state?.data?.onboardingComplete) || current >= 4 && Number(state?.data?.profileCompleteness || 0) >= 100) {
+          navigate("/student/dashboard", { replace: true });
+          return;
+        }
         setStep(Math.min(Math.max(current, 1), 4));
         setForm(profileToForm(state?.data?.profile));
       } catch (requestError) {
@@ -112,7 +118,7 @@ export default function OnboardingWizard() {
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [navigate]);
 
   const update = (section, changes) => {
     setForm((previous) => ({ ...previous, [section]: { ...previous[section], ...changes } }));
@@ -138,7 +144,11 @@ export default function OnboardingWizard() {
           dateOfBirth: form.personal.dateOfBirth || null,
           gender: form.personal.gender || null,
           bio: form.personal.bio.trim(),
+          collegeId: form.contact.collegeId === "" ? null : Number(form.contact.collegeId),
           city: form.contact.city.trim(),
+          state: form.contact.state.trim(),
+          country: form.contact.country.trim(),
+          pincode: form.contact.pincode.trim(),
         };
       } else if (step === 2) {
         payload = {
@@ -215,7 +225,7 @@ export default function OnboardingWizard() {
             <StepPersonalInfo
               personal={{ name: form.personal.fullName, phone: form.personal.phone, dateOfBirth: form.personal.dateOfBirth, gender: form.personal.gender, bio: form.personal.bio }}
               contact={form.contact}
-              errors={{ name: errors.fullName, phone: errors.phone, city: errors.city }}
+              errors={{ name: errors.fullName, phone: errors.phone, city: errors.city, collegeId: errors.collegeId }}
               onPersonalChange={(changes) => update("personal", { ...changes, fullName: changes.name ?? form.personal.fullName })}
               onContactChange={(changes) => update("contact", changes)}
             />
