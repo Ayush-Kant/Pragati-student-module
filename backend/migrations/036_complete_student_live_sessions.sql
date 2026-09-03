@@ -15,4 +15,7 @@ ALTER TABLE session_attendance
   ADD COLUMN IF NOT EXISTS leave_timestamp TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS duration_seconds INTEGER;
 
+ALTER TABLE student_drive_progress
+  ADD COLUMN IF NOT EXISTS sessions_attended INTEGER NOT NULL DEFAULT 0 CHECK (sessions_attended >= 0);
+
 COMMIT;
