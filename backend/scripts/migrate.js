@@ -66,6 +66,7 @@ const migrationFiles = [
   "032_create_student_notification_delivery.sql",
   "033_create_student_placement_intelligence.sql",
   "034_complete_student_learning_experience.sql",
+  "035_student_auth_onboarding.sql",
 ];
 
 async function runMigrationsFresh() {

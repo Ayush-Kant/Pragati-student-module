@@ -1,21 +1,31 @@
 import React from "react";
 
-export default function MCQOptions({ options = [], selectedOption, onSelect }) {
+export default function MCQOptions({ options, selectedOption, onSelect }) {
+  const normalizedOptions = Array.isArray(options) ? options : [];
+
+  if (normalizedOptions.length === 0) {
+    return (
+      <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        No multiple-choice options are configured for this question.
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-2 mt-4">
-      {options.map((option, idx) => (
+    <div className="mt-4 space-y-2">
+      {normalizedOptions.map((option, idx) => (
         <button
-          key={`${option}-${idx}`}
+          key={`${String(option)}-${idx}`}
           type="button"
           onClick={() => onSelect?.(idx)}
-          className={`w-full text-left p-3 rounded-lg border transition ${
+          className={`w-full rounded-lg border p-3 text-left transition ${
             selectedOption === idx
-              ? "border-blue-600 bg-blue-50 text-blue-900 font-medium"
-              : "border-gray-200 hover:bg-gray-50 text-gray-700"
+              ? "border-blue-600 bg-blue-50 font-medium text-blue-900"
+              : "border-gray-200 text-gray-700 hover:bg-gray-50"
           }`}
         >
-          <span className="font-bold mr-2">{String.fromCharCode(65 + idx)}.</span>
-          {option}
+          <span className="mr-2 font-bold">{String.fromCharCode(65 + idx)}.</span>
+          {String(option)}
         </button>
       ))}
     </div>

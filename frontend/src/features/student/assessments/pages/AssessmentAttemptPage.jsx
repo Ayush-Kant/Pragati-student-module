@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Component, useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import QuestionCard from "../components/questions/QuestionCard";
 import QuestionPalette from "../components/questions/QuestionPalette";
@@ -17,7 +17,46 @@ const normalizeAttempt = (attempt) => ({
   answers: attempt?.answers || {},
 });
 
+class AssessmentAttemptErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, info) {
+    console.error("[AssessmentAttemptErrorBoundary] Rendering error:", error, info);
+  }
+
+  render() {
+    if (!this.state.hasError) return this.props.children;
+
+    const message = import.meta.env.DEV && this.state.error?.message
+      ? `Assessment page error: ${this.state.error.message}`
+      : "The assessment page could not be rendered. Please return to the assessment list and try again.";
+
+    return (
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 p-6">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-rose-200 bg-white p-8 shadow-sm">
+          <ErrorState message={message} />
+        </div>
+      </div>
+    );
+  }
+}
+
 export default function AssessmentAttemptPage() {
+  return (
+    <AssessmentAttemptErrorBoundary>
+      <AssessmentAttemptContent />
+    </AssessmentAttemptErrorBoundary>
+  );
+}
+
+function AssessmentAttemptContent() {
   const { assessmentId } = useParams();
   const navigate = useNavigate();
   const [assessment, setAssessment] = useState(null);
@@ -34,10 +73,15 @@ export default function AssessmentAttemptPage() {
       try {
         setLoading(true);
         setError(null);
-        const [details, started] = await Promise.all([
-          getAssessmentById(assessmentId),
-          startAssessment(assessmentId),
-        ]);
+
+        const details = await getAssessmentById(assessmentId);
+        const questions = Array.isArray(details?.questions) ? details.questions : [];
+
+        if (!questions.length) {
+          throw new Error("This assessment is not configured with any questions yet.");
+        }
+
+        const started = await startAssessment(assessmentId);
 
         if (!active) return;
         setAssessment(details);
@@ -87,7 +131,7 @@ export default function AssessmentAttemptPage() {
   if (error) return <ErrorState message={error} />;
   if (!assessment || !attempt) return <ErrorState message="Assessment attempt is unavailable." />;
 
-  const questions = assessment.questions || [];
+  const questions = Array.isArray(assessment.questions) ? assessment.questions : [];
   const totalQuestions = questions.length;
   const currentQuestion = questions[currentIndex] || null;
 
@@ -111,7 +155,7 @@ export default function AssessmentAttemptPage() {
             <QuestionCard
               question={{
                 ...currentQuestion,
-                text: currentQuestion.questionText,
+                text: currentQuestion.questionText || currentQuestion.text,
               }}
               questionIndex={currentIndex}
               selectedOption={answers[currentIndex]?.optionIndex}

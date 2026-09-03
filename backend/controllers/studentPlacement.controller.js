@@ -1,6 +1,5 @@
 import studentPlacementService from '../services/studentPlacement.service.js';
-
-const getErrorStatus = (error) => Number(error?.statusCode || error?.status || 500);
+import { resolveStudentId } from '../utils/studentProfileIdentity.js';
 
 export const getDashboard = async (req, res, next) => {
   try {
@@ -13,11 +12,9 @@ export const getDashboard = async (req, res, next) => {
 
 export const getApplications = async (req, res, next) => {
   try {
-    const studentId = await studentPlacementService.getStudentPlacementDashboard
-      ? await import('../utils/studentProfileIdentity.js').then(({ resolveStudentId }) => resolveStudentId(req.user))
-      : null;
-    const data = await studentPlacementService.getApplications(studentId, req.query);
-    return res.status(200).json({ success: true, applications: data });
+    const studentId = await resolveStudentId(req.user);
+    const applications = await studentPlacementService.getApplications(studentId, req.query);
+    return res.status(200).json({ success: true, applications });
   } catch (error) {
     return next(error);
   }
@@ -25,22 +22,19 @@ export const getApplications = async (req, res, next) => {
 
 export const getApplicationById = async (req, res, next) => {
   try {
-    const { resolveStudentId } = await import('../utils/studentProfileIdentity.js');
     const studentId = await resolveStudentId(req.user);
-    const data = await studentPlacementService.getApplicationById(studentId, req.params.applicationId);
-    return res.status(200).json({ success: true, application: data });
+    const application = await studentPlacementService.getApplicationById(studentId, req.params.applicationId);
+    return res.status(200).json({ success: true, application });
   } catch (error) {
-    error.statusCode = getErrorStatus(error);
     return next(error);
   }
 };
 
 export const createApplication = async (req, res, next) => {
   try {
-    const { resolveStudentId } = await import('../utils/studentProfileIdentity.js');
     const studentId = await resolveStudentId(req.user);
-    const data = await studentPlacementService.createApplication(studentId, req.body);
-    return res.status(201).json({ success: true, application: data });
+    const application = await studentPlacementService.createApplication(studentId, req.body);
+    return res.status(201).json({ success: true, application });
   } catch (error) {
     return next(error);
   }
@@ -48,15 +42,14 @@ export const createApplication = async (req, res, next) => {
 
 export const updateApplicationStatus = async (req, res, next) => {
   try {
-    const { resolveStudentId } = await import('../utils/studentProfileIdentity.js');
     const studentId = await resolveStudentId(req.user);
-    const data = await studentPlacementService.updateApplicationStatus(
+    const application = await studentPlacementService.updateApplicationStatus(
       studentId,
       req.params.applicationId,
       req.body?.status,
       req.body?.note,
     );
-    return res.status(200).json({ success: true, application: data });
+    return res.status(200).json({ success: true, application });
   } catch (error) {
     return next(error);
   }
@@ -64,10 +57,9 @@ export const updateApplicationStatus = async (req, res, next) => {
 
 export const withdrawApplication = async (req, res, next) => {
   try {
-    const { resolveStudentId } = await import('../utils/studentProfileIdentity.js');
     const studentId = await resolveStudentId(req.user);
-    const data = await studentPlacementService.withdrawApplication(studentId, req.params.applicationId);
-    return res.status(200).json({ success: true, application: data });
+    const application = await studentPlacementService.withdrawApplication(studentId, req.params.applicationId);
+    return res.status(200).json({ success: true, application });
   } catch (error) {
     return next(error);
   }
@@ -75,10 +67,9 @@ export const withdrawApplication = async (req, res, next) => {
 
 export const getInterviews = async (req, res, next) => {
   try {
-    const { resolveStudentId } = await import('../utils/studentProfileIdentity.js');
     const studentId = await resolveStudentId(req.user);
-    const data = await studentPlacementService.getPlacementInterviews(studentId, req.query);
-    return res.status(200).json({ success: true, interviews: data });
+    const interviews = await studentPlacementService.getPlacementInterviews(studentId, req.query);
+    return res.status(200).json({ success: true, interviews });
   } catch (error) {
     return next(error);
   }
@@ -86,10 +77,9 @@ export const getInterviews = async (req, res, next) => {
 
 export const getSkills = async (req, res, next) => {
   try {
-    const { resolveStudentId } = await import('../utils/studentProfileIdentity.js');
     const studentId = await resolveStudentId(req.user);
-    const data = await studentPlacementService.getSkillReadiness(studentId);
-    return res.status(200).json({ success: true, skills: data });
+    const skills = await studentPlacementService.getSkillReadiness(studentId);
+    return res.status(200).json({ success: true, skills });
   } catch (error) {
     return next(error);
   }
@@ -97,10 +87,9 @@ export const getSkills = async (req, res, next) => {
 
 export const getSkillGaps = async (req, res, next) => {
   try {
-    const { resolveStudentId } = await import('../utils/studentProfileIdentity.js');
     const studentId = await resolveStudentId(req.user);
-    const data = await studentPlacementService.getSkillGaps(studentId);
-    return res.status(200).json({ success: true, gaps: data });
+    const gaps = await studentPlacementService.getSkillGaps(studentId);
+    return res.status(200).json({ success: true, gaps });
   } catch (error) {
     return next(error);
   }
@@ -108,10 +97,9 @@ export const getSkillGaps = async (req, res, next) => {
 
 export const getRecommendations = async (req, res, next) => {
   try {
-    const { resolveStudentId } = await import('../utils/studentProfileIdentity.js');
     const studentId = await resolveStudentId(req.user);
-    const data = await studentPlacementService.getCareerRecommendations(studentId);
-    return res.status(200).json({ success: true, recommendations: data });
+    const recommendations = await studentPlacementService.getCareerRecommendations(studentId);
+    return res.status(200).json({ success: true, recommendations });
   } catch (error) {
     return next(error);
   }
@@ -119,10 +107,9 @@ export const getRecommendations = async (req, res, next) => {
 
 export const getAnalytics = async (req, res, next) => {
   try {
-    const { resolveStudentId } = await import('../utils/studentProfileIdentity.js');
     const studentId = await resolveStudentId(req.user);
-    const data = await studentPlacementService.getPlacementAnalytics(studentId);
-    return res.status(200).json({ success: true, analytics: data });
+    const analytics = await studentPlacementService.getPlacementAnalytics(studentId);
+    return res.status(200).json({ success: true, analytics });
   } catch (error) {
     return next(error);
   }

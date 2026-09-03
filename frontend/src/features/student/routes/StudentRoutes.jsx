@@ -39,6 +39,7 @@ import CertificateVerificationPage from "../certificates/pages/CertificateVerifi
 
 import PerformancePage from "../pages/performance/PerformancePage";
 import InterviewsPage from "../pages/interviews/InterviewsPage";
+import PlacementDashboardPage from "../placement/pages/PlacementDashboardPage";
 import NotificationsCenterPage from "../pages/notifications/NotificationsCenterPage";
 import NotificationPreferences from "../pages/settings/NotificationPreferences";
 
@@ -86,6 +87,7 @@ const studentRoute = (
 
         <Route path="performance" element={<PerformancePage />} />
         <Route path="interviews" element={<InterviewsPage />} />
+        <Route path="placement" element={<PlacementDashboardPage />} />
         <Route path="notifications" element={<NotificationsCenterPage />} />
         <Route path="settings/notifications" element={<NotificationPreferences />} />
       </Route>

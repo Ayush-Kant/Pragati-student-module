@@ -22,6 +22,7 @@ export default function StudentSidebar({ isOpen, onClose, collapsed = false, onT
       title: "CAREER",
       links: [
         { to: "/student/performance", label: "Performance", icon: "📈" },
+        { to: "/student/placement", label: "Placement", icon: "🎯" },
         { to: "/student/interviews", label: "Interviews", icon: "💼" },
       ],
     },
