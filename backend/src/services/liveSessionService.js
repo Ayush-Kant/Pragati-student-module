@@ -1,5 +1,10 @@
 import liveSessionModel from "../models/liveSessionModel.js";
 
+const sessionDurationMinutes = (value) => {
+  const match = String(value || "").match(/\d+(?:\.\d+)?/);
+  return match ? Number(match[0]) : 0;
+};
+
 export const getSessions = async (studentId, filters = {}) => liveSessionModel.getAllSessions(studentId, filters);
 
 export const getSession = async (id, studentId) => {
@@ -19,20 +24,32 @@ export const joinSession = async (sessionId, studentId, userName) => {
     error.status = 404;
     throw error;
   }
+
   const start = session.scheduledAt ? new Date(session.scheduledAt).getTime() : NaN;
-  const durationMatch = String(session.duration || '').match(/\d+(?:\.\d+)?/);
-  const durationMinutes = durationMatch ? Number(durationMatch[0]) : 0;
+  const durationMinutes = sessionDurationMinutes(session.duration);
   const joinableAt = Number.isFinite(start) ? start - 10 * 60 * 1000 : NaN;
-  if (Number.isFinite(joinableAt) && Date.now() < joinableAt && session.status !== 'Live') {
+  const endAt = Number.isFinite(start) && durationMinutes > 0
+    ? start + durationMinutes * 60 * 1000
+    : NaN;
+
+  if (session.status === "Completed") {
+    const error = new Error("This session has already ended");
+    error.status = 403;
+    throw error;
+  }
+
+  if (Number.isFinite(start) && Date.now() >= start && Number.isFinite(endAt) && Date.now() > endAt) {
+    const error = new Error("This session has already ended");
+    error.status = 403;
+    throw error;
+  }
+
+  if (Number.isFinite(joinableAt) && Date.now() < joinableAt && session.status !== "Live") {
     const error = new Error(`Session becomes joinable at ${new Date(joinableAt).toISOString()}`);
     error.status = 403;
     throw error;
   }
-  if (session.status === 'Completed') {
-    const error = new Error('This session has already ended');
-    error.status = 403;
-    throw error;
-  }
+
   return liveSessionModel.joinSession(sessionId, studentId, userName, durationMinutes);
 };
 
