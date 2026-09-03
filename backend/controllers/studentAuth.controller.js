@@ -23,6 +23,15 @@ const clearCookieOptions = () => ({
   path: "/api/auth/student",
 });
 
+const getRefreshToken = (req) => {
+  const cookieHeader = req.headers.cookie || "";
+  const match = cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${REFRESH_COOKIE}=`));
+  return match ? decodeURIComponent(match.slice(REFRESH_COOKIE.length + 1)) : null;
+};
+
 const handleError = (res, error) => {
   const status = Number(error?.statusCode) || (error?.code === "auth/email-already-exists" ? 409 : 500);
   const message = status === 500 ? "Authentication service failed" : error.message;
@@ -73,7 +82,7 @@ export const login = async (req, res) => {
 export const refresh = async (req, res) => {
   try {
     await ensureStudentAuthSchema();
-    const result = await refreshStudentSession(req.cookies?.[REFRESH_COOKIE]);
+    const result = await refreshStudentSession(getRefreshToken(req));
     return res.status(200).json({
       success: true,
       accessToken: result.accessToken,
@@ -95,7 +104,7 @@ export const refresh = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     await ensureStudentAuthSchema();
-    await logoutStudent(req.cookies?.[REFRESH_COOKIE]);
+    await logoutStudent(getRefreshToken(req));
     res.clearCookie(REFRESH_COOKIE, clearCookieOptions());
     return res.status(200).json({ success: true, message: "Logged out successfully" });
   } catch (error) {
