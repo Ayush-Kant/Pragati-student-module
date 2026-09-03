@@ -1,4 +1,5 @@
 import { pool } from "../../../config/db.js";
+import notificationService from "../../../services/notification.service.js";
 import {
   liveSessionSeedData,
   attendanceSeedData,
@@ -132,66 +133,67 @@ export const createLiveSessionTables = async () => {
   await pool.query(createLiveSessionTablesQuery);
 };
 
+const notifyStudentsForSessions = async (sessionIds) => {
+  if (!sessionIds.length) return;
+  const { rows } = await pool.query(
+    `SELECT id, title, trainer, scheduled_at AS "scheduledAt"
+     FROM live_sessions WHERE id = ANY($1::int[])`,
+    [sessionIds],
+  );
+
+  const students = await pool.query(`SELECT id FROM students WHERE user_id IS NOT NULL`);
+  if (!students.rows.length) return;
+
+  for (const session of rows) {
+    try {
+      await notificationService.sendNotificationToStudents({
+        studentIds: students.rows.map((student) => Number(student.id)),
+        title: 'New live session scheduled',
+        message: `${session.title} with ${session.trainer} is scheduled for ${new Date(session.scheduledAt).toLocaleString()}.`,
+        type: notificationService.NOTIFICATION_TYPES.SESSION_SCHEDULED,
+        linkUrl: `/student/sessions/${session.id}`,
+      });
+    } catch (error) {
+      console.error('[liveSession] Failed to dispatch session notifications:', error.message);
+    }
+  }
+};
+
 export const seedLiveSessionData = async () => {
   const sessionCount = await pool.query("SELECT COUNT(*)::int AS count FROM live_sessions");
-  if (sessionCount.rows[0].count > 0) {
-    return;
-  }
+  if (sessionCount.rows[0].count > 0) return;
 
+  const createdSessionIds = [];
   const createdSessions = await pool.query(
     `INSERT INTO live_sessions (title, trainer, date, time, duration, status, session_type, scheduled_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING id`,
-    [
-      liveSessionSeedData[0].title,
-      liveSessionSeedData[0].trainer,
-      liveSessionSeedData[0].date,
-      liveSessionSeedData[0].time,
-      liveSessionSeedData[0].duration,
-      liveSessionSeedData[0].status,
-      liveSessionSeedData[0].session_type,
-      liveSessionSeedData[0].scheduled_at,
-    ],
+    [liveSessionSeedData[0].title, liveSessionSeedData[0].trainer, liveSessionSeedData[0].date, liveSessionSeedData[0].time, liveSessionSeedData[0].duration, liveSessionSeedData[0].status, liveSessionSeedData[0].session_type, liveSessionSeedData[0].scheduled_at],
   );
-
   const firstSessionId = createdSessions.rows[0]?.id;
+  if (firstSessionId) createdSessionIds.push(firstSessionId);
 
   if (firstSessionId) {
-    const userTableCheck = await pool.query(
-      "SELECT to_regclass('public.users') AS table_name"
-    );
+    const userTableCheck = await pool.query("SELECT to_regclass('public.users') AS table_name");
     const usersTableExists = Boolean(userTableCheck.rows[0]?.table_name);
-
     if (usersTableExists) {
-      const studentCheck = await pool.query(
-        "SELECT EXISTS (SELECT 1 FROM users WHERE id = $1) AS exists",
-        [attendanceSeedData[0].studentId]
-      );
-
+      const studentCheck = await pool.query("SELECT EXISTS (SELECT 1 FROM users WHERE id = $1) AS exists", [attendanceSeedData[0].studentId]);
       if (studentCheck.rows[0]?.exists) {
         await pool.query(
           `INSERT INTO session_attendance (session_id, student_id, attended, status)
-           VALUES ($1, $2, true, $3)
-           ON CONFLICT (session_id, student_id) DO NOTHING`,
+           VALUES ($1, $2, true, $3) ON CONFLICT (session_id, student_id) DO NOTHING`,
           [firstSessionId, attendanceSeedData[0].studentId, attendanceSeedData[0].status],
         );
       }
-
-      const participantCheck = await pool.query(
-        "SELECT EXISTS (SELECT 1 FROM users WHERE id = $1) AS exists",
-        [participantSeedData[0].studentId]
-      );
-
+      const participantCheck = await pool.query("SELECT EXISTS (SELECT 1 FROM users WHERE id = $1) AS exists", [participantSeedData[0].studentId]);
       if (participantCheck.rows[0]?.exists) {
         await pool.query(
           `INSERT INTO session_participants (session_id, student_id, joined_at, left_at)
-           VALUES ($1, $2, NOW(), NULL)
-           ON CONFLICT (session_id, student_id) DO NOTHING`,
+           VALUES ($1, $2, NOW(), NULL) ON CONFLICT (session_id, student_id) DO NOTHING`,
           [firstSessionId, participantSeedData[0].studentId],
         );
       }
     }
-
     await pool.query(
       `INSERT INTO session_recordings (session_id, title, duration, recording_url)
        VALUES ($1, $2, $3, $4)`,
@@ -208,12 +210,15 @@ export const seedLiveSessionData = async () => {
   }
 
   for (const session of liveSessionSeedData.slice(1)) {
-    await pool.query(
+    const result = await pool.query(
       `INSERT INTO live_sessions (title, trainer, date, time, duration, status, session_type, scheduled_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
       [session.title, session.trainer, session.date, session.time, session.duration, session.status, session.session_type, session.scheduled_at],
     );
+    if (result.rows[0]?.id) createdSessionIds.push(result.rows[0].id);
   }
+
+  await notifyStudentsForSessions(createdSessionIds);
 };
 
 export const initializeLiveSessionModule = async () => {
