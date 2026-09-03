@@ -8,6 +8,7 @@ import { connectDB } from "./config/db.js";
 import { initializeLiveSessionModule } from "./src/database/migrations/liveSessionSchema.js";
 import { initializeAssignmentModule } from "./src/database/migrations/assignmentSchema.js";
 import { startNotificationDigestScheduler } from "./services/notification.service.js";
+import { ensureStudentAuthSchema } from "./services/studentAuth.service.js";
 
 // Admin Routes
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
@@ -25,6 +26,7 @@ import adminCompanyRoutes from "./routes/admin.company.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import studentProfileRoutes from "./routes/studentProfile.routes.js";
+import studentOnboardingRoutes from "./routes/studentOnboarding.routes.js";
 import studentAssessmentRoutes from "./routes/studentAssessment.routes.js";
 import studentCourseRoutes from "./src/routes/studentCourseRoutes.js";
 import studentLiveSessionRoutes from "./src/routes/liveSessionRoutes.js";
@@ -108,6 +110,7 @@ app.use(
 app.use("/api/auth", authRouter);
 app.use("/api/students", studentRoutes);
 app.use("/api/student/profile", studentProfileRoutes);
+app.use("/api/student/onboarding", studentOnboardingRoutes);
 app.use("/api/student/assessments", studentAssessmentRoutes);
 app.use("/api/student/courses", studentCourseRoutes);
 app.use("/api/student/sessions", studentLiveSessionRoutes);
@@ -179,6 +182,13 @@ app.use(errorMiddleware);
 
 connectDB()
   .then(async () => {
+    try {
+      await ensureStudentAuthSchema();
+      console.log("✅ Student authentication/session schema ready");
+    } catch (error) {
+      console.error("⚠️ Student auth schema initialization failed:", error.message);
+    }
+
     try {
       await initializeLiveSessionModule();
       console.log("✅ Live session module initialized");
