@@ -12,7 +12,7 @@ const baseInterviewQuery = `
     i.id,
     i.application_id AS "applicationId",
     i.student_id AS "studentId",
-    sdp.drive_id AS "driveId",
+    COALESCE(i.drive_id, sdp.drive_id) AS "driveId",
     i.scheduled_at AS "scheduledAt",
     i.title,
     i.interview_type AS "interviewType",
@@ -22,11 +22,12 @@ const baseInterviewQuery = `
     i.status,
     i.attendance,
     i.feedback,
+    i.created_at AS "createdAt",
     rd.title AS "driveTitle",
     c.name AS "companyName"
   FROM interviews i
   LEFT JOIN student_drive_progress sdp ON sdp.id = i.application_id
-  LEFT JOIN recruitment_drives rd ON rd.id = sdp.drive_id
+  LEFT JOIN recruitment_drives rd ON rd.id = COALESCE(i.drive_id, sdp.drive_id)
   LEFT JOIN companies c ON c.id = rd.company_id
 `;
 
@@ -60,16 +61,19 @@ const getInterview = async (user, interviewId) => {
 };
 
 const confirmInterview = async (user, interviewId) => {
-  await getInterview(user, interviewId);
+  const interview = await getInterview(user, interviewId);
+  if (!['scheduled', 'invited'].includes(String(interview.status).toLowerCase())) {
+    return { id: interview.id, status: interview.status };
+  }
+
   const result = await pool.query(
     `UPDATE interviews
-     SET status = CASE WHEN status IN ('scheduled','invited') THEN 'confirmed' ELSE status END,
-         updated_at = NOW()
-     WHERE id = $1
+     SET status = 'confirmed'
+     WHERE id = $1 AND student_id = $2
      RETURNING id, status`,
-    [interviewId],
+    [interviewId, await resolveStudentId(user)],
   );
-  return result.rows[0];
+  return result.rows[0] || { id: interview.id, status: interview.status };
 };
 
 const joinInterview = async (user, interviewId) => {
