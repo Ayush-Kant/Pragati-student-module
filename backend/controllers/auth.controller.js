@@ -45,6 +45,17 @@ export const login = async (req, res) => {
 
     const user = result.rows[0];
 
+    // Students must authenticate through Firebase. The shared frontend login page
+    // uses this signal to switch to the canonical Firebase student flow while all
+    // existing non-student platform roles keep their legacy authentication intact.
+    if (user.role === "student") {
+      return res.status(409).json({
+        success: false,
+        code: "STUDENT_USE_FIREBASE",
+        message: "Student accounts must sign in with Firebase",
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
@@ -160,8 +171,6 @@ export const register = async (req, res) => {
     let companyId = null;
 
     if (role === "student") {
-      // Reuse an existing seeded/imported student row with the same email when
-      // it is not already linked. Otherwise create a new canonical student.
       const existingStudent = await client.query(
         `SELECT id, user_id
          FROM students
