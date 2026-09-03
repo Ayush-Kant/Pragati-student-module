@@ -1,9 +1,11 @@
 import { readFileSync } from "node:fs";
 import { applicationDefault, cert, getApps, getApp, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 
 const FIREBASE_PROJECT_ID = "pragatistudentmodule";
 let initializedAuth = null;
+let initializedFirestore = null;
 
 const normalizeServiceAccount = (serviceAccount) => {
   if (serviceAccount?.private_key) {
@@ -60,33 +62,37 @@ const validateServiceAccountProject = (serviceAccount, configuredProjectId) => {
   }
 };
 
-export const getFirebaseAdminAuth = () => {
-  if (initializedAuth) return initializedAuth;
-
+const ensureAdminApp = () => {
   const apps = getApps();
-  if (apps.length === 0) {
-    const serviceAccount = loadServiceAccount();
-    const configuredProjectId = getConfiguredProjectId();
+  if (apps.length > 0) return getApp();
 
-    if (serviceAccount) {
-      validateServiceAccountProject(serviceAccount, configuredProjectId);
-      initializeApp({
-        credential: cert(serviceAccount),
-        projectId: configuredProjectId,
-      });
-    } else {
-      // Google-hosted deployments may use ambient Application Default Credentials.
-      // Local development should set GOOGLE_APPLICATION_CREDENTIALS to the downloaded
-      // service-account JSON file so the credential source is deterministic.
-      initializeApp({
-        credential: applicationDefault(),
-        projectId: configuredProjectId,
-      });
-    }
+  const serviceAccount = loadServiceAccount();
+  const configuredProjectId = getConfiguredProjectId();
+
+  if (serviceAccount) {
+    validateServiceAccountProject(serviceAccount, configuredProjectId);
+    return initializeApp({
+      credential: cert(serviceAccount),
+      projectId: configuredProjectId,
+    });
   }
 
-  initializedAuth = getAuth(getApp());
+  return initializeApp({
+    credential: applicationDefault(),
+    projectId: configuredProjectId,
+  });
+};
+
+export const getFirebaseAdminAuth = () => {
+  if (initializedAuth) return initializedAuth;
+  initializedAuth = getAuth(ensureAdminApp());
   return initializedAuth;
+};
+
+export const getFirebaseFirestore = () => {
+  if (initializedFirestore) return initializedFirestore;
+  initializedFirestore = getFirestore(ensureAdminApp());
+  return initializedFirestore;
 };
 
 export const verifyFirebaseAdminConfiguration = async () => {
