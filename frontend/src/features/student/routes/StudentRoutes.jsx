@@ -17,8 +17,11 @@ import CourseDetailPage from "../pages/training/CourseDetailPage";
 import SM04LearningWorkspace from "../pages/training/SM04LearningWorkspace";
 import SM04CourseWorkspace from "../pages/training/SM04CourseWorkspace";
 import LiveSessionsPage from "../live-sessions/pages/LiveSessionsPage";
+import SM05LiveSessionsWorkspace from "../live-sessions/pages/SM05LiveSessionsWorkspace";
 import AssignmentsPage from "../pages/assignments/AssignmentsPage";
 import AssignmentDetail from "../pages/assignments/AssignmentDetail";
+import SM06AssignmentsWorkspace from "../pages/assignments/SM06AssignmentsWorkspace";
+import SM06AssignmentDetail from "../pages/assignments/SM06AssignmentDetail";
 
 import AssessmentsPage from "../assessments/pages/AssessmentsPage";
 import AssessmentDetailsPage from "../assessments/pages/AssessmentDetailsPage";
@@ -56,21 +59,26 @@ const studentRoute = (
     <Route element={<PrivateRoute />}>
       <Route path="student" element={<StudentLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
-        {/* SM-03: comprehensive student dashboard. Existing dashboard remains available for rollback/reference. */}
+        {/* SM-03 */}
         <Route path="dashboard" element={<SM03DashboardPage />} />
         <Route path="dashboard/legacy" element={<DashboardPage />} />
         <Route path="onboarding" element={<OnboardingWizard />} />
-        {/* SM-02: dedicated profile workspace. Legacy implementation remains available for rollback/reference. */}
+        {/* SM-02 */}
         <Route path="profile" element={<SM02ProfileWorkspace />} />
         <Route path="profile/legacy" element={<ProfilePage />} />
-        {/* SM-04: learning workspace. Existing learning screens remain available for rollback/reference. */}
+        {/* SM-04 */}
         <Route path="courses" element={<SM04LearningWorkspace />} />
         <Route path="courses/legacy" element={<CoursesPage />} />
         <Route path="courses/:courseId" element={<SM04CourseWorkspace />} />
         <Route path="courses-legacy/:courseId" element={<CourseDetailPage />} />
-        <Route path="sessions" element={<LiveSessionsPage />} />
-        <Route path="assignments" element={<AssignmentsPage />} />
-        <Route path="assignments/:id" element={<AssignmentDetail />} />
+        {/* SM-05 */}
+        <Route path="sessions" element={<SM05LiveSessionsWorkspace />} />
+        <Route path="sessions/legacy" element={<LiveSessionsPage />} />
+        {/* SM-06 */}
+        <Route path="assignments" element={<SM06AssignmentsWorkspace />} />
+        <Route path="assignments/:id" element={<SM06AssignmentDetail />} />
+        <Route path="assignments-legacy" element={<AssignmentsPage />} />
+        <Route path="assignments-legacy/:id" element={<AssignmentDetail />} />
 
         <Route path="assessments" element={<AssessmentsPage />} />
         <Route path="assessments/:assessmentId" element={<AssessmentDetailsPage />} />
