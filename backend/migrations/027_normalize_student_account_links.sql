@@ -19,11 +19,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_students_user_id
 
 -- Deterministic development student account for a fresh local database.
 -- Credentials: student@demo.edu / Student@123
+-- This creates a dedicated demo student and does not modify the existing
+-- seeded student records (Rahul, Priya, Arjun).
 DO $$
 DECLARE
   demo_auth_user_id INTEGER;
   demo_user_id INTEGER;
-  demo_student_id INTEGER;
 BEGIN
   SELECT au.id
   INTO demo_auth_user_id
@@ -72,33 +73,9 @@ BEGIN
     WHERE id = demo_user_id;
   END IF;
 
-  SELECT s.id
-  INTO demo_student_id
-  FROM students s
-  WHERE LOWER(s.email) = 'rahul@test.com'
-    AND (s.user_id IS NULL OR s.user_id = demo_user_id)
-  LIMIT 1;
-
-  IF demo_student_id IS NULL THEN
-    SELECT s.id
-    INTO demo_student_id
-    FROM students s
-    WHERE LOWER(s.email) = 'student@demo.edu'
-      AND (s.user_id IS NULL OR s.user_id = demo_user_id)
-    LIMIT 1;
-  END IF;
-
-  IF demo_student_id IS NULL THEN
-    INSERT INTO students (user_id, name, email, status)
-    VALUES (demo_user_id, 'Demo Student', 'student@demo.edu', 'pending');
-  ELSE
-    UPDATE students
-    SET user_id = demo_user_id,
-        email = CASE
-          WHEN LOWER(email) = 'rahul@test.com' THEN 'student@demo.edu'
-          ELSE email
-        END,
-        updated_at = NOW()
-    WHERE id = demo_student_id;
-  END IF;
+  INSERT INTO students (user_id, name, email, status)
+  SELECT demo_user_id, 'Demo Student', 'student@demo.edu', 'pending'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM students WHERE LOWER(email) = 'student@demo.edu'
+  );
 END $$;
