@@ -71,16 +71,53 @@ const StepPersonalInfo = ({ personal, contact, errors = {}, onPersonalChange, on
         />
       </div>
 
-      <div>
-        <label className="block text-xs font-semibold text-slate-600 mb-1.5">City *</label>
-        <input
-          value={contact.city}
-          onChange={(event) => onContactChange({ city: event.target.value })}
-          className={fieldClass(errors.city)}
-          placeholder="Pune"
-          autoComplete="address-level2"
-        />
-        {errors.city ? <p className="mt-1 text-xs text-red-500">{errors.city}</p> : null}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">College ID</label>
+          <input
+            value={contact.collegeId ?? ""}
+            onChange={(event) => onContactChange({ collegeId: event.target.value })}
+            className={fieldClass(errors.collegeId)}
+            placeholder="Numeric College ID"
+            inputMode="numeric"
+          />
+          {errors.collegeId ? <p className="mt-1 text-xs text-red-500">{errors.collegeId}</p> : null}
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">City *</label>
+          <input
+            value={contact.city}
+            onChange={(event) => onContactChange({ city: event.target.value })}
+            className={fieldClass(errors.city)}
+            placeholder="Pune"
+            autoComplete="address-level2"
+          />
+          {errors.city ? <p className="mt-1 text-xs text-red-500">{errors.city}</p> : null}
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">State</label>
+          <input
+            value={contact.state}
+            onChange={(event) => onContactChange({ state: event.target.value })}
+            className={fieldClass(false)}
+            placeholder="Maharashtra"
+            autoComplete="address-level1"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">Pincode</label>
+          <input
+            value={contact.pincode}
+            onChange={(event) => onContactChange({ pincode: event.target.value })}
+            className={fieldClass(false)}
+            placeholder="411001"
+            inputMode="numeric"
+            autoComplete="postal-code"
+          />
+        </div>
       </div>
     </div>
   );
