@@ -6,7 +6,6 @@ import {
   ChevronRight,
   FileText,
   PlayCircle,
-  Send,
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import StudentPageShell from '../../components/common/StudentPageShell';
