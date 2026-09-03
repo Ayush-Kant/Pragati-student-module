@@ -1,59 +1,71 @@
-// liveSessionsService.js
-// API service layer for the Live Sessions module.
-// Currently backed by shared dummy data — swap the body of each function
-// for a real fetch/axios call to BASE_URL + LIVE_SESSIONS_API.* during integration.
-// No hardcoded URLs: endpoint paths live in liveSessionsConstants.js
+import api from "../../../../services/api";
 
-import { liveSessions } from "../types/liveSessionDummyData";
+const unwrap = (response) => response?.data?.data ?? response?.data;
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const toIsoDateTime = (date, time) => {
+  if (!date || !time) return null;
+  const value = new Date(`${date}T${time}`);
+  return Number.isNaN(value.getTime()) ? null : value.toISOString();
+};
 
-const getHeaders = () => ({
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-});
+const parseDurationMinutes = (duration) => {
+  if (typeof duration === "number" && Number.isFinite(duration)) return duration;
+  const match = String(duration || "").match(/(\d+(?:\.\d+)?)\s*(?:min|mins|minutes?)/i);
+  return match ? Number(match[1]) : 0;
+};
 
-// ── Helper — simulate network latency with dummy data ──────────
-const simulateApi = (data, delay = 400) =>
-  new Promise((resolve) => setTimeout(() => resolve(structuredClone(data)), delay));
+const normalizeSession = (session) => {
+  const startTime = session?.scheduledAt || toIsoDateTime(session?.date, session?.time);
+  const durationMinutes = parseDurationMinutes(session?.duration);
+  const endDate = startTime ? new Date(startTime) : null;
+  if (endDate && durationMinutes > 0) {
+    endDate.setMinutes(endDate.getMinutes() + durationMinutes);
+  }
 
-// ─────────────────────────────────────────────────────
-// SESSIONS
-// ─────────────────────────────────────────────────────
+  return {
+    ...session,
+    mentor: session?.trainer || session?.mentor || "Training Mentor",
+    category: session?.sessionType || session?.category || "Live Session",
+    startTime,
+    endTime: endDate && !Number.isNaN(endDate.getTime()) ? endDate.toISOString() : startTime,
+    description: session?.description || "Join this live learning session and participate with your training cohort.",
+    meetingLink: session?.meetingLink || session?.meetingUrl || "",
+  };
+};
 
 export const getLiveSessions = async () => {
-  // TODO(integration): fetch(`${BASE_URL}${LIVE_SESSIONS_API.GET_SESSIONS}`, { headers: getHeaders() })
-  return simulateApi(liveSessions);
+  const response = await api.get("/student/sessions");
+  const data = unwrap(response);
+  return (Array.isArray(data) ? data : []).map(normalizeSession);
 };
 
 export const getSessionById = async (sessionId) => {
-  const session = liveSessions.find((s) => s.id === Number(sessionId));
-  if (!session) throw new Error("Session not found");
-  return simulateApi(session);
+  const response = await api.get(`/student/sessions/${sessionId}`);
+  return normalizeSession(unwrap(response));
 };
 
-// ─────────────────────────────────────────────────────
-// ATTENDANCE
-// ─────────────────────────────────────────────────────
+export const joinSession = async (sessionId) => {
+  const response = await api.post(`/student/sessions/${sessionId}/join`);
+  return unwrap(response);
+};
+
+export const leaveSession = async (sessionId) => {
+  const response = await api.post(`/student/sessions/${sessionId}/leave`);
+  return unwrap(response);
+};
 
 export const getAttendance = async (sessionId) => {
-  const session = liveSessions.find((s) => s.id === Number(sessionId));
-  if (!session) throw new Error("Session not found");
-  return simulateApi({ sessionId: session.id, status: session.attendanceStatus });
+  const response = await api.get("/student/sessions/attendance", {
+    params: { sessionId },
+  });
+  const data = unwrap(response);
+  if (Array.isArray(data)) return data[0] || null;
+  return data;
 };
-
-// ─────────────────────────────────────────────────────
-// RECORDINGS
-// ─────────────────────────────────────────────────────
 
 export const getRecordings = async (sessionId) => {
-  const session = liveSessions.find((s) => s.id === Number(sessionId));
-  if (!session) throw new Error("Session not found");
-  return simulateApi({
-    sessionId: session.id,
-    recordingUrl: session.recordingUrl,
-    available: Boolean(session.recordingUrl),
-  });
+  const response = await api.get("/student/sessions/recordings");
+  const data = unwrap(response);
+  const recordings = Array.isArray(data) ? data : [];
+  return recordings.find((recording) => Number(recording.sessionId) === Number(sessionId)) || null;
 };
-
-export { BASE_URL, getHeaders };
