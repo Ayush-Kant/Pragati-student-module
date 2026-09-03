@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import NotificationDropdown from "./NotificationDropdown";
-import { getNotifications } from "../../services/notification.service";
+import { getNotifications } from "../../../../services/notification.service";
 
 export default function NotificationBell({ unreadCount = 0 }) {
   const [count, setCount] = useState(Number(unreadCount) || 0);
@@ -9,7 +9,7 @@ export default function NotificationBell({ unreadCount = 0 }) {
 
   const refreshCount = useCallback(async () => {
     try {
-      const data = await getNotifications({ read: 'false', page: 1, limit: 1 });
+      const data = await getNotifications({ read: "false", page: 1, limit: 1 });
       setCount(Number(data?.unreadCount || 0));
     } catch {
       setCount(Number(unreadCount) || 0);
@@ -33,7 +33,7 @@ export default function NotificationBell({ unreadCount = 0 }) {
         <Bell className="h-6 w-6" />
         {count > 0 && (
           <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">
-            {count > 99 ? '99+' : count}
+            {count > 99 ? "99+" : count}
           </span>
         )}
       </button>
