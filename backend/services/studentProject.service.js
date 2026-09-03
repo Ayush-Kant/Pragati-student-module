@@ -50,3 +50,13 @@ export const getEvaluation = async (studentId, projectId) => {
   if (!project) throw notFound();
   return studentProjectModel.getEvaluation(studentId, projectId);
 };
+
+export default {
+  listProjects,
+  getProject,
+  getMilestones,
+  getSubmission,
+  getHistory,
+  submitProject,
+  getEvaluation,
+};
