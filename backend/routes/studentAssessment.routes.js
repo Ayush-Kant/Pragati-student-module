@@ -5,6 +5,7 @@ import {
   getAssessment,
   getHistory,
   getResult,
+  getReview,
   listAssessments,
   recordTabSwitch,
   saveAnswer,
@@ -18,6 +19,7 @@ router.use(authMiddleware, roleMiddleware("student"));
 
 router.get("/", listAssessments);
 router.get("/history", getHistory);
+router.get("/:assessmentId/review", getReview);
 router.get("/:assessmentId", getAssessment);
 router.post("/:assessmentId/start", startAssessment);
 router.put("/attempts/:attemptId/questions/:questionId/answer", saveAnswer);
