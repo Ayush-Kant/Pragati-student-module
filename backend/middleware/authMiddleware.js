@@ -16,10 +16,25 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     req.user = decoded;
+
+    // Keep a lightweight activity timestamp for student notification digests.
+    // Throttle writes so authenticated traffic does not update the database on every request.
+    const authenticatedUserId = Number(decoded.id ?? decoded.uid);
+    if (Number.isInteger(authenticatedUserId) && authenticatedUserId > 0) {
+      try {
+        await pool.query(
+          `UPDATE users
+           SET last_active_at = NOW()
+           WHERE id = $1
+             AND (last_active_at IS NULL OR last_active_at < NOW() - INTERVAL '15 minutes')`,
+          [authenticatedUserId],
+        );
+      } catch (activityError) {
+        console.warn("[auth] Failed to update activity timestamp:", activityError.message);
+      }
+    }
 
     if (decoded.role === "company") {
       const userId = decoded.id || decoded.uid;
