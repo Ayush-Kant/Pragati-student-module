@@ -3,62 +3,31 @@ import { ChevronDown, ChevronUp, Terminal } from 'lucide-react';
 import SampleTestCases from './SampleTestCases';
 import ExecutionOutput from './ExecutionOutput';
 
-/**
- * Collapsible bottom panel containing sample test cases and execution output.
- *
- * @param {{
- *   testCases: object[],
- *   executionResult: object | null,
- *   executionError: string | null,
- *   isExecuting: boolean,
- * }} props
- */
-const TestCasePanel = memo(({
-  testCases,
-  executionResult,
-  executionError,
-  isExecuting,
-}) => {
+const TestCasePanel = memo(({ testCases, executionResult, executionError, isExecuting }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const hasResult = !!executionResult || !!executionError || isExecuting;
+  const hasResult = Boolean(executionResult || executionError || isExecuting);
 
   return (
-    <div className="border-t border-gray-800 flex-shrink-0 bg-[#080808]" style={{ minHeight: '120px' }}>
-      {/* Panel header */}
+    <div className="flex-shrink-0 border-t border-slate-200 bg-white">
       <button
         type="button"
         onClick={() => setIsExpanded((prev) => !prev)}
-        className="w-full flex items-center justify-between px-4 py-2 text-xs font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-900/50 transition-colors"
+        className="flex w-full items-center justify-between border-b border-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
         aria-expanded={isExpanded}
         aria-controls="test-panel-body"
       >
         <div className="flex items-center gap-2">
-          <Terminal size={13} aria-hidden="true" />
+          <Terminal size={14} className="text-slate-500" aria-hidden="true" />
           <span>Test Cases</span>
-          {hasResult && (
-            <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" aria-hidden="true" />
-          )}
+          {hasResult && <span className="h-2 w-2 rounded-full bg-blue-500" aria-hidden="true" />}
         </div>
-        {/* Issue 6 fix: Up arrow = panel is open (click to collapse); Down arrow = panel is closed (click to expand) */}
-        {isExpanded ? (
-          <ChevronUp size={14} aria-hidden="true" />
-        ) : (
-          <ChevronDown size={14} aria-hidden="true" />
-        )}
+        {isExpanded ? <ChevronUp size={15} className="text-slate-400" /> : <ChevronDown size={15} className="text-slate-400" />}
       </button>
 
-      {/* Panel body */}
       {isExpanded && (
-        <div
-          id="test-panel-body"
-          className="px-4 py-3 max-h-72 overflow-y-auto scrollbar-thin space-y-4"
-        >
+        <div id="test-panel-body" className="max-h-80 overflow-y-auto px-4 py-3">
           {hasResult ? (
-            <ExecutionOutput
-              result={executionResult}
-              error={executionError}
-              isLoading={isExecuting}
-            />
+            <ExecutionOutput result={executionResult} error={executionError} isLoading={isExecuting} />
           ) : (
             <SampleTestCases testCases={testCases} />
           )}
@@ -69,5 +38,4 @@ const TestCasePanel = memo(({
 });
 
 TestCasePanel.displayName = 'TestCasePanel';
-
 export default TestCasePanel;
