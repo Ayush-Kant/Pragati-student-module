@@ -38,22 +38,18 @@ const getEligibleAssessment = async (client, assessmentId, studentId) => {
        AND a.status = 'active'
        AND (
          NOT EXISTS (
-           SELECT 1
-           FROM assessment_assignments aa
-           WHERE aa.assessment_id = a.id
+           SELECT 1 FROM assessment_assignments aa WHERE aa.assessment_id = a.id
          )
          OR EXISTS (
            SELECT 1
            FROM assessment_assignments aa
            JOIN student_drive_progress sdp ON sdp.drive_id = aa.drive_id
-           WHERE aa.assessment_id = a.id
-             AND sdp.student_id = $2
+           WHERE aa.assessment_id = a.id AND sdp.student_id = $2
          )
        )
      LIMIT 1`,
     [assessmentId, studentId],
   );
-
   return result.rows[0] || null;
 };
 
@@ -68,7 +64,6 @@ const ensureNotExpired = async (client, attempt) => {
      RETURNING *`,
     [attempt.id],
   );
-
   return updated.rows[0] || attempt;
 };
 
@@ -83,17 +78,13 @@ const gradeAttempt = async (client, attemptId) => {
 
   let score = 0;
   let totalMarks = 0;
-
   for (const row of answers.rows) {
     const marks = Number(row.marks) || 0;
     totalMarks += marks;
-
     const selected = Number(row.answer?.optionIndex);
     const isCorrect = Number.isInteger(selected) && selected === Number(row.correct_option);
     const awarded = isCorrect ? marks : 0;
-
     score += awarded;
-
     await client.query(
       `UPDATE student_assessment_answers
        SET is_correct = $1, marks_awarded = $2, updated_at = NOW()
@@ -109,51 +100,31 @@ const gradeAttempt = async (client, attemptId) => {
      WHERE sa.id = $1`,
     [attemptId],
   );
-
   const assessmentTotal = Number(assessmentRes.rows[0]?.assessment_total_marks);
   const effectiveTotal = assessmentTotal > 0 ? assessmentTotal : totalMarks;
   const percentage = effectiveTotal > 0 ? Number(((score / effectiveTotal) * 100).toFixed(2)) : 0;
-  const passed = percentage >= 40;
-
-  return { score, totalMarks: effectiveTotal, percentage, passed };
+  return { score, totalMarks: effectiveTotal, percentage, passed: percentage >= 40 };
 };
 
 class StudentAssessmentService {
   async listAssessments(studentId) {
     const result = await pool.query(
-      `SELECT
-         a.id,
-         a.title,
-         a.type,
-         a.difficulty,
-         a.time_limit_minutes AS "timeLimitMinutes",
-         a.total_marks AS "totalMarks",
-         a.status,
-         (
-           SELECT COUNT(*)::INTEGER
-           FROM assessment_questions aq
-           WHERE aq.assessment_id = a.id
-         ) AS "questionsCount",
-         (
-           SELECT COALESCE(MAX(saa.attempt_number), 0)::INTEGER
-           FROM student_assessment_attempts saa
-           WHERE saa.assessment_id = a.id
-             AND saa.student_id = $1
-         ) AS "attemptsUsed"
+      `SELECT a.id, a.title, a.type, a.difficulty,
+              a.time_limit_minutes AS "timeLimitMinutes",
+              a.total_marks AS "totalMarks", a.status,
+              (SELECT COUNT(*)::INTEGER FROM assessment_questions aq WHERE aq.assessment_id = a.id) AS "questionsCount",
+              (SELECT COALESCE(MAX(saa.attempt_number), 0)::INTEGER
+               FROM student_assessment_attempts saa
+               WHERE saa.assessment_id = a.id AND saa.student_id = $1) AS "attemptsUsed"
        FROM assessments a
        WHERE a.status = 'active'
          AND (
-           NOT EXISTS (
-             SELECT 1
-             FROM assessment_assignments aa0
-             WHERE aa0.assessment_id = a.id
-           )
+           NOT EXISTS (SELECT 1 FROM assessment_assignments aa0 WHERE aa0.assessment_id = a.id)
            OR EXISTS (
              SELECT 1
              FROM assessment_assignments aa0
              JOIN student_drive_progress sdp ON sdp.drive_id = aa0.drive_id
-             WHERE aa0.assessment_id = a.id
-               AND sdp.student_id = $1
+             WHERE aa0.assessment_id = a.id AND sdp.student_id = $1
            )
          )
        ORDER BY a.created_at DESC`,
@@ -172,17 +143,11 @@ class StudentAssessmentService {
   async getAssessment(studentId, assessmentIdValue) {
     const assessmentId = parseAssessmentId(assessmentIdValue);
     const assessment = await getEligibleAssessment(pool, assessmentId, studentId);
-
     if (!assessment) return null;
-
     const questions = await pool.query(
-      `SELECT aq.*
-       FROM assessment_questions aq
-       WHERE aq.assessment_id = $1
-       ORDER BY aq.created_at ASC, aq.id ASC`,
+      `SELECT aq.* FROM assessment_questions aq WHERE aq.assessment_id = $1 ORDER BY aq.created_at ASC, aq.id ASC`,
       [assessmentId],
     );
-
     return {
       ...assessment,
       id: `assess_${assessment.id}`,
@@ -199,11 +164,19 @@ class StudentAssessmentService {
     try {
       await client.query("BEGIN");
 
+      // React development StrictMode and repeated clicks can issue two start
+      // requests almost simultaneously. The attempt-number uniqueness rule is
+      // not sufficient by itself because both transactions can read the same
+      // latest attempt before either inserts. A transaction-scoped PostgreSQL
+      // advisory lock serializes starts for exactly this student/assessment pair.
+      await client.query(
+        `SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`,
+        [`student-assessment:${studentId}:${assessmentId}`],
+      );
+
       const assessment = await getEligibleAssessment(client, assessmentId, studentId);
       if (!assessment) {
-        throw Object.assign(new Error("Assessment not found or is not available to this student"), {
-          statusCode: 404,
-        });
+        throw Object.assign(new Error("Assessment not found or is not available to this student"), { statusCode: 404 });
       }
 
       const questions = await client.query(
@@ -212,7 +185,6 @@ class StudentAssessmentService {
          ORDER BY created_at ASC, id ASC`,
         [assessmentId],
       );
-
       if (questions.rows.length === 0) {
         throw Object.assign(new Error("Assessment has no questions"), { statusCode: 409 });
       }
@@ -220,8 +192,7 @@ class StudentAssessmentService {
       const latest = await client.query(
         `SELECT * FROM student_assessment_attempts
          WHERE assessment_id = $1 AND student_id = $2
-         ORDER BY attempt_number DESC
-         LIMIT 1`,
+         ORDER BY attempt_number DESC LIMIT 1`,
         [assessmentId, studentId],
       );
 
@@ -237,7 +208,6 @@ class StudentAssessmentService {
              ORDER BY saq.question_order ASC`,
             [checked.id],
           );
-
           await client.query("COMMIT");
           return this.#formatAttempt(checked, assessment, attemptQuestions.rows);
         }
@@ -254,7 +224,6 @@ class StudentAssessmentService {
 
       const attempt = started.rows[0];
       const insertedQuestions = [];
-
       for (let index = 0; index < questions.rows.length; index += 1) {
         const question = questions.rows[index];
         await client.query(
@@ -278,41 +247,23 @@ class StudentAssessmentService {
   async saveAnswer(studentId, attemptIdValue, questionId, answer) {
     const attemptId = parseAttemptId(attemptIdValue);
     const client = await pool.connect();
-
     try {
       await client.query("BEGIN");
-
       const attemptRes = await client.query(
-        `SELECT * FROM student_assessment_attempts
-         WHERE id = $1 AND student_id = $2
-         FOR UPDATE`,
+        `SELECT * FROM student_assessment_attempts WHERE id = $1 AND student_id = $2 FOR UPDATE`,
         [attemptId, studentId],
       );
-
-      if (!attemptRes.rows[0]) {
-        throw Object.assign(new Error("Attempt not found"), { statusCode: 404 });
-      }
-
+      if (!attemptRes.rows[0]) throw Object.assign(new Error("Attempt not found"), { statusCode: 404 });
       const attempt = await ensureNotExpired(client, attemptRes.rows[0]);
       if (attempt.status !== "in_progress") {
-        throw Object.assign(new Error("This assessment attempt is no longer editable"), {
-          statusCode: 409,
-        });
+        throw Object.assign(new Error("This assessment attempt is no longer editable"), { statusCode: 409 });
       }
-
       const question = await client.query(
-        `SELECT saq.question_id
-         FROM student_assessment_attempt_questions saq
+        `SELECT saq.question_id FROM student_assessment_attempt_questions saq
          WHERE saq.attempt_id = $1 AND saq.question_id = $2`,
         [attemptId, Number(questionId)],
       );
-
-      if (!question.rows[0]) {
-        throw Object.assign(new Error("Question does not belong to this attempt"), {
-          statusCode: 400,
-        });
-      }
-
+      if (!question.rows[0]) throw Object.assign(new Error("Question does not belong to this attempt"), { statusCode: 400 });
       await client.query(
         `INSERT INTO student_assessment_answers (attempt_id, question_id, answer)
          VALUES ($1, $2, $3)
@@ -320,7 +271,6 @@ class StudentAssessmentService {
          DO UPDATE SET answer = EXCLUDED.answer, answered_at = NOW(), updated_at = NOW()`,
         [attemptId, Number(questionId), JSON.stringify(answer ?? null)],
       );
-
       await client.query("COMMIT");
       return { saved: true, attemptId: `attempt_${attemptId}`, questionId: Number(questionId) };
     } catch (error) {
@@ -340,63 +290,37 @@ class StudentAssessmentService {
        RETURNING tab_switch_count`,
       [attemptId, studentId],
     );
-
-    if (!result.rows[0]) {
-      throw Object.assign(new Error("Attempt not found or is no longer active"), { statusCode: 409 });
-    }
-
-    return {
-      attemptId: `attempt_${attemptId}`,
-      tabSwitchCount: result.rows[0].tab_switch_count,
-    };
+    if (!result.rows[0]) throw Object.assign(new Error("Attempt not found or is no longer active"), { statusCode: 409 });
+    return { attemptId: `attempt_${attemptId}`, tabSwitchCount: result.rows[0].tab_switch_count };
   }
 
   async submitAssessment(studentId, attemptIdValue, reason = "submitted") {
     const attemptId = parseAttemptId(attemptIdValue);
     const client = await pool.connect();
-
     try {
       await client.query("BEGIN");
-
       const attemptRes = await client.query(
         `SELECT saa.*, a.title, a.time_limit_minutes AS "timeLimitMinutes", a.total_marks AS "assessmentTotalMarks"
-         FROM student_assessment_attempts saa
-         JOIN assessments a ON a.id = saa.assessment_id
-         WHERE saa.id = $1 AND saa.student_id = $2
-         FOR UPDATE`,
+         FROM student_assessment_attempts saa JOIN assessments a ON a.id = saa.assessment_id
+         WHERE saa.id = $1 AND saa.student_id = $2 FOR UPDATE`,
         [attemptId, studentId],
       );
-
-      if (!attemptRes.rows[0]) {
-        throw Object.assign(new Error("Attempt not found"), { statusCode: 404 });
-      }
-
-      let attempt = attemptRes.rows[0];
-      attempt = await ensureNotExpired(client, attempt);
-
+      if (!attemptRes.rows[0]) throw Object.assign(new Error("Attempt not found"), { statusCode: 404 });
+      let attempt = await ensureNotExpired(client, attemptRes.rows[0]);
       if (["submitted", "auto_submitted"].includes(attempt.status)) {
         await client.query("COMMIT");
         return this.getResult(studentId, attemptId);
       }
-
       const isExpired = attempt.status === "expired" || new Date(attempt.expires_at) <= new Date();
       const submissionStatus = isExpired || reason === "timeout" ? "auto_submitted" : "submitted";
       const grading = await gradeAttempt(client, attemptId);
-
       const updated = await client.query(
         `UPDATE student_assessment_attempts
-         SET status = $1,
-             submitted_at = NOW(),
-             score = $2,
-             total_marks = $3,
-             percentage = $4,
-             passed = $5,
-             updated_at = NOW()
-         WHERE id = $6
-         RETURNING *`,
+         SET status = $1, submitted_at = NOW(), score = $2, total_marks = $3,
+             percentage = $4, passed = $5, updated_at = NOW()
+         WHERE id = $6 RETURNING *`,
         [submissionStatus, grading.score, grading.totalMarks, grading.percentage, grading.passed, attemptId],
       );
-
       await client.query("COMMIT");
       return this.getResult(studentId, updated.rows[0].id);
     } catch (error) {
@@ -410,32 +334,15 @@ class StudentAssessmentService {
   async getResult(studentId, attemptIdValue) {
     const attemptId = parseAttemptId(attemptIdValue);
     const result = await pool.query(
-      `SELECT
-         saa.id,
-         saa.assessment_id,
-         saa.attempt_number,
-         saa.status,
-         saa.started_at,
-         saa.expires_at,
-         saa.submitted_at,
-         saa.score,
-         saa.total_marks,
-         saa.percentage,
-         saa.passed,
-         saa.tab_switch_count,
-         a.title,
-         a.type,
-         a.difficulty,
-         a.time_limit_minutes,
-         json_agg(
-           json_build_object(
-             'questionId', aq.id,
-             'answer', sa.answer,
-             'isCorrect', sa.is_correct,
-             'marksAwarded', sa.marks_awarded,
-             'correctOption', NULL
-           ) ORDER BY sa.answered_at NULLS LAST, aq.id
-         ) FILTER (WHERE aq.id IS NOT NULL) AS answers
+      `SELECT saa.id, saa.assessment_id, saa.attempt_number, saa.status,
+              saa.started_at, saa.expires_at, saa.submitted_at, saa.score,
+              saa.total_marks, saa.percentage, saa.passed, saa.tab_switch_count,
+              a.title, a.type, a.difficulty,
+              json_agg(json_build_object(
+                'questionId', aq.id, 'answer', sa.answer, 'isCorrect', sa.is_correct,
+                'marksAwarded', sa.marks_awarded, 'correctOption', NULL
+              ) ORDER BY sa.answered_at NULLS LAST, aq.id)
+              FILTER (WHERE aq.id IS NOT NULL) AS answers
        FROM student_assessment_attempts saa
        JOIN assessments a ON a.id = saa.assessment_id
        LEFT JOIN student_assessment_answers sa ON sa.attempt_id = saa.id
@@ -444,9 +351,7 @@ class StudentAssessmentService {
        GROUP BY saa.id, a.id`,
       [attemptId, studentId],
     );
-
     if (!result.rows[0]) return null;
-
     const row = result.rows[0];
     return {
       attemptId: `attempt_${row.id}`,
@@ -470,27 +375,15 @@ class StudentAssessmentService {
 
   async getHistory(studentId) {
     const result = await pool.query(
-      `SELECT
-         saa.id,
-         saa.assessment_id,
-         saa.attempt_number,
-         saa.status,
-         saa.started_at,
-         saa.submitted_at,
-         saa.score,
-         saa.total_marks,
-         saa.percentage,
-         saa.passed,
-         a.title,
-         a.type,
-         a.difficulty
+      `SELECT saa.id, saa.assessment_id, saa.attempt_number, saa.status,
+              saa.started_at, saa.submitted_at, saa.score, saa.total_marks,
+              saa.percentage, saa.passed, a.title, a.type, a.difficulty
        FROM student_assessment_attempts saa
        JOIN assessments a ON a.id = saa.assessment_id
        WHERE saa.student_id = $1
        ORDER BY COALESCE(saa.submitted_at, saa.started_at) DESC`,
       [studentId],
     );
-
     return result.rows.map((row) => ({
       attemptId: `attempt_${row.id}`,
       assessmentId: `assess_${row.assessment_id}`,
@@ -521,10 +414,7 @@ class StudentAssessmentService {
       status: attempt.status,
       startedAt: attempt.started_at,
       expiresAt: attempt.expires_at,
-      remainingSeconds: Math.max(
-        0,
-        Math.floor((new Date(attempt.expires_at).getTime() - Date.now()) / 1000),
-      ),
+      remainingSeconds: Math.max(0, Math.floor((new Date(attempt.expires_at).getTime() - Date.now()) / 1000)),
       tabSwitchCount: Number(attempt.tab_switch_count || 0),
       questions: questions.map((question) => publicQuestion(question, question.question_order)),
     };
