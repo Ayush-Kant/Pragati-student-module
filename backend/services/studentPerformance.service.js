@@ -23,9 +23,6 @@ export const getPerformance = async (user, driveId = null) => {
     throw error;
   }
 
-  const driveCondition = driveId ? 'AND sdp.drive_id = $2' : '';
-  const baseParams = driveId ? [studentId, Number(driveId)] : [studentId];
-
   if (driveId) {
     const enrollment = await pool.query(
       `SELECT 1 FROM student_drive_progress sdp WHERE sdp.student_id = $1 AND sdp.drive_id = $2 LIMIT 1`,
@@ -37,6 +34,9 @@ export const getPerformance = async (user, driveId = null) => {
       throw error;
     }
   }
+
+  const codingUserParam = driveId ? '$3' : '$2';
+  const activityParams = driveId ? [studentId, Number(driveId), userId] : [studentId, userId];
 
   const [activity, progress, attendance, trend, rank, submissions, xp] = await Promise.all([
     pool.query(
@@ -54,11 +54,11 @@ export const getPerformance = async (user, driveId = null) => {
         (SELECT COUNT(*) FROM assignment_grades ag
                   ${driveId ? 'JOIN student_drive_progress sdp ON sdp.student_id = ag.student_id' : ''}
                   WHERE ag.student_id = $1 ${driveId ? 'AND sdp.drive_id = $2' : ''})::int AS assignment_attempted,
-        COALESCE((SELECT AVG(total_score) FROM challenge_submissions cs WHERE cs.student_id = $3 ${driveId ? 'AND EXISTS (SELECT 1 FROM student_drive_progress sdp WHERE sdp.student_id = $1 AND sdp.drive_id = $2)' : ''}), 0) AS coding_average,
-        (SELECT COUNT(*) FROM challenge_submissions cs WHERE cs.student_id = $3)::int AS coding_attempted,
+        COALESCE((SELECT AVG(total_score) FROM challenge_submissions cs WHERE cs.student_id = ${codingUserParam} ${driveId ? 'AND EXISTS (SELECT 1 FROM student_drive_progress sdp WHERE sdp.student_id = $1 AND sdp.drive_id = $2)' : ''}), 0) AS coding_average,
+        (SELECT COUNT(*) FROM challenge_submissions cs WHERE cs.student_id = ${codingUserParam})::int AS coding_attempted,
         COALESCE((SELECT AVG(pe.score) FROM project_evaluations pe JOIN student_projects sp ON sp.id = pe.project_id WHERE sp.student_id = $1), 0) AS project_average,
         (SELECT COUNT(*) FROM project_submissions ps JOIN student_projects sp ON sp.id = ps.project_id WHERE sp.student_id = $1)::int AS project_submitted`,
-      [studentId, ...(driveId ? [Number(driveId)] : []), userId],
+      activityParams,
     ),
     pool.query(
       `SELECT tc.id AS "courseId", tc.title,
