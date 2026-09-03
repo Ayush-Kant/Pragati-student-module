@@ -13,11 +13,16 @@ const storage = multer.diskStorage({
   },
 });
 
-const allowed = new Set(['application/pdf', 'application/zip', 'application/x-zip-compressed', 'application/octet-stream']);
+const allowedMimeTypes = new Set(['application/pdf', 'application/zip', 'application/x-zip-compressed']);
+const allowedExtensions = new Set(['.pdf', '.zip']);
+
 const uploader = multer({
   storage,
   limits: { fileSize: 20 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => cb(null, allowed.has(file.mimetype)),
+  fileFilter: (_req, file, cb) => {
+    const extension = path.extname(file.originalname || '').toLowerCase();
+    cb(null, allowedMimeTypes.has(file.mimetype) && allowedExtensions.has(extension));
+  },
 }).single('file');
 
 const uploadMiddleware = (req, res, next) => {
