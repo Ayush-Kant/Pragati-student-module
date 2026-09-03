@@ -5,8 +5,6 @@ import StudentLayout from "../layout/StudentLayout";
 import DashboardPage from "../dashboard/pages/DashboardPage";
 import SM03DashboardPage from "../dashboard/pages/SM03DashboardPage";
 import VerificationPage from "../pages/public/VerificationPage";
-import LoginPage from "../../auth/LoginPage";
-import RegisterPage from "../../auth/RegisterPage";
 import OnboardingWizard from "../pages/onboarding/OnboardingWizard";
 import ProfilePage from "../pages/profile/ProfilePage";
 import SM02ProfileWorkspace from "../pages/profile/SM02ProfileWorkspace";
@@ -46,8 +44,6 @@ import NotificationPreferences from "../pages/settings/NotificationPreferences";
 
 const studentRoute = (
   <>
-    <Route path="login" element={<LoginPage />} />
-    <Route path="register" element={<RegisterPage />} />
     <Route path="verify/:code" element={<VerificationPage />} />
     <Route element={<PrivateRoute />}>
       <Route path="student" element={<StudentLayout />}>
