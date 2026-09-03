@@ -13,10 +13,10 @@ const createAssignmentTablesQuery = `
     status VARCHAR(50) NOT NULL DEFAULT '${ASSIGNMENT_STATUS.OPEN}' CHECK (status IN ('${ASSIGNMENT_STATUS.OPEN}', '${ASSIGNMENT_STATUS.CLOSED}', '${ASSIGNMENT_STATUS.PENDING}')),
     submission_type VARCHAR(20) NOT NULL DEFAULT 'both',
     starter_file_url TEXT,
-    grace_days INTEGER NOT NULL DEFAULT 0 CHECK (grace_days >= 0),
-    penalty_per_day NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (penalty_per_day >= 0),
+    grace_days INTEGER NOT NULL DEFAULT 0,
+    penalty_per_day NUMERIC(5,2) NOT NULL DEFAULT 0,
     allow_resubmission BOOLEAN NOT NULL DEFAULT TRUE,
-    max_resubmissions INTEGER NOT NULL DEFAULT 3 CHECK (max_resubmissions >= 0),
+    max_resubmissions INTEGER NOT NULL DEFAULT 3,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
   ALTER TABLE assignments
@@ -38,8 +38,7 @@ const createAssignmentTablesQuery = `
     late_days INTEGER NOT NULL DEFAULT 0,
     late_penalty NUMERIC(6,2) NOT NULL DEFAULT 0,
     attempt_number INTEGER NOT NULL DEFAULT 1,
-    submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (assignment_id, student_id)
+    submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
   ALTER TABLE assignment_submissions
     ADD COLUMN IF NOT EXISTS submitted_file_name TEXT,
@@ -71,6 +70,7 @@ const createAssignmentTablesQuery = `
   CREATE INDEX IF NOT EXISTS idx_assignments_due_date ON assignments(due_date);
   CREATE INDEX IF NOT EXISTS idx_assignment_submissions_assignment_id ON assignment_submissions(assignment_id);
   CREATE INDEX IF NOT EXISTS idx_assignment_submissions_student_id ON assignment_submissions(student_id);
+  CREATE INDEX IF NOT EXISTS idx_assignment_submissions_assignment_student_submitted_at ON assignment_submissions(assignment_id, student_id, submitted_at DESC);
   CREATE INDEX IF NOT EXISTS idx_assignment_feedback_assignment_id ON assignment_feedback(assignment_id);
   CREATE INDEX IF NOT EXISTS idx_assignment_grades_student_id ON assignment_grades(student_id);
 `;
