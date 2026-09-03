@@ -10,6 +10,7 @@ import RegisterPage from "../../auth/RegisterPage";
 
 import OnboardingWizard from "../pages/onboarding/OnboardingWizard";
 import ProfilePage from "../pages/profile/ProfilePage";
+import SM02ProfilePage from "../pages/profile/SM02ProfilePage";
 import CoursesPage from "../pages/training/CoursesPage";
 import CourseDetailPage from "../pages/training/CourseDetailPage";
 import LiveSessionsPage from "../live-sessions/pages/LiveSessionsPage";
@@ -54,7 +55,9 @@ const studentRoute = (
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="onboarding" element={<OnboardingWizard />} />
-        <Route path="profile" element={<ProfilePage />} />
+        {/* SM-02: dedicated student profile workspace. Legacy page remains intact for rollback/reference. */}
+        <Route path="profile" element={<SM02ProfilePage />} />
+        <Route path="profile/legacy" element={<ProfilePage />} />
         <Route path="courses" element={<CoursesPage />} />
         <Route path="courses/:courseId" element={<CourseDetailPage />} />
         <Route path="sessions" element={<LiveSessionsPage />} />
