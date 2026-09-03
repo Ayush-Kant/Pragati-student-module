@@ -67,6 +67,8 @@ const migrationFiles = [
   "033_create_student_placement_intelligence.sql",
   "034_complete_student_learning_experience.sql",
   "035_student_auth_onboarding.sql",
+  "036_complete_student_live_sessions.sql",
+  "037_complete_student_assignments.sql",
 ];
 
 async function runMigrationsFresh() {
@@ -74,9 +76,7 @@ async function runMigrationsFresh() {
     console.log("Dropping existing tables and types to start fresh...");
 
     const { rows: tables } = await pool.query(`
-      SELECT tablename
-      FROM pg_tables
-      WHERE schemaname = 'public';
+      SELECT tablename FROM pg_tables WHERE schemaname = 'public';
     `);
 
     if (tables.length > 0) {
@@ -89,8 +89,7 @@ async function runMigrationsFresh() {
       SELECT t.typname
       FROM pg_type t
       JOIN pg_namespace n ON t.typnamespace = n.oid
-      WHERE n.nspname = 'public'
-        AND t.typtype = 'e';
+      WHERE n.nspname = 'public' AND t.typtype = 'e';
     `);
 
     if (types.length > 0) {
@@ -109,160 +108,58 @@ async function runMigrationsFresh() {
 function splitSqlStatements(sql) {
   const statements = [];
   let current = "";
-
   let singleQuote = false;
   let doubleQuote = false;
   let lineComment = false;
   let blockComment = false;
   let dollarQuote = false;
 
-  for (let i = 0; i < sql.length; i++) {
+  for (let i = 0; i < sql.length; i += 1) {
     const char = sql[i];
     const next = sql[i + 1];
-
-    if (lineComment) {
-      current += char;
-      if (char === "\n") lineComment = false;
-      continue;
-    }
-
-    if (blockComment) {
-      current += char;
-      if (char === "*" && next === "/") {
-        current += next;
-        i++;
-        blockComment = false;
-      }
-      continue;
-    }
-
-    if (dollarQuote) {
-      current += char;
-      if (char === "$" && next === "$") {
-        current += next;
-        i++;
-        dollarQuote = false;
-      }
-      continue;
-    }
-
-    if (singleQuote) {
-      current += char;
-      if (char === "'" && next === "'") {
-        current += next;
-        i++;
-      } else if (char === "'") {
-        singleQuote = false;
-      }
-      continue;
-    }
-
-    if (doubleQuote) {
-      current += char;
-      if (char === '"' && next === '"') {
-        current += next;
-        i++;
-      } else if (char === '"') {
-        doubleQuote = false;
-      }
-      continue;
-    }
-
-    if (char === "$" && next === "$") {
-      dollarQuote = true;
-      current += "$$";
-      i++;
-      continue;
-    }
-
-    if (char === "-" && next === "-") {
-      lineComment = true;
-      current += "--";
-      i++;
-      continue;
-    }
-
-    if (char === "/" && next === "*") {
-      blockComment = true;
-      current += "/*";
-      i++;
-      continue;
-    }
-
-    if (char === "'") {
-      singleQuote = true;
-      current += char;
-      continue;
-    }
-
-    if (char === '"') {
-      doubleQuote = true;
-      current += char;
-      continue;
-    }
-
-    if (char === ";") {
-      const statement = current.trim();
-      if (statement) statements.push(statement);
-      current = "";
-      continue;
-    }
-
+    if (lineComment) { current += char; if (char === "\n") lineComment = false; continue; }
+    if (blockComment) { current += char; if (char === "*" && next === "/") { current += next; i += 1; blockComment = false; } continue; }
+    if (dollarQuote) { current += char; if (char === "$" && next === "$") { current += next; i += 1; dollarQuote = false; } continue; }
+    if (singleQuote) { current += char; if (char === "'" && next === "'") { current += next; i += 1; } else if (char === "'") singleQuote = false; continue; }
+    if (doubleQuote) { current += char; if (char === '"' && next === '"') { current += next; i += 1; } else if (char === '"') doubleQuote = false; continue; }
+    if (char === "$" && next === "$") { dollarQuote = true; current += "$$"; i += 1; continue; }
+    if (char === "-" && next === "-") { lineComment = true; current += "--"; i += 1; continue; }
+    if (char === "/" && next === "*") { blockComment = true; current += "/*"; i += 1; continue; }
+    if (char === "'") { singleQuote = true; current += char; continue; }
+    if (char === '"') { doubleQuote = true; current += char; continue; }
+    if (char === ";") { const statement = current.trim(); if (statement) statements.push(statement); current = ""; continue; }
     current += char;
   }
-
   const tail = current.trim();
   if (tail) statements.push(tail);
-
   return statements;
 }
 
 async function runMigrations() {
   const client = await pool.connect();
-
   try {
     await client.query("BEGIN");
-
     console.log("\n==============================");
     console.log("Running SQL migrations in strict order...");
     console.log("==============================\n");
 
     for (const file of migrationFiles) {
       const filePath = path.join(migrationsDir, file);
-
-      if (!fs.existsSync(filePath)) {
-        throw new Error(`File not found: ${filePath}`);
-      }
-
+      if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
       console.log(`▶ Running: ${file}`);
-
       const sql = fs.readFileSync(filePath, "utf8");
-      const statements = splitSqlStatements(sql);
-
-      for (const statement of statements) {
-        try {
-          await client.query(statement);
-        } catch (statementError) {
-          console.error(`\n❌ Error executing a statement in file: ${file}`);
-          console.error(`SQL Snippet: \n${statement.substring(0, 150)}...\n`);
-          throw statementError;
-        }
-      }
-
+      for (const statement of splitSqlStatements(sql)) await client.query(statement);
       console.log(`✔ Completed: ${file}\n`);
     }
 
     await client.query("COMMIT");
-
     console.log("==============================");
     console.log("✅ All migrations completed successfully.");
     console.log("==============================");
   } catch (error) {
     await client.query("ROLLBACK");
-
     console.error("\n❌ Migration failed! Transaction rolled back.");
     console.error(error);
-
     throw error;
   } finally {
     client.release();
