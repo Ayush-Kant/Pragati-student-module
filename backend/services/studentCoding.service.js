@@ -39,7 +39,6 @@ const normalizeVerdict = (statusId, description) => {
 };
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const encode = (value) => Buffer.from(value ?? '', 'utf8').toString('base64');
 const decode = (value) => {
   if (!value) return '';
@@ -50,13 +49,17 @@ const decode = (value) => {
   }
 };
 
-const executeWithJudge0 = async ({ sourceCode, languageId, stdin, expectedOutput, timeLimitMs = 2000 }) => {
-  if (!LANGUAGE_IDS[languageId] && !Object.values(LANGUAGE_IDS).includes(Number(languageId))) {
+const resolveLanguageId = (language) => {
+  const languageId = LANGUAGE_IDS[language] || Number(language);
+  if (!Number.isInteger(languageId) || languageId <= 0) {
     const error = new Error('Unsupported programming language');
     error.statusCode = 400;
     throw error;
   }
+  return languageId;
+};
 
+const executeWithJudge0 = async ({ sourceCode, languageId, stdin, expectedOutput, timeLimitMs = 2000 }) => {
   const response = await fetch(`${JUDGE0_BASE_URL}/submissions?base64_encoded=true&wait=false`, {
     method: 'POST',
     headers: judgeHeaders(),
@@ -123,7 +126,7 @@ const executeWithJudge0 = async ({ sourceCode, languageId, stdin, expectedOutput
   };
 };
 
-const getChallengeRows = async (studentId) => {
+const getChallengeRows = async (studentUserId) => {
   const result = await pool.query(
     `SELECT
        a.id,
@@ -135,7 +138,7 @@ const getChallengeRows = async (studentId) => {
        q.language_support AS "languageSupport",
        q.sample_input AS "sampleInput",
        q.sample_output AS "sampleOutput",
-       COALESCE(AVG(cs.total_score), 0) AS "bestScore",
+       COALESCE(MAX(cs.total_score), 0) AS "bestScore",
        CASE
          WHEN MAX(cs.total_score) >= 100 THEN 'Solved'
          WHEN COUNT(cs.id) > 0 THEN 'Attempted'
@@ -151,14 +154,14 @@ const getChallengeRows = async (studentId) => {
      WHERE a.status = 'active'
      GROUP BY a.id, q.id
      ORDER BY a.id DESC`,
-    [studentId],
+    [studentUserId],
   );
 
   const ids = result.rows.map((row) => row.id);
   if (!ids.length) return [];
 
   const testCaseResult = await pool.query(
-    `SELECT challenge_id AS "challengeId", id, input, expected_output AS "expectedOutput", is_hidden AS "isHidden"
+    `SELECT challenge_id AS "challengeId", id, input, expected_output AS "expectedOutput", is_hidden AS "isHidden", time_limit_ms AS "timeLimitMs"
      FROM coding_test_cases
      WHERE challenge_id = ANY($1::int[])
      ORDER BY challenge_id, id`,
@@ -190,10 +193,10 @@ const getChallengeRows = async (studentId) => {
   }));
 };
 
-export const listChallenges = async (studentId) => getChallengeRows(studentId);
+export const listChallenges = async (studentUserId) => getChallengeRows(studentUserId);
 
-export const getChallenge = async (studentId, challengeId) => {
-  const challenges = await getChallengeRows(studentId);
+export const getChallenge = async (studentUserId, challengeId) => {
+  const challenges = await getChallengeRows(studentUserId);
   const challenge = challenges.find((item) => Number(item.id) === Number(challengeId));
   if (!challenge) {
     const error = new Error('Coding challenge not found');
@@ -233,7 +236,7 @@ const getTestCases = async (challengeId, hidden) => {
   return result.rows;
 };
 
-export const runCode = async (studentId, payload) => {
+export const runCode = async (studentUserId, payload) => {
   const challengeId = Number(payload.challengeId);
   const challenge = await assertChallenge(challengeId);
   const publicTests = await getTestCases(challengeId, false);
@@ -241,7 +244,7 @@ export const runCode = async (studentId, payload) => {
     publicTests.push({ id: 0, input: challenge.sampleInput || '', expectedOutput: challenge.sampleOutput || '', timeLimitMs: 2000 });
   }
 
-  const languageId = LANGUAGE_IDS[payload.language] || Number(payload.language);
+  const languageId = resolveLanguageId(payload.language);
   const results = [];
   for (const testCase of publicTests) {
     const result = await executeWithJudge0({
@@ -271,16 +274,15 @@ export const runCode = async (studentId, payload) => {
     stdout: results.map((item) => item.actual).join('\n'),
     stderr: results.find((item) => item.stderr)?.stderr || null,
     challengeId,
-    studentId,
   };
 };
 
-export const submitSolution = async (studentId, payload) => {
+export const submitSolution = async (studentUserId, payload) => {
   const challengeId = Number(payload.challengeId);
   const challenge = await assertChallenge(challengeId);
   const hiddenTests = await getTestCases(challengeId, true);
   const tests = hiddenTests.length ? hiddenTests : await getTestCases(challengeId, false);
-  const languageId = LANGUAGE_IDS[payload.language] || Number(payload.language);
+  const languageId = resolveLanguageId(payload.language);
   const results = [];
 
   for (const testCase of tests) {
@@ -298,7 +300,6 @@ export const submitSolution = async (studentId, payload) => {
   const total = results.length;
   const score = total ? Math.round((passed / total) * 10000) / 100 : 0;
   const verdict = passed === total ? 'Accepted' : (results.find((result) => result.verdict !== 'Accepted')?.verdict || 'Wrong Answer');
-
   const runtime = results.reduce((max, result) => Math.max(max, Number(result.runtime || 0)), 0);
 
   const submission = await pool.query(
@@ -307,7 +308,7 @@ export const submitSolution = async (studentId, payload) => {
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
      RETURNING id, challenge_id AS "challengeId", total_score AS "score", execution_time_ms AS "runtime", judge0_verdict AS verdict,
                passed_test_cases AS "passedTestCases", total_test_cases AS "totalTestCases", submitted_at AS "submittedAt"`,
-    [studentId, challengeId, languageId, payload.code, score, runtime, verdict, passed, total],
+    [studentUserId, challengeId, languageId, payload.code, score, runtime, verdict, passed, total],
   );
 
   return {
@@ -320,8 +321,8 @@ export const submitSolution = async (studentId, payload) => {
   };
 };
 
-export const getSubmissionHistory = async (studentId, challengeId = null) => {
-  const params = [studentId];
+export const getSubmissionHistory = async (studentUserId, challengeId = null) => {
+  const params = [studentUserId];
   let where = 'student_id = $1';
   if (challengeId) {
     params.push(Number(challengeId));
@@ -351,14 +352,15 @@ export const getLeaderboard = async (challengeId = null) => {
   }
   const result = await pool.query(
     `SELECT
-       ROW_NUMBER() OVER (ORDER BY MAX(total_score) DESC, MIN(submitted_at) ASC) AS rank,
-       s.name,
+       ROW_NUMBER() OVER (ORDER BY MAX(cs.total_score) DESC, MIN(cs.submitted_at) ASC) AS rank,
+       COALESCE(s.name, u.full_name, 'Student') AS name,
        MAX(cs.total_score) AS score,
        COUNT(*) FILTER (WHERE cs.judge0_verdict = 'Accepted') AS "acceptedSubmissions"
      FROM challenge_submissions cs
-     LEFT JOIN students s ON s.id = cs.student_id
+     LEFT JOIN users u ON u.id = cs.student_id
+     LEFT JOIN students s ON s.user_id = u.id
      WHERE ${where}
-     GROUP BY s.id, s.name
+     GROUP BY u.id, u.full_name, s.id, s.name
      ORDER BY rank
      LIMIT 100`,
     params,
