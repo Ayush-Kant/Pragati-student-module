@@ -105,7 +105,7 @@ export default function OnboardingWizard() {
         const state = await getOnboardingStateApi();
         if (!mounted) return;
         const current = Number(state?.data?.currentStep || 1);
-        if (Boolean(state?.data?.onboardingComplete) || current >= 4 && Number(state?.data?.profileCompleteness || 0) >= 100) {
+        if (Boolean(state?.data?.onboardingComplete) || current >= 4) {
           navigate("/student/dashboard", { replace: true });
           return;
         }
