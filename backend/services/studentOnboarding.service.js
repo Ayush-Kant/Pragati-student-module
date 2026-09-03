@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { pool } from "../config/db.js";
 import { getMyProfile, getProfileCompleteness } from "./studentProfile.service.js";
 import { resolveStudentId } from "../utils/studentProfileIdentity.js";
+import { syncStudentFirebaseProfile } from "./studentFirebaseProfile.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,6 +40,14 @@ const validateStep = (step, body) => {
       const error = new Error("City must be 100 characters or fewer");
       error.statusCode = 400;
       throw error;
+    }
+    if (body.collegeId !== undefined && body.collegeId !== null && body.collegeId !== "") {
+      const collegeId = Number(body.collegeId);
+      if (!Number.isInteger(collegeId) || collegeId <= 0) {
+        const error = new Error("College ID must be a valid positive number");
+        error.statusCode = 400;
+        throw error;
+      }
     }
   }
 
@@ -80,6 +89,31 @@ const recalculateProfile = async (studentId) => {
   };
 };
 
+const syncFirebaseOnboarding = async (studentId, step, profile, completeness) => {
+  try {
+    const identity = await pool.query(
+      `SELECT firebase_uid FROM students WHERE id = $1 LIMIT 1`,
+      [studentId],
+    );
+    const firebaseUid = identity.rows[0]?.firebase_uid;
+    if (!firebaseUid) return;
+
+    await syncStudentFirebaseProfile({
+      studentId,
+      firebaseUid,
+      onboarding: {
+        currentStep: step,
+        completed: step >= 4,
+        profileCompleteness: completeness,
+        lastSavedStep: step,
+      },
+      profile,
+    });
+  } catch (error) {
+    console.warn("[student-onboarding] Firebase profile sync deferred:", error.message);
+  }
+};
+
 export const getOnboardingState = async (user) => {
   const studentId = await resolveStudentId(user);
   const result = await pool.query(
@@ -117,13 +151,27 @@ export const saveOnboardingStep = async (user, rawStep, body = {}, file = null) 
   );
 
   if (step === 1) {
+    const collegeId = body.collegeId === "" || body.collegeId === undefined || body.collegeId === null
+      ? null
+      : Number(body.collegeId);
+
+    if (collegeId !== null) {
+      const college = await pool.query("SELECT id FROM colleges WHERE id = $1", [collegeId]);
+      if (!college.rows.length) {
+        const error = new Error("Selected college was not found");
+        error.statusCode = 400;
+        throw error;
+      }
+    }
+
     await pool.query(
       `UPDATE students
        SET name = $1,
            phone = $2,
+           college_id = COALESCE($3, college_id),
            updated_at = NOW()
-       WHERE id = $3`,
-      [text(body.fullName), text(body.phone) || null, studentId],
+       WHERE id = $4`,
+      [text(body.fullName), text(body.phone) || null, collegeId, studentId],
     );
 
     await pool.query(
@@ -240,6 +288,7 @@ export const saveOnboardingStep = async (user, rawStep, body = {}, file = null) 
   }
 
   const synced = await recalculateProfile(studentId);
+  await syncFirebaseOnboarding(studentId, step, synced.profile, synced.completeness);
 
   return {
     stepSaved: step,
