@@ -1,1 +1,0 @@
-This directory is reserved for intern development setup tooling. It will be populated by the intern onboarding setup on the copy-for-interns branch.
