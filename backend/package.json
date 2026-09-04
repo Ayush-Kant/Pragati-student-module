@@ -11,7 +11,8 @@
     "seed:student-college": "node scripts/seedStudentCollege.js",
     "verify:firebase": "node scripts/checkFirebaseAdmin.js",
     "seed:student-interviews": "node scripts/seedStudentInterviews.js",
-    "seed:student-notifications": "node scripts/seedStudentNotifications.js"
+    "seed:student-notifications": "node scripts/seedStudentNotifications.js",
+    "seed:student-demo": "node scripts/seedStudentDemoData.js"
   },
   "author": "",
   "license": "ISC",
