@@ -1,6 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
 import roleMiddleware from '../middleware/roleMiddleware.js';
+import '../services/studentCodingExecution.bootstrap.js';
 import {
   getChallenge,
   getLeaderboard,
