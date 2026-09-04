@@ -2,8 +2,15 @@ import { pool } from "../../config/db.js";
 import dailyService from "../../services/daily.service.js";
 
 const durationMinutes = (value) => {
-  const match = String(value || "").match(/\d+(?:\.\d+)?/);
-  return match ? Number(match[0]) : 0;
+  if (typeof value === "number" && Number.isFinite(value)) return Math.max(0, value);
+  const text = String(value || "").trim().toLowerCase();
+  const match = text.match(/(\d+(?:\.\d+)?)\s*(hours?|hrs?|h|minutes?|mins?|m)?/i);
+  if (!match) return 0;
+  const amount = Number(match[1]);
+  const unit = match[2] || "minutes";
+  if (!Number.isFinite(amount)) return 0;
+  if (/^(hours?|hrs?|h)$/.test(unit)) return amount * 60;
+  return amount;
 };
 
 const deriveSessionStatus = (session, now = Date.now()) => {
@@ -35,6 +42,14 @@ const resolveDriveId = async (studentId) => {
   return result.rows[0]?.driveId ?? null;
 };
 
+const resolveUserId = async (studentId) => {
+  const result = await pool.query(
+    `SELECT user_id AS "userId" FROM students WHERE id = $1 LIMIT 1`,
+    [studentId],
+  );
+  return Number(result.rows[0]?.userId || 0) || null;
+};
+
 export const getAllSessions = async (studentId, filters = {}) => {
   if (!Number.isInteger(Number(studentId)) || Number(studentId) <= 0) {
     const error = new Error("Student not found");
@@ -43,8 +58,15 @@ export const getAllSessions = async (studentId, filters = {}) => {
   }
 
   const resolvedStudentId = Number(studentId);
+  const userId = await resolveUserId(resolvedStudentId);
+  if (!userId) {
+    const error = new Error("Student account is not linked to a platform user");
+    error.status = 409;
+    throw error;
+  }
+
   const driveId = await resolveDriveId(resolvedStudentId);
-  const values = [resolvedStudentId];
+  const values = [userId];
   const conditions = [driveId ? `(ls.drive_id = $2 OR ls.drive_id IS NULL)` : `ls.drive_id IS NULL`];
   if (driveId) values.push(driveId);
 
@@ -151,8 +173,10 @@ export const getSessionById = async (id, studentId = null) => {
     const resolvedStudentId = Number(studentId);
     if (!Number.isInteger(resolvedStudentId) || resolvedStudentId <= 0) return null;
 
+    const userId = await resolveUserId(resolvedStudentId);
+    if (!userId) return null;
     const driveId = await resolveDriveId(resolvedStudentId);
-    values.push(resolvedStudentId);
+    values.push(userId);
     studentJoin = `
       LEFT JOIN session_attendance sa
         ON sa.session_id = ls.id AND sa.student_id = $2
@@ -232,6 +256,13 @@ export const joinSession = async (
     throw error;
   }
 
+  const userId = await resolveUserId(resolvedStudentId);
+  if (!userId) {
+    const error = new Error("Student account is not linked to a platform user");
+    error.status = 409;
+    throw error;
+  }
+
   const session = await getSessionById(sessionId, resolvedStudentId);
   if (!session) {
     const error = new Error("Session not found or not available to this student");
@@ -277,12 +308,12 @@ export const joinSession = async (
        END
      RETURNING id,
                session_id AS "sessionId",
-               student_id AS "studentId",
+               student_id AS "platformUserId",
                joined_at AS "joinedAt"`,
-    [sessionId, resolvedStudentId, token],
+    [sessionId, userId, token],
   );
 
-  return { ...result.rows[0], meetingUrl, roomName, token };
+  return { ...result.rows[0], studentId: resolvedStudentId, meetingUrl, roomName, token };
 };
 
 export const leaveSession = async (sessionId, studentId) => {
@@ -290,6 +321,13 @@ export const leaveSession = async (sessionId, studentId) => {
   if (!Number.isInteger(resolvedStudentId) || resolvedStudentId <= 0) {
     const error = new Error("Student not found");
     error.status = 404;
+    throw error;
+  }
+
+  const userId = await resolveUserId(resolvedStudentId);
+  if (!userId) {
+    const error = new Error("Student account is not linked to a platform user");
+    error.status = 409;
     throw error;
   }
 
@@ -302,7 +340,7 @@ export const leaveSession = async (sessionId, studentId) => {
 
   const existingAttendance = await pool.query(
     "SELECT attended FROM session_attendance WHERE session_id = $1 AND student_id = $2",
-    [sessionId, resolvedStudentId],
+    [sessionId, userId],
   );
   const previousAttended = Boolean(existingAttendance.rows[0]?.attended);
 
@@ -317,11 +355,11 @@ export const leaveSession = async (sessionId, studentId) => {
      WHERE session_id = $1 AND student_id = $2
      RETURNING id,
                session_id AS "sessionId",
-               student_id AS "studentId",
+               student_id AS "platformUserId",
                joined_at AS "joinedAt",
                left_at AS "leftAt",
                duration_seconds AS "durationSeconds"`,
-    [sessionId, resolvedStudentId],
+    [sessionId, userId],
   );
 
   const row = participant.rows[0];
@@ -345,7 +383,7 @@ export const leaveSession = async (sessionId, studentId) => {
        leave_timestamp = EXCLUDED.leave_timestamp,
        duration_seconds = EXCLUDED.duration_seconds,
        updated_at = NOW()`,
-    [sessionId, resolvedStudentId, attended, status, row.joinedAt, row.leftAt, row.durationSeconds],
+    [sessionId, userId, attended, status, row.joinedAt, row.leftAt, row.durationSeconds],
   );
 
   if (attended && !previousAttended && session.driveId) {
@@ -359,6 +397,7 @@ export const leaveSession = async (sessionId, studentId) => {
 
   return {
     ...row,
+    studentId: resolvedStudentId,
     attended,
     attendanceStatus: status,
     requiredDurationSeconds: Math.round(scheduledMinutes * 60 * 0.6),
