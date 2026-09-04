@@ -1,7 +1,8 @@
 import "dotenv/config";
 import { pool } from "../config/db.js";
 
-const DEMO_VIDEO_URL = "https://www.youtube.com/watch?v=Ke90Tje7VS0";
+const DEMO_VIDEO_WATCH_URL = "https://www.youtube.com/watch?v=Ke90Tje7VS0";
+const DEMO_VIDEO_EMBED_URL = "https://www.youtube.com/embed/Ke90Tje7VS0";
 const LIVE_SESSION_DURATION = "8 hours";
 
 const seed = async () => {
@@ -77,8 +78,8 @@ const seed = async () => {
     }
   }
 
-  // Replace an old demo session rather than preserving a stale short-duration
-  // fixture. The new session begins immediately and remains live for 8 hours.
+  // Always replace the demo session so repeated seeding never preserves a
+  // stale duration or stale start time from a previous run.
   await pool.query(
     `DELETE FROM session_schedules
      WHERE session_id IN (
@@ -125,7 +126,7 @@ const seed = async () => {
        'pragati-live-demo',
        $2)
      RETURNING id`,
-    [LIVE_SESSION_DURATION, DEMO_VIDEO_URL],
+    [LIVE_SESSION_DURATION, DEMO_VIDEO_EMBED_URL],
   );
 
   const sessionId = liveSession.rows[0]?.id;
@@ -143,13 +144,13 @@ const seed = async () => {
       `INSERT INTO session_recordings
         (session_id, title, duration, recording_url)
        VALUES ($1, 'Demo session recording', '42 minutes', $2)`,
-      [sessionId, DEMO_VIDEO_URL],
+      [sessionId, DEMO_VIDEO_WATCH_URL],
     );
   }
 
   const [{ rows: projectCount }, { rows: sessionRows }, { rows: challengeCount }] = await Promise.all([
     pool.query(`SELECT COUNT(*)::int AS count FROM student_projects WHERE title = 'SM-09 Student Portfolio Project'`),
-    pool.query(`SELECT id, scheduled_at, duration, status FROM live_sessions WHERE title = 'Live Demo: Student Learning Session' ORDER BY id DESC LIMIT 1`),
+    pool.query(`SELECT id, scheduled_at, duration, status, meeting_url FROM live_sessions WHERE title = 'Live Demo: Student Learning Session' ORDER BY id DESC LIMIT 1`),
     pool.query(`SELECT COUNT(*)::int AS count FROM assessment_questions WHERE LOWER(type) = 'coding'`),
   ]);
 
@@ -158,8 +159,9 @@ const seed = async () => {
   console.log(`   Start: ${sessionRows[0]?.scheduled_at ?? "n/a"}`);
   console.log(`   Duration: ${sessionRows[0]?.duration ?? "n/a"} (8 hours)`);
   console.log(`   Status: ${sessionRows[0]?.status ?? "n/a"}`);
+  console.log(`   Meeting URL: ${sessionRows[0]?.meeting_url ?? "n/a"}`);
   console.log(`✅ Coding challenges available: ${challengeCount[0].count}`);
-  console.log(`▶ Demo video: ${DEMO_VIDEO_URL}`);
+  console.log(`▶ Demo recording: ${DEMO_VIDEO_WATCH_URL}`);
 };
 
 try {
