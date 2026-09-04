@@ -1,3 +1,5 @@
+import { isAnswerProvided } from "../../utils/answerState";
+
 export default function QuestionPalette({ totalQuestions, currentIndex, answers = {}, questions = [], onSelectQuestion }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
@@ -9,7 +11,7 @@ export default function QuestionPalette({ totalQuestions, currentIndex, answers 
       <div className="grid grid-cols-5 gap-2">
         {Array.from({ length: totalQuestions }).map((_, index) => {
           const questionId = questions[index]?.id;
-          const isAnswered = questionId !== undefined && answers[String(questionId)] !== undefined;
+          const isAnswered = questionId !== undefined && isAnswerProvided(answers[String(questionId)]);
           const isCurrent = currentIndex === index;
           let style = isAnswered ? "bg-emerald-500 text-white border-emerald-600" : "bg-slate-100 text-slate-600 border-slate-200";
           if (isCurrent) style += " ring-2 ring-blue-500 font-bold";
