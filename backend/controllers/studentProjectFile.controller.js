@@ -15,48 +15,32 @@ const storage = multer.diskStorage({
   },
 });
 
+const allowedProjectTypes = ['application/pdf', 'image/png', 'image/jpeg'];
+
 export const uploadProjectFile = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    const allowed = ['application/pdf', 'image/png', 'image/jpeg'];
-    cb(null, allowed.includes(file.mimetype));
-  },
+  fileFilter: (_req, file, cb) => cb(null, allowedProjectTypes.includes(file.mimetype)),
 }).single('file');
+
+// SM-09 final report: optional PDF, maximum 20MB.
+export const uploadProjectReport = multer({
+  storage,
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => cb(null, file.mimetype === 'application/pdf'),
+}).single('report');
 
 export const uploadFile = async (req, res, next) => {
   try {
-    if (!req.file) {
-      const error = new Error('A PDF, PNG or JPEG file is required');
-      error.statusCode = 400;
-      throw error;
-    }
-
+    if (!req.file) { const error = new Error('A PDF, PNG or JPEG file is required'); error.statusCode = 400; throw error; }
     const studentId = await resolveStudentId(req.user);
     const projectId = Number(req.params.projectId);
     const project = await studentProjectModel.getProjectById(studentId, projectId);
-    if (!project) {
-      const error = new Error('Project not found');
-      error.statusCode = 404;
-      throw error;
-    }
-
+    if (!project) { const error = new Error('Project not found'); error.statusCode = 404; throw error; }
     const url = `${req.protocol}://${req.get('host')}/uploads/projects/${req.file.filename}`;
-    res.status(201).json({
-      success: true,
-      data: {
-        id: req.file.filename,
-        name: req.file.originalname,
-        size: req.file.size,
-        type: req.file.mimetype,
-        url,
-        uploadedAt: new Date().toISOString(),
-      },
-    });
+    res.status(201).json({ success: true, data: { id: req.file.filename, name: req.file.originalname, size: req.file.size, type: req.file.mimetype, url, uploadedAt: new Date().toISOString() } });
   } catch (error) {
-    if (req.file?.path) {
-      fs.rm(req.file.path, { force: true }, () => {});
-    }
+    if (req.file?.path) fs.rm(req.file.path, { force: true }, () => {});
     next(error);
   }
 };
@@ -66,18 +50,9 @@ export const deleteFile = async (req, res, next) => {
     const studentId = await resolveStudentId(req.user);
     const projectId = Number(req.params.projectId);
     const project = await studentProjectModel.getProjectById(studentId, projectId);
-    if (!project) {
-      const error = new Error('Project not found');
-      error.statusCode = 404;
-      throw error;
-    }
-
+    if (!project) { const error = new Error('Project not found'); error.statusCode = 404; throw error; }
     const safeName = path.basename(req.params.fileId);
-    const filePath = path.join(uploadRoot, safeName);
-    await fs.promises.rm(filePath, { force: true });
-
+    await fs.promises.rm(path.join(uploadRoot, safeName), { force: true });
     res.status(200).json({ success: true, data: null });
-  } catch (error) {
-    next(error);
-  }
+  } catch (error) { next(error); }
 };
