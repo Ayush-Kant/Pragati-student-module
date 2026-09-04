@@ -6,6 +6,20 @@ const durationMinutes = (value) => {
   return match ? Number(match[0]) : 0;
 };
 
+const deriveSessionStatus = (session, now = Date.now()) => {
+  if (!session) return "Upcoming";
+  if (session.status === "Completed") return "Completed";
+
+  const start = session.scheduledAt ? new Date(session.scheduledAt).getTime() : NaN;
+  const minutes = durationMinutes(session.duration);
+  if (!Number.isFinite(start)) return session.status || "Upcoming";
+
+  const end = minutes > 0 ? start + minutes * 60 * 1000 : NaN;
+  if (Number.isFinite(end) && now > end) return "Completed";
+  if (now >= start && (!Number.isFinite(end) || now <= end)) return "Live";
+  return session.status === "Live" ? "Upcoming" : session.status || "Upcoming";
+};
+
 const resolveDriveId = async (studentId) => {
   const tableCheck = await pool.query("SELECT to_regclass('public.student_drive_progress') AS table_name");
   if (!tableCheck.rows[0]?.table_name) return null;
@@ -82,6 +96,7 @@ export const getAllSessions = async (studentId, filters = {}) => {
   );
 
   return result.rows.map((row) => {
+    const status = deriveSessionStatus(row);
     const start = row.scheduledAt ? new Date(row.scheduledAt) : null;
     const mins = durationMinutes(row.duration);
     const joinableAt = start && !Number.isNaN(start.getTime())
@@ -93,8 +108,8 @@ export const getAllSessions = async (studentId, filters = {}) => {
     const beforeEnd = !endsAt || Date.now() <= endsAt.getTime();
     const joinable = Boolean(
       beforeEnd &&
-      row.status !== "Completed" &&
-      (row.status === "Live" || (joinableAt && Date.now() >= joinableAt.getTime())),
+      status !== "Completed" &&
+      (status === "Live" || (joinableAt && Date.now() >= joinableAt.getTime())),
     );
 
     return {
@@ -113,9 +128,9 @@ export const getAllSessions = async (studentId, filters = {}) => {
       time: row.time,
       duration: row.duration,
       durationMinutes: mins,
-      status: row.status,
-      attended: row.status === "Completed" ? Boolean(row.attended) : null,
-      attendanceStatus: row.status === "Completed" ? row.attendanceStatus : null,
+      status,
+      attended: status === "Completed" ? Boolean(row.attended) : null,
+      attendanceStatus: status === "Completed" ? row.attendanceStatus : null,
       attendedAt: row.attendedAt,
       joinableAt: joinableAt?.toISOString() || null,
       joinable,
@@ -193,6 +208,7 @@ export const getSessionById = async (id, studentId = null) => {
     mentor: row.trainer,
     startTime: row.scheduledAt,
     category: row.sessionType,
+    status: deriveSessionStatus(row),
     durationMinutes: durationMinutes(row.duration),
     attended: row.attended ?? null,
     attendanceStatus: row.attendanceStatus ?? null,
