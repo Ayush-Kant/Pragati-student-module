@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pragati-local-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pragati_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pragati-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pragati_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: pragati-local-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - pragati-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  firebase:
+    build:
+      context: ./docker/firebase
+    container_name: pragati-local-firebase
+    restart: unless-stopped
+    working_dir: /workspace
+    command: ["firebase", "emulators:start", "--only", "auth,firestore", "--project", "pragati-local", "--host", "0.0.0.0"]
+    ports:
+      - "4000:4000"
+      - "8080:8080"
+      - "9099:9099"
+    volumes:
+      - ./:/workspace
+      - pragati-firebase-cache:/root/.cache
+
+volumes:
+  pragati-postgres-data:
+  pragati-redis-data:
+  pragati-firebase-cache:
