@@ -66,8 +66,21 @@ const ensureAdminApp = () => {
   const apps = getApps();
   if (apps.length > 0) return getApp();
 
-  const serviceAccount = loadServiceAccount();
   const configuredProjectId = getConfiguredProjectId();
+  const firebaseEmulatorMode = Boolean(
+    String(process.env.FIREBASE_AUTH_EMULATOR_HOST || "").trim() ||
+    String(process.env.FIRESTORE_EMULATOR_HOST || "").trim(),
+  );
+
+  // In local emulator mode the Admin SDK must not try to load a real
+  // service-account/application-default credential. The Firebase SDKs
+  // route Auth and Firestore traffic to the local emulators using the
+  // emulator host environment variables.
+  if (firebaseEmulatorMode) {
+    return initializeApp({ projectId: configuredProjectId });
+  }
+
+  const serviceAccount = loadServiceAccount();
 
   if (serviceAccount) {
     validateServiceAccountProject(serviceAccount, configuredProjectId);
