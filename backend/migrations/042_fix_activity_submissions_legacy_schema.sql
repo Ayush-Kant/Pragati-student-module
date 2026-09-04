@@ -4,7 +4,7 @@ BEGIN;
 -- table used by the placement/activity APIs. Migration 039 only created the
 -- modern shape when the table was absent, so those older tables can be missing
 -- the columns required by the student-assessment submission lifecycle.
--- Keep this migration strictly additive: never drop or rewrite existing rows.
+-- Keep this migration non-destructive: never drop or rewrite existing rows.
 
 ALTER TABLE activity_submissions
   ADD COLUMN IF NOT EXISTS student_id INTEGER,
@@ -20,6 +20,34 @@ ALTER TABLE activity_submissions
   ADD COLUMN IF NOT EXISTS submitted_at TIMESTAMPTZ DEFAULT NOW(),
   ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW(),
   ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Legacy placement/activity schemas may require drive_id and activity_title.
+-- Assessment submissions do not have those legacy concepts, so relax only the
+-- NOT NULL requirement when those optional legacy columns exist. This preserves
+-- all existing values and allows the canonical assessment writer to coexist with
+-- the older activity APIs.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'activity_submissions'
+      AND column_name = 'drive_id'
+  ) THEN
+    ALTER TABLE activity_submissions ALTER COLUMN drive_id DROP NOT NULL;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'activity_submissions'
+      AND column_name = 'activity_title'
+  ) THEN
+    ALTER TABLE activity_submissions ALTER COLUMN activity_title DROP NOT NULL;
+  END IF;
+END $$;
 
 -- The assessment submission service uses ON CONFLICT (attempt_id). A regular
 -- UNIQUE constraint is intentional here: PostgreSQL permits multiple NULLs,
