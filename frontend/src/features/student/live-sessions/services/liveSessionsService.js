@@ -8,15 +8,22 @@ const toIsoDateTime = (date, time) => {
   return Number.isNaN(value.getTime()) ? null : value.toISOString();
 };
 
-const parseDurationMinutes = (duration) => {
-  if (typeof duration === "number" && Number.isFinite(duration)) return duration;
-  const match = String(duration || "").match(/(\d+(?:\.\d+)?)\s*(?:min|mins|minutes?)/i);
-  return match ? Number(match[1]) : 0;
+const parseDurationMinutes = (session) => {
+  const serverMinutes = Number(session?.durationMinutes);
+  if (Number.isFinite(serverMinutes) && serverMinutes >= 0) return serverMinutes;
+
+  const text = String(session?.duration || "").trim().toLowerCase();
+  const match = text.match(/(\d+(?:\.\d+)?)\s*(hours?|hrs?|h|minutes?|mins?|m)?/i);
+  if (!match) return 0;
+  const amount = Number(match[1]);
+  if (!Number.isFinite(amount)) return 0;
+  const unit = match[2] || "minutes";
+  return /^(hours?|hrs?|h)$/.test(unit) ? amount * 60 : amount;
 };
 
 const normalizeSession = (session) => {
   const startTime = session?.scheduledAt || toIsoDateTime(session?.date, session?.time);
-  const durationMinutes = parseDurationMinutes(session?.duration);
+  const durationMinutes = parseDurationMinutes(session);
   const endDate = startTime ? new Date(startTime) : null;
   if (endDate && durationMinutes > 0) {
     endDate.setMinutes(endDate.getMinutes() + durationMinutes);
@@ -24,6 +31,7 @@ const normalizeSession = (session) => {
 
   return {
     ...session,
+    durationMinutes,
     mentor: session?.trainer || session?.mentor || "Training Mentor",
     category: session?.sessionType || session?.category || "Live Session",
     startTime,
