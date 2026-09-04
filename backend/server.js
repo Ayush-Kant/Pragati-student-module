@@ -9,6 +9,7 @@ import { initializeLiveSessionModule } from "./src/database/migrations/liveSessi
 import { initializeAssignmentModule } from "./src/database/migrations/assignmentSchema.js";
 import { startNotificationDigestScheduler } from "./services/notification.service.js";
 import { ensureStudentAuthSchema } from "./services/studentAuth.service.js";
+import { ensureStudentAssessmentSchema } from "./services/studentAssessmentSchema.service.js";
 
 import adminDashboardRoutes from "./routes/admin.dashboard.routes.js";
 import adminCollegeRoutes from "./routes/admin.college.routes.js";
@@ -151,7 +152,7 @@ app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/companies", companiesRoutes);
-app.use("/api/placement-drives", placementDriveRoutes);
+app.use("/api/placement-drives", placementDrivesRoutes);
 app.use("/api/v1/notifications", notificationsRoutes);
 app.use("/api/v1/certificates", certificatesRouter);
 app.use("/api/v1/badges", badgesRouter);
@@ -166,6 +167,8 @@ connectDB()
   .then(async () => {
     try { await ensureStudentAuthSchema(); console.log("✅ Student authentication/session schema ready"); }
     catch (error) { console.error("⚠️ Student auth schema initialization failed:", error.message); }
+    try { await ensureStudentAssessmentSchema(); console.log("✅ Student assessment schema ready"); }
+    catch (error) { console.error("⚠️ Student assessment schema initialization failed:", error.message); }
     try { await initializeLiveSessionModule(); console.log("✅ Live session module initialized"); }
     catch (error) { console.error("⚠️ Live session module initialization failed:", error.message); }
     try { await initializeAssignmentModule(); console.log("✅ Assignment module initialized"); }
