@@ -152,7 +152,7 @@ app.use("/api/departments/statistics", departmentStatisticsRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/companies", companiesRoutes);
-app.use("/api/placement-drives", placementDrivesRoutes);
+app.use("/api/placement-drives", placementDriveRoutes);
 app.use("/api/v1/notifications", notificationsRoutes);
 app.use("/api/v1/certificates", certificatesRouter);
 app.use("/api/v1/badges", badgesRouter);
