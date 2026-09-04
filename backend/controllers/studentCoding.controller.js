@@ -1,4 +1,4 @@
-import studentCodingService from '../services/studentCoding.service.js';
+import * as studentCodingService from '../services/studentCoding.service.js';
 import { resolveStudentId } from '../utils/studentProfileIdentity.js';
 
 const positiveId = (value, field) => {
