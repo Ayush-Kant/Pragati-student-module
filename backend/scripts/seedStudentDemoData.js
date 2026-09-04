@@ -2,6 +2,7 @@ import "dotenv/config";
 import { pool } from "../config/db.js";
 
 const DEMO_VIDEO_URL = "https://www.youtube.com/watch?v=Ke90Tje7VS0";
+const LIVE_SESSION_DURATION = "8 hours";
 
 const seed = async () => {
   const { rows: students } = await pool.query(
@@ -12,11 +13,9 @@ const seed = async () => {
   );
 
   if (!students.length) {
-    throw new Error("No students found. Run the normal migrations first and create a student account.");
+    throw new Error("No students found. Register a student first, then run this seed script.");
   }
 
-  // Give every student a deterministic project so the student-project flow can be
-  // tested without relying on the legacy demo account.
   for (const student of students) {
     const projectResult = await pool.query(
       `INSERT INTO student_projects
@@ -78,76 +77,87 @@ const seed = async () => {
     }
   }
 
-  // A single currently-live demo session. It starts now and remains available
-  // for the next eight hours so a freshly registered student can exercise the
-  // join flow without racing a short demo window.
+  // Replace an old demo session rather than preserving a stale short-duration
+  // fixture. The new session begins immediately and remains live for 8 hours.
+  await pool.query(
+    `DELETE FROM session_schedules
+     WHERE session_id IN (
+       SELECT id FROM live_sessions WHERE title = 'Live Demo: Student Learning Session'
+     )`,
+  );
+  await pool.query(
+    `DELETE FROM session_recordings
+     WHERE session_id IN (
+       SELECT id FROM live_sessions WHERE title = 'Live Demo: Student Learning Session'
+     )`,
+  );
+  await pool.query(
+    `DELETE FROM session_participants
+     WHERE session_id IN (
+       SELECT id FROM live_sessions WHERE title = 'Live Demo: Student Learning Session'
+     )`,
+  );
+  await pool.query(
+    `DELETE FROM session_attendance
+     WHERE session_id IN (
+       SELECT id FROM live_sessions WHERE title = 'Live Demo: Student Learning Session'
+     )`,
+  );
+  await pool.query(
+    `DELETE FROM live_sessions
+     WHERE title = 'Live Demo: Student Learning Session'`,
+  );
+
   const liveSession = await pool.query(
     `INSERT INTO live_sessions
       (mentor_id, title, session_type, scheduled_at, trainer, date, time,
        duration, status, room_name, meeting_url)
-     SELECT
-       NULL,
+     VALUES
+      (NULL,
        'Live Demo: Student Learning Session',
        'webinar',
        NOW(),
        'Pragati Demo Trainer',
        TO_CHAR(NOW(), 'YYYY-MM-DD'),
        TO_CHAR(NOW(), 'HH24:MI'),
-       '8 hours',
+       $1,
        'Live',
        'pragati-live-demo',
-       $1
-     WHERE NOT EXISTS (
-       SELECT 1 FROM live_sessions
-       WHERE title = 'Live Demo: Student Learning Session'
-         AND status = 'Live'
-         AND scheduled_at > NOW() - INTERVAL '8 hours'
-     )
+       $2)
      RETURNING id`,
-    [DEMO_VIDEO_URL],
+    [LIVE_SESSION_DURATION, DEMO_VIDEO_URL],
   );
 
-  const sessionId = liveSession.rows[0]?.id ?? (
-    await pool.query(
-      `SELECT id FROM live_sessions
-       WHERE title = 'Live Demo: Student Learning Session'
-       ORDER BY id DESC LIMIT 1`,
-    )
-  ).rows[0]?.id;
+  const sessionId = liveSession.rows[0]?.id;
 
   if (sessionId) {
     await pool.query(
       `INSERT INTO session_schedules
         (session_id, title, trainer, date, time, duration, status)
-       SELECT $1, 'Live Demo: Student Learning Session', 'Pragati Demo Trainer',
-              TO_CHAR(NOW(), 'YYYY-MM-DD'), TO_CHAR(NOW(), 'HH24:MI'), '8 hours', 'Live'
-       WHERE NOT EXISTS (
-         SELECT 1 FROM session_schedules
-         WHERE session_id = $1 AND title = 'Live Demo: Student Learning Session'
-       )`,
-      [sessionId],
+       VALUES ($1, 'Live Demo: Student Learning Session', 'Pragati Demo Trainer',
+               TO_CHAR(NOW(), 'YYYY-MM-DD'), TO_CHAR(NOW(), 'HH24:MI'), $2, 'Live')`,
+      [sessionId, LIVE_SESSION_DURATION],
     );
 
     await pool.query(
       `INSERT INTO session_recordings
         (session_id, title, duration, recording_url)
-       SELECT $1, 'Demo session recording', '42 minutes', $2
-       WHERE NOT EXISTS (
-         SELECT 1 FROM session_recordings
-         WHERE session_id = $1 AND title = 'Demo session recording'
-       )`,
+       VALUES ($1, 'Demo session recording', '42 minutes', $2)`,
       [sessionId, DEMO_VIDEO_URL],
     );
   }
 
-  const [{ rows: projectCount }, { rows: sessionCount }, { rows: challengeCount }] = await Promise.all([
+  const [{ rows: projectCount }, { rows: sessionRows }, { rows: challengeCount }] = await Promise.all([
     pool.query(`SELECT COUNT(*)::int AS count FROM student_projects WHERE title = 'SM-09 Student Portfolio Project'`),
-    pool.query(`SELECT COUNT(*)::int AS count FROM live_sessions WHERE title = 'Live Demo: Student Learning Session'`),
+    pool.query(`SELECT id, scheduled_at, duration, status FROM live_sessions WHERE title = 'Live Demo: Student Learning Session' ORDER BY id DESC LIMIT 1`),
     pool.query(`SELECT COUNT(*)::int AS count FROM assessment_questions WHERE LOWER(type) = 'coding'`),
   ]);
 
   console.log(`✅ Demo students with SM-09 project: ${projectCount[0].count}`);
-  console.log(`✅ Demo live sessions: ${sessionCount[0].count}`);
+  console.log(`✅ Demo live session: ${sessionRows[0]?.id ?? "not created"}`);
+  console.log(`   Start: ${sessionRows[0]?.scheduled_at ?? "n/a"}`);
+  console.log(`   Duration: ${sessionRows[0]?.duration ?? "n/a"} (8 hours)`);
+  console.log(`   Status: ${sessionRows[0]?.status ?? "n/a"}`);
   console.log(`✅ Coding challenges available: ${challengeCount[0].count}`);
   console.log(`▶ Demo video: ${DEMO_VIDEO_URL}`);
 };
