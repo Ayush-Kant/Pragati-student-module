@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { recordTabSwitch, saveAssessmentAnswer } from "../services/assessmentService";
+import { isAnswerProvided } from "../utils/answerState";
 
 const getTimeLeft = (attempt) => {
   if (!attempt?.expiresAt) return 0;
@@ -75,7 +76,12 @@ export const useAssessmentAttempt = ({ assessment, attempt, onSubmit }) => {
     const question = assessment?.questions?.[currentIndex];
     if (!question || !attempt?.attemptId) return;
     setSaveError("");
-    setAnswers((prev) => ({ ...prev, [String(question.id)]: answer }));
+    setAnswers((prev) => {
+      const next = { ...prev };
+      if (isAnswerProvided(answer)) next[String(question.id)] = answer;
+      else delete next[String(question.id)];
+      return next;
+    });
     setSavingQuestionId(question.id);
     void saveAssessmentAnswer(attempt.attemptId, question.id, answer)
       .catch((error) => setSaveError(error?.response?.data?.message || error?.message || "Answer could not be saved."))
