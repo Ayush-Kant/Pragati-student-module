@@ -14,6 +14,7 @@ const createLiveSessionTablesQuery = `
     time VARCHAR(50) NOT NULL,
     duration VARCHAR(50) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'Upcoming',
+    drive_id INTEGER,
     room_name VARCHAR(255),
     meeting_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -30,6 +31,7 @@ const createLiveSessionTablesQuery = `
     ADD COLUMN IF NOT EXISTS time VARCHAR(50),
     ADD COLUMN IF NOT EXISTS duration VARCHAR(50),
     ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Upcoming',
+    ADD COLUMN IF NOT EXISTS drive_id INTEGER,
     ADD COLUMN IF NOT EXISTS room_name VARCHAR(255),
     ADD COLUMN IF NOT EXISTS meeting_url TEXT,
     ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
@@ -96,6 +98,7 @@ const createLiveSessionTablesQuery = `
 
   CREATE INDEX IF NOT EXISTS idx_live_sessions_status_scheduled_at ON live_sessions(status, scheduled_at);
   CREATE INDEX IF NOT EXISTS idx_live_sessions_room_name ON live_sessions(room_name);
+  CREATE INDEX IF NOT EXISTS idx_live_sessions_drive_id ON live_sessions(drive_id);
   CREATE INDEX IF NOT EXISTS idx_session_attendance_session_id ON session_attendance(session_id);
   CREATE INDEX IF NOT EXISTS idx_session_attendance_student_id ON session_attendance(student_id);
   CREATE INDEX IF NOT EXISTS idx_session_participants_session_id ON session_participants(session_id);
