@@ -4,12 +4,12 @@ import RunCodeButton from './RunCodeButton';
 import SubmitSolutionButton from './SubmitSolutionButton';
 import ResetEditorButton from './ResetEditorButton';
 
-const EditorToolbar = memo(({ language, onLanguageChange, onRunCode, onSubmit, onReset, isExecuting = false, isSubmitting = false }) => {
-  const busy = isExecuting || isSubmitting;
+const EditorToolbar = memo(({ language, onLanguageChange, onRunCode, onSubmit, onReset, isExecuting = false, isSubmitting = false, disabled = false }) => {
+  const busy = disabled || isExecuting || isSubmitting;
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-2.5">
       <div className="flex items-center gap-2">
-        <LanguageSelector language={language} onChange={onLanguageChange} />
+        <LanguageSelector language={language} onChange={onLanguageChange} disabled={busy} />
         <ResetEditorButton onClick={onReset} disabled={busy} />
       </div>
       <div className="flex items-center gap-2">
