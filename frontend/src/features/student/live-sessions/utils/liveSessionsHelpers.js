@@ -40,13 +40,19 @@ export const formatSessionTime = (isoString) => {
 };
 
 /**
- * Whether the "Join Session" button should be enabled — true once we're within
- * JOIN_WINDOW_MINUTES of the start time and before the session's end time.
+ * Whether the "Join Session" button should be enabled.
+ * The backend is authoritative when it provides `joinable`; the client-side
+ * time calculation is retained as a compatibility fallback for older APIs.
  */
 export const canJoinSession = (session, now = new Date()) => {
+  if (!session || session.status === "Completed") return false;
+  if (typeof session.joinable === "boolean") return session.joinable;
   if (!session?.startTime || !session?.endTime) return false;
+
   const start = new Date(session.startTime);
   const end = new Date(session.endTime);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return false;
+
   const joinOpensAt = new Date(start.getTime() - JOIN_WINDOW_MINUTES * 60 * 1000);
   return now >= joinOpensAt && now <= end;
 };
@@ -55,15 +61,17 @@ export const canJoinSession = (session, now = new Date()) => {
  * Human readable countdown/status caption for a session card.
  */
 export const getSessionTimingLabel = (session, now = new Date()) => {
+  if (!session?.startTime) return "Schedule unavailable";
   const start = new Date(session.startTime);
-  const end = new Date(session.endTime);
+  const end = session.endTime ? new Date(session.endTime) : null;
 
-  if (session.status === "Completed" || now > end) return "Session ended";
-  if (now >= start && now <= end) return "Live now";
+  if (Number.isNaN(start.getTime())) return "Schedule unavailable";
+  if (session.status === "Completed" || (end && !Number.isNaN(end.getTime()) && now > end)) return "Session ended";
+  if (now >= start && (!end || now <= end)) return "Live now";
 
   const diffMs = start - now;
   const diffMins = Math.round(diffMs / 60000);
-  if (diffMins < 60) return `Starts in ${diffMins} min`;
+  if (diffMins < 60) return `Starts in ${Math.max(diffMins, 0)} min`;
   const diffHours = Math.round(diffMins / 60);
   if (diffHours < 24) return `Starts in ${diffHours} hr`;
   const diffDays = Math.round(diffHours / 24);
