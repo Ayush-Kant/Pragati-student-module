@@ -1,5 +1,4 @@
 /** ProjectWorkspacePage — milestone tracking and progress workspace. */
-import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Target, Layers, Calendar } from 'lucide-react';
 import { useProjectDetails } from '../hooks/useProjectDetails';
@@ -15,9 +14,8 @@ import { formatMilestoneDue } from '../utils/milestoneHelpers';
 
 const ProjectWorkspacePage = () => {
   const { projectId } = useParams();
-  const [milestoneRefresh, setMilestoneRefresh] = useState(0);
   const { project, isLoading: projLoading, error: projError, refetch } = useProjectDetails(projectId);
-  const { milestones, activeMilestone, progress, isLoading: mlLoading } = useMilestones(projectId, milestoneRefresh);
+  const { milestones, activeMilestone, progress, isLoading: mlLoading, refetch: refetchMilestones } = useMilestones(projectId);
 
   if (projLoading || mlLoading) return <LoadingSpinner size="lg" label="Loading workspace…" />;
   if (projError) return <ErrorState error={projError} onRetry={refetch} />;
@@ -38,7 +36,7 @@ const ProjectWorkspacePage = () => {
         <div className={`bg-gradient-to-br ${overdue ? 'from-red-500/10' : 'from-gray-800/50'} to-transparent border ${overdue ? 'border-red-500/20' : 'border-white/6'} rounded-2xl p-5`}><div className="flex items-center gap-2 mb-3"><Calendar size={16} className={deadlineColor} /><span className="text-xs text-gray-400">Deadline</span></div><p className={`text-lg font-bold ${deadlineColor} mb-1`}>{formatDeadline(project.deadline)}</p>{overdue && <p className="text-xs text-red-400 font-medium">Overdue</p>}</div>
       </div>
 
-      {activeMilestone && <div className="mb-8 bg-gradient-to-r from-violet-500/10 to-blue-500/5 border border-violet-500/25 rounded-2xl p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">Current Milestone</p><h3 className="text-base font-bold mb-1">{activeMilestone.title}</h3><p className="text-sm text-gray-400 line-clamp-2">{activeMilestone.description}</p></div><div className="flex flex-col items-end gap-2"><MilestoneStatusBadge status={activeMilestone.status} /><p className="text-xs text-gray-600">Due {formatMilestoneDue(activeMilestone.dueDate)}</p></div></div>{activeMilestone.progress > 0 && <div className="mt-4"><ProgressBar value={activeMilestone.progress} showLabel size="sm" /></div>}<MilestoneSubmitForm projectId={projectId} milestone={activeMilestone} onSubmitted={() => setMilestoneRefresh((value) => value + 1)} /></div>}
+      {activeMilestone && <div className="mb-8 bg-gradient-to-r from-violet-500/10 to-blue-500/5 border border-violet-500/25 rounded-2xl p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">Current Milestone</p><h3 className="text-base font-bold mb-1">{activeMilestone.title}</h3><p className="text-sm text-gray-400 line-clamp-2">{activeMilestone.description}</p></div><div className="flex flex-col items-end gap-2"><MilestoneStatusBadge status={activeMilestone.status} /><p className="text-xs text-gray-600">Due {formatMilestoneDue(activeMilestone.dueDate)}</p></div></div>{activeMilestone.progress > 0 && <div className="mt-4"><ProgressBar value={activeMilestone.progress} showLabel size="sm" /></div>}<MilestoneSubmitForm projectId={projectId} milestone={activeMilestone} onSubmitted={refetchMilestones} /></div>}
 
       <div><h2 className="text-sm font-semibold text-gray-300 mb-5">All Milestones</h2><MilestoneTimeline milestones={milestones} /></div>
     </div>
