@@ -12,10 +12,9 @@ import {
   submitMilestone,
   submitProject,
 } from '../controllers/studentProject.controller.js';
-import { deleteFile, uploadFile, uploadProjectFile } from '../controllers/studentProjectFile.controller.js';
+import { deleteFile, uploadFile, uploadProjectFile, uploadProjectReport } from '../controllers/studentProjectFile.controller.js';
 
 const router = express.Router();
-
 router.use(authMiddleware, roleMiddleware('student'));
 
 router.get('/', listProjects);
@@ -25,7 +24,7 @@ router.get('/:projectId/milestones/:milestoneId/submission', getMilestoneSubmiss
 router.post('/:projectId/milestones/:milestoneId', submitMilestone);
 router.get('/:projectId/submission', getSubmission);
 router.get('/:projectId/submissions', getSubmissionHistory);
-router.post('/:projectId/submit', submitProject);
+router.post('/:projectId/submit', uploadProjectReport, submitProject);
 router.post('/:projectId/files', uploadProjectFile, uploadFile);
 router.delete('/:projectId/files/:fileId', deleteFile);
 router.get('/:projectId/evaluation', getEvaluation);
