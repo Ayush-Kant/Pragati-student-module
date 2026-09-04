@@ -72,6 +72,8 @@ const migrationFiles = [
   "038_fix_assignment_resubmissions.sql",
   "039_complete_student_assessments.sql",
   "040_complete_student_coding_projects.sql",
+  "041_ensure_assessment_description.sql",
+  "042_fix_activity_submissions_legacy_schema.sql",
 ];
 
 async function runMigrationsFresh() {
