@@ -78,8 +78,9 @@ const seed = async () => {
     }
   }
 
-  // A single currently-live demo session. It is global in the existing student
-  // session model, so every authenticated student can test the join flow.
+  // A single currently-live demo session. It starts now and remains available
+  // for the next eight hours so a freshly registered student can exercise the
+  // join flow without racing a short demo window.
   const liveSession = await pool.query(
     `INSERT INTO live_sessions
       (mentor_id, title, session_type, scheduled_at, trainer, date, time,
@@ -88,18 +89,19 @@ const seed = async () => {
        NULL,
        'Live Demo: Student Learning Session',
        'webinar',
-       NOW() - INTERVAL '5 minutes',
+       NOW(),
        'Pragati Demo Trainer',
        TO_CHAR(NOW(), 'YYYY-MM-DD'),
        TO_CHAR(NOW(), 'HH24:MI'),
-       '60 minutes',
+       '8 hours',
        'Live',
        'pragati-live-demo',
        $1
      WHERE NOT EXISTS (
        SELECT 1 FROM live_sessions
        WHERE title = 'Live Demo: Student Learning Session'
-         AND scheduled_at > NOW() - INTERVAL '2 hours'
+         AND status = 'Live'
+         AND scheduled_at > NOW() - INTERVAL '8 hours'
      )
      RETURNING id`,
     [DEMO_VIDEO_URL],
@@ -118,7 +120,7 @@ const seed = async () => {
       `INSERT INTO session_schedules
         (session_id, title, trainer, date, time, duration, status)
        SELECT $1, 'Live Demo: Student Learning Session', 'Pragati Demo Trainer',
-              TO_CHAR(NOW(), 'YYYY-MM-DD'), TO_CHAR(NOW(), 'HH24:MI'), '60 minutes', 'Live'
+              TO_CHAR(NOW(), 'YYYY-MM-DD'), TO_CHAR(NOW(), 'HH24:MI'), '8 hours', 'Live'
        WHERE NOT EXISTS (
          SELECT 1 FROM session_schedules
          WHERE session_id = $1 AND title = 'Live Demo: Student Learning Session'
