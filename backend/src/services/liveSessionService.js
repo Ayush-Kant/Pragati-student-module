@@ -1,8 +1,14 @@
 import liveSessionModel from "../models/liveSessionModel.js";
 
 const sessionDurationMinutes = (value) => {
-  const match = String(value || "").match(/\d+(?:\.\d+)?/);
-  return match ? Number(match[0]) : 0;
+  if (typeof value === "number" && Number.isFinite(value)) return Math.max(0, value);
+  const text = String(value || "").trim().toLowerCase();
+  const match = text.match(/(\d+(?:\.\d+)?)\s*(hours?|hrs?|h|minutes?|mins?|m)?/i);
+  if (!match) return 0;
+  const amount = Number(match[1]);
+  if (!Number.isFinite(amount)) return 0;
+  const unit = match[2] || "minutes";
+  return /^(hours?|hrs?|h)$/.test(unit) ? amount * 60 : amount;
 };
 
 export const getSessions = async (studentId, filters = {}) => liveSessionModel.getAllSessions(studentId, filters);
