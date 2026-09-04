@@ -7,6 +7,9 @@ const durationMinutes = (value) => {
 };
 
 const resolveDriveId = async (studentId) => {
+  const tableCheck = await pool.query("SELECT to_regclass('public.student_drive_progress') AS table_name");
+  if (!tableCheck.rows[0]?.table_name) return null;
+
   const result = await pool.query(
     `SELECT drive_id AS "driveId"
      FROM student_drive_progress
@@ -20,7 +23,9 @@ const resolveDriveId = async (studentId) => {
 
 export const getAllSessions = async (studentId, filters = {}) => {
   if (!Number.isInteger(Number(studentId)) || Number(studentId) <= 0) {
-    throw new Error("Student not found");
+    const error = new Error("Student not found");
+    error.status = 404;
+    throw error;
   }
 
   const resolvedStudentId = Number(studentId);
@@ -193,6 +198,8 @@ export const getSessionById = async (id, studentId = null) => {
     attendanceStatus: row.attendanceStatus ?? null,
     attendedAt: row.attendedAt ?? null,
     recordingUrl: row.recordingUrl ?? null,
+    meetingUrl: row.meetingUrl || "",
+    roomName: row.roomName || null,
   };
 };
 
@@ -204,11 +211,17 @@ export const joinSession = async (
 ) => {
   const resolvedStudentId = Number(studentId);
   if (!Number.isInteger(resolvedStudentId) || resolvedStudentId <= 0) {
-    throw new Error("Student not found");
+    const error = new Error("Student not found");
+    error.status = 404;
+    throw error;
   }
 
   const session = await getSessionById(sessionId, resolvedStudentId);
-  if (!session) throw new Error("Session not found");
+  if (!session) {
+    const error = new Error("Session not found or not available to this student");
+    error.status = 404;
+    throw error;
+  }
 
   let meetingUrl = session.meetingUrl || "";
   let roomName = session.roomName || `pragati-session-${sessionId}`;
@@ -228,6 +241,12 @@ export const joinSession = async (
       Date.now() + Math.max((sessionDurationMinutes || 60) + 30, 90) * 60 * 1000,
     );
     token = await dailyService.createParticipantToken({ roomName, userName, expiresAt });
+  }
+
+  if (!meetingUrl) {
+    const error = new Error("This live session has no meeting link and Daily.co is not configured");
+    error.status = 503;
+    throw error;
   }
 
   const result = await pool.query(
@@ -253,11 +272,17 @@ export const joinSession = async (
 export const leaveSession = async (sessionId, studentId) => {
   const resolvedStudentId = Number(studentId);
   if (!Number.isInteger(resolvedStudentId) || resolvedStudentId <= 0) {
-    throw new Error("Student not found");
+    const error = new Error("Student not found");
+    error.status = 404;
+    throw error;
   }
 
   const session = await getSessionById(sessionId, resolvedStudentId);
-  if (!session) throw new Error("Session not found");
+  if (!session) {
+    const error = new Error("Session not found or not available to this student");
+    error.status = 404;
+    throw error;
+  }
 
   const existingAttendance = await pool.query(
     "SELECT attended FROM session_attendance WHERE session_id = $1 AND student_id = $2",
