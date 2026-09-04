@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { readFileSync } from "node:fs";
 import { applicationDefault, cert, getApps, getApp, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
