@@ -11,6 +11,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorState from "../components/common/ErrorState";
 import { getAssessmentById, startAssessment, submitAssessment } from "../services/assessmentService";
 import { useAssessmentAttempt } from "../hooks/useAssessmentAttempt";
+import { isAnswerProvided } from "../utils/answerState";
 
 const normalizeAttempt = (attempt) => ({ ...attempt, answers: attempt?.answers || {}, questions: attempt?.questions || [] });
 
@@ -78,7 +79,7 @@ function AssessmentAttemptContent() {
   const currentQuestion = questions[currentIndex] || null;
   if (!currentQuestion) return <ErrorState message="This assessment has no questions." />;
 
-  const answeredCount = questions.filter((question) => Boolean(answers[String(question.id)])).length;
+  const answeredCount = questions.filter((question) => isAnswerProvided(answers[String(question.id)])).length;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
