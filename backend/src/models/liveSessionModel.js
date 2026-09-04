@@ -233,11 +233,11 @@ export const joinSession = async (
   const result = await pool.query(
     `INSERT INTO session_participants
       (session_id, student_id, joined_at, left_at, join_token_issued_at)
-     VALUES ($1, $2, NOW(), NULL, CASE WHEN $3 IS NOT NULL THEN NOW() ELSE NULL END)
+     VALUES ($1, $2, NOW(), NULL, CASE WHEN $3::text IS NOT NULL THEN NOW() ELSE NULL END)
      ON CONFLICT (session_id, student_id)
      DO UPDATE SET joined_at = NOW(), left_at = NULL, duration_seconds = NULL,
        join_token_issued_at = CASE
-         WHEN $3 IS NOT NULL THEN NOW()
+         WHEN $3::text IS NOT NULL THEN NOW()
          ELSE session_participants.join_token_issued_at
        END
      RETURNING id,
