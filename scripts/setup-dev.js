@@ -1,6 +1,5 @@
 import { existsSync, copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import net from "node:net";
 import path from "node:path";
 import process from "node:process";
 
@@ -9,14 +8,6 @@ const backendDir = path.join(root, "backend");
 const frontendDir = path.join(root, "frontend");
 const backendEnv = path.join(backendDir, ".env");
 const backendEnvTemplate = path.join(backendDir, ".env.intern.example");
-
-const LOCAL_PORTS = {
-  postgres: 55432,
-  redis: 56379,
-  firebaseUi: 54000,
-  firestore: 58080,
-  firebaseAuth: 59099,
-};
 
 const run = (command, args, cwd = root) => {
   console.log(`\n> ${command} ${args.join(" ")}`);
@@ -35,23 +26,6 @@ const commandExists = (command) => {
     return false;
   }
 };
-
-const portIsBusy = (port) =>
-  new Promise((resolve) => {
-    const socket = net.createConnection({ host: "127.0.0.1", port });
-    let settled = false;
-
-    const finish = (busy) => {
-      if (settled) return;
-      settled = true;
-      socket.destroy();
-      resolve(busy);
-    };
-
-    socket.setTimeout(500, () => finish(false));
-    socket.once("connect", () => finish(true));
-    socket.once("error", (error) => finish(error.code !== "ECONNREFUSED"));
-  });
 
 const ensureLocalEnv = () => {
   if (!existsSync(backendEnvTemplate)) {
@@ -105,22 +79,6 @@ const ensureLocalEnv = () => {
   }
 };
 
-const checkLocalPorts = async () => {
-  const busy = [];
-
-  for (const [name, port] of Object.entries(LOCAL_PORTS)) {
-    if (await portIsBusy(port)) busy.push(`${name} (${port})`);
-  }
-
-  if (busy.length > 0) {
-    throw new Error(
-      `Required Pragati local port(s) are already in use: ${busy.join(", ")}. ` +
-        "Close the application using the port and rerun npm run setup:dev. " +
-        "The setup deliberately uses dedicated high ports so native PostgreSQL/Redis installations on 5432/6379 can remain running."
-    );
-  }
-};
-
 const main = async () => {
   console.log("============================================");
   console.log(" Pragati - Local Intern Development Setup");
@@ -142,12 +100,19 @@ const main = async () => {
   run("docker", ["compose", "version"]);
 
   ensureLocalEnv();
-  await checkLocalPorts();
 
   console.log("\nValidating Docker Compose configuration...");
   run("docker", ["compose", "config", "-q"]);
 
-  run("docker", ["compose", "up", "-d", "postgres", "redis", "firebase"]);
+  try {
+    run("docker", ["compose", "up", "-d", "postgres", "redis", "firebase"]);
+  } catch {
+    throw new Error(
+      "Docker could not start the Pragati local services. A dedicated host port may already be in use. " +
+        "Pragati uses PostgreSQL 55432, Redis 56379, Firebase UI 54000, Firestore 58080, and Auth 59099. " +
+        "Stop the process using the conflicting port and rerun npm run setup:dev."
+    );
+  }
 
   console.log("\nWaiting for PostgreSQL to become ready...");
   let postgresReady = false;
