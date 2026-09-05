@@ -1,5 +1,6 @@
 import { existsSync, copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import net from "node:net";
 import path from "node:path";
 import process from "node:process";
 
@@ -9,9 +10,21 @@ const frontendDir = path.join(root, "frontend");
 const backendEnv = path.join(backendDir, ".env");
 const backendEnvTemplate = path.join(backendDir, ".env.intern.example");
 
+const LOCAL_PORTS = {
+  postgres: 55432,
+  redis: 56379,
+  firebaseUi: 54000,
+  firestore: 58080,
+  firebaseAuth: 59099,
+};
+
 const run = (command, args, cwd = root) => {
   console.log(`\n> ${command} ${args.join(" ")}`);
-  execFileSync(command, args, { cwd, stdio: "inherit", shell: process.platform === "win32" });
+  execFileSync(command, args, {
+    cwd,
+    stdio: "inherit",
+    shell: process.platform === "win32",
+  });
 };
 
 const commandExists = (command) => {
@@ -23,16 +36,92 @@ const commandExists = (command) => {
   }
 };
 
-const ensureFile = (target, template) => {
-  if (existsSync(target)) {
-    console.log(`✓ Keeping existing ${path.relative(root, target)}`);
+const portIsBusy = (port) =>
+  new Promise((resolve) => {
+    const socket = net.createConnection({ host: "127.0.0.1", port });
+    let settled = false;
+
+    const finish = (busy) => {
+      if (settled) return;
+      settled = true;
+      socket.destroy();
+      resolve(busy);
+    };
+
+    socket.setTimeout(500, () => finish(false));
+    socket.once("connect", () => finish(true));
+    socket.once("error", (error) => finish(error.code !== "ECONNREFUSED"));
+  });
+
+const ensureLocalEnv = () => {
+  if (!existsSync(backendEnvTemplate)) {
+    throw new Error("backend/.env.intern.example is missing.");
+  }
+
+  if (!existsSync(backendEnv)) {
+    copyFileSync(backendEnvTemplate, backendEnv);
+    console.log("✓ Created backend/.env from the intern template.");
     return;
   }
-  copyFileSync(template, target);
-  console.log(`✓ Created ${path.relative(root, target)}`);
+
+  const requiredValues = {
+    PORT: "5000",
+    NODE_ENV: "development",
+    POSTGRESQL_URI: "postgresql://postgres:postgres@127.0.0.1:55432/pragati_dev",
+    JWT_SECRET: "pragati-local-development-secret",
+    JWT_EXPIRES_IN: "7d",
+    STUDENT_JWT_EXPIRES_IN: "15m",
+    STUDENT_REFRESH_TTL_DAYS: "7",
+    PUBLIC_API_URL: "http://localhost:5000",
+    CLIENT_URL: "http://localhost:5173",
+    REDIS_URL: "redis://127.0.0.1:56379",
+    FIREBASE_PROJECT_ID: "pragati-local",
+    FIREBASE_AUTH_EMULATOR_HOST: "127.0.0.1:59099",
+    FIRESTORE_EMULATOR_HOST: "127.0.0.1:58080",
+  };
+
+  let envText = readFileSync(backendEnv, "utf8");
+  let changed = false;
+
+  for (const [key, value] of Object.entries(requiredValues)) {
+    const pattern = new RegExp(`^${key}=.*$`, "m");
+    const replacement = `${key}=${value}`;
+
+    if (pattern.test(envText)) {
+      const next = envText.replace(pattern, replacement);
+      if (next !== envText) changed = true;
+      envText = next;
+    } else {
+      envText = `${envText.trimEnd()}\n${replacement}\n`;
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    writeFileSync(backendEnv, envText);
+    console.log("✓ Updated local infrastructure settings in backend/.env.");
+  } else {
+    console.log("✓ backend/.env already uses the intern local configuration.");
+  }
 };
 
-const main = () => {
+const checkLocalPorts = async () => {
+  const busy = [];
+
+  for (const [name, port] of Object.entries(LOCAL_PORTS)) {
+    if (await portIsBusy(port)) busy.push(`${name} (${port})`);
+  }
+
+  if (busy.length > 0) {
+    throw new Error(
+      `Required Pragati local port(s) are already in use: ${busy.join(", ")}. ` +
+        "Close the application using the port and rerun npm run setup:dev. " +
+        "The setup deliberately uses dedicated high ports so native PostgreSQL/Redis installations on 5432/6379 can remain running."
+    );
+  }
+};
+
+const main = async () => {
   console.log("============================================");
   console.log(" Pragati - Local Intern Development Setup");
   console.log("============================================");
@@ -49,23 +138,40 @@ const main = () => {
     throw new Error("docker-compose.yml is missing. Run this command from the repository root.");
   }
 
-  ensureFile(backendEnv, backendEnvTemplate);
+  console.log("\nChecking Docker Compose...");
+  run("docker", ["compose", "version"]);
+
+  ensureLocalEnv();
+  await checkLocalPorts();
+
+  console.log("\nValidating Docker Compose configuration...");
+  run("docker", ["compose", "config", "-q"]);
 
   run("docker", ["compose", "up", "-d", "postgres", "redis", "firebase"]);
 
   console.log("\nWaiting for PostgreSQL to become ready...");
+  let postgresReady = false;
   for (let attempt = 1; attempt <= 30; attempt += 1) {
     try {
       run("docker", ["compose", "exec", "-T", "postgres", "pg_isready", "-U", "postgres", "-d", "pragati_dev"]);
+      postgresReady = true;
       break;
     } catch {
-      if (attempt === 30) throw new Error("PostgreSQL did not become ready in time.");
+      if (attempt === 30) break;
       Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1000);
     }
   }
 
+  if (!postgresReady) {
+    throw new Error("PostgreSQL did not become ready in time. Run `docker compose logs postgres` for details.");
+  }
+
   run("npm", ["install"], backendDir);
   run("npm", ["install"], frontendDir);
+
+  console.log("\nTesting the exact PostgreSQL connection used by the backend...");
+  run("npm", ["run", "check:db"], backendDir);
+
   run("npm", ["run", "migrate"], backendDir);
 
   console.log("\n============================================");
@@ -73,17 +179,17 @@ const main = () => {
   console.log("============================================");
   console.log("Frontend:          http://localhost:5173");
   console.log("Backend:           http://localhost:5000");
-  console.log("Firebase Emulator: http://localhost:4000");
-  console.log("Auth Emulator:     http://localhost:9099");
-  console.log("Firestore:         http://localhost:8080");
-  console.log("PostgreSQL:        localhost:5432");
-  console.log("Redis:             localhost:6379");
+  console.log("Firebase Emulator: http://localhost:54000");
+  console.log("Auth Emulator:     http://localhost:59099");
+  console.log("Firestore:         http://localhost:58080");
+  console.log("PostgreSQL:        127.0.0.1:55432");
+  console.log("Redis:             127.0.0.1:56379");
   console.log("\nRun `npm run dev` to start frontend and backend.");
   console.log("Register a local student through the app when student data is needed.");
 };
 
 try {
-  main();
+  await main();
 } catch (error) {
   console.error(`\n✗ Local setup failed: ${error?.message || error}`);
   process.exitCode = 1;
