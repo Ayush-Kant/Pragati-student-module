@@ -9,8 +9,6 @@ const backendDir = path.resolve(__dirname, "..");
 
 dotenv.config({ path: path.join(backendDir, ".env") });
 
-dns.setDefaultResultOrder?.("ipv4first");
-
 const connectionString = process.env.POSTGRESQL_URI;
 
 if (!connectionString) {
@@ -42,7 +40,7 @@ const client = new Client({ connectionString, connectionTimeoutMillis: 10000 });
 
 try {
   await client.connect();
-  const { rows } = await client.query("SELECT current_user, current_database(), version()");
+  const { rows } = await client.query("SELECT current_user, current_database()");
   const row = rows[0];
 
   console.log("✓ PostgreSQL authentication succeeded.");
