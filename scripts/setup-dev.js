@@ -68,7 +68,7 @@ const waitForPort = async (name, port, attempts = 60) => {
 
   throw new Error(
     `${name} did not become reachable on 127.0.0.1:${port} within ${attempts} seconds. ` +
-      "Run `docker compose ps` and `docker compose logs firebase` (or the relevant service) for details."
+      "Run `docker compose ps -a` and `docker compose logs --tail=200 firebase` (or the relevant service) for details."
   );
 };
 
@@ -170,7 +170,7 @@ const checkDedicatedPorts = async () => {
   if (busy.length > 0) {
     throw new Error(
       `Required Pragati local port(s) are already in use: ${busy.join(", ")}. ` +
-        "Close the application using the port and rerun npm run setup:dev. " +
+        "A non-Pragati process may be using one of these ports. Stop it and rerun npm run setup:dev. " +
         "Pragati deliberately uses dedicated high ports so native PostgreSQL/Redis installations on 5432/6379 can remain running."
     );
   }
@@ -198,18 +198,25 @@ const main = async () => {
 
   ensureBackendEnv();
   ensureFrontendEnv();
+
+  console.log("\nStopping any previous Pragati local containers (volumes are preserved)...");
+  run("docker", ["compose", "down", "--remove-orphans"]);
+
   await checkDedicatedPorts();
 
   console.log("\nValidating Docker Compose configuration...");
   run("docker", ["compose", "config", "-q"]);
 
   try {
-    run("docker", ["compose", "up", "-d", "postgres", "redis", "firebase"]);
+    run("docker", ["compose", "up", "-d", "--build", "--force-recreate", "postgres", "redis", "firebase"]);
   } catch {
     throw new Error(
-      "Docker could not start the Pragati local services. Check Docker Desktop and confirm the dedicated local ports are free."
+      "Docker could not start the Pragati local services. Run `docker compose ps -a` and `docker compose logs --tail=200 firebase` for the exact container failure."
     );
   }
+
+  console.log("\nChecking local Firebase emulator container...");
+  run("docker", ["compose", "ps", "firebase"]);
 
   console.log("\nWaiting for PostgreSQL to become ready...");
   let postgresReady = false;
