@@ -10,7 +10,9 @@
     "build": "npm run build --prefix frontend",
     "lint": "npm run lint --prefix frontend",
     "test:backend": "npm test --prefix backend",
-    "seed:student": "npm run seed:student-all --prefix backend"
+    "seed:student": "npm run seed:student-all --prefix backend",
+    "seed:student-all": "npm run seed:student-all --prefix backend",
+    "colleges:list": "npm run colleges:list --prefix backend"
   },
   "engines": {
     "node": ">=18"
