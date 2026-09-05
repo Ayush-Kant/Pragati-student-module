@@ -1,0 +1,1 @@
+The canonical student demo seed is backend/scripts/seedStudentDemoData.js on develop. This file intentionally documents the source branch for maintainers.
