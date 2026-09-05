@@ -1,6 +1,7 @@
 {
   "name": "pragati-root",
   "private": true,
+  "type": "module",
   "scripts": {
     "setup:dev": "node scripts/setup-dev.js",
     "dev": "node scripts/dev.js",
