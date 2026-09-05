@@ -5,7 +5,9 @@
     "dev": "npm run dev --prefix frontend",
     "build": "npm run build --prefix frontend",
     "dev:backend": "npm run dev --prefix backend",
-    "seed:student": "npm run seed:student-all --prefix backend"
+    "seed:student": "npm run seed:student-all --prefix backend",
+    "seed:student-all": "npm run seed:student-all --prefix backend",
+    "colleges:list": "npm run colleges:list --prefix backend"
   },
   "dependencies": {
     "jspdf": "^4.2.1",
