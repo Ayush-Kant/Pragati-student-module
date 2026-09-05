@@ -1,5 +1,6 @@
 import { existsSync, copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import net from "node:net";
 import path from "node:path";
 import process from "node:process";
 
@@ -8,6 +9,15 @@ const backendDir = path.join(root, "backend");
 const frontendDir = path.join(root, "frontend");
 const backendEnv = path.join(backendDir, ".env");
 const backendEnvTemplate = path.join(backendDir, ".env.intern.example");
+const frontendEnv = path.join(frontendDir, ".env.local");
+
+const LOCAL_PORTS = {
+  postgres: 55432,
+  redis: 56379,
+  firebaseUi: 54000,
+  firestore: 58080,
+  firebaseAuth: 59099,
+};
 
 const run = (command, args, cwd = root) => {
   console.log(`\n> ${command} ${args.join(" ")}`);
@@ -27,7 +37,42 @@ const commandExists = (command) => {
   }
 };
 
-const ensureLocalEnv = () => {
+const portIsBusy = (port) =>
+  new Promise((resolve) => {
+    const socket = net.createConnection({ host: "127.0.0.1", port });
+    let settled = false;
+
+    const finish = (busy) => {
+      if (settled) return;
+      settled = true;
+      socket.destroy();
+      resolve(busy);
+    };
+
+    socket.setTimeout(500, () => finish(false));
+    socket.once("connect", () => finish(true));
+    socket.once("error", (error) => finish(error.code !== "ECONNREFUSED"));
+  });
+
+const waitForPort = async (name, port, attempts = 60) => {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    if (await portIsBusy(port)) {
+      console.log(`✓ ${name} is listening on 127.0.0.1:${port}`);
+      return;
+    }
+
+    if (attempt < attempts) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+
+  throw new Error(
+    `${name} did not become reachable on 127.0.0.1:${port} within ${attempts} seconds. ` +
+      "Run `docker compose ps` and `docker compose logs firebase` (or the relevant service) for details."
+  );
+};
+
+const ensureBackendEnv = () => {
   if (!existsSync(backendEnvTemplate)) {
     throw new Error("backend/.env.intern.example is missing.");
   }
@@ -79,6 +124,58 @@ const ensureLocalEnv = () => {
   }
 };
 
+const ensureFrontendEnv = () => {
+  const requiredValues = {
+    VITE_FIREBASE_API_KEY: "pragati-local-development-key",
+    VITE_FIREBASE_AUTH_DOMAIN: "pragati-local.firebaseapp.com",
+    VITE_FIREBASE_PROJECT_ID: "pragati-local",
+    VITE_FIREBASE_STORAGE_BUCKET: "pragati-local.appspot.com",
+    VITE_FIREBASE_MESSAGING_SENDER_ID: "pragati-local",
+    VITE_FIREBASE_APP_ID: "pragati-local",
+    VITE_FIREBASE_AUTH_EMULATOR_HOST: "127.0.0.1:59099",
+  };
+
+  let envText = existsSync(frontendEnv) ? readFileSync(frontendEnv, "utf8") : "";
+  let changed = false;
+
+  for (const [key, value] of Object.entries(requiredValues)) {
+    const pattern = new RegExp(`^${key}=.*$`, "m");
+    const replacement = `${key}=${value}`;
+
+    if (pattern.test(envText)) {
+      const next = envText.replace(pattern, replacement);
+      if (next !== envText) changed = true;
+      envText = next;
+    } else {
+      envText = `${envText.trimEnd()}${envText.trim() ? "\n" : ""}${replacement}\n`;
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    writeFileSync(frontendEnv, envText);
+    console.log("✓ Configured frontend for the local Firebase Auth emulator.");
+  } else {
+    console.log("✓ frontend/.env.local already uses the local Firebase configuration.");
+  }
+};
+
+const checkDedicatedPorts = async () => {
+  const busy = [];
+
+  for (const [name, port] of Object.entries(LOCAL_PORTS)) {
+    if (await portIsBusy(port)) busy.push(`${name} (${port})`);
+  }
+
+  if (busy.length > 0) {
+    throw new Error(
+      `Required Pragati local port(s) are already in use: ${busy.join(", ")}. ` +
+        "Close the application using the port and rerun npm run setup:dev. " +
+        "Pragati deliberately uses dedicated high ports so native PostgreSQL/Redis installations on 5432/6379 can remain running."
+    );
+  }
+};
+
 const main = async () => {
   console.log("============================================");
   console.log(" Pragati - Local Intern Development Setup");
@@ -99,7 +196,9 @@ const main = async () => {
   console.log("\nChecking Docker Compose...");
   run("docker", ["compose", "version"]);
 
-  ensureLocalEnv();
+  ensureBackendEnv();
+  ensureFrontendEnv();
+  await checkDedicatedPorts();
 
   console.log("\nValidating Docker Compose configuration...");
   run("docker", ["compose", "config", "-q"]);
@@ -108,9 +207,7 @@ const main = async () => {
     run("docker", ["compose", "up", "-d", "postgres", "redis", "firebase"]);
   } catch {
     throw new Error(
-      "Docker could not start the Pragati local services. A dedicated host port may already be in use. " +
-        "Pragati uses PostgreSQL 55432, Redis 56379, Firebase UI 54000, Firestore 58080, and Auth 59099. " +
-        "Stop the process using the conflicting port and rerun npm run setup:dev."
+      "Docker could not start the Pragati local services. Check Docker Desktop and confirm the dedicated local ports are free."
     );
   }
 
@@ -122,14 +219,21 @@ const main = async () => {
       postgresReady = true;
       break;
     } catch {
-      if (attempt === 30) break;
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1000);
+      if (attempt < 30) await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 
   if (!postgresReady) {
     throw new Error("PostgreSQL did not become ready in time. Run `docker compose logs postgres` for details.");
   }
+
+  console.log("\nWaiting for Firebase emulators to become reachable...");
+  await waitForPort("Firebase UI", LOCAL_PORTS.firebaseUi);
+  await waitForPort("Firestore emulator", LOCAL_PORTS.firestore);
+  await waitForPort("Firebase Auth emulator", LOCAL_PORTS.firebaseAuth);
+
+  console.log("\nWaiting for Redis to become reachable...");
+  await waitForPort("Redis", LOCAL_PORTS.redis);
 
   run("npm", ["install"], backendDir);
   run("npm", ["install"], frontendDir);

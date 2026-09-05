@@ -37,7 +37,7 @@ services:
     container_name: pragati-local-firebase
     restart: unless-stopped
     working_dir: /workspace
-    command: ["firebase", "emulators:start", "--only", "auth,firestore", "--project", "pragati-local", "--host", "0.0.0.0"]
+    command: ["firebase", "emulators:start", "--only", "auth,firestore", "--project", "pragati-local"]
     ports:
       - "127.0.0.1:54000:4000"
       - "127.0.0.1:58080:8080"

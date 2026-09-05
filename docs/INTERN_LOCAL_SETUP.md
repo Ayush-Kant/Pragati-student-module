@@ -53,13 +53,14 @@ This command:
 
 1. Verifies Node.js and Docker Compose.
 2. Creates or repairs the local `backend/.env` infrastructure settings.
-3. Checks that Pragati's dedicated local ports are available.
-4. Starts PostgreSQL, Redis, and Firebase emulators through Docker Compose.
-5. Waits for PostgreSQL to become ready.
-6. Installs backend dependencies.
-7. Installs frontend dependencies.
-8. Authenticates against PostgreSQL using the exact connection the backend will use.
-9. Runs the backend database migrations.
+3. Creates or repairs the ignored `frontend/.env.local` Firebase emulator settings.
+4. Checks that Pragati's dedicated local ports are available.
+5. Starts PostgreSQL, Redis, and Firebase emulators through Docker Compose.
+6. Waits for PostgreSQL, Redis, Firebase Auth, Firestore, and the Firebase UI to become reachable.
+7. Installs backend dependencies.
+8. Installs frontend dependencies.
+9. Authenticates against PostgreSQL using the exact connection the backend will use.
+10. Runs the backend database migrations.
 
 The command does not copy or use production credentials.
 
@@ -103,7 +104,7 @@ Open the frontend at `http://localhost:5173`.
 
 ## 6. Local student authentication
 
-The backend is configured to use the Firebase Auth emulator when `FIREBASE_AUTH_EMULATOR_HOST` is present. Student registration therefore uses the same backend authentication path as the application, but accounts are created only in the local emulator.
+The backend is configured to use the Firebase Auth emulator when `FIREBASE_AUTH_EMULATOR_HOST` is present. The frontend setup also points Firebase Auth at the same local emulator. Student registration therefore uses the same application authentication flow, but the account is created only in the local emulator.
 
 Register a student through the application using a development email address and a password that meets the application's student password rules.
 
@@ -288,6 +289,17 @@ npm --prefix backend run check:db
 
 The command tests the same `POSTGRESQL_URI` used by the backend. If it reports that the local configuration is wrong, rerun `npm run setup:dev` from the repository root so the required local infrastructure settings in `backend/.env` are repaired.
 
+### Firebase emulator is restarting or registration says ECONNREFUSED
+
+Run:
+
+```bash
+docker compose ps
+docker compose logs --tail=200 firebase
+```
+
+A healthy Firebase service should be `Up`, not `Restarting` or `Exited`. The setup script waits for the Firebase UI, Firestore emulator, and Auth emulator ports before completing, so a fresh setup should stop here with a diagnostic error instead of reporting a false success.
+
 ### Need a completely clean local database
 
 Run:
@@ -300,13 +312,15 @@ npm run setup:dev
 
 ### Firebase credential error
 
-Check that the local backend environment contains:
+For local development the backend should contain:
 
 ```env
 FIREBASE_PROJECT_ID=pragati-local
 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:59099
 FIRESTORE_EMULATOR_HOST=127.0.0.1:58080
 ```
+
+The setup also creates an ignored `frontend/.env.local` that points the browser's Firebase Auth SDK to `127.0.0.1:59099`.
 
 Do not add a production service-account key just to make local development work.
 
@@ -349,4 +363,4 @@ Express API :5000
        Firestore host :58080 → container :8080
 ```
 
-No production service is required for the basic development workflow.
+No production Firebase Auth project is required for the basic local student registration workflow.
