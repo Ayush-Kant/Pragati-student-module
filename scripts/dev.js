@@ -3,14 +3,12 @@ import path from "node:path";
 import process from "node:process";
 
 const children = [];
-
-const npmCli = process.platform === "win32"
-  ? path.join(process.env.APPDATA || process.env.LOCALAPPDATA || "", "npm", "node_modules", "npm", "bin", "npm-cli.js")
-  : "npm";
+const root = process.cwd();
+const comSpec = process.env.ComSpec || "cmd.exe";
 
 const start = (label, args, cwd) => {
   const child = process.platform === "win32"
-    ? spawn(process.execPath, [npmCli, ...args], {
+    ? spawn(comSpec, ["/d", "/s", "/c", `npm ${args.join(" ")}`], {
         cwd,
         stdio: "inherit",
         shell: false,
@@ -41,12 +39,8 @@ const start = (label, args, cwd) => {
   return child;
 };
 
-const root = process.cwd();
-const backendDir = path.join(root, "backend");
-const frontendDir = path.join(root, "frontend");
-
-start("Backend", ["run", "dev"], backendDir);
-start("Frontend", ["run", "dev"], frontendDir);
+start("Backend", ["run", "dev"], path.join(root, "backend"));
+start("Frontend", ["run", "dev"], path.join(root, "frontend"));
 
 const shutdown = () => {
   for (const child of children) {
