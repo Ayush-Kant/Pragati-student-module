@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:55432:5432"
     volumes:
       - pragati-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -22,7 +22,7 @@ services:
     container_name: pragati-local-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "127.0.0.1:56379:6379"
     volumes:
       - pragati-redis-data:/data
     healthcheck:
@@ -39,9 +39,9 @@ services:
     working_dir: /workspace
     command: ["firebase", "emulators:start", "--only", "auth,firestore", "--project", "pragati-local", "--host", "0.0.0.0"]
     ports:
-      - "4000:4000"
-      - "8080:8080"
-      - "9099:9099"
+      - "127.0.0.1:54000:4000"
+      - "127.0.0.1:58080:8080"
+      - "127.0.0.1:59099:9099"
     volumes:
       - ./:/workspace
       - pragati-firebase-cache:/root/.cache
