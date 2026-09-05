@@ -3,6 +3,7 @@ import path from "node:path";
 import process from "node:process";
 
 const scripts = [
+  "installStudentStarterData.js",
   "seedStudentCollege.js",
   "seedStudentDemoData.js",
   "seedStudentInterviews.js",
@@ -13,6 +14,7 @@ console.log("============================================");
 console.log(" Pragati - Student Demo Data Seeder");
 console.log("============================================");
 console.log("This command is non-destructive: it does not run the legacy full seed.js truncation script.");
+console.log("Starter data is account-agnostic: existing students are backfilled and future student registrations are seeded automatically.");
 
 for (const script of scripts) {
   console.log(`\n▶ Running ${script}`);
@@ -36,4 +38,4 @@ for (const script of scripts) {
 console.log("\n============================================");
 console.log(" Student demo data seed completed");
 console.log("============================================");
-console.log("The local database now has the student demo profile/content plus interview and notification scenarios.");
+console.log("All existing student accounts have starter data, and the database trigger will seed new student accounts automatically.");
