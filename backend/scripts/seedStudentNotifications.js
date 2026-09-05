@@ -1,18 +1,20 @@
 import "dotenv/config";
 import { pool } from "../config/db.js";
 
-const DEMO_EMAIL = "student@demo.edu";
+const PREFERRED_EMAIL = "student@demo.edu";
 
 const seed = async () => {
   const result = await pool.query(
-    `SELECT u.id AS "userId", s.id AS "studentId", s.name
-     FROM users u JOIN students s ON s.user_id = u.id
-     WHERE LOWER(s.email) = LOWER($1::text) LIMIT 1`,
-    [DEMO_EMAIL],
+    `SELECT u.id AS "userId", s.id AS "studentId", s.name, s.email
+     FROM users u
+     JOIN students s ON s.user_id = u.id
+     ORDER BY CASE WHEN LOWER(s.email) = LOWER($1::text) THEN 0 ELSE 1 END, s.id
+     LIMIT 1`,
+    [PREFERRED_EMAIL],
   );
 
-  if (!result.rows[0]) throw new Error(`Student ${DEMO_EMAIL} was not found.`);
-  const { userId, studentId, name } = result.rows[0];
+  if (!result.rows[0]) throw new Error("No student with a linked user account was found. Register a student first.");
+  const { userId, studentId, name, email } = result.rows[0];
 
   // Domain/event scenarios already used by the student notification flow.
   const rows = [
@@ -58,7 +60,7 @@ const seed = async () => {
   );
 
   console.log(
-    `Seeded/verified notification scenarios for ${name} (${DEMO_EMAIL}), user ${userId}, student ${studentId}.`,
+    `Seeded/verified notification scenarios for ${name} (${email}), user ${userId}, student ${studentId}.`,
   );
   console.table(summary.rows);
 };
