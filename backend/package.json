@@ -9,10 +9,11 @@
     "migrate": "node scripts/migrate.js",
     "test": "node --test",
     "seed:student-college": "node scripts/seedStudentCollege.js",
-    "verify:firebase": "node scripts/checkFirebaseAdmin.js",
     "seed:student-interviews": "node scripts/seedStudentInterviews.js",
     "seed:student-notifications": "node scripts/seedStudentNotifications.js",
-    "seed:student-demo": "node scripts/seedStudentDemoData.js"
+    "seed:student-demo": "node scripts/seedStudentDemoData.js",
+    "seed:student-all": "node scripts/seedStudentAllData.js",
+    "verify:firebase": "node scripts/checkFirebaseAdmin.js"
   },
   "author": "",
   "license": "ISC",
