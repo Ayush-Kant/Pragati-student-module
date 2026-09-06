@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import ProfileMenu from "./ProfileMenu";
 import NotificationBell from "./NotificationBell";
+import ThemeToggle from "../../../../components/common/ThemeToggle";
+import { useTheme } from "../../../../context/ThemeContext";
 
 export default function StudentDashboardHeader({
   user,
@@ -9,20 +11,39 @@ export default function StudentDashboardHeader({
   onLogout
 }) {
   const [profileOpen, setProfileOpen] = useState(false);
+  const { isDark } = useTheme();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-8">
+    <header
+      className={`sticky top-0 z-30 flex h-16 items-center justify-between border-b px-4 md:px-8 transition-colors duration-300 ${
+        isDark
+          ? "bg-[#111827] border-gray-800 text-white"
+          : "bg-white border-gray-200 text-gray-900"
+      }`}
+    >
       <div className="flex items-center gap-4">
         <button
           onClick={onToggleSidebar}
-          className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 md:hidden"
+          className={`rounded-lg p-2 md:hidden transition-colors duration-200 ${
+            isDark
+              ? "text-gray-400 hover:bg-gray-800 hover:text-gray-200"
+              : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+          }`}
+          aria-label="Toggle navigation menu"
         >
           <span className="text-xl">☰</span>
         </button>
-        <span className="text-xl font-bold tracking-tight text-gray-900">PRAGATI</span>
+        <span
+          className={`text-xl font-bold tracking-tight transition-colors duration-300 ${
+            isDark ? "text-white" : "text-gray-900"
+          }`}
+        >
+          PRAGATI
+        </span>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+        <ThemeToggle />
         <NotificationBell unreadCount={unreadCount} />
         <ProfileMenu
           user={user}

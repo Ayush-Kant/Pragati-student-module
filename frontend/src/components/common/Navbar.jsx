@@ -1,3 +1,5 @@
+import ThemeToggle from "./ThemeToggle";
+
 const Navbar = () => {
   return (
     <div
@@ -7,12 +9,14 @@ const Navbar = () => {
         color: "white",
         display: "flex",
         alignItems: "center",
+        justifyContent: "space-between",
         padding: "0 20px",
         fontSize: "22px",
         fontWeight: "bold",
       }}
     >
-      Pragati Placement Portal
+      <span>Pragati Placement Portal</span>
+      <ThemeToggle />
     </div>
   );
 };

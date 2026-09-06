@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:is(.dark, .dark *));
+
 html,
 body,
 #root {
@@ -10,21 +12,33 @@ body,
 
 html {
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark {
+  color-scheme: dark;
+  background-color: #0b0f19;
+  color: #f8fafc;
 }
 
 body {
   min-height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body {
+  background-color: #0b0f19;
+  color: #f8fafc;
 }
 
 /*
  * Pragati student UI foundation
  * --------------------------------
- * The student area intentionally uses a restrained slate + indigo palette.
- * Existing Tailwind utility classes remain usable, but the student shell
- * normalizes the older blue/gray variants so every student module reads as
- * one product instead of a collection of separately styled pages.
+ * The student area uses a restrained slate + indigo palette.
+ * In light mode: clean white surfaces and slate text.
+ * In dark mode: dark slate/navy surfaces, crisp text, and indigo accents.
  */
 .student-shell {
   --student-bg: #f8fafc;
@@ -46,9 +60,260 @@ body {
   background-color: var(--student-bg);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Slate replaces the legacy neutral gray scale inside the student shell. */
+/* Dark mode palette for student shell */
+html.dark .student-shell,
+.dark .student-shell,
+.student-shell.dark {
+  --student-bg: #0b0f19;
+  --student-surface: #111827;
+  --student-surface-muted: #1e293b;
+  --student-border: #1f293d;
+  --student-border-soft: #1e293b;
+  --student-text: #f1f5f9;
+  --student-text-strong: #ffffff;
+  --student-text-muted: #94a3b8;
+  --student-text-subtle: #64748b;
+  --student-primary-50: #1e1b4b;
+  --student-primary-100: #2e2875;
+  --student-primary-500: #818cf8;
+  --student-primary-600: #6366f1;
+  --student-primary-700: #4f46e5;
+  --student-primary-800: #4338ca;
+  color: var(--student-text);
+  background-color: var(--student-bg);
+}
+
+/* Smooth global transitions for theme switching */
+html,
+body,
+#root,
+.student-shell,
+main,
+section,
+article,
+div,
+aside,
+header,
+nav,
+button,
+input,
+select,
+textarea {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/*
+ * Navigation Bar Theming:
+ * In light mode: clean white surface with high-contrast text and crisp border.
+ * In dark mode: dark slate surface (#111827) with crisp white text and dark borders.
+ */
+html:not(.dark) header.sticky,
+html:not(.dark) header.fixed,
+html:not(.dark) nav,
+html:not(.dark) .navbar,
+html:not(.dark) .student-shell header.sticky,
+html:not(.dark) .student-shell header.fixed,
+html:not(.dark) .student-shell nav {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+html:not(.dark) header.sticky .text-gray-900,
+html:not(.dark) header.sticky .text-slate-900,
+html:not(.dark) .student-shell header.sticky .text-gray-900,
+html:not(.dark) .student-shell header.sticky .text-slate-900 {
+  color: #111827 !important;
+}
+
+html:not(.dark) header.sticky .text-gray-800,
+html:not(.dark) header.sticky .text-slate-800,
+html:not(.dark) .student-shell header.sticky .text-gray-800,
+html:not(.dark) .student-shell header.sticky .text-slate-800 {
+  color: #1f2937 !important;
+}
+
+html:not(.dark) header.sticky .text-gray-700,
+html:not(.dark) header.sticky .text-slate-700,
+html:not(.dark) .student-shell header.sticky .text-gray-700,
+html:not(.dark) .student-shell header.sticky .text-slate-700 {
+  color: #374151 !important;
+}
+
+html:not(.dark) header.sticky .text-gray-600,
+html:not(.dark) header.sticky .text-slate-600,
+html:not(.dark) .student-shell header.sticky .text-gray-600,
+html:not(.dark) .student-shell header.sticky .text-slate-600 {
+  color: #4b5563 !important;
+}
+
+html:not(.dark) header.sticky .text-gray-500,
+html:not(.dark) header.sticky .text-slate-500,
+html:not(.dark) .student-shell header.sticky .text-gray-500,
+html:not(.dark) .student-shell header.sticky .text-slate-500 {
+  color: #6b7280 !important;
+}
+
+html:not(.dark) header.sticky .border-gray-200,
+html:not(.dark) header.sticky .border-slate-200,
+html:not(.dark) .student-shell header.sticky .border-gray-200,
+html:not(.dark) .student-shell header.sticky .border-slate-200 {
+  border-color: #e5e7eb !important;
+}
+
+html:not(.dark) header.sticky button:hover,
+html:not(.dark) nav button:hover,
+html:not(.dark) .student-shell header.sticky button:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* Page banners with gradients or text-white must always have crisp white text in both light and dark mode */
+header[class*="bg-gradient"],
+.student-shell header[class*="bg-gradient"],
+header.text-white,
+.student-shell header.text-white {
+  color: #ffffff !important;
+}
+
+header[class*="bg-gradient"] h1,
+.student-shell header[class*="bg-gradient"] h1,
+header.text-white h1,
+.student-shell header.text-white h1,
+header[class*="bg-gradient"] p,
+.student-shell header[class*="bg-gradient"] p {
+  color: #ffffff !important;
+}
+
+/* Dark mode navigation bar styling */
+html.dark header.sticky,
+html.dark header.fixed,
+html.dark nav,
+html.dark .navbar,
+html.dark .student-shell header.sticky,
+html.dark .student-shell header.fixed,
+html.dark .student-shell nav {
+  background-color: #111827 !important;
+  border-color: #1f293d !important;
+  color: #f8fafc !important;
+}
+
+html.dark header .bg-white,
+html.dark nav .bg-white,
+html.dark .student-shell header .bg-white,
+html.dark .student-shell nav .bg-white {
+  background-color: #111827 !important;
+}
+
+html.dark header .text-gray-900,
+html.dark header .text-slate-900,
+html.dark .student-shell header .text-gray-900,
+html.dark .student-shell header .text-slate-900 {
+  color: #ffffff !important;
+}
+
+html.dark header .text-gray-800,
+html.dark header .text-slate-800,
+html.dark .student-shell header .text-gray-800,
+html.dark .student-shell header .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+
+html.dark header .text-gray-700,
+html.dark header .text-slate-700,
+html.dark .student-shell header .text-gray-700,
+html.dark .student-shell header .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+html.dark header .text-gray-600,
+html.dark header .text-slate-600,
+html.dark .student-shell header .text-gray-600,
+html.dark .student-shell header .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+html.dark header .text-gray-500,
+html.dark header .text-slate-500,
+html.dark .student-shell header .text-gray-500,
+html.dark .student-shell header .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark header .border-gray-200,
+html.dark header .border-slate-200,
+html.dark .student-shell header .border-gray-200,
+html.dark .student-shell header .border-slate-200 {
+  border-color: #1f293d !important;
+}
+
+/* Header interactive hover states in dark mode */
+html.dark header button:hover,
+html.dark nav button:hover,
+html.dark .student-shell header button:hover {
+  background-color: #1e293b !important;
+}
+
+/* Header dropdown panels in light mode */
+html:not(.dark) header .shadow-lg,
+html:not(.dark) header .shadow-xl,
+html:not(.dark) .student-shell header .shadow-lg,
+html:not(.dark) .student-shell header .shadow-xl {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+html:not(.dark) header .shadow-lg p,
+html:not(.dark) header .shadow-xl p,
+html:not(.dark) .student-shell header .shadow-lg p,
+html:not(.dark) .student-shell header .shadow-xl p {
+  color: #111827 !important;
+}
+
+html:not(.dark) header .shadow-lg p.text-xs,
+html:not(.dark) header .shadow-xl p.text-xs,
+html:not(.dark) .student-shell header .shadow-lg p.text-xs,
+html:not(.dark) .student-shell header .shadow-xl p.text-xs {
+  color: #64748b !important;
+}
+
+html:not(.dark) header .shadow-lg a,
+html:not(.dark) header .shadow-xl a,
+html:not(.dark) .student-shell header .shadow-lg a,
+html:not(.dark) .student-shell header .shadow-xl a {
+  color: #374151 !important;
+}
+
+html:not(.dark) header .shadow-lg a:hover,
+html:not(.dark) header .shadow-xl a:hover,
+html:not(.dark) .student-shell header .shadow-lg a:hover,
+html:not(.dark) .student-shell header .shadow-xl a:hover {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Header dropdown panels in dark mode */
+html.dark header .shadow-lg,
+html.dark header .shadow-xl,
+html.dark .student-shell header .shadow-lg,
+html.dark .student-shell header .shadow-xl {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html.dark header .shadow-lg *,
+html.dark header .shadow-xl *,
+html.dark .student-shell header .shadow-lg *,
+html.dark .student-shell header .shadow-xl * {
+  border-color: #334155 !important;
+}
+
+/* Light mode Slate mappings */
 .student-shell .bg-gray-50 { background-color: var(--student-bg) !important; }
 .student-shell .bg-gray-100 { background-color: var(--student-surface-muted) !important; }
 .student-shell .bg-gray-200 { background-color: #e2e8f0 !important; }
@@ -62,7 +327,61 @@ body {
 .student-shell .border-gray-100 { border-color: var(--student-border-soft) !important; }
 .student-shell .border-gray-50 { border-color: #f8fafc !important; }
 
-/* Indigo is the single student product accent. */
+/* Dark mode explicit overrides for student shell components */
+html.dark .student-shell .bg-white {
+  background-color: var(--student-surface) !important;
+}
+html.dark .student-shell .bg-gray-50,
+html.dark .student-shell .bg-slate-50 {
+  background-color: var(--student-bg) !important;
+}
+html.dark .student-shell .bg-gray-100,
+html.dark .student-shell .bg-slate-100 {
+  background-color: var(--student-surface-muted) !important;
+}
+html.dark .student-shell .bg-gray-200,
+html.dark .student-shell .bg-slate-200 {
+  background-color: #1e293b !important;
+}
+html.dark .student-shell .text-gray-900,
+html.dark .student-shell .text-slate-900 {
+  color: var(--student-text-strong) !important;
+}
+html.dark .student-shell .text-gray-800,
+html.dark .student-shell .text-slate-800 {
+  color: var(--student-text-strong) !important;
+}
+html.dark .student-shell .text-gray-700,
+html.dark .student-shell .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+html.dark .student-shell .text-gray-600,
+html.dark .student-shell .text-slate-600 {
+  color: #94a3b8 !important;
+}
+html.dark .student-shell .text-gray-500,
+html.dark .student-shell .text-slate-500 {
+  color: var(--student-text-muted) !important;
+}
+html.dark .student-shell .border-gray-200,
+html.dark .student-shell .border-gray-100,
+html.dark .student-shell .border-slate-200,
+html.dark .student-shell .border-slate-100 {
+  border-color: var(--student-border) !important;
+}
+html.dark .student-shell input:not([type="checkbox"]):not([type="radio"]),
+html.dark .student-shell select,
+html.dark .student-shell textarea {
+  background-color: #1a233a !important;
+  color: #f1f5f9 !important;
+  border-color: var(--student-border) !important;
+}
+html.dark .student-shell input::placeholder,
+html.dark .student-shell textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Indigo accent */
 .student-shell .bg-blue-50,
 .student-shell .bg-indigo-50 { background-color: var(--student-primary-50) !important; }
 .student-shell .bg-blue-100,
@@ -92,14 +411,13 @@ body {
 .student-shell [class*="bg-blue-50/"] { background-color: rgb(238 242 255 / 0.5) !important; }
 .student-shell [class*="bg-indigo-50/"] { background-color: rgb(238 242 255 / 0.5) !important; }
 
-/* Student hero cards use the same indigo primary as the rest of the product. */
+/* Student hero cards */
 .student-shell header.bg-gradient-to-br.p-5.text-white,
 .student-shell header.bg-gradient-to-br.sm\:p-7 {
   background-image: none !important;
   background-color: var(--student-primary-600) !important;
 }
 
-/* Remove other promotional gradients from student page heroes. */
 .student-shell .bg-gradient-to-br,
 .student-shell .bg-gradient-to-r,
 .student-shell .bg-gradient-to-b {
@@ -107,7 +425,7 @@ body {
   background-color: #0f172a !important;
 }
 
-/* Keep blue/indigo hover states on the same accent scale. */
+/* Hover states */
 .student-shell .hover\:bg-blue-50:hover,
 .student-shell .hover\:bg-indigo-50:hover { background-color: var(--student-primary-50) !important; }
 .student-shell .hover\:bg-blue-600:hover,
@@ -117,7 +435,7 @@ body {
 .student-shell .hover\:text-blue-700:hover,
 .student-shell .hover\:text-indigo-700:hover { color: var(--student-primary-700) !important; }
 
-/* Make primary focus states coherent across forms. */
+/* Focus states */
 .student-shell .focus\:ring-blue-500:focus,
 .student-shell .focus\:ring-indigo-500:focus {
   --tw-ring-color: rgb(99 102 241 / 0.35) !important;
@@ -126,3 +444,19 @@ body {
 .student-shell .focus\:border-indigo-500:focus {
   border-color: var(--student-primary-500) !important;
 }
+
+/* Universal Dark Mode styles for non-student views (Company, College, Mentor, Admin, Auth) */
+html.dark .card,
+html.dark .bg-card {
+  background-color: #111827;
+  border-color: #1f293d;
+  color: #f1f5f9;
+}
+
+html.dark .shadow-xl,
+html.dark .shadow-lg,
+html.dark .shadow-md,
+html.dark .shadow-sm {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+}
+

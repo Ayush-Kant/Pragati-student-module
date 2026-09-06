@@ -16,6 +16,7 @@ import {
 } from '../../firebase/studentFirebaseAuth';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
+import ThemeToggle from '../../components/common/ThemeToggle';
 
 const initialFormData = {
   fullName: '',
@@ -279,8 +280,9 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#FFFBF7] p-4 md:p-8 font-sans antialiased">
-      <div className="max-w-4xl w-full bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col md:flex-row relative p-4 gap-4 border border-gray-100">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#FFFBF7] dark:bg-[#0b0f19] p-4 md:p-8 font-sans antialiased relative transition-colors duration-300">
+      <ThemeToggle variant="floating" />
+      <div className="max-w-4xl w-full bg-white dark:bg-[#111827] rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col md:flex-row relative p-4 gap-4 border border-gray-100 dark:border-slate-800 transition-colors duration-300">
         <div className={`w-full md:w-[48%] ${currentTheme.bgColor} rounded-[24px] p-6 md:p-8 flex flex-col justify-between text-white transition-all duration-700 ease-in-out relative min-h-[490px] md:min-h-[540px]`}>
           <div className="text-2xl font-black tracking-tight bg-white/15 inline-block px-4 py-1.5 rounded-xl backdrop-blur-md border border-white/10 self-start shadow-sm">
             Uptoskills
@@ -387,7 +389,7 @@ const RegisterPage = () => {
               />
 
               <div className="space-y-1">
-                <label htmlFor="password" className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">
+                <label htmlFor="password" className="block text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider pl-1">
                   Password
                 </label>
                 <div className="relative">
@@ -399,24 +401,24 @@ const RegisterPage = () => {
                     onChange={handleChange}
                     autoComplete="new-password"
                     placeholder={isStudent ? 'At least 8 characters' : '••••••••'}
-                    className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm pr-12 ${errors.password ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 ${currentTheme.focusRing} ${currentTheme.focusBorder}`}`}
+                    className={`block w-full px-4 py-3 bg-white dark:bg-slate-800 border rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm pr-12 ${errors.password ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 dark:border-slate-700 ${currentTheme.focusRing} ${currentTheme.focusBorder}`}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((value) => !value)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-bold text-gray-400 hover:text-gray-700 transition-colors focus:outline-none"
+                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-bold text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
                   >
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
                 {formData.password && (
                   <div className="mt-1.5 space-y-1 px-1">
-                    <div className="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
+                    <div className="w-full bg-gray-100 dark:bg-slate-700 h-1 rounded-full overflow-hidden">
                       <div className={`h-full ${strength.color} ${strength.width} transition-all duration-300`} />
                     </div>
-                    <div className="flex justify-between items-center text-[10px] text-gray-400 font-medium">
+                    <div className="flex justify-between items-center text-[10px] text-gray-400 dark:text-gray-400 font-medium">
                       <span>Password strength:</span>
-                      <span className="font-bold text-gray-600">{strength.label}</span>
+                      <span className="font-bold text-gray-600 dark:text-gray-300">{strength.label}</span>
                     </div>
                   </div>
                 )}
@@ -424,7 +426,7 @@ const RegisterPage = () => {
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="confirmPassword" className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">
+                <label htmlFor="confirmPassword" className="block text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider pl-1">
                   Confirm Password
                 </label>
                 <div className="relative">
@@ -436,12 +438,12 @@ const RegisterPage = () => {
                     onChange={handleChange}
                     autoComplete="new-password"
                     placeholder="Repeat password"
-                    className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm pr-12 ${errors.confirmPassword ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 ${currentTheme.focusRing} ${currentTheme.focusBorder}`}`}
+                    className={`block w-full px-4 py-3 bg-white dark:bg-slate-800 border rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm pr-12 ${errors.confirmPassword ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 dark:border-slate-700 ${currentTheme.focusRing} ${currentTheme.focusBorder}`}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword((value) => !value)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-bold text-gray-400 hover:text-gray-700 transition-colors focus:outline-none"
+                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-bold text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
                   >
                     {showConfirmPassword ? 'Hide' : 'Show'}
                   </button>
@@ -460,20 +462,20 @@ const RegisterPage = () => {
               {isStudent && (
                 <>
                   <div className="flex items-center gap-3 py-1">
-                    <div className="h-px flex-1 bg-gray-200" />
+                    <div className="h-px flex-1 bg-gray-200 dark:bg-slate-700" />
                     <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">or</span>
-                    <div className="h-px flex-1 bg-gray-200" />
+                    <div className="h-px flex-1 bg-gray-200 dark:bg-slate-700" />
                   </div>
 
                   <button
                     type="button"
                     disabled={submitting}
                     onClick={handleGoogleStudentRegistration}
-                    className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Continue with Google
                   </button>
-                  <p className="text-[11px] text-gray-400 text-center leading-relaxed">
+                  <p className="text-[11px] text-gray-400 dark:text-gray-400 text-center leading-relaxed">
                     Google sign-up uses the College ID above to create or link your student account.
                   </p>
                 </>
@@ -502,7 +504,7 @@ const RegisterPage = () => {
 function Field({ id, label, name, value, onChange, placeholder, type = 'text', inputMode, error, autoComplete }) {
   return (
     <div className="space-y-1">
-      <label htmlFor={id} className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">
+      <label htmlFor={id} className="block text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider pl-1">
         {label}
       </label>
       <input
@@ -514,7 +516,7 @@ function Field({ id, label, name, value, onChange, placeholder, type = 'text', i
         placeholder={placeholder}
         inputMode={inputMode}
         autoComplete={autoComplete}
-        className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm ${error ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : 'border-gray-200 focus:ring-blue-500/20 focus:border-blue-500'}`}
+        className={`block w-full px-4 py-3 bg-white dark:bg-slate-800 border rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 font-medium focus:outline-none focus:ring-2 transition-all text-sm shadow-sm ${error ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : 'border-gray-200 dark:border-slate-700 focus:ring-blue-500/20 focus:border-blue-500'}`}
       />
       {error && <p className="text-xs text-red-500 font-medium pl-1">{error}</p>}
     </div>

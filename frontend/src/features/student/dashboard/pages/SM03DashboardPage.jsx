@@ -219,7 +219,7 @@ export default function SM03DashboardPage() {
               </div>
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-100">Student dashboard • SM-03</div>
-                <h1 className="mt-1 text-2xl font-black tracking-tight sm:text-3xl">Welcome back, {name} 👋</h1>
+                <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">Welcome back, {name} 👋</h1>
                 <p className="mt-1 text-sm text-blue-100">{email}</p>
               </div>
             </div>

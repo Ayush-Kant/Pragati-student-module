@@ -135,9 +135,8 @@ import {
   FaBell,
   FaSearch,
   FaBars,
-  FaMoon,
-  FaSun,
 } from "react-icons/fa";
+import ThemeToggle from "../../../components/common/ThemeToggle";
 
 
 function AdminNavbar({
@@ -222,20 +221,7 @@ function AdminNavbar({
       <div className="flex items-center gap-4">
 
         {/* Dark Mode Toggle */}
-        
-           <button
-         onClick={() => setDarkMode(!darkMode)}
-        className={`
-        p-2 rounded-full border transition-all duration-300
-        ${
-         darkMode
-           ? "bg-gray-800 border-gray-600 text-yellow-400"
-           : "bg-white border-gray-300 text-gray-600"
-         }
-       `}
-       >
-        {darkMode ? <FaSun size={16} /> : <FaMoon size={16} />}
-       </button>
+        <ThemeToggle />
           
 
         {/* Notification */}

@@ -5,6 +5,8 @@ import { registerStudentApi, loginStudentApi } from "./services/studentAuth.serv
 import { signInStudentWithPassword, getFirebaseIdToken } from "../../firebase/studentFirebaseAuth";
 import { useAuth } from "../../context/AuthContext";
 
+import ThemeToggle from "../../components/common/ThemeToggle";
+
 const initialForm = { fullName: "", email: "", password: "", confirmPassword: "", collegeId: "" };
 
 export default function StudentRegisterPage() {
@@ -55,15 +57,16 @@ export default function StudentRegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-xl rounded-2xl bg-white border border-slate-200 shadow-xl p-6 sm:p-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] flex items-center justify-center p-4 relative transition-colors duration-300">
+      <ThemeToggle variant="floating" />
+      <div className="w-full max-w-xl rounded-2xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 shadow-xl p-6 sm:p-8 transition-colors duration-300">
         <div className="mb-6">
-          <p className="text-xs font-bold tracking-widest uppercase text-blue-600">Pragati Student</p>
-          <h1 className="text-3xl font-black text-slate-900 mt-2">Create your student account</h1>
-          <p className="text-sm text-slate-500 mt-2">Your account is secured by Firebase and the Pragati student session layer.</p>
+          <p className="text-xs font-bold tracking-widest uppercase text-blue-600 dark:text-blue-400">Pragati Student</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white mt-2">Create your student account</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Your account is secured by Firebase and the Pragati student session layer.</p>
         </div>
 
-        {error && <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+        {error && <div className="mb-5 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 px-4 py-3 text-sm text-red-700 dark:text-red-400">{error}</div>}
 
         <form onSubmit={submit} className="space-y-4" noValidate>
           <Field label="Full name" value={form.fullName} onChange={(v) => set("fullName", v)} placeholder="Arjun Sharma" />
@@ -72,13 +75,13 @@ export default function StudentRegisterPage() {
           <Field label="Password" value={form.password} onChange={(v) => set("password", v)} placeholder="At least 8 characters" type="password" />
           <Field label="Confirm password" value={form.confirmPassword} onChange={(v) => set("confirmPassword", v)} placeholder="Repeat password" type="password" />
 
-          <button disabled={saving} className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 disabled:opacity-60">
+          <button disabled={saving} className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 disabled:opacity-60 transition-colors">
             {saving ? "Creating account…" : "Create student account"}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-slate-500">
-          Already registered? <button className="font-bold text-blue-600 hover:underline" onClick={() => navigate("/student/login")}>Sign in</button>
+        <div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+          Already registered? <button className="font-bold text-blue-600 dark:text-blue-400 hover:underline" onClick={() => navigate("/student/login")}>Sign in</button>
         </div>
       </div>
     </div>
@@ -88,8 +91,15 @@ export default function StudentRegisterPage() {
 function Field({ label, value, onChange, placeholder, type = "text", inputMode }) {
   return (
     <label className="block">
-      <span className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">{label}</span>
-      <input value={value} onChange={(e) => onChange(e.target.value)} type={type} inputMode={inputMode} placeholder={placeholder} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+      <span className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">{label}</span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        type={type}
+        inputMode={inputMode}
+        placeholder={placeholder}
+        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 transition-colors"
+      />
     </label>
   );
 }

@@ -10,6 +10,7 @@ import {
   signInStudentWithPassword,
 } from '../../firebase/studentFirebaseAuth';
 import { useAuth } from '../../context/AuthContext';
+import ThemeToggle from '../../components/common/ThemeToggle';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -169,8 +170,9 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#FFFBF7] p-4 md:p-8 font-sans antialiased">
-      <div className="max-w-4xl w-full bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col md:flex-row relative p-4 gap-4 border border-gray-100">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#FFFBF7] dark:bg-[#0b0f19] p-4 md:p-8 font-sans antialiased relative transition-colors duration-300">
+      <ThemeToggle variant="floating" />
+      <div className="max-w-4xl w-full bg-white dark:bg-[#111827] rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col md:flex-row relative p-4 gap-4 border border-gray-100 dark:border-slate-800 transition-colors duration-300">
 
         {/* LEFT */}
         <div className={`w-full md:w-[48%] ${current.bgColor} rounded-[24px] p-6 md:p-8 flex flex-col justify-between text-white transition-all duration-700 ease-in-out relative min-h-[490px] md:min-h-[540px]`}>
@@ -218,7 +220,7 @@ const AuthPage = () => {
 
             <form className="space-y-4" onSubmit={handleSubmit} noValidate>
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">Email Address</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider pl-1">Email Address</label>
                 <input
                   id="email"
                   name="email"
@@ -227,13 +229,13 @@ const AuthPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all duration-200 text-sm shadow-sm ${errors.email ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 ${current.focusRing} ${current.focusBorder}`}`}
+                  className={`block w-full px-4 py-3 bg-white dark:bg-slate-800 border rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 font-medium focus:outline-none focus:ring-2 transition-all duration-200 text-sm shadow-sm ${errors.email ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 dark:border-slate-700 ${current.focusRing} ${current.focusBorder}`}`}
                 />
                 {errors.email && <p className="text-xs text-red-500 font-medium pl-1 mt-0.5">{errors.email}</p>}
               </div>
 
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider pl-1">Password</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider pl-1">Password</label>
                 <div className="relative">
                   <input
                     id="password"
@@ -243,12 +245,12 @@ const AuthPage = () => {
                     onChange={handleChange}
                     placeholder="••••••••"
                     autoComplete="current-password"
-                    className={`block w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 font-medium focus:outline-none focus:ring-2 transition-all duration-200 text-sm shadow-sm pr-12 ${errors.password ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 ${current.focusRing} ${current.focusBorder}`}`}
+                    className={`block w-full px-4 py-3 bg-white dark:bg-slate-800 border rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 font-medium focus:outline-none focus:ring-2 transition-all duration-200 text-sm shadow-sm pr-12 ${errors.password ? 'border-red-400 focus:ring-red-500/20 focus:border-red-400' : `border-gray-200 dark:border-slate-700 ${current.focusRing} ${current.focusBorder}`}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors focus:outline-none"
                   >
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
@@ -284,7 +286,7 @@ const AuthPage = () => {
               <button
                 type="button"
                 onClick={() => navigate('/student/login')}
-                className="text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-xs font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
               >
                 Student / Firebase login
               </button>
