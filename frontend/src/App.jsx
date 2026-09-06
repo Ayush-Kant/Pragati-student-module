@@ -20,9 +20,12 @@ import collegeRoute from "./features/college/routes/AppRoutes";
 import NotFoundPage from "./routes/NotFoundPage";
 import CompanyRoute from "./features/company/routes/CompanyRoute";
 
+import { ThemeProvider } from "./context/ThemeContext";
+
 function App() {
   return (
-    <AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
       <Toaster />
       <ToastContainer />
       <Routes>
@@ -46,6 +49,7 @@ function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AuthProvider>
+    </ThemeProvider>
   );
 }
 

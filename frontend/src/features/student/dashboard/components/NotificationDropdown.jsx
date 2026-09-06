@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ArrowRight, Bell, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getNotifications, markNotificationRead, markNotificationsRead } from "../../../../services/notification.service";
+import { useTheme } from "../../../../context/ThemeContext";
 
 const formatRelativeTime = (value) => {
   const date = new Date(value);
@@ -21,6 +22,7 @@ const formatRelativeTime = (value) => {
 const NotificationDropdown = ({ onUnreadCountChange, onClose }) => {
   const navigate = useNavigate();
   const panelRef = useRef(null);
+  const { isDark } = useTheme();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -77,12 +79,28 @@ const NotificationDropdown = ({ onUnreadCountChange, onClose }) => {
   return (
     <div
       ref={panelRef}
-      className="absolute right-0 top-12 z-50 w-[min(380px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
+      className={`absolute right-0 top-12 z-50 w-[min(380px,calc(100vw-2rem))] overflow-hidden rounded-2xl border shadow-xl transition-colors duration-200 ${
+        isDark
+          ? "border-gray-700 bg-[#1e293b] text-white"
+          : "border-slate-200 bg-white text-slate-900"
+      }`}
     >
-      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+      <div
+        className={`flex items-center justify-between border-b px-4 py-3 ${
+          isDark ? "border-gray-700" : "border-slate-100"
+        }`}
+      >
         <div>
-          <h3 className="text-sm font-semibold text-slate-900">Notifications</h3>
-          <p className="text-xs text-slate-500">Your latest 10 updates</p>
+          <h3
+            className={`text-sm font-semibold ${
+              isDark ? "text-white" : "text-slate-900"
+            }`}
+          >
+            Notifications
+          </h3>
+          <p className={`text-xs ${isDark ? "text-gray-400" : "text-slate-500"}`}>
+            Your latest 10 updates
+          </p>
         </div>
         <button
           type="button"
@@ -90,7 +108,9 @@ const NotificationDropdown = ({ onUnreadCountChange, onClose }) => {
             onClose?.();
             navigate("/student/notifications");
           }}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700"
+          className={`inline-flex items-center gap-1 text-xs font-semibold ${
+            isDark ? "text-indigo-400 hover:text-indigo-300" : "text-blue-600 hover:text-blue-700"
+          }`}
         >
           View all <ArrowRight size={13} />
         </button>
@@ -100,16 +120,37 @@ const NotificationDropdown = ({ onUnreadCountChange, onClose }) => {
         {loading ? (
           <div className="space-y-2 p-3">
             {Array.from({ length: 4 }, (_, index) => (
-              <div key={index} className="h-16 animate-pulse rounded-xl bg-slate-100" />
+              <div
+                key={index}
+                className={`h-16 animate-pulse rounded-xl ${
+                  isDark ? "bg-gray-800" : "bg-slate-100"
+                }`}
+              />
             ))}
           </div>
         ) : notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
-            <div className="mb-3 rounded-full bg-blue-50 p-3 text-blue-600">
+            <div
+              className={`mb-3 rounded-full p-3 ${
+                isDark ? "bg-indigo-900/30 text-indigo-400" : "bg-blue-50 text-blue-600"
+              }`}
+            >
               <Bell size={20} />
             </div>
-            <p className="text-sm font-semibold text-slate-900">You're all caught up</p>
-            <p className="mt-1 text-xs text-slate-500">New platform updates will appear here.</p>
+            <p
+              className={`text-sm font-semibold ${
+                isDark ? "text-white" : "text-slate-900"
+              }`}
+            >
+              You're all caught up
+            </p>
+            <p
+              className={`mt-1 text-xs ${
+                isDark ? "text-gray-400" : "text-slate-500"
+              }`}
+            >
+              New platform updates will appear here.
+            </p>
           </div>
         ) : (
           notifications.map((notification) => (
@@ -117,30 +158,50 @@ const NotificationDropdown = ({ onUnreadCountChange, onClose }) => {
               key={notification.id}
               type="button"
               onClick={() => openNotification(notification)}
-              className="flex w-full items-start gap-3 border-b border-slate-100 px-4 py-3 text-left transition hover:bg-slate-50"
+              className={`flex w-full items-start gap-3 border-b px-4 py-3 text-left transition ${
+                isDark
+                  ? "border-gray-700/60 hover:bg-gray-800/60"
+                  : "border-slate-100 hover:bg-slate-50"
+              }`}
             >
               <div
                 className={`mt-0.5 rounded-lg p-2 ${
                   notification.isRead
-                    ? "bg-slate-100 text-slate-500"
-                    : "bg-blue-50 text-blue-600"
+                    ? isDark
+                      ? "bg-gray-800 text-gray-400"
+                      : "bg-slate-100 text-slate-500"
+                    : isDark
+                      ? "bg-indigo-900/40 text-indigo-300"
+                      : "bg-blue-50 text-blue-600"
                 }`}
               >
                 {notification.isRead ? <CheckCircle2 size={15} /> : <Bell size={15} />}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="truncate text-sm font-semibold text-slate-900">
+                  <p
+                    className={`truncate text-sm font-semibold ${
+                      isDark ? "text-white" : "text-slate-900"
+                    }`}
+                  >
                     {notification.title}
                   </p>
                   {!notification.isRead && (
                     <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-600" />
                   )}
                 </div>
-                <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-600">
+                <p
+                  className={`mt-1 line-clamp-2 text-xs leading-5 ${
+                    isDark ? "text-gray-300" : "text-slate-600"
+                  }`}
+                >
                   {notification.message || notification.body}
                 </p>
-                <p className="mt-1 text-[11px] text-slate-400">
+                <p
+                  className={`mt-1 text-[11px] ${
+                    isDark ? "text-gray-400" : "text-slate-400"
+                  }`}
+                >
                   {formatRelativeTime(notification.createdAt)}
                 </p>
               </div>

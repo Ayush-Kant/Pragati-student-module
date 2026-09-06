@@ -2,10 +2,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import NotificationDropdown from "./NotificationDropdown";
 import { getNotifications } from "../../../../services/notification.service";
+import { useTheme } from "../../../../context/ThemeContext";
 
 export default function NotificationBell({ unreadCount = 0 }) {
   const [count, setCount] = useState(Number(unreadCount) || 0);
   const [open, setOpen] = useState(false);
+  const { isDark } = useTheme();
 
   const refreshCount = useCallback(async () => {
     try {
@@ -25,7 +27,11 @@ export default function NotificationBell({ unreadCount = 0 }) {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative rounded-full p-2 text-gray-600 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-100"
+        className={`relative rounded-full p-2 transition-colors duration-300 focus:outline-none focus:ring-2 ${
+          isDark
+            ? "text-gray-300 hover:bg-gray-800 hover:text-white focus:ring-gray-700"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:ring-blue-100"
+        }`}
         aria-label={count > 0 ? `View notifications, ${count} unread` : "View notifications"}
         aria-expanded={open}
         aria-haspopup="dialog"

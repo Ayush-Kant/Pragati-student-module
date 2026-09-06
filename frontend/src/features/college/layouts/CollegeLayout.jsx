@@ -6,13 +6,14 @@ import CollegeNavbar from "../navbar/components/navbar";
 import CollegeSidebar from "../components/CollegeSidebar";
 import MobileSidebar from "../dashboard/components/layout/MobileSidebar";
 import CollegeFooter from "../components/CollegeFooter";
+import { useTheme } from "../../../context/ThemeContext";
 
 const CollegeLayout = () => {
   // Sidebar Toggle
   const [openSidebar, setOpenSidebar] = useState(false);
 
-  // Dark Mode
-  const [darkMode, setDarkMode] = useState(true);
+  // Global Dark Mode
+  const { isDark: darkMode, toggleTheme: setDarkMode } = useTheme();
 
   const navigate = useNavigate();
   const location = useLocation();

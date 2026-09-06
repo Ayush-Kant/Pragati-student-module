@@ -11,6 +11,7 @@ import {
   signInStudentWithPassword,
 } from "../../firebase/studentFirebaseAuth";
 import { useAuth } from "../../context/AuthContext";
+import ThemeToggle from "../../components/common/ThemeToggle";
 
 export default function StudentLoginPage() {
   const navigate = useNavigate();
@@ -93,26 +94,41 @@ export default function StudentLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-xl p-6 sm:p-8">
-        <p className="text-xs font-bold tracking-widest uppercase text-blue-600">Pragati Student</p>
-        <h1 className="text-3xl font-black text-slate-900 mt-2">Welcome back</h1>
-        <p className="text-sm text-slate-500 mt-2 mb-6">Sign in with your Firebase student account.</p>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] flex items-center justify-center p-4 relative transition-colors duration-300">
+      <ThemeToggle variant="floating" />
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 shadow-xl p-6 sm:p-8 transition-colors duration-300">
+        <p className="text-xs font-bold tracking-widest uppercase text-blue-600 dark:text-blue-400">Pragati Student</p>
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white mt-2">Welcome back</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 mb-6">Sign in with your Firebase student account.</p>
 
-        {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+        {error && <div className="mb-4 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 px-4 py-3 text-sm text-red-700 dark:text-red-400">{error}</div>}
 
         <form onSubmit={submit} className="space-y-4">
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" placeholder="student@college.edu" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete="current-password" placeholder="Password" className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
-          <button disabled={loading} className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 disabled:opacity-60">
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            autoComplete="email"
+            placeholder="student@college.edu"
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 transition-colors"
+          />
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            autoComplete="current-password"
+            placeholder="Password"
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 transition-colors"
+          />
+          <button disabled={loading} className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 disabled:opacity-60 transition-colors">
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
-        <button disabled={loading} onClick={googleLogin} className="w-full mt-3 rounded-xl border border-slate-200 bg-white py-3 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-60">Continue with Google</button>
-        <button disabled={loading} onClick={useExistingSession} className="w-full mt-3 text-xs font-semibold text-slate-400 hover:text-slate-600">Restore existing student session</button>
+        <button disabled={loading} onClick={googleLogin} className="w-full mt-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-3 font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-60 transition-colors">Continue with Google</button>
+        <button disabled={loading} onClick={useExistingSession} className="w-full mt-3 text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">Restore existing student session</button>
 
-        <p className="mt-6 text-center text-sm text-slate-500">New student? <button className="font-bold text-blue-600 hover:underline" onClick={() => navigate("/student/register")}>Create an account</button></p>
+        <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">New student? <button className="font-bold text-blue-600 dark:text-blue-400 hover:underline" onClick={() => navigate("/student/register")}>Create an account</button></p>
       </div>
     </div>
   );
