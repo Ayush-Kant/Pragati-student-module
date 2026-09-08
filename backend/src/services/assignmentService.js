@@ -74,6 +74,49 @@ class AssignmentService {
         return assignmentFeedbackModel.addFeedback(assignmentId, studentId, input);
     }
 
+    static async getFeedback(assignmentId, studentId) {
+        const assignment = await assignmentModel.getAssignmentById(assignmentId, studentId);
+        if (!assignment) throw normalizeError('Assignment not found', 404);
+
+        const feedback = await assignmentFeedbackModel.getFeedback(assignmentId, studentId);
+        if (!feedback) throw normalizeError('No feedback yet — submission pending review', 404);
+
+        const rubric = Array.isArray(feedback.inlineComments)
+            ? feedback.inlineComments
+            : feedback.inlineComments && typeof feedback.inlineComments === 'object'
+                ? Object.entries(feedback.inlineComments).map(([criterion, value]) => {
+                    if (value && typeof value === 'object') {
+                        return {
+                            criterion,
+                            score: value.score ?? null,
+                            maxScore: value.maxScore ?? value.max_score ?? null,
+                            comment: value.comment ?? value.remarks ?? '',
+                        };
+                    }
+                    return { criterion, score: null, maxScore: null, comment: String(value ?? '') };
+                })
+                : [];
+
+        const totalScore = feedback.score != null
+            ? feedback.score
+            : Number.isFinite(Number(feedback.grade))
+                ? Number(feedback.grade)
+                : null;
+        const gradedAt = feedback.gradeCreatedAt || feedback.feedbackCreatedAt || null;
+        const resubmissionAllowed = Boolean(
+            feedback.allowResubmission
+            && feedback.latestAttempt < feedback.maxResubmissions + 1,
+        );
+
+        return {
+            totalScore,
+            rubric,
+            generalComment: feedback.gradeRemarks || feedback.remarks || '',
+            gradedAt,
+            resubmissionAllowed,
+        };
+    }
+
     static async addGrade(assignmentId, studentId, input) {
         const assignment = await assignmentModel.getAssignmentById(assignmentId);
         if (!assignment) throw normalizeError('Assignment not found', 404);

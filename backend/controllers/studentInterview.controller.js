@@ -28,7 +28,15 @@ export const getInterview = async (req, res, next) => {
 
 export const confirmInterview = async (req, res, next) => {
   try {
-    res.json({ success: true, data: await studentInterviewService.confirmInterview(req.user, parseId(req.params.interviewId)) });
+    const interviewId = parseId(req.params.interviewId);
+    const result = await studentInterviewService.confirmInterview(req.user, interviewId);
+    res.json({
+      success: true,
+      message: 'Interview confirmed',
+      interviewId: result.id,
+      confirmedAt: result.confirmedAt,
+      data: result,
+    });
   } catch (error) {
     next(error);
   }
@@ -42,4 +50,13 @@ export const joinInterview = async (req, res, next) => {
   }
 };
 
-export default { listInterviews, getInterview, confirmInterview, joinInterview };
+export const getInterviewOutcome = async (req, res, next) => {
+  try {
+    const outcome = await studentInterviewService.getInterviewOutcome(req.user, parseId(req.params.interviewId));
+    res.json({ success: true, outcome, data: outcome });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { listInterviews, getInterview, confirmInterview, joinInterview, getInterviewOutcome };
