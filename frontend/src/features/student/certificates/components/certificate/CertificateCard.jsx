@@ -74,15 +74,15 @@ const CertificateCard = ({
   };
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md">
       {/* Certificate visual header */}
-      <div className="relative overflow-hidden border-b border-slate-100 bg-slate-50 px-4 py-5 sm:px-5 sm:py-6">
-        <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-slate-200/50" />
-        <div className="absolute -bottom-10 -left-8 h-24 w-24 rounded-full bg-slate-200/40" />
+      <div className="relative overflow-hidden border-b border-slate-100 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-800/50 px-4 py-5 sm:px-5 sm:py-6">
+        <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-slate-200/50 dark:bg-slate-700/30" />
+        <div className="absolute -bottom-10 -left-8 h-24 w-24 rounded-full bg-slate-200/40 dark:bg-slate-700/20" />
 
         <div className="relative">
           <div className="flex items-start justify-between gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-slate-700 shadow-sm ring-1 ring-slate-200 sm:h-12 sm:w-12">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 sm:h-12 sm:w-12">
               <Award
                 className="h-5 w-5 sm:h-6 sm:w-6"
                 strokeWidth={1.8}
@@ -97,11 +97,11 @@ const CertificateCard = ({
           </div>
 
           <div className="mt-5">
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500">
               Certificate
             </p>
 
-            <h3 className="mt-1.5 line-clamp-2 min-h-[3.5rem] text-base font-bold leading-6 text-slate-900 sm:text-lg">
+            <h3 className="mt-1.5 line-clamp-2 min-h-[3.5rem] text-base font-bold leading-6 text-slate-900 dark:text-white sm:text-lg">
               {title || "Untitled Certificate"}
             </h3>
           </div>
@@ -113,7 +113,7 @@ const CertificateCard = ({
         <div className="space-y-3">
           {/* Issue date */}
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
               <CalendarDays
                 className="h-4 w-4"
                 aria-hidden="true"
@@ -121,11 +121,11 @@ const CertificateCard = ({
             </div>
 
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Issued on
               </p>
 
-              <p className="mt-0.5 text-sm font-semibold text-slate-700">
+              <p className="mt-0.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
                 {formatCertificateDate(
                   issueDate
                 )}
@@ -134,29 +134,29 @@ const CertificateCard = ({
           </div>
 
           {/* Certificate ID */}
-          <div className="rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+          <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-3.5 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               Certificate ID
             </p>
 
-            <p className="mt-1 break-all font-mono text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
+            <p className="mt-1 break-all font-mono text-xs font-semibold tracking-wide text-slate-700 dark:text-slate-200 sm:text-sm">
               {id || "N/A"}
             </p>
           </div>
 
           {/* Verification */}
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 px-3.5 py-3">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3.5 py-3">
             <div className="flex min-w-0 items-center gap-2.5">
               <ShieldCheck
                 className={`h-4 w-4 shrink-0 ${
                   verified
-                    ? "text-emerald-600"
-                    : "text-slate-400"
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-slate-400 dark:text-slate-500"
                 }`}
                 aria-hidden="true"
               />
 
-              <span className="truncate text-xs font-medium text-slate-600 sm:text-sm">
+              <span className="truncate text-xs font-medium text-slate-600 dark:text-slate-300 sm:text-sm">
                 Verification
               </span>
             </div>
@@ -174,7 +174,7 @@ const CertificateCard = ({
             <button
               type="button"
               onClick={handleView}
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-700 transition-colors duration-200 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2 sm:text-sm"
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700 focus:ring-offset-2 sm:text-sm cursor-pointer"
             >
               <Eye
                 className="h-4 w-4"
@@ -191,7 +191,7 @@ const CertificateCard = ({
                 !issued ||
                 downloadLoading
               }
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-semibold text-white transition-colors duration-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 sm:text-sm"
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-slate-900 dark:bg-[#4F46E5] px-3 py-2.5 text-xs font-semibold text-white transition-colors duration-200 hover:bg-slate-800 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-indigo-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-slate-800 disabled:text-slate-400 dark:disabled:text-slate-600 sm:text-sm cursor-pointer"
             >
               {downloadLoading ? (
                 <>

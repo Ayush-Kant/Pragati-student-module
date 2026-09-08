@@ -68,7 +68,7 @@ const CertificateHistory = ({
       {/* Certificate history */}
       <div className="mt-5">
         {certificateHistoryLoading ? (
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-8 shadow-sm sm:px-5 sm:py-10">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] px-4 py-8 shadow-sm sm:px-5 sm:py-10">
             <LoadingSpinner
               size="md"
               label="Loading certificate history..."
@@ -114,7 +114,7 @@ const CertificateHistory = ({
       {/* Download history */}
       <div className="mt-8 sm:mt-10">
         {downloadHistoryLoading ? (
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-8 shadow-sm sm:px-5 sm:py-10">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] px-4 py-8 shadow-sm sm:px-5 sm:py-10">
             <LoadingSpinner
               size="md"
               label="Loading download history..."

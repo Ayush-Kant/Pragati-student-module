@@ -15,7 +15,7 @@ export default function StudentDashboardHeader({
 
   return (
     <header
-      className={`sticky top-0 z-30 flex h-16 items-center justify-between border-b px-4 md:px-8 transition-colors duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-30 flex h-16 w-full items-center justify-between border-b px-4 md:px-8 transition-colors duration-300 ${
         isDark
           ? "bg-[#111827] border-gray-800 text-white"
           : "bg-white border-gray-200 text-gray-900"

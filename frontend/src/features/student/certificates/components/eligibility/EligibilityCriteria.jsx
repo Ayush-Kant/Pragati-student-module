@@ -77,10 +77,10 @@ const EligibilityCriteria = ({
           return (
             <div
               key={key}
-              className="rounded-xl border border-slate-100 bg-white p-4 shadow-sm sm:p-5"
+              className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#111827] p-4 shadow-sm sm:p-5"
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 sm:h-10 sm:w-10">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 sm:h-10 sm:w-10">
                   <Icon
                     className="h-4 w-4 sm:h-5 sm:w-5"
                     strokeWidth={1.8}
@@ -90,7 +90,7 @@ const EligibilityCriteria = ({
 
                 {completed ? (
                   <CheckCircle2
-                    className="h-4 w-4 shrink-0 text-emerald-600"
+                    className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
                     strokeWidth={2.2}
                     aria-label="Completed"
                   />
@@ -98,20 +98,20 @@ const EligibilityCriteria = ({
               </div>
 
               <div className="mt-4">
-                <p className="text-xs font-semibold leading-5 text-slate-600 sm:text-sm">
+                <p className="text-xs font-semibold leading-5 text-slate-600 dark:text-slate-400 sm:text-sm">
                   {label}
                 </p>
 
                 <div className="mt-3 flex items-end justify-between gap-3">
-                  <p className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+                  <p className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                     {normalizedValue}%
                   </p>
 
                   <span
                     className={`text-[10px] font-semibold sm:text-xs ${
                       completed
-                        ? "text-emerald-600"
-                        : "text-slate-400"
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-slate-400 dark:text-slate-500"
                     }`}
                   >
                     {completed
@@ -121,12 +121,12 @@ const EligibilityCriteria = ({
                 </div>
               </div>
 
-              <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-100">
+              <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     completed
                       ? "bg-emerald-500"
-                      : "bg-slate-800"
+                      : "bg-[#4F46E5]"
                   }`}
                   style={{
                     width: `${normalizedValue}%`,
