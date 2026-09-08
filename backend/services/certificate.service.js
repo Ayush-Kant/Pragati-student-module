@@ -667,7 +667,6 @@ export const revokeCertificateById = async (id) => {
 
 export default {
   evaluateCertificateEligibility,
-  validateCompletionCriteria,
   issueCertificate,
   autoIssueCertificatesForStudent,
   getCertificateById,
