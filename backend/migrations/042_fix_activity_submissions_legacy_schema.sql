@@ -102,6 +102,33 @@ BEGIN
   END IF;
 END $$;
 
+-- SM-07 assessment submissions use activity_type = 'assessment'. Preserve the
+-- existing legacy activity types while allowing the canonical assessment value.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conrelid = 'activity_submissions'::regclass
+      AND conname = 'activity_submissions_activity_type_check'
+  ) THEN
+    ALTER TABLE activity_submissions
+      DROP CONSTRAINT activity_submissions_activity_type_check;
+  END IF;
+
+  ALTER TABLE activity_submissions
+    ADD CONSTRAINT activity_submissions_activity_type_check
+    CHECK (
+      activity_type::text = ANY (ARRAY[
+        'assignment',
+        'project',
+        'quiz',
+        'task',
+        'assessment'
+      ]::text[])
+    );
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_sm07_activity_submissions_attempt
   ON activity_submissions(attempt_id);
 
