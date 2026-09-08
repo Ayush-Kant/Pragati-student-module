@@ -1,5 +1,22 @@
 BEGIN;
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- SM-13 dependency: the certificate service expects this table to exist even
+-- on a clean database where no legacy certificate schema was created.
+-- CREATE TABLE IF NOT EXISTS preserves any existing certificate table/rows.
+CREATE TABLE IF NOT EXISTS certificates (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  drive_id INTEGER NOT NULL REFERENCES recruitment_drives(id) ON DELETE CASCADE,
+  certificate_url TEXT,
+  verify_uuid UUID NOT NULL DEFAULT gen_random_uuid(),
+  score NUMERIC(5,2),
+  issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  revoked BOOLEAN NOT NULL DEFAULT FALSE,
+  revoked_at TIMESTAMPTZ
+);
+
 -- Existing develop databases may already have an older activity_submissions
 -- table used by the placement/activity APIs. Migration 039 only created the
 -- modern shape when the table was absent, so those older tables can be missing
@@ -87,5 +104,11 @@ END $$;
 
 CREATE INDEX IF NOT EXISTS idx_sm07_activity_submissions_attempt
   ON activity_submissions(attempt_id);
+
+CREATE INDEX IF NOT EXISTS idx_certificates_student_drive
+  ON certificates(student_id, drive_id);
+
+CREATE INDEX IF NOT EXISTS idx_certificates_verification_code
+  ON certificates(verification_code);
 
 COMMIT;
