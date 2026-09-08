@@ -38,21 +38,21 @@ const CertificateStatusBadge = ({
       label: "Issued",
       icon: CheckCircle2,
       classes:
-        "border-emerald-100 bg-emerald-50 text-emerald-700",
+        "border-emerald-100 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300",
     },
 
     [CERTIFICATE_STATUS.PENDING.toLowerCase()]: {
       label: "Pending",
       icon: Clock3,
       classes:
-        "border-amber-100 bg-amber-50 text-amber-700",
+        "border-amber-100 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300",
     },
 
     [CERTIFICATE_STATUS.REVOKED.toLowerCase()]: {
       label: "Revoked",
       icon: XCircle,
       classes:
-        "border-red-100 bg-red-50 text-red-700",
+        "border-red-100 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300",
     },
   };
 
@@ -61,21 +61,21 @@ const CertificateStatusBadge = ({
       label: "Verified",
       icon: ShieldCheck,
       classes:
-        "border-emerald-100 bg-emerald-50 text-emerald-700",
+        "border-emerald-100 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300",
     },
 
     [VERIFICATION_STATUS.UNVERIFIED.toLowerCase()]: {
       label: "Unverified",
       icon: ShieldAlert,
       classes:
-        "border-slate-200 bg-slate-50 text-slate-600",
+        "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400",
     },
 
     [VERIFICATION_STATUS.INVALID.toLowerCase()]: {
       label: "Invalid",
       icon: ShieldAlert,
       classes:
-        "border-red-100 bg-red-50 text-red-700",
+        "border-red-100 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300",
     },
   };
 

@@ -19,7 +19,7 @@ const SubmissionForm = ({ projectId: _projectId, submissionState, formErrors, ex
   const handleSubmit = (e) => { e.preventDefault(); onSubmit({ ...form, reportFile }); };
   const stateLabel = getSubmissionStateLabel(submissionState);
   const stateColor = getSubmissionStateColor(submissionState);
-  const inputClass = 'w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-gray-800 text-gray-200 text-sm placeholder-gray-600 focus:outline-none focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/20 hover:border-gray-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+  const inputClass = 'w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-gray-800 text-slate-900 dark:text-gray-200 text-sm placeholder-slate-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#4F46E5] focus:ring-2 focus:ring-[#4F46E5]/20 hover:border-slate-300 dark:hover:border-gray-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-6">

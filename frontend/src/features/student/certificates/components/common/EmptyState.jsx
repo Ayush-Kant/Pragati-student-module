@@ -22,9 +22,9 @@ const EmptyState = ({
 }) => {
   return (
     <div
-      className={`w-full rounded-2xl border border-slate-200 bg-white px-5 py-10 text-center shadow-sm sm:px-8 sm:py-12 md:px-10 md:py-14 ${className}`}
+      className={`w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] px-5 py-10 text-center shadow-sm sm:px-8 sm:py-12 md:px-10 md:py-14 ${className}`}
     >
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 sm:h-14 sm:w-14">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 sm:h-14 sm:w-14">
         <Icon
           className="h-6 w-6 sm:h-7 sm:w-7"
           strokeWidth={1.8}
@@ -32,11 +32,11 @@ const EmptyState = ({
         />
       </div>
 
-      <h3 className="mt-5 text-base font-bold text-slate-900 sm:text-lg">
+      <h3 className="mt-5 text-base font-bold text-slate-900 dark:text-white sm:text-lg">
         {title}
       </h3>
 
-      <p className="mx-auto mt-2 max-w-md text-xs leading-5 text-slate-500 sm:text-sm sm:leading-6">
+      <p className="mx-auto mt-2 max-w-md text-xs leading-5 text-slate-500 dark:text-slate-400 sm:text-sm sm:leading-6">
         {description}
       </p>
 
@@ -44,7 +44,7 @@ const EmptyState = ({
         <button
           type="button"
           onClick={onAction}
-          className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-semibold text-white transition-colors duration-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2 sm:px-5 sm:text-sm"
+          className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 dark:bg-[#4F46E5] px-4 py-2.5 text-xs font-semibold text-white transition-colors duration-200 hover:bg-slate-800 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-indigo-400 focus:ring-offset-2 sm:px-5 sm:text-sm cursor-pointer"
         >
           <span>{actionLabel}</span>
 

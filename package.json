@@ -1,10 +1,15 @@
 {
   "name": "pragati-root",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "npm run dev --prefix frontend",
-    "build": "npm run build --prefix frontend",
+    "setup:dev": "node scripts/setup-dev.js",
+    "dev": "node scripts/dev.js",
     "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "lint": "npm run lint --prefix frontend",
+    "test:backend": "npm test --prefix backend",
     "seed:student": "npm run seed:student-all --prefix backend",
     "seed:student-all": "npm run seed:student-all --prefix backend",
     "colleges:list": "npm run colleges:list --prefix backend"
@@ -13,5 +18,8 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "react-hot-toast": "^2.6.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

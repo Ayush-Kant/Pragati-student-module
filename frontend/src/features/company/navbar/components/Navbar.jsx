@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { GlobalSearch } from "./GlobalSearch";
 import { useAuth } from "../../../../context/AuthContext";
+import ThemeToggle from "../../../../components/common/ThemeToggle";
 
 import { FiBell, FiSettings, FiSearch, FiMenu } from "react-icons/fi";
 import {
@@ -644,6 +645,11 @@ const Navbar = ({ openSidebar, setOpenSidebar }) => {
                 onMarkAllRead={handleMarkAllRead}
               />
             )}
+          </div>
+
+          {/* Theme Toggle */}
+          <div className="flex items-center">
+            <ThemeToggle />
           </div>
 
           {/* Settings icon */}

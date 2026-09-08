@@ -26,6 +26,7 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "../../../../context/AuthContext";
+import ThemeToggle from "../../../../components/common/ThemeToggle";
 
 export default function MentorLayout() {
   const { logout } = useAuth();
@@ -285,29 +286,30 @@ export default function MentorLayout() {
       {/* 2. RIGHT SIDE CONTENT CANVAS */}
       <div className="flex min-w-0 flex-1 flex-col overflow-y-auto w-full lg:ml-[260px]">
         {/* Top Header Navigation Bar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white p-3 lg:px-6">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] p-3 lg:px-6 transition-colors duration-300">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 text-slate-500 hover:text-slate-700 focus:outline-none"
+              className="lg:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 focus:outline-none"
             >
               <Menu className="w-6 h-6" />
             </button>
             {/* Search */}
             <div className="relative hidden sm:block w-[240px] md:w-[320px]">
-              <span className="absolute left-3.5 top-2.5 text-slate-400">
+              <span className="absolute left-3.5 top-2.5 text-slate-400 dark:text-slate-500">
                 <Search className="h-4 w-4 mt-0.5" />
               </span>
               <input
                 type="text"
                 placeholder="Search for opportunities, profiles..."
-                className="w-full rounded-full border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                className="w-full rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 py-2.5 pl-10 pr-4 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
               />
             </div>
           </div>
 
-          {/* User Profile */}
-          <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+          {/* User Profile & Actions */}
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+            <ThemeToggle />
             {/* Added the notification bell option */}
             <NotificationBell />
 

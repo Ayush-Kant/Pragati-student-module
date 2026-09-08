@@ -20,9 +20,10 @@ const seed = async () => {
         `INSERT INTO interviews
           (application_id, student_id, scheduled_at, title, interviewer_id, meeting_link,
            interview_type, result, status, attendance, feedback)
-         SELECT NULL, $1, NOW() + ($2 * INTERVAL '1 day'), $3, NULL, $4, $5, $6, $7, $8, $9
+         SELECT NULL, $1::integer, NOW() + ($2::integer * INTERVAL '1 day'), $3::text, NULL, $4::text,
+                $5::text, $6::text, $7::text, $8::text, $9::text
          WHERE NOT EXISTS (
-           SELECT 1 FROM interviews WHERE student_id = $1 AND title = $3
+           SELECT 1 FROM interviews WHERE student_id = $1::integer AND title = $3::text
          )`,
         [student.id, interview.offset, interview.title, interview.meeting, interview.type, interview.result, interview.status, interview.attendance, interview.feedback],
       );

@@ -9,6 +9,7 @@ export const getAssignments = async ({ status } = {}) => {
 
 export const getAssignmentById = async (id) => unwrap(await api.get(`/student/assignments/${id}`));
 export const getAssignmentSubmission = async (id) => unwrap(await api.get(`/student/assignments/${id}/submission`));
+export const getAssignmentFeedback = async (id) => unwrap(await api.get(`/student/assignments/${id}/feedback`));
 export const getAssignmentSubmissions = async () => unwrap(await api.get('/student/assignments/submissions'));
 
 export const submitAssignment = async (id, payload) => {

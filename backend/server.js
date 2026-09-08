@@ -66,12 +66,14 @@ import collegeCommunicationAnnouncementsRoutes from "./routes/collegeCommunicati
 import companiesRoutes from "./routes/companies.routes.js";
 import assignmentRoutes from "./src/routes/assignmentRoutes.js";
 import certificatesRouter from "./routes/certificates.routes.js";
+import { verifyCertificate } from "./controllers/certificates.controller.js";
 import badgesRouter from "./routes/badges.routes.js";
 import { getStudentBadgesController } from "./controllers/badges.controller.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 import mentorHiringRoutes from "./routes/mentorHiring.routes.js";
 import notificationsRoutes from "./routes/notifications.routes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
+import certificateAutoGenerationJob from "./jobs/certificateAutoGeneration.job.js";
 
 dotenv.config();
 console.log("POSTGRESQL_URI =", process.env.POSTGRESQL_URI);
@@ -114,6 +116,9 @@ app.use("/api/student/dashboard", dashboardRoutes);
 app.use("/api/student/notifications", notificationRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/public", express.static(path.join(__dirname, "public")));
+
+// SM-13: public certificate verification endpoint. No authentication required.
+app.get("/api/verify/:verificationCode", verifyCertificate);
 
 app.use("/api/v1/admin/dashboard", adminDashboardRoutes);
 app.use("/api/v1/admin/colleges", adminCollegeRoutes);
@@ -175,6 +180,8 @@ connectDB()
     catch (error) { console.error("⚠️ Assignment module initialization failed:", error.message); }
     startNotificationDigestScheduler();
     console.log("✅ Student notification digest scheduler started");
+    certificateAutoGenerationJob.start();
+    console.log("✅ Certificate auto-generation scheduler started");
     app.listen(PORT, () => console.log(`✅ Server running on PORT : ${PORT}`));
   })
   .catch((err) => console.error("⚠️ PostgreSQL connection failed:", err.message));

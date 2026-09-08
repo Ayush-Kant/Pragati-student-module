@@ -4,6 +4,7 @@ import CompanyFooter from "../components/CompanyFooter";
 import CompanySideBar from "../components/CompanySideBar";
 import CompanyNavBar from "../navbar/components/Navbar";
 import { useCompanyProfile } from "../hooks/useCompanyProfile";
+import { useTheme } from "../../../context/ThemeContext";
 
 const CompanyLayout = () => {
 
@@ -17,8 +18,8 @@ const CompanyLayout = () => {
   // Sidebar Toggle
   const [openSidebar, setOpenSidebar] = useState(false);
 
-  // Dark Mode
-  const [darkMode, setDarkMode] = useState(false);
+  // Global Dark Mode
+  const { isDark: darkMode, toggleTheme: setDarkMode } = useTheme();
 
   return (
     <div

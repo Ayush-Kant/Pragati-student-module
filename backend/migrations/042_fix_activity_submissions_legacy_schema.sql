@@ -1,5 +1,22 @@
 BEGIN;
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- SM-13 dependency: the certificate service expects this table to exist even
+-- on a clean database where no legacy certificate schema was created.
+-- CREATE TABLE IF NOT EXISTS preserves any existing certificate table/rows.
+CREATE TABLE IF NOT EXISTS certificates (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  drive_id INTEGER NOT NULL REFERENCES recruitment_drives(id) ON DELETE CASCADE,
+  certificate_url TEXT,
+  verify_uuid UUID NOT NULL DEFAULT gen_random_uuid(),
+  score NUMERIC(5,2),
+  issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  revoked BOOLEAN NOT NULL DEFAULT FALSE,
+  revoked_at TIMESTAMPTZ
+);
+
 -- Existing develop databases may already have an older activity_submissions
 -- table used by the placement/activity APIs. Migration 039 only created the
 -- modern shape when the table was absent, so those older tables can be missing
@@ -85,7 +102,39 @@ BEGIN
   END IF;
 END $$;
 
+-- SM-07 assessment submissions use activity_type = 'assessment'. Preserve the
+-- existing legacy activity types while allowing the canonical assessment value.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conrelid = 'activity_submissions'::regclass
+      AND conname = 'activity_submissions_activity_type_check'
+  ) THEN
+    ALTER TABLE activity_submissions
+      DROP CONSTRAINT activity_submissions_activity_type_check;
+  END IF;
+
+  ALTER TABLE activity_submissions
+    ADD CONSTRAINT activity_submissions_activity_type_check
+    CHECK (
+      activity_type::text = ANY (ARRAY[
+        'assignment',
+        'project',
+        'quiz',
+        'task',
+        'assessment'
+      ]::text[])
+    );
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_sm07_activity_submissions_attempt
   ON activity_submissions(attempt_id);
+
+-- The certificate-specific verification_code column is added by migration 043,
+-- so its index belongs there and must not be created before that column exists.
+CREATE INDEX IF NOT EXISTS idx_certificates_student_drive
+  ON certificates(student_id, drive_id);
 
 COMMIT;

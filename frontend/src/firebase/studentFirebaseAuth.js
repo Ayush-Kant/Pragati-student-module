@@ -1,5 +1,6 @@
 import {
   GoogleAuthProvider,
+  connectAuthEmulator,
   getAuth,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -7,6 +8,15 @@ import {
 import firebaseApp from "./firebaseConfig";
 
 export const firebaseAuth = getAuth(firebaseApp);
+
+const authEmulatorHost = String(import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST || "").trim();
+if (authEmulatorHost) {
+  const emulatorUrl = authEmulatorHost.startsWith("http://") || authEmulatorHost.startsWith("https://")
+    ? authEmulatorHost
+    : `http://${authEmulatorHost}`;
+  connectAuthEmulator(firebaseAuth, emulatorUrl, { disableWarnings: true });
+}
+
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 

@@ -4,6 +4,7 @@ import assignmentFeedbackModel from '../models/assignmentFeedbackModel.js';
 import assignmentGradeModel from '../models/assignmentGradeModel.js';
 import { normalizeError } from '../utils/assignmentHelpers.js';
 import notificationService from '../../services/notification.service.js';
+import { autoIssueCertificatesForStudent } from './certificate.service.js';
 
 class AssignmentService {
     static async createAssignment(input) {
@@ -86,6 +87,14 @@ class AssignmentService {
             });
         } catch (error) {
             console.error('[assignment] Failed to dispatch grade notification:', error.message);
+        }
+        try {
+            await autoIssueCertificatesForStudent({
+                studentProfileId: Number(studentId),
+                reason: 'assignment-graded',
+            });
+        } catch (error) {
+            console.error('[assignment] Certificate auto-issuance check failed:', error.message);
         }
         return grade;
     }

@@ -5,6 +5,7 @@ import AdminNavbar from "./adminNavbar/AdminNavbar";
 import AdminSidebar from "./adminSidebar/AdminSidebar";
 import AdminFooter from "./adminFooter/AdminFooter";
 import { useAdminProfile } from "./hooks/useAdminProfile";
+import { useTheme } from "../../context/ThemeContext";
 
 const AdminLayout = () => {
   const {
@@ -17,17 +18,8 @@ const AdminLayout = () => {
   // Sidebar Toggle
   const [openSidebar, setOpenSidebar] = useState(false);
 
-  // Dark Mode
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("theme") === "dark"
-  );
-
-  useEffect(() => {
-    localStorage.setItem(
-      "theme",
-      darkMode ? "dark" : "light"
-    );
-  }, [darkMode]);
+  // Global Dark Mode
+  const { isDark: darkMode, toggleTheme: setDarkMode } = useTheme();
 
   return (
     <div

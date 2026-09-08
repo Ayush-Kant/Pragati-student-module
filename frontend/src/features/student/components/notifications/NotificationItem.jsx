@@ -70,42 +70,48 @@ const NotificationItem = ({ notification, onRead }) => {
 
   return (
     <article
-      className={`relative flex items-start justify-between gap-4 rounded-2xl border px-5 py-4 shadow-sm transition ${
+      className={`relative flex items-start justify-between gap-4 rounded-2xl border px-5 py-4 transition-all duration-200 bg-white dark:bg-[#111827] hover:bg-slate-50/80 dark:hover:bg-[#161f33] ${
         isRead
-          ? "border-slate-200 bg-white"
-          : "border-blue-100 bg-blue-50/70"
+          ? "border-slate-200 dark:border-slate-800/80 opacity-80 hover:opacity-100"
+          : "border-slate-200 dark:border-slate-800 border-l-4 border-l-[#4F46E5] dark:border-l-[#4F46E5] shadow-sm"
       }`}
     >
       <button
         type="button"
         onClick={handleOpen}
-        className="flex min-w-0 flex-1 items-start gap-4 text-left"
+        className="flex min-w-0 flex-1 items-start gap-4 text-left cursor-pointer"
       >
         <div
-          className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+          className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
             isRead
-              ? "bg-slate-100 text-slate-500"
-              : "bg-white text-blue-600 ring-1 ring-blue-100"
+              ? "bg-slate-100 dark:bg-slate-800/70 text-slate-400 dark:text-slate-500"
+              : "bg-indigo-50 dark:bg-indigo-950/50 text-[#4F46E5] dark:text-indigo-400 ring-1 ring-indigo-100 dark:ring-indigo-800/40"
           }`}
         >
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="truncate text-sm font-semibold text-slate-900">
+            <h3
+              className={`truncate text-sm ${
+                isRead
+                  ? "font-medium text-slate-700 dark:text-slate-300"
+                  : "font-bold text-slate-900 dark:text-white"
+              }`}
+            >
               {notification.title}
             </h3>
             {!isRead && (
               <span
-                className="h-2 w-2 shrink-0 rounded-full bg-blue-600"
+                className="h-2 w-2 shrink-0 rounded-full bg-[#4F46E5]"
                 aria-label="Unread"
               />
             )}
           </div>
-          <p className="mt-1 text-sm leading-6 text-slate-600">
+          <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">
             {notification.message || notification.body}
           </p>
-          <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700">
+          <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#4F46E5] dark:text-indigo-400 hover:underline">
             {notification.linkUrl ? "View details" : "View notification"}{" "}
             <ArrowRight size={13} />
           </span>
@@ -113,7 +119,7 @@ const NotificationItem = ({ notification, onRead }) => {
       </button>
       <time
         dateTime={notification.createdAt}
-        className="shrink-0 pt-1 text-xs text-slate-400"
+        className="shrink-0 pt-1 text-xs font-medium text-slate-400 dark:text-slate-500"
       >
         {relativeTime(notification.createdAt)}
       </time>

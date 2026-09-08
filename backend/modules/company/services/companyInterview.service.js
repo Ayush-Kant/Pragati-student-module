@@ -1,5 +1,6 @@
 import { pool } from '../../../config/db.js';
 import { sendInterviewScheduledEmail, sendInterviewResultEmail } from '../../../src/modules/company/services/email.service.js';
+import { autoIssueCertificatesForStudent } from '../../../services/certificate.service.js';
 
 export const listInterviews = async (companyId) => {
   const query = `
@@ -63,7 +64,6 @@ export const getInterviewById = async (interviewId, companyId) => {
 };
 
 export const scheduleInterview = async (companyId, { candidateId, round, date, time, interviewerId, meetingLink, notes }) => {
-  // Validate candidateId exists for this company
   const validCheck = await pool.query(
     `SELECT id FROM student_drive_progress WHERE id = $1 AND company_id = $2`,
     [candidateId, companyId]
@@ -101,13 +101,11 @@ export const scheduleInterview = async (companyId, { candidateId, round, date, t
 
   const interview = result.rows[0];
 
-  // Try to update student_drive_progress stage to 'interviews'
   await pool.query(
     `UPDATE student_drive_progress SET current_stage = 'interviews', stage = 'Interview' WHERE id = $1`,
     [candidateId]
   );
 
-  // Send email notification
   try {
     const candidateDetails = await pool.query(
       `
@@ -141,7 +139,8 @@ export const submitFeedback = async (interviewId, companyId, feedback) => {
   const result = await pool.query(
     `
     UPDATE interviews i
-    SET feedback = $3
+    SET feedback = $3,
+        updated_at = NOW()
     FROM student_drive_progress sdp
     WHERE i.id = $1 AND sdp.id = i.application_id AND sdp.company_id = $2
     RETURNING i.*
@@ -164,7 +163,9 @@ export const updateResult = async (interviewId, companyId, resultStatus, attenda
     UPDATE interviews i
     SET result = $3,
         status = $4,
-        attendance = $5
+        attendance = $5,
+        outcome_published_at = NOW(),
+        updated_at = NOW()
     FROM student_drive_progress sdp
     WHERE i.id = $1 AND sdp.id = i.application_id AND sdp.company_id = $2
     RETURNING i.*
@@ -175,7 +176,6 @@ export const updateResult = async (interviewId, companyId, resultStatus, attenda
   const interview = result.rows[0];
 
   if (interview) {
-    // Notify candidate
     try {
       const candidateDetails = await pool.query(
         `
@@ -199,6 +199,22 @@ export const updateResult = async (interviewId, companyId, resultStatus, attenda
       }
     } catch (emailErr) {
       console.error("[companyInterview.service] Failed to send email:", emailErr.message);
+    }
+
+    try {
+      const student = await pool.query(
+        `SELECT student_id FROM student_drive_progress WHERE id = $1 LIMIT 1`,
+        [interview.application_id],
+      );
+      const studentProfileId = student.rows[0]?.student_id;
+      if (studentProfileId) {
+        await autoIssueCertificatesForStudent({
+          studentProfileId: Number(studentProfileId),
+          reason: 'interview-outcome',
+        });
+      }
+    } catch (certificateError) {
+      console.error('[companyInterview.service] Certificate auto-issuance check failed:', certificateError.message);
     }
   }
 

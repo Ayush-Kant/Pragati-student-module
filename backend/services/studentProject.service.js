@@ -1,4 +1,5 @@
 import studentProjectModel from '../models/studentProject.model.js';
+import { autoIssueCertificatesForStudent } from './certificate.service.js';
 
 const notFound = (message = 'Project not found') => { const error = new Error(message); error.statusCode = 404; return error; };
 const validationError = (message) => { const error = new Error(message); error.statusCode = 400; return error; };
@@ -39,7 +40,18 @@ export const submitProject = async (studentId, projectId, payload) => {
   if (!ensureHttpsGitHub(payload.githubUrl)) throw validationError('GitHub URL must start with https://github.com/');
   if (!ensureHttpsUrl(payload.deploymentUrl)) throw validationError('Deployment URL must be a valid HTTPS URL');
   if (payload.reportSizeBytes && Number(payload.reportSizeBytes) > 20 * 1024 * 1024) throw validationError('Project report must be 20MB or smaller');
-  return studentProjectModel.createSubmission(studentId, projectId, payload);
+  const submission = await studentProjectModel.createSubmission(studentId, projectId, payload);
+
+  try {
+    await autoIssueCertificatesForStudent({
+      studentProfileId: Number(studentId),
+      reason: 'project-final-submission',
+    });
+  } catch (certificateError) {
+    console.error('[studentProject] Certificate auto-issuance check failed:', certificateError.message);
+  }
+
+  return submission;
 };
 
 export const getEvaluation = async (studentId, projectId) => { const project = await studentProjectModel.getProjectById(studentId, projectId); if (!project) throw notFound(); return studentProjectModel.getEvaluation(studentId, projectId); };

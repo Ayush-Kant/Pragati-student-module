@@ -8,6 +8,7 @@ const scripts = [
   "seedStudentDemoData.js",
   "seedStudentInterviews.js",
   "seedStudentNotifications.js",
+  "seedStudentCertificateEligibility.js",
 ];
 
 console.log("============================================");
@@ -38,4 +39,4 @@ for (const script of scripts) {
 console.log("\n============================================");
 console.log(" Student demo data seed completed");
 console.log("============================================");
-console.log("All existing student accounts have starter data, and the database trigger will seed new student accounts automatically.");
+console.log("All existing student accounts have starter data, the certificate test drive is eligible for every student, and the database trigger will seed new student accounts automatically.");
