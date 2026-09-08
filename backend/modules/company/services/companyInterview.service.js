@@ -139,7 +139,8 @@ export const submitFeedback = async (interviewId, companyId, feedback) => {
   const result = await pool.query(
     `
     UPDATE interviews i
-    SET feedback = $3
+    SET feedback = $3,
+        updated_at = NOW()
     FROM student_drive_progress sdp
     WHERE i.id = $1 AND sdp.id = i.application_id AND sdp.company_id = $2
     RETURNING i.*
@@ -162,7 +163,9 @@ export const updateResult = async (interviewId, companyId, resultStatus, attenda
     UPDATE interviews i
     SET result = $3,
         status = $4,
-        attendance = $5
+        attendance = $5,
+        outcome_published_at = NOW(),
+        updated_at = NOW()
     FROM student_drive_progress sdp
     WHERE i.id = $1 AND sdp.id = i.application_id AND sdp.company_id = $2
     RETURNING i.*

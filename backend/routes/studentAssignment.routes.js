@@ -16,6 +16,7 @@ router.get('/', assignmentController.listAssignments);
 router.get('/statistics', assignmentController.getStatistics);
 router.get('/submissions', assignmentController.listSubmissions);
 router.get('/:id', validateRequest(assignmentIdSchema, 'params'), assignmentController.getAssignmentById);
+router.get('/:id/feedback', validateRequest(assignmentIdSchema, 'params'), assignmentController.getFeedback);
 router.post(
   '/:id/submit',
   validateRequest(assignmentIdSchema, 'params'),

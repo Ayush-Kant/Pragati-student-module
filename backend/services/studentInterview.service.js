@@ -23,6 +23,9 @@ const baseInterviewQuery = `
     i.attendance,
     i.feedback,
     i.created_at AS "createdAt",
+    i.confirmed_at AS "confirmedAt",
+    i.outcome_published_at AS "outcomePublishedAt",
+    i.offer_letter_url AS "offerLetterUrl",
     rd.title AS "driveTitle",
     c.name AS "companyName"
   FROM interviews i
@@ -62,18 +65,35 @@ const getInterview = async (user, interviewId) => {
 
 const confirmInterview = async (user, interviewId) => {
   const interview = await getInterview(user, interviewId);
-  if (!['scheduled', 'invited'].includes(String(interview.status).toLowerCase())) {
-    return { id: interview.id, status: interview.status };
+  const normalizedStatus = String(interview.status || '').toLowerCase();
+
+  if (!['scheduled', 'invited'].includes(normalizedStatus)) {
+    const error = new Error('Interview already confirmed or is no longer confirmable');
+    error.statusCode = 409;
+    throw error;
   }
 
+  if (interview.scheduledAt && Date.now() >= new Date(interview.scheduledAt).getTime()) {
+    const error = new Error('Cannot confirm interview after its scheduled start time');
+    error.statusCode = 409;
+    throw error;
+  }
+
+  const studentId = await resolveStudentId(user);
   const result = await pool.query(
     `UPDATE interviews
-     SET status = 'confirmed'
-     WHERE id = $1 AND student_id = $2
-     RETURNING id, status`,
-    [interviewId, await resolveStudentId(user)],
+     SET status = 'confirmed', confirmed_at = NOW(), updated_at = NOW()
+     WHERE id = $1 AND student_id = $2 AND LOWER(COALESCE(status, '')) IN ('scheduled', 'invited')
+     RETURNING id, status, confirmed_at AS "confirmedAt"`,
+    [interviewId, studentId],
   );
-  return result.rows[0] || { id: interview.id, status: interview.status };
+
+  if (!result.rows[0]) {
+    const error = new Error('Unable to confirm interview');
+    error.statusCode = 409;
+    throw error;
+  }
+  return result.rows[0];
 };
 
 const joinInterview = async (user, interviewId) => {
@@ -104,6 +124,31 @@ const joinInterview = async (user, interviewId) => {
   return { meetingLink: interview.meetingLink, interviewId: interview.id };
 };
 
+const getInterviewOutcome = async (user, interviewId) => {
+  const interview = await getInterview(user, interviewId);
+  const status = String(interview.status || '').toLowerCase();
+  const result = interview.result == null ? '' : String(interview.result).trim();
+  const published = Boolean(
+    interview.outcomePublishedAt
+    && ['completed', 'no_show'].includes(status)
+    && result
+    && result.toUpperCase() !== 'PENDING',
+  );
+
+  if (!published) {
+    const error = new Error('Outcome not yet published');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return {
+    status: interview.result,
+    offerLetterUrl: interview.offerLetterUrl || null,
+    feedback: interview.feedback || '',
+    publishedAt: interview.outcomePublishedAt,
+  };
+};
+
 export const listInterviews = (user) => getStudentInterviews(user);
-export { getInterview, confirmInterview, joinInterview };
-export default { listInterviews, getInterview, confirmInterview, joinInterview };
+export { getInterview, confirmInterview, joinInterview, getInterviewOutcome };
+export default { listInterviews, getInterview, confirmInterview, joinInterview, getInterviewOutcome };
