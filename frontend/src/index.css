@@ -381,6 +381,67 @@ html.dark .student-shell textarea::placeholder {
   color: #64748b !important;
 }
 
+/* Dark mode alert, status, and feedback surfaces in student shell */
+html.dark .student-shell .bg-red-50,
+html.dark .student-shell [class*="bg-red-50"] {
+  background-color: #111827 !important;
+}
+html.dark .student-shell .border-red-100,
+html.dark .student-shell .border-red-200 {
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+html.dark .student-shell .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+html.dark .student-shell .text-red-900,
+html.dark .student-shell .text-red-800,
+html.dark .student-shell .text-red-700 {
+  color: #fca5a5 !important;
+}
+html.dark .student-shell .text-red-600 {
+  color: #f87171 !important;
+}
+
+html.dark .student-shell .bg-emerald-50,
+html.dark .student-shell [class*="bg-emerald-50"] {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+html.dark .student-shell .border-emerald-100,
+html.dark .student-shell .border-emerald-200 {
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+html.dark .student-shell .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+}
+html.dark .student-shell .text-emerald-900,
+html.dark .student-shell .text-emerald-800,
+html.dark .student-shell .text-emerald-700 {
+  color: #6ee7b7 !important;
+}
+html.dark .student-shell .text-emerald-600 {
+  color: #34d399 !important;
+}
+
+html.dark .student-shell .bg-amber-50,
+html.dark .student-shell [class*="bg-amber-50"] {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+}
+html.dark .student-shell .border-amber-100,
+html.dark .student-shell .border-amber-200 {
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+html.dark .student-shell .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+}
+html.dark .student-shell .text-amber-900,
+html.dark .student-shell .text-amber-800,
+html.dark .student-shell .text-amber-700 {
+  color: #fcd34d !important;
+}
+html.dark .student-shell .text-amber-600 {
+  color: #fbbf24 !important;
+}
+
 /* Indigo accent */
 .student-shell .bg-blue-50,
 .student-shell .bg-indigo-50 { background-color: var(--student-primary-50) !important; }
@@ -408,8 +469,6 @@ html.dark .student-shell textarea::placeholder {
 .student-shell .border-indigo-100 { border-color: var(--student-primary-100) !important; }
 .student-shell .border-blue-200,
 .student-shell .border-indigo-200 { border-color: #c7d2fe !important; }
-.student-shell [class*="bg-blue-50/"] { background-color: rgb(238 242 255 / 0.5) !important; }
-.student-shell [class*="bg-indigo-50/"] { background-color: rgb(238 242 255 / 0.5) !important; }
 
 /* Student hero cards */
 .student-shell header.bg-gradient-to-br.p-5.text-white,
@@ -418,11 +477,70 @@ html.dark .student-shell textarea::placeholder {
   background-color: var(--student-primary-600) !important;
 }
 
-.student-shell .bg-gradient-to-br,
-.student-shell .bg-gradient-to-r,
-.student-shell .bg-gradient-to-b {
-  background-image: none !important;
-  background-color: #0f172a !important;
+/* Student next action banner */
+.student-next-action-card,
+html.dark .student-shell .student-next-action-card {
+  background-color: #4F46E5 !important;
+  color: #ffffff !important;
+}
+
+.student-next-action-card h2,
+.student-next-action-card span,
+html.dark .student-shell .student-next-action-card h2,
+html.dark .student-shell .student-next-action-card span {
+  color: #ffffff !important;
+}
+
+.student-next-action-card p,
+html.dark .student-shell .student-next-action-card p {
+  color: #e0e7ff !important;
+}
+
+html.dark .student-shell .student-next-action-card a,
+.student-shell .student-next-action-card a,
+.student-next-action-card a {
+  background-color: #ffffff !important;
+  color: #4F46E5 !important;
+}
+
+html.dark .student-shell .student-next-action-card a:hover,
+.student-shell .student-next-action-card a:hover,
+.student-next-action-card a:hover {
+  background-color: #f5f3ff !important;
+  color: #4338ca !important;
+}
+
+/* Student continue learning hero banner */
+.student-continue-learning-card,
+html.dark .student-shell .student-continue-learning-card {
+  background-color: #4F46E5 !important;
+  color: #ffffff !important;
+}
+
+.student-continue-learning-card h2,
+.student-continue-learning-card span,
+html.dark .student-shell .student-continue-learning-card h2,
+html.dark .student-shell .student-continue-learning-card span {
+  color: #ffffff !important;
+}
+
+.student-continue-learning-card p,
+html.dark .student-shell .student-continue-learning-card p {
+  color: #e0e7ff !important;
+}
+
+html.dark .student-shell .student-continue-learning-card a,
+.student-shell .student-continue-learning-card a,
+.student-continue-learning-card a {
+  background-color: #ffffff !important;
+  color: #4F46E5 !important;
+}
+
+html.dark .student-shell .student-continue-learning-card a:hover,
+.student-shell .student-continue-learning-card a:hover,
+.student-continue-learning-card a:hover {
+  background-color: #f5f3ff !important;
+  color: #4338ca !important;
 }
 
 /* Hover states */

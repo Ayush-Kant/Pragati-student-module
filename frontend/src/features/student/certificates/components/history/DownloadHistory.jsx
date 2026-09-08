@@ -40,7 +40,7 @@ const DownloadHistory = ({
         label: "Downloaded",
         icon: CheckCircle2,
         classes:
-          "border-emerald-100 bg-emerald-50 text-emerald-700",
+          "border-emerald-100 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300",
       };
     }
 
@@ -52,7 +52,7 @@ const DownloadHistory = ({
         label: "Downloading",
         icon: Clock3,
         classes:
-          "border-amber-100 bg-amber-50 text-amber-700",
+          "border-amber-100 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300",
       };
     }
 
@@ -60,7 +60,7 @@ const DownloadHistory = ({
       label: "Failed",
       icon: Clock3,
       classes:
-        "border-red-100 bg-red-50 text-red-700",
+        "border-red-100 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300",
     };
   };
 
@@ -71,20 +71,20 @@ const DownloadHistory = ({
   if (downloadHistory.length === 0) {
     return (
       <div
-        className={`rounded-2xl border border-slate-200 bg-white px-5 py-8 text-center shadow-sm sm:px-6 sm:py-10 ${className}`}
+        className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] px-5 py-8 text-center shadow-sm sm:px-6 sm:py-10 ${className}`}
       >
-        <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-500 sm:h-12 sm:w-12">
+        <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 sm:h-12 sm:w-12">
           <Download
             className="h-5 w-5 sm:h-6 sm:w-6"
             aria-hidden="true"
           />
         </div>
 
-        <h3 className="mt-4 text-sm font-bold text-slate-900 sm:text-base">
+        <h3 className="mt-4 text-sm font-bold text-slate-900 dark:text-white sm:text-base">
           No download history
         </h3>
 
-        <p className="mx-auto mt-1.5 max-w-sm text-xs leading-5 text-slate-500 sm:text-sm">
+        <p className="mx-auto mt-1.5 max-w-sm text-xs leading-5 text-slate-500 dark:text-slate-400 sm:text-sm">
           Certificate downloads will appear here once you download a certificate.
         </p>
       </div>
@@ -93,11 +93,11 @@ const DownloadHistory = ({
 
   return (
     <section
-      className={`w-full rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}
+      className={`w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] shadow-sm ${className}`}
     >
-      <div className="border-b border-slate-100 p-4 sm:p-5">
+      <div className="border-b border-slate-100 dark:border-slate-800/80 p-4 sm:p-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 sm:h-11 sm:w-11">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 sm:h-11 sm:w-11">
             <Download
               className="h-5 w-5"
               aria-hidden="true"
@@ -105,18 +105,18 @@ const DownloadHistory = ({
           </div>
 
           <div className="min-w-0">
-            <h3 className="text-base font-bold text-slate-900 sm:text-lg">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white sm:text-lg">
               Download History
             </h3>
 
-            <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
               Recent certificate download activity.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
         {downloadHistory.map(
           (item, index) => {
             const config =
@@ -139,7 +139,7 @@ const DownloadHistory = ({
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex min-w-0 items-start gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500 ring-1 ring-slate-100 sm:h-10 sm:w-10">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 ring-1 ring-slate-100 dark:ring-slate-700 sm:h-10 sm:w-10">
                       <FileText
                         className="h-4 w-4 sm:h-5 sm:w-5"
                         aria-hidden="true"
@@ -147,15 +147,15 @@ const DownloadHistory = ({
                     </div>
 
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                         Certificate ID
                       </p>
 
-                      <p className="mt-1 break-all font-mono text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
+                      <p className="mt-1 break-all font-mono text-xs font-semibold tracking-wide text-slate-700 dark:text-slate-200 sm:text-sm">
                         {certificateId}
                       </p>
 
-                      <p className="mt-1 text-xs text-slate-400">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                         {downloadedAt
                           ? formatCertificateDate(
                               downloadedAt

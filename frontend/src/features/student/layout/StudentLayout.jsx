@@ -43,7 +43,7 @@ export default function StudentLayout() {
         onLogout={logout}
       />
 
-      <div className="flex min-h-[calc(100vh-4rem)]">
+      <div className="flex flex-1 pt-16 min-h-screen">
         <StudentSidebar
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
@@ -51,7 +51,11 @@ export default function StudentLayout() {
           onToggleCollapse={() => setSidebarCollapsed((collapsed) => !collapsed)}
         />
 
-        <main className="min-w-0 flex-1 bg-gray-50 transition-[margin,width] duration-300">
+        <main
+          className={`min-w-0 flex-1 bg-gray-50 transition-[margin,width] duration-300 ${
+            sidebarCollapsed ? "md:ml-[76px]" : "md:ml-64"
+          }`}
+        >
           <Outlet />
         </main>
       </div>

@@ -31,17 +31,17 @@ const SectionHeader = ({
         className={`flex min-w-0 flex-1 flex-col ${alignmentClasses}`}
       >
         {eyebrow ? (
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 sm:text-[11px]">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500 sm:text-[11px]">
             {eyebrow}
           </p>
         ) : null}
 
-        <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+        <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
           {title}
         </h2>
 
         {description ? (
-          <p className="mt-1.5 max-w-2xl text-xs leading-5 text-slate-500 sm:text-sm sm:leading-6">
+          <p className="mt-1.5 max-w-2xl text-xs leading-5 text-slate-500 dark:text-slate-400 sm:text-sm sm:leading-6">
             {description}
           </p>
         ) : null}

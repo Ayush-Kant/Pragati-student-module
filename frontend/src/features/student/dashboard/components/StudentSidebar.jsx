@@ -46,25 +46,34 @@ export default function StudentSidebar({ isOpen, onClose, collapsed = false, onT
       )}
 
       <aside
-        className={`fixed md:sticky top-0 md:top-16 left-0 z-50 md:z-20 h-screen md:h-[calc(100vh-4rem)] bg-white border-r border-gray-200 overflow-y-auto transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 md:top-16 left-0 bottom-0 z-40 md:z-20 h-screen md:h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col ${
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         } ${
           collapsed ? "md:w-[76px]" : "md:w-64"
         } w-64`}
         aria-label="Student navigation"
       >
-        <div className={`p-3 ${collapsed ? "md:px-2" : "p-4"}`}>
-          <div className={`mb-4 flex ${collapsed ? "justify-center" : "justify-end"}`}>
-            <button
-              type="button"
-              onClick={onToggleCollapse}
-              className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition"
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              <span className="text-lg leading-none">{collapsed ? "→" : "←"}</span>
-            </button>
-          </div>
+        <div
+          className={`shrink-0 p-3 pb-1 flex items-center transition-colors duration-200 ${
+            collapsed ? "justify-center" : "justify-end"
+          }`}
+        >
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className="hidden md:inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <span className="text-base leading-none">{collapsed ? "→" : "←"}</span>
+          </button>
+        </div>
+
+        <div
+          className={`flex-1 overflow-y-auto overflow-x-hidden p-3 ${
+            collapsed ? "md:px-2" : "p-4"
+          } [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] dark:[scrollbar-color:#334155_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700`}
+        >
 
           <div className="space-y-6">
             {navGroups.map((group, idx) => (

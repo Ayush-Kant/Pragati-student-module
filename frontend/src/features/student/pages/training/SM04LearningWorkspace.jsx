@@ -18,9 +18,9 @@ const getNextLesson = (course) => {
   return lessons.find((lesson) => !lesson.locked && !lesson.completed) || lessons.find((lesson) => !lesson.locked) || null;
 };
 
-const ProgressBar = ({ value }) => (
-  <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-    <div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${clamp(value)}%` }} />
+const ProgressBar = ({ value, trackColor = "bg-slate-100", barColor = "bg-indigo-600" }) => (
+  <div className={`h-2 overflow-hidden rounded-full ${trackColor}`}>
+    <div className={`h-full rounded-full ${barColor} transition-all`} style={{ width: `${clamp(value)}%` }} />
   </div>
 );
 
@@ -58,55 +58,52 @@ export default function SM04LearningWorkspace() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    let active = true;
-    const load = async () => {
-      setLoading(true);
-      setError('');
+    async function load() {
       try {
+        setLoading(true);
         const data = await getCourses();
-        if (active) setCourses(Array.isArray(data) ? data : []);
+        setCourses(Array.isArray(data) ? data : []);
       } catch (err) {
-        if (active) setError(err?.response?.data?.message || err?.message || 'Unable to load learning content.');
+        setError(err?.response?.data?.message || err?.message || 'Unable to load courses.');
       } finally {
-        if (active) setLoading(false);
+        setLoading(false);
       }
-    };
+    }
     load();
-    return () => { active = false; };
   }, []);
 
-  const filtered = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    const result = !query ? courses : courses.filter((course) =>
-      `${course.title} ${course.category} ${course.level} ${course.description || ''}`.toLowerCase().includes(query)
-    );
-    return result;
-  }, [courses, search]);
-
   const summary = useMemo(() => {
-    const totalLessons = courses.reduce((sum, course) => sum + Number(course.totalLessons || 0), 0);
-    const completedLessons = courses.reduce((sum, course) => sum + Number(course.completedLessons || 0), 0);
-    const completedCourses = courses.filter((course) => clamp(course.progress) >= 100).length;
-    const averageProgress = courses.length
-      ? Math.round(courses.reduce((sum, course) => sum + clamp(course.progress), 0) / courses.length)
-      : 0;
+    const totalLessons = courses.reduce((acc, c) => acc + (c.totalLessons || 0), 0);
+    const completedLessons = courses.reduce((acc, c) => acc + (c.completedLessons || 0), 0);
+    const completedCourses = courses.filter((c) => clamp(c.progress) >= 100).length;
+    const averageProgress = courses.length ? Math.round(courses.reduce((acc, c) => acc + clamp(c.progress), 0) / courses.length) : 0;
     return { totalLessons, completedLessons, completedCourses, averageProgress };
   }, [courses]);
 
   const nextCourse = useMemo(() => {
-    const inProgress = courses.filter((course) => clamp(course.progress) < 100);
-    if (!inProgress.length) return null;
-    return inProgress.reduce((best, course) => (clamp(course.progress) > clamp(best?.progress) ? course : best), inProgress[0]);
+    return courses.find((course) => clamp(course.progress) < 100) || courses[0] || null;
   }, [courses]);
 
-  const nextLesson = nextCourse ? getNextLesson(nextCourse) : null;
+  const nextLesson = useMemo(() => {
+    return nextCourse ? getNextLesson(nextCourse) : null;
+  }, [nextCourse]);
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return courses;
+    return courses.filter((course) =>
+      course.title?.toLowerCase().includes(query) ||
+      course.category?.toLowerCase().includes(query) ||
+      course.level?.toLowerCase().includes(query)
+    );
+  }, [courses, search]);
 
   if (loading) {
     return (
       <StudentPageShell>
-        <div className="animate-pulse space-y-5">
-          <div className="h-8 w-64 rounded-lg bg-slate-200" />
-          <div className="h-32 rounded-2xl bg-slate-200" />
+        <div className="animate-pulse space-y-6">
+          <div className="h-10 w-48 rounded-xl bg-slate-200" />
+          <div className="h-44 rounded-3xl bg-slate-200" />
           <div className="grid gap-4 sm:grid-cols-3"><div className="h-28 rounded-2xl bg-slate-200" /><div className="h-28 rounded-2xl bg-slate-200" /><div className="h-28 rounded-2xl bg-slate-200" /></div>
           <div className="grid gap-5 lg:grid-cols-2"><div className="h-64 rounded-2xl bg-slate-200" /><div className="h-64 rounded-2xl bg-slate-200" /></div>
         </div>
@@ -121,15 +118,32 @@ export default function SM04LearningWorkspace() {
       {error ? <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div> : null}
 
       {nextCourse && nextLesson ? (
-        <section className="mb-6 overflow-hidden rounded-3xl bg-slate-900 p-6 text-white shadow-sm sm:p-7">
+        <section
+          className="student-continue-learning-card mb-6 overflow-hidden rounded-3xl p-6 text-white shadow-lg sm:p-7 transition-all"
+          style={{ backgroundColor: "#4F46E5" }}
+        >
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-indigo-300"><Sparkles className="h-4 w-4" /> Continue learning</div>
-              <h2 className="mt-2 text-2xl font-black tracking-tight">{nextCourse.title}</h2>
-              <p className="mt-1 text-sm text-slate-300">Next up: {nextLesson.title}</p>
-              <div className="mt-5 max-w-xl"><div className="mb-2 flex items-center justify-between text-xs font-semibold text-slate-300"><span>Course progress</span><span>{Math.round(clamp(nextCourse.progress))}%</span></div><ProgressBar value={nextCourse.progress} /></div>
+            <div className="min-w-0 max-w-3xl">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white/90">
+                <Sparkles className="h-4 w-4 text-white/90" /> Continue learning
+              </div>
+              <h2 className="mt-2 text-2xl font-black tracking-tight text-white">{nextCourse.title}</h2>
+              <p className="mt-1 text-sm text-indigo-100">Next up: {nextLesson.title}</p>
+              <div className="mt-5 max-w-xl">
+                <div className="mb-2 flex items-center justify-between text-xs font-semibold text-indigo-100">
+                  <span>Course progress</span>
+                  <span>{Math.round(clamp(nextCourse.progress))}%</span>
+                </div>
+                <ProgressBar value={nextCourse.progress} trackColor="bg-white/20" barColor="bg-white" />
+              </div>
             </div>
-            <Link to={`/student/courses/${nextCourse.id}`} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-700">Resume course <ArrowRight className="h-4 w-4" /></Link>
+            <Link
+              to={`/student/courses/${nextCourse.id}`}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold shadow-md hover:bg-indigo-50 hover:shadow-lg transition-all duration-150 active:scale-95"
+              style={{ backgroundColor: "#ffffff", color: "#4F46E5" }}
+            >
+              Resume course <ArrowRight className="h-4 w-4" style={{ color: "#4F46E5" }} />
+            </Link>
           </div>
         </section>
       ) : (

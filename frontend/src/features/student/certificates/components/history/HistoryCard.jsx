@@ -58,12 +58,12 @@ const HistoryCard = ({
 
   return (
     <article
-      className={`w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md sm:p-5 ${className}`}
+      className={`w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] p-4 shadow-sm transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md sm:p-5 ${className}`}
     >
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         {/* Main information */}
         <div className="flex min-w-0 items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 sm:h-11 sm:w-11">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 sm:h-11 sm:w-11">
             <Award
               className="h-5 w-5 sm:h-5.5 sm:w-5.5"
               strokeWidth={1.8}
@@ -72,7 +72,7 @@ const HistoryCard = ({
           </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="line-clamp-2 text-sm font-bold leading-5 text-slate-900 sm:text-base">
+            <h3 className="line-clamp-2 text-sm font-bold leading-5 text-slate-900 dark:text-white sm:text-base">
               {title || "Untitled Certificate"}
             </h3>
 
@@ -93,18 +93,18 @@ const HistoryCard = ({
 
         {/* Metadata */}
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:min-w-[300px] lg:min-w-[360px]">
-          <div className="flex min-w-0 items-center gap-2.5 rounded-xl bg-slate-50 px-3 py-2.5">
+          <div className="flex min-w-0 items-center gap-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-800/60 px-3 py-2.5">
             <CalendarDays
-              className="h-4 w-4 shrink-0 text-slate-400"
+              className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500"
               aria-hidden="true"
             />
 
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Issue Date
               </p>
 
-              <p className="mt-0.5 text-xs font-semibold text-slate-700 sm:text-sm">
+              <p className="mt-0.5 text-xs font-semibold text-slate-700 dark:text-slate-200 sm:text-sm">
                 {formatCertificateDate(
                   issueDate
                 )}
@@ -112,18 +112,18 @@ const HistoryCard = ({
             </div>
           </div>
 
-          <div className="flex min-w-0 items-center gap-2.5 rounded-xl bg-slate-50 px-3 py-2.5">
+          <div className="flex min-w-0 items-center gap-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-800/60 px-3 py-2.5">
             <Hash
-              className="h-4 w-4 shrink-0 text-slate-400"
+              className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500"
               aria-hidden="true"
             />
 
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Certificate ID
               </p>
 
-              <p className="mt-0.5 truncate font-mono text-xs font-semibold text-slate-700 sm:text-sm">
+              <p className="mt-0.5 truncate font-mono text-xs font-semibold text-slate-700 dark:text-slate-200 sm:text-sm">
                 {certificateId || id || "N/A"}
               </p>
             </div>
@@ -136,7 +136,7 @@ const HistoryCard = ({
             <button
               type="button"
               onClick={handleView}
-              className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 transition-colors duration-200 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2 md:w-auto sm:text-sm"
+              className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700 focus:ring-offset-2 md:w-auto sm:text-sm cursor-pointer"
             >
               <ShieldCheck
                 className="h-4 w-4"
