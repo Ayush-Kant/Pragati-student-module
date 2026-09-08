@@ -6,8 +6,6 @@ const TEST_DRIVE_TITLES = [
   "SM Demo Completed Drive",
 ];
 
-const CERTIFICATE_SCORE_THRESHOLD = 70;
-const CERTIFICATE_ATTENDANCE_THRESHOLD = 60;
 const CERTIFICATE_QA_SESSION_COUNT = 5;
 
 const getTableColumns = async (tableName) => {
@@ -35,43 +33,43 @@ const seedStudentDriveProgress = async (driveIds) => {
   const columns = await getTableColumns("student_drive_progress");
   if (!columns.has("student_id") || !columns.has("drive_id")) return;
 
-  const optionalAssignments = [];
   const insertColumns = ["student_id", "drive_id"];
   const insertValues = ["s.id", "d.id"];
+  const updateAssignments = [];
 
   if (columns.has("current_stage")) {
     insertColumns.push("current_stage");
     insertValues.push("'selection'");
-    optionalAssignments.push("current_stage = EXCLUDED.current_stage");
+    updateAssignments.push("current_stage = EXCLUDED.current_stage");
   }
   if (columns.has("stage")) {
     insertColumns.push("stage");
     insertValues.push("'selected'");
-    optionalAssignments.push("stage = EXCLUDED.stage");
+    updateAssignments.push("stage = EXCLUDED.stage");
   }
   if (columns.has("assessment_score")) {
     insertColumns.push("assessment_score");
     insertValues.push("100");
-    optionalAssignments.push("assessment_score = EXCLUDED.assessment_score");
+    updateAssignments.push("assessment_score = EXCLUDED.assessment_score");
   }
   if (columns.has("training_completion")) {
     insertColumns.push("training_completion");
     insertValues.push("100");
-    optionalAssignments.push("training_completion = EXCLUDED.training_completion");
+    updateAssignments.push("training_completion = EXCLUDED.training_completion");
   }
   if (columns.has("sessions_attended")) {
     insertColumns.push("sessions_attended");
     insertValues.push(String(CERTIFICATE_QA_SESSION_COUNT));
-    optionalAssignments.push("sessions_attended = EXCLUDED.sessions_attended");
+    updateAssignments.push("sessions_attended = EXCLUDED.sessions_attended");
   }
   if (columns.has("stage_updated_at")) {
     insertColumns.push("stage_updated_at");
     insertValues.push("NOW()");
-    optionalAssignments.push("stage_updated_at = EXCLUDED.stage_updated_at");
+    updateAssignments.push("stage_updated_at = EXCLUDED.stage_updated_at");
   }
 
-  const updateClause = optionalAssignments.length
-    ? optionalAssignments.join(",\n         ")
+  const updateClause = updateAssignments.length
+    ? updateAssignments.join(",\n       ")
     : "drive_id = EXCLUDED.drive_id";
 
   await pool.query(
@@ -138,7 +136,11 @@ const seedCertificateAttendance = async (driveIds) => {
   const attendanceColumns = await getTableColumns("session_attendance");
 
   if (!liveSessionColumns.has("drive_id")) return;
-  if (!attendanceColumns.has("session_id") || !attendanceColumns.has("student_id") || !attendanceColumns.has("attended")) return;
+  if (
+    !attendanceColumns.has("session_id") ||
+    !attendanceColumns.has("student_id") ||
+    !attendanceColumns.has("attended")
+  ) return;
 
   const students = await pool.query(
     `SELECT id AS student_id, user_id
@@ -162,9 +164,6 @@ const seedCertificateAttendance = async (driveIds) => {
       let sessionId = session.rows[0]?.id;
       if (!sessionId) {
         const scheduledAt = new Date(Date.now() - sessionNumber * 24 * 60 * 60 * 1000);
-        const date = scheduledAt.toISOString().slice(0, 10);
-        const time = "10:00";
-
         const columns = [
           "title",
           "trainer",
@@ -179,8 +178,8 @@ const seedCertificateAttendance = async (driveIds) => {
         const values = [
           title,
           "Pragati Certificate QA Mentor",
-          date,
-          time,
+          scheduledAt.toISOString().slice(0, 10),
+          "10:00",
           "60 minutes",
           "Completed",
           "webinar",
@@ -211,9 +210,8 @@ const seedCertificateAttendance = async (driveIds) => {
       for (const student of students.rows) {
         const joinAt = new Date(Date.now() - 2 * 60 * 60 * 1000);
         const leaveAt = new Date(Date.now() - 60 * 60 * 1000);
-
         const columns = ["session_id", "student_id", "attended"];
-        const values = [sessionId, Number(student.user_id), true];
+        const values = [Number(sessionId), Number(student.user_id), true];
         const updates = ["attended = TRUE"];
 
         if (attendanceColumns.has("attended_at")) {
@@ -261,7 +259,7 @@ const seedCertificateAttendance = async (driveIds) => {
 
 const seedCertificateEligibility = async () => {
   const drives = await pool.query(
-    `SELECT id, title
+    `SELECT id, title, certificate_min_score, certificate_min_attendance
        FROM recruitment_drives
       WHERE title = ANY($1::text[])
       ORDER BY id`,
@@ -275,16 +273,13 @@ const seedCertificateEligibility = async () => {
 
   const driveIds = drives.rows.map((row) => Number(row.id));
 
-  // Preserve the PRD eligibility rules: 70% score, 60% attendance, all
-  // mandatory activities submitted, and completed drive status. We only seed
-  // the underlying data needed to satisfy them.
+  // Preserve the PRD eligibility rules and the drive's configured thresholds.
+  // Only the drive completion state and underlying student performance data are seeded.
   await pool.query(
     `UPDATE recruitment_drives
-        SET status = 'completed',
-            certificate_min_score = $2,
-            certificate_min_attendance = $3
+        SET status = 'completed'
       WHERE id = ANY($1::int[])`,
-    [driveIds, CERTIFICATE_SCORE_THRESHOLD, CERTIFICATE_ATTENDANCE_THRESHOLD],
+    [driveIds],
   );
 
   await seedStudentDriveProgress(driveIds);
@@ -312,8 +307,15 @@ const seedCertificateEligibility = async () => {
        FROM students`,
   );
 
+  const scoreSummary = drives.rows
+    .map((drive) => `${drive.title}: threshold ${drive.certificate_min_score ?? 70}%`)
+    .join("; ");
+  const attendanceSummary = drives.rows
+    .map((drive) => `${drive.title}: threshold ${drive.certificate_min_attendance ?? 60}%`)
+    .join("; ");
+
   console.log(
-    `✅ Certificate QA seed prepared for ${students.rows[0]?.count ?? 0} seeded student(s): score ≥ ${CERTIFICATE_SCORE_THRESHOLD}%, attendance ≥ ${CERTIFICATE_ATTENDANCE_THRESHOLD}%, ${CERTIFICATE_QA_SESSION_COUNT} attended completed sessions per demo drive, drive completed${requiredActivityCount === null ? " (mandatory activity configuration unchanged)" : `, ${requiredActivityCount} mandatory activity/activities left unchanged`}.`,
+    `✅ Certificate QA seed prepared for ${students.rows[0]?.count ?? 0} seeded student(s): ${scoreSummary}; ${attendanceSummary}; ${CERTIFICATE_QA_SESSION_COUNT} completed attended sessions per demo drive; mandatory activity configuration unchanged${requiredActivityCount === null ? "" : ` (${requiredActivityCount} mandatory activity/activities detected)`}.`,
   );
 };
 
