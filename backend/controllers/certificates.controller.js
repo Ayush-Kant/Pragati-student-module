@@ -1,14 +1,16 @@
 import {
   issueCertificate,
   getCertificateById,
-  verifyCertificateByUuid,
+  verifyCertificateByCode,
   revokeCertificateById,
 } from "../services/certificate.service.js";
 import { triggerBadgeEvaluation } from "../jobs/badgeEvaluation.job.js";
 
+const getRequestUserId = (req) => Number(req.user?.id ?? req.user?.userId);
+
 export const generateCertificate = async (req, res) => {
   try {
-    const { studentId, driveId, score, minScore } = req.body;
+    const { studentId, driveId } = req.body;
 
     if (!studentId || !driveId) {
       return res.status(400).json({
@@ -17,41 +19,30 @@ export const generateCertificate = async (req, res) => {
       });
     }
 
+    // The certificate service always recomputes the authoritative eligibility
+    // score and drive thresholds. Client-provided score/minScore values are
+    // intentionally ignored so they cannot be used to mint an invalid cert.
     const certificate = await issueCertificate({
-      studentId: parseInt(studentId),
-      driveId: parseInt(driveId),
-      score: score !== undefined ? parseFloat(score) : undefined,
-      minScore: minScore !== undefined ? parseFloat(minScore) : undefined,
+      studentId: Number(studentId),
+      driveId: Number(driveId),
     });
 
-    // Run badge evaluation after a certificate is generated
     try {
       await triggerBadgeEvaluation(studentId);
     } catch (jobErr) {
-      console.error(
-        "Non-fatal: Failed to run badge evaluation job after certificate generation:",
-        jobErr,
-      );
+      console.error("Non-fatal: Failed to run badge evaluation job after certificate generation:", jobErr);
     }
 
     return res.status(201).json({
       success: true,
-      certificate: {
-        id: certificate.id,
-        studentId: certificate.student_id,
-        driveId: certificate.drive_id,
-        certificateUrl: certificate.certificate_url,
-        verifyUuid: certificate.verify_uuid,
-        score: certificate.score ? parseFloat(certificate.score) : null,
-        issuedAt: certificate.issued_at,
-        revoked: certificate.revoked,
-      },
+      certificate,
     });
   } catch (error) {
     console.error("Certificate generation error:", error);
-    return res.status(400).json({
+    return res.status(error.statusCode || 400).json({
       success: false,
       message: error.message || "Failed to generate certificate",
+      details: error.details || undefined,
     });
   }
 };
@@ -59,7 +50,7 @@ export const generateCertificate = async (req, res) => {
 export const getCertificate = async (req, res) => {
   try {
     const { id } = req.params;
-    const certificate = await getCertificateById(parseInt(id));
+    const certificate = await getCertificateById(Number(id));
 
     if (!certificate) {
       return res.status(404).json({
@@ -68,9 +59,9 @@ export const getCertificate = async (req, res) => {
       });
     }
 
-    // IDOR Fix: Ensure the user is the owner of the certificate, or an admin/mentor
-    const isOwner = certificate.student_id === req.user.id;
-    const isPrivileged = ["admin", "mentor"].includes(req.user.role);
+    const userId = getRequestUserId(req);
+    const isOwner = certificate.student_id === userId;
+    const isPrivileged = ["admin", "mentor"].includes(req.user?.role);
 
     if (!isOwner && !isPrivileged) {
       return res.status(403).json({
@@ -81,16 +72,7 @@ export const getCertificate = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      certificate: {
-        id: certificate.id,
-        studentId: certificate.student_id,
-        driveId: certificate.drive_id,
-        certificateUrl: certificate.certificate_url,
-        verifyUuid: certificate.verify_uuid,
-        score: certificate.score ? parseFloat(certificate.score) : null,
-        issuedAt: certificate.issued_at,
-        revoked: certificate.revoked,
-      },
+      certificate,
     });
   } catch (error) {
     console.error("Error retrieving certificate:", error);
@@ -103,34 +85,45 @@ export const getCertificate = async (req, res) => {
 
 export const verifyCertificate = async (req, res) => {
   try {
-    const { uuid } = req.params;
-    const certificate = await verifyCertificateByUuid(uuid);
+    const verificationCode = req.params.verificationCode || req.params.uuid || req.params.code;
+    if (!verificationCode) {
+      return res.status(400).json({ valid: false, message: "Verification code is required" });
+    }
 
+    const certificate = await verifyCertificateByCode(verificationCode);
     if (!certificate) {
       return res.status(404).json({
+        valid: false,
         verified: false,
-        message: "Certificate not found",
+        message: "No certificate found for this verification code",
       });
     }
 
     if (certificate.revoked) {
-      return res.status(200).json({
+      return res.status(410).json({
+        valid: false,
         verified: false,
-        message: "Certificate Revoked",
+        message: "Certificate has been revoked",
+        verificationCode: certificate.verificationCode,
       });
     }
 
     return res.status(200).json({
+      valid: true,
       verified: true,
-      studentName: certificate.student_name,
-      drive: certificate.drive_title,
-      score: certificate.score ? parseFloat(certificate.score) : null,
-      issuedAt: certificate.issued_at,
-      revoked: false,
+      studentName: certificate.studentName,
+      collegeName: certificate.collegeName,
+      driveName: certificate.driveName,
+      companyName: certificate.companyName,
+      skillDomain: certificate.skillDomain,
+      issuedAt: certificate.issuedAt,
+      issuedBy: certificate.issuedBy,
+      verificationCode: certificate.verificationCode,
     });
   } catch (error) {
     console.error("Error verifying certificate:", error);
     return res.status(500).json({
+      valid: false,
       verified: false,
       message: "Internal Server Error",
     });
@@ -140,7 +133,7 @@ export const verifyCertificate = async (req, res) => {
 export const revokeCertificate = async (req, res) => {
   try {
     const { id } = req.params;
-    const certificate = await revokeCertificateById(parseInt(id));
+    const certificate = await revokeCertificateById(Number(id));
 
     if (!certificate) {
       return res.status(404).json({

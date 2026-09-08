@@ -1,5 +1,6 @@
 import * as studentCodingService from '../services/studentCoding.service.js';
 import { resolveStudentId } from '../utils/studentProfileIdentity.js';
+import { autoIssueCertificatesForStudent } from '../services/certificate.service.js';
 
 const positiveId = (value, field) => {
   const parsed = Number(value);
@@ -74,9 +75,20 @@ export const submitSolution = async (req, res, next) => {
     const studentUserId = await getStudentUserId(req.user);
     const body = codeBody(req.body);
     const challengeId = positiveId(body.challengeId ?? req.params.challengeId, 'challengeId');
+    const result = await studentCodingService.submitSolution(studentUserId, { ...body, challengeId });
+
+    try {
+      await autoIssueCertificatesForStudent({
+        userId: studentUserId,
+        reason: 'coding-final-submission',
+      });
+    } catch (certificateError) {
+      console.error('[studentCoding] Certificate auto-issuance check failed:', certificateError.message);
+    }
+
     res.status(201).json({
       success: true,
-      data: await studentCodingService.submitSolution(studentUserId, { ...body, challengeId }),
+      data: result,
     });
   } catch (error) {
     next(error);

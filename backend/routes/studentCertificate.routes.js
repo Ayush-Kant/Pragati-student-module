@@ -5,6 +5,7 @@ import {
   getCertificate,
   getEligibility,
   listCertificates,
+  downloadCertificate,
 } from '../controllers/studentCertificate.controller.js';
 
 const router = express.Router();
@@ -12,6 +13,7 @@ router.use(authMiddleware, roleMiddleware('student'));
 
 router.get('/', listCertificates);
 router.get('/eligibility', getEligibility);
+router.get('/:certificateId/download', downloadCertificate);
 router.get('/:certificateId', getCertificate);
 
 export default router;

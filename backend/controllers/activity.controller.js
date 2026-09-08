@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import { autoIssueCertificatesForStudent } from "../services/certificate.service.js";
 
 /*
 POST /api/activity/assessments
@@ -134,6 +135,15 @@ export const createSubmission = async (req, res) => {
             ]
         );
 
+        try {
+            await autoIssueCertificatesForStudent({
+                studentProfileId: Number(student_id),
+                reason: 'activity-submission-updated',
+            });
+        } catch (certificateError) {
+            console.error('[activity] Certificate auto-issuance check failed:', certificateError.message);
+        }
+
         res.status(201).json({
             success: true,
             submission: result.rows[0]
@@ -154,7 +164,7 @@ GET /api/activity/submissions/:driveId
 */
 export const getSubmissions = async (req, res) => {
     try {
-        const { driveId } = req.params; // Using drive_id instead of assessment_id for activity_submissions
+        const { driveId } = req.params;
 
         if (!driveId) {
             return res.status(400).json({
