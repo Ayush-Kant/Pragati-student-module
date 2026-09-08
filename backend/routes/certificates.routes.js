@@ -10,7 +10,9 @@ import roleMiddleware from "../middleware/roleMiddleware.js";
 
 const router = Router();
 
-router.get("/verify/:uuid", verifyCertificate);
+// Public verification. The same handler accepts the new PRD verification code
+// and legacy verify UUIDs so existing certificates remain verifiable.
+router.get("/verify/:verificationCode", verifyCertificate);
 
 router.get("/:id", authMiddleware, getCertificate);
 

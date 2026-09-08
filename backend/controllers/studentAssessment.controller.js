@@ -3,6 +3,7 @@ import { resolveStudentId } from "../utils/studentAssessmentIdentity.js";
 import studentAssessmentService from "../services/studentAssessment.service.js";
 import notificationService from "../services/notification.service.js";
 import { ensureOptionalAssessmentQuestions } from "../utils/studentAssessmentOptionalAnswers.js";
+import { autoIssueCertificatesForStudent } from "../services/certificate.service.js";
 
 const isUnanswered = (answer) => {
   if (answer === null || answer === undefined) return true;
@@ -67,8 +68,6 @@ export const saveAnswer = async (req, res, next) => {
       return res.status(200).json({ success: true, data: result });
     }
 
-    // Clearing an answer is a valid student action. Remove the stored response
-    // so the question is treated as unanswered on submission.
     const attemptId = parsePositiveId(req.params.attemptId, "attemptId");
     const questionId = parsePositiveId(req.params.questionId, "questionId");
     const cleared = await pool.query(
@@ -135,6 +134,15 @@ export const submitAssessment = async (req, res, next) => {
       });
     } catch (notificationError) {
       console.error("[studentAssessment] Failed to dispatch result notification:", notificationError.message);
+    }
+
+    try {
+      await autoIssueCertificatesForStudent({
+        studentProfileId: Number(studentId),
+        reason: 'assessment-completed',
+      });
+    } catch (certificateError) {
+      console.error("[studentAssessment] Certificate auto-issuance check failed:", certificateError.message);
     }
 
     return res.status(200).json({ success: true, data: result });
