@@ -105,10 +105,9 @@ END $$;
 CREATE INDEX IF NOT EXISTS idx_sm07_activity_submissions_attempt
   ON activity_submissions(attempt_id);
 
+-- The certificate-specific verification_code column is added by migration 043,
+-- so its index belongs there and must not be created before that column exists.
 CREATE INDEX IF NOT EXISTS idx_certificates_student_drive
   ON certificates(student_id, drive_id);
-
-CREATE INDEX IF NOT EXISTS idx_certificates_verification_code
-  ON certificates(verification_code);
 
 COMMIT;
