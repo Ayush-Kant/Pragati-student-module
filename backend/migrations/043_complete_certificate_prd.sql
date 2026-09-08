@@ -63,18 +63,54 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_certificates_verification_code
 CREATE INDEX IF NOT EXISTS idx_certificates_storage_key
   ON certificates(storage_key);
 
+-- Backfill immutable certificate display snapshots from the related records.
+-- Use correlated scalar subqueries so the outer certificate row can be referenced
+-- safely in every lookup branch on PostgreSQL.
 UPDATE certificates c
-SET student_name = COALESCE(c.student_name, u.full_name, s.full_name, s.name),
-    college_name = COALESCE(c.college_name, co.name, s.college),
-    drive_name = COALESCE(c.drive_name, d.title),
-    company_name = COALESCE(c.company_name, comp.name),
-    skill_domain = COALESCE(c.skill_domain, d.skill_domain, NULLIF(d.job_title, ''))
-FROM users u
-LEFT JOIN students s ON s.user_id = u.id
-LEFT JOIN recruitment_drives d ON d.id = c.drive_id
-LEFT JOIN companies comp ON comp.id = d.company_id
-LEFT JOIN colleges co ON co.id = s.college_id
-WHERE c.student_id = u.id;
+SET student_name = COALESCE(
+      c.student_name,
+      (SELECT u.full_name FROM users u WHERE u.id = c.student_id LIMIT 1),
+      (SELECT s.full_name FROM students s WHERE s.user_id = c.student_id LIMIT 1),
+      (SELECT s.name FROM students s WHERE s.user_id = c.student_id LIMIT 1)
+    ),
+    college_name = COALESCE(
+      c.college_name,
+      (
+        SELECT co.name
+        FROM colleges co
+        JOIN students s ON s.college_id = co.id
+        WHERE s.user_id = c.student_id
+        LIMIT 1
+      ),
+      (SELECT s.college FROM students s WHERE s.user_id = c.student_id LIMIT 1)
+    ),
+    drive_name = COALESCE(
+      c.drive_name,
+      (SELECT d.title FROM recruitment_drives d WHERE d.id = c.drive_id LIMIT 1)
+    ),
+    company_name = COALESCE(
+      c.company_name,
+      (
+        SELECT comp.name
+        FROM companies comp
+        JOIN recruitment_drives d ON d.company_id = comp.id
+        WHERE d.id = c.drive_id
+        LIMIT 1
+      )
+    ),
+    skill_domain = COALESCE(
+      c.skill_domain,
+      (SELECT d.skill_domain FROM recruitment_drives d WHERE d.id = c.drive_id LIMIT 1),
+      (
+        SELECT d.job_title
+        FROM recruitment_drives d
+        WHERE d.id = c.drive_id
+          AND NULLIF(d.job_title, '') IS NOT NULL
+        LIMIT 1
+      )
+    )
+WHERE c.student_id IS NOT NULL
+  AND c.drive_id IS NOT NULL;
 
 DO $$
 DECLARE
