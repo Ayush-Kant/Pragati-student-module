@@ -13,7 +13,7 @@ import {
  * Certificate verification form.
  *
  * The component only handles:
- * - Verification code input
+ * - Certificate ID input
  * - Local validation
  * - Form submission
  * - Resetting the input
@@ -70,19 +70,13 @@ const VerificationForm = ({
             strokeWidth={1.8}
             aria-hidden="true"
           />
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 sm:h-11 sm:w-11">
-          <ShieldCheck className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
         </div>
         <div className="min-w-0">
           <h2 className="text-base font-bold text-slate-900 dark:text-white sm:text-lg">
             Verify Certificate
           </h2>
-
           <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400 sm:text-sm">
             Enter the Certificate ID to verify its authenticity.
-          <h2 className="text-base font-bold text-slate-900 sm:text-lg">Verify Certificate</h2>
-          <p className="mt-1 text-xs leading-5 text-slate-500 sm:text-sm">
-            Enter the verification code shown on the certificate.
           </p>
         </div>
       </div>
@@ -93,23 +87,20 @@ const VerificationForm = ({
           className="mb-2 block text-xs font-semibold text-slate-700 dark:text-slate-300 sm:text-sm"
         >
           Certificate ID
-        <label htmlFor="certificate-id" className="mb-2 block text-xs font-semibold text-slate-700 sm:text-sm">
-          Verification Code
         </label>
+
         <div className="relative">
           <Search
             className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
             aria-hidden="true"
           />
-
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
           <input
             id="certificate-id"
             name="certificateId"
             type="text"
             value={certificateId}
             onChange={handleChange}
-            placeholder="e.g. PRAG-2026-A7KD-0421"
+            placeholder="e.g. CERT-001"
             autoComplete="off"
             spellCheck="false"
             disabled={loading}
@@ -120,14 +111,13 @@ const VerificationForm = ({
                 : "certificate-id-help"
             }
             className={`min-h-11 w-full rounded-xl border bg-white dark:bg-slate-900 pl-10 pr-3.5 text-sm font-medium text-slate-800 dark:text-slate-100 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 sm:min-h-12 ${
-            aria-describedby={errorMessage ? "certificate-id-error" : "certificate-id-help"}
-            className={`min-h-11 w-full rounded-xl border bg-white pl-10 pr-3.5 text-sm font-medium text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:ring-2 sm:min-h-12 ${
               errorMessage
                 ? "border-red-300 dark:border-red-500/50 focus:border-red-400 focus:ring-red-100 dark:focus:ring-red-950/40"
                 : "border-slate-200 dark:border-slate-800 focus:border-[#4F46E5] focus:ring-indigo-100 dark:focus:ring-indigo-950/40"
             } disabled:cursor-not-allowed disabled:bg-slate-50 dark:disabled:bg-slate-800/50 disabled:text-slate-400`}
           />
         </div>
+
         {errorMessage ? (
           <p
             id="certificate-id-error"
@@ -142,12 +132,6 @@ const VerificationForm = ({
             className="mt-2 text-[11px] leading-4 text-slate-400 dark:text-slate-500 sm:text-xs"
           >
             Use the Certificate ID exactly as shown on your certificate.
-          <p id="certificate-id-error" className="mt-2 text-xs font-medium leading-5 text-red-600" role="alert">
-            {errorMessage}
-          </p>
-        ) : (
-          <p id="certificate-id-help" className="mt-2 text-[11px] leading-4 text-slate-400 sm:text-xs">
-            Use the verification code exactly as shown on the certificate.
           </p>
         )}
       </div>
@@ -164,6 +148,7 @@ const VerificationForm = ({
             <span>Clear</span>
           </button>
         ) : null}
+
         <button
           type="submit"
           disabled={loading}
@@ -171,7 +156,10 @@ const VerificationForm = ({
         >
           {loading ? (
             <>
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
+              <span
+                className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                aria-hidden="true"
+              />
               <span>Verifying...</span>
             </>
           ) : (
