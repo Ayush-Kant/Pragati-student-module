@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Check, Copy, ExternalLink, Linkedin, Share2, X } from "lucide-react";
+import { Check, Copy, ExternalLink, Share2, X } from "lucide-react";
+import { FaLinkedin } from "react-icons/fa6";
 
 const ShareCertificateModal = ({ certificate, open, onClose }) => {
   const [copied, setCopied] = useState(false);
@@ -85,7 +86,7 @@ const ShareCertificateModal = ({ certificate, open, onClose }) => {
               rel="noreferrer noopener"
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200"
             >
-              <Linkedin className="h-4 w-4" aria-hidden="true" />
+              <FaLinkedin className="h-4 w-4" aria-hidden="true" />
               Share on LinkedIn
               <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
